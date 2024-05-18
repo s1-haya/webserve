@@ -1,0 +1,34 @@
+BasedOnStyle: LLVM
+UseTab: ForContinuationAndIndentation
+IndentWidth: 4
+TabWidth: 4
+AllowShortFunctionsOnASingleLine: Empty
+IndentCaseLabels: false
+NamespaceIndentation: All
+BreakConstructorInitializers: BeforeColon
+AlwaysBreakTemplateDeclarations: Yes
+SpacesInAngles: Leave
+ColumnLimit: 85
+AlignAfterOpenBracket: BlockIndent
+BinPackArguments: false
+BinPackParameters: false
+PackConstructorInitializers: NextLine
+AllowShortEnumsOnASingleLine: false
+AlignConsecutiveAssignments: true
+AlignConsecutiveDeclarations: true
+# BreakBeforeBraces: Custom
+# BraceWrapping:
+#   AfterClass: true
+#   AfterFunction: true
+#   AfterStruct: true
+#   SplitEmptyFunction: false
+#   SplitEmptyRecord: false
+#   AfterNamespace: true
+AlignConsecutiveBitFields: true
+PPIndentWidth: 2
+# IndentPPDirectives: BeforerHash
+
+# mysetting
+IndentPPDirectives: AfterHash
+BreakBeforeBraces: Attach
+AlignConsecutiveMacros: AcrossEmptyLines

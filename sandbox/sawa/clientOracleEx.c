@@ -1,8 +1,8 @@
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
 #include <netdb.h>
+#include <netinet/in.h>
 #include <stdio.h>
+#include <sys/socket.h>
+#include <sys/types.h>
 
 #define DATA "Half a league, half a league . . ."
 
@@ -14,45 +14,37 @@
  * コマンド行の書式: streamwrite hostname portnumber
  * 使用法: pgm host port
  */
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
 	int sock, errnum h_addr_index;
 	struct sockaddr_in6 server;
-	struct hostent *hp;
-	char buf[1024];
+	struct hostent     *hp;
+	char                buf[1024];
 
 	/* ソケットを作成する。*/
 	sock = socket(AF_INET6, SOCK_STREAM, 0);
-	if (sock == -1)
-	{
+	if (sock == -1) {
 		perror("opening stream socket");
 		exit(1);
 	}
 	/* コマンド行で指定される名前を使用してソケットを接続する。*/
 	bzero(&sin6, sizeof(sin6));
 	server.sin6_family = AF_INET6;
-	hp = getipnodebyname(AF_INET6, argv[1], AI_DEFAULT, &errnum);
+	hp                 = getipnodebyname(AF_INET6, argv[1], AI_DEFAULT, &errnum);
 	/*
 	 * getinodebyname が、指定されたホストのネットワーク
 	 * アドレスを含む構造体を返す。
 	 */
-	if (hp == (struct hostent *)0)
-	{
+	if (hp == (struct hostent *)0) {
 		fprintf(stderr, "%s: unknown host¥n", argv[1]);
 		exit(2);
 	}
 
 	h_addr_index = 0;
-	while (hp->h_addr_list[h_addr_index] != NULL)
-	{
-		bcopy(hp->h_addr_list[h_addr_index], &server.sin6_addr,
-			  hp->h_length);
+	while (hp->h_addr_list[h_addr_index] != NULL) {
+		bcopy(hp->h_addr_list[h_addr_index], &server.sin6_addr, hp->h_length);
 		server.sin6_port = htons(atoi(argv[2]));
-		if (connect(sock, (struct sockaddr *)&server,
-					sizeof(server)) == -1)
-		{
-			if (hp->h_addr_list[++h_addr_index] != NULL)
-			{
+		if (connect(sock, (struct sockaddr *)&server, sizeof(server)) == -1) {
+			if (hp->h_addr_list[++h_addr_index] != NULL) {
 				/* 次のアドレスを試みる */
 				continue;
 			}
