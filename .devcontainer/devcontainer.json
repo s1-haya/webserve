@@ -1,0 +1,12 @@
+{
+	"name": "webserv",
+	"dockerComposeFile": "../docker-compose.yml",
+	"service": "development",
+	"workspaceFolder": "/workspace",
+	"extensions": [
+		"ms-azuretools.vscode-docker"
+	],
+	"settings": {
+		"terminal.integrated.shell.linux": "/bin/bash"
+	}
+}
