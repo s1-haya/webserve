@@ -1,1 +1,15 @@
-.history
+# ignore all
+*
+!**/
+
+# include
+!.gitignore
+!.clang-format
+!sandbox/**
+
+!Makefile
+!*.cpp
+!*.hpp
+
+!Dockerfile
+!docker-compose.yml
