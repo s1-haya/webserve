@@ -1,8 +1,6 @@
 {
 	"name": "webserv",
-	"dockerComposeFile": "../docker-compose.yml",
-	"service": "development",
-	"workspaceFolder": "/workspace",
+	"dockerFile": "./Dockerfile",
 	"extensions": [
 		"ms-azuretools.vscode-docker"
 	],

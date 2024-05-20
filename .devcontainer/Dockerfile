@@ -12,7 +12,13 @@ RUN add-apt-repository ppa:longsleep/golang-backports && \
     curl \
     telnet \
     valgrind \
-    clang-format
+    clang-format \
+    vim
 
 RUN ln -s /usr/lib/go-1.22/bin/go /usr/local/bin/go
 
+VOLUME [ "/workspaces" ]
+
+WORKDIR /workspaces/webserv
+
+CMD [ "/bin/bash" ]
