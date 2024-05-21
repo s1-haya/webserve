@@ -6,7 +6,7 @@
 !.gitignore
 !.vscode/setting.json
 !.clang-format
-!sandbox/**
+!sandbox/*
 
 !Makefile
 !*.cpp
