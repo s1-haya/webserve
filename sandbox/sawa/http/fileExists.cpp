@@ -13,5 +13,11 @@ int main() {
     } else {
         std::cout << "File does not exist." << std::endl;
     }
+    const std::string& notAuthorizedFilePath = "notAuthorizedFile";
+    if (fileExists(notAuthorizedFilePath)) {
+        std::cout << "File exists." << std::endl;
+    } else {
+        std::cout << "File does not exist." << std::endl;
+    }
     return (0);
 }
