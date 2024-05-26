@@ -1,8 +1,8 @@
 #include <iostream>
 #include <fstream>
 
-bool fileExists(const std::string& filePath) {
-    std::ifstream file(filePath.c_str());
+bool FileExists(const std::string& file_path) {
+    std::ifstream file(file_path.c_str());
     return (file.good());
 }
 
