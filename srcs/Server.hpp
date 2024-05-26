@@ -8,7 +8,7 @@
 class Server {
   public:
 	Server();
-	Server(Config::MapConfig &config);
+	Server(const Config::ConfigData &config);
 	~Server();
 	void Run();
 
@@ -17,8 +17,8 @@ class Server {
 	Server(const Server &other);
 	Server &operator=(const Server &other);
 	// const variables
-	const std::string server_name_;
-	const std::string port_;
+	const std::string  server_name_;
+	const unsigned int port_;
 	// todo: more variables(struct?)
 };
 
