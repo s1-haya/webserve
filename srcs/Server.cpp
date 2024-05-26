@@ -4,11 +4,6 @@
 #include <sys/socket.h> // socket
 #include <unistd.h>     // close
 
-// todo: set default config
-Server::Server() : server_name_("default"), port_(8080) {
-	Init();
-}
-
 // todo: set ConfigData -> private variables
 Server::Server(const Config::ConfigData &config)
 	: server_name_("from_config"), port_(8080) {

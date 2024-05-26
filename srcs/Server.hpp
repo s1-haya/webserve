@@ -9,12 +9,12 @@
 
 class Server {
   public:
-	Server();
 	Server(const Config::ConfigData &config);
 	~Server();
 	void Run();
 
   private:
+	Server();
 	// prohibit copy
 	Server(const Server &other);
 	Server &operator=(const Server &other);
