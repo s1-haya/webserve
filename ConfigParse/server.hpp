@@ -1,25 +1,24 @@
 #ifndef SERVER_HPP_
-# define SERVER_HPP_
+#define SERVER_HPP_
 
-# include <iostream>
+#include <iostream>
 
-class Server
-{
-private:
-	int port_;
-	std::string& location_;
-public:
-	Server(/* args */);
-	~Server();
+enum Method {
+	GET,
+	POST,
+	DELETE,
 };
 
-Server::Server(/* args */)
-{
-}
+struct LocationDir {
+	std::string root_;
+	std::string index_;
+	std::string allowed_method_;
+};
 
-Server::~Server()
-{
-}
-
+struct ServerDir {
+	int         port_;
+	std::string server_name_;
+	LocationDir location_dir_;
+};
 
 #endif
