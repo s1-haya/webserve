@@ -4,10 +4,16 @@
 #include <iostream>
 #include <string>
 
+namespace {
+	void PrintError(const std::string &s) {
+		std::cerr << COLOR_RED "Error: " << s << COLOR_RESET << std::endl;
+	}
+} // namespace
+
 // ./webserv [configuration file]
 int main(int argc, char **argv) {
 	if (argc > 2) {
-		std::cerr << "Error: invalid arguments" << std::endl;
+		PrintError("invalid arguments");
 		return EXIT_FAILURE;
 	}
 
@@ -20,9 +26,12 @@ int main(int argc, char **argv) {
 	}
 	Config::MapConfig config = Config::ParseConfig(path_config);
 
-	// todo: try-catch?
-	Server server(config);
-	server.Run();
-
+	try {
+		Server server(config);
+		server.Run();
+	} catch (const std::exception &e) {
+		PrintError(e.what());
+		return EXIT_FAILURE;
+	}
 	return EXIT_SUCCESS;
 }
