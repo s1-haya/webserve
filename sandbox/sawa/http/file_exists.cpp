@@ -1,9 +1,9 @@
-#include <iostream>
 #include <fstream>
+#include <iostream>
 
-bool FileExists(const std::string& file_path) {
-    std::ifstream file(file_path.c_str());
-    return (file.good());
+bool FileExists(const std::string &file_path) {
+	std::ifstream file(file_path.c_str());
+	return (file.good());
 }
 
 // int main() {
