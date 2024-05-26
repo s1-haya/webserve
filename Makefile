@@ -1,12 +1,13 @@
 NAME		:=	webserv
 
-SRCS_DIR	:=	srcs
-SRCS		:=	main.cpp
+SRC_DIR		:=	srcs
+SRC_DIRS	:=	$(shell find $(SRC_DIR) -type d)
+SRCS		:=	$(shell find $(SRC_DIR) -type f -name "*.cpp")
 
 OBJ_DIR		:=	objs
-OBJS		:=	$(SRCS:%.cpp=$(OBJ_DIR)/%.o)
+OBJS		:=	$(patsubst $(SRC_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(SRCS))
 
-INCLUDES	:=	-I.
+INCLUDES	:=	$(addprefix -I,$(SRC_DIRS))
 
 CXX			:=	c++
 CXXFLAGS	:=	-std=c++98 -Wall -Wextra -Werror -MMD -MP -pedantic
@@ -18,7 +19,7 @@ MKDIR		:=	mkdir -p
 .PHONY	: all
 all		: $(NAME)
 
-$(OBJ_DIR)/%.o: $(SRCS_DIR)/%.cpp
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	@$(MKDIR) $(dir $@)
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
 
@@ -37,13 +38,15 @@ fclean: clean
 re: fclean all
 
 #--------------------------------------------
+PATH_CONFIG	:=	default.conf
+
 .PHONY	: run
 run: all
-	@./$(NAME)
+	@./$(NAME) $(PATH_CONFIG)
 
 .PHONY	: val
 val: all
-	@valgrind ./$(NAME)
+	@valgrind ./$(NAME) $(PATH_CONFIG)
 
 .PHONY	: check
 check:
