@@ -22,7 +22,7 @@ class ConfigParse {
 	static const ConfigParse *GetInstance();
 	static void               Create(std::string &file_path);
 	static void               Destroy();
-	ServerDir                 server_; // getterなしのこの構造で良い?
+	ServerDir                 server_;
 };
 
 #endif
