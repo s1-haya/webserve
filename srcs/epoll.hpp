@@ -13,7 +13,7 @@ class Epoll {
 	void DeleteConnection(int socket_fd);
 	int  CreateReadyList();
 	// getter
-	const struct epoll_event &GetEvent(int index) const;
+	const struct epoll_event &GetEvent(std::size_t index) const;
 
   private:
 	// prohibit copy

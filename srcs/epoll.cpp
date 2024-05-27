@@ -40,8 +40,8 @@ int Epoll::CreateReadyList() {
 	return ready;
 }
 
-const struct epoll_event &Epoll::GetEvent(int index) const {
-	if (index < 0 || static_cast<unsigned int>(index) >= kMaxEvents) {
+const struct epoll_event &Epoll::GetEvent(std::size_t index) const {
+	if (index >= kMaxEvents) {
 		throw std::out_of_range("evlist index out of range");
 	}
 	return evlist_[index];

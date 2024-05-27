@@ -9,7 +9,7 @@
 
 class Server {
   public:
-	Server(const Config::ConfigData &config);
+	explicit Server(const Config::ConfigData &config);
 	~Server();
 	void Run();
 
