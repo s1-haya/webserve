@@ -18,42 +18,32 @@ Server::~Server() {
 	if (server_fd_ != kSystemErr) {
 		close(server_fd_);
 	}
-	if (epoll_fd_ != kSystemErr) {
-		close(epoll_fd_);
-	}
 }
 
 void Server::Run() {
 	Debug("server", "run server");
 
-	struct epoll_event evlist[kMaxEvents];
 	while (true) {
 		errno           = 0;
-		const int ready = epoll_wait(epoll_fd_, evlist, kMaxEvents, -1);
-		if (ready == kSystemErr) {
-			if (errno == EINTR) {
-				continue;
-			}
-			throw std::runtime_error("epoll_wait failed");
+		const int ready = epoll_.CreateReadyList();
+		// todo: error handle
+		if (ready == kSystemErr && errno == EINTR) {
+			continue;
 		}
 		for (std::size_t i = 0; i < (std::size_t)ready; ++i) {
-			if (evlist[i].data.fd == server_fd_) {
+			struct epoll_event ev = epoll_.GetEvent(i);
+			if (ev.data.fd == server_fd_) {
 				// accept
 				const int new_socket =
 					accept(server_fd_, (struct sockaddr *)&sock_addr_, &addrlen_);
 				if (new_socket == kSystemErr) {
 					throw std::runtime_error("accept failed");
 				}
-				ev_.events  = EPOLLIN;
-				ev_.data.fd = new_socket;
-				if (epoll_ctl(epoll_fd_, EPOLL_CTL_ADD, new_socket, &ev_) ==
-					kSystemErr) {
-					throw std::runtime_error("epoll_ctl failed");
-				}
+				epoll_.AddNewConnection(new_socket);
 				Debug("server", "add new client (fd: " + ToString(new_socket) + ")");
-			} else if (evlist[i].events & EPOLLIN) {
+			} else if (ev.events & EPOLLIN) {
 				// read,send
-				const int client_fd = evlist[i].data.fd;
+				const int client_fd = ev.data.fd;
 
 				char    buffer[kBufferSize];
 				ssize_t read_ret = read(client_fd, buffer, kBufferSize);
@@ -66,7 +56,7 @@ void Server::Run() {
 						"disconnected client (fd: " + ToString(client_fd) + ")"
 					);
 					close(client_fd);
-					epoll_ctl(epoll_fd_, EPOLL_CTL_DEL, client_fd, NULL);
+					epoll_.DeleteConnection(client_fd);
 				} else {
 					send(client_fd, buffer, read_ret, 0);
 					Debug(
@@ -101,14 +91,6 @@ void Server::Init() {
 		throw std::runtime_error("listen failed");
 	}
 
-	// create epoll
-	epoll_fd_ = epoll_create1(EPOLL_CLOEXEC);
-	if (epoll_fd_ == kSystemErr) {
-		throw std::runtime_error("epoll_create failed");
-	}
-	ev_.events  = EPOLLIN;
-	ev_.data.fd = server_fd_;
-	if (epoll_ctl(epoll_fd_, EPOLL_CTL_ADD, server_fd_, &ev_) == kSystemErr) {
-		throw std::runtime_error("epoll_ctl failed");
-	}
+	// add to epoll's interest list
+	epoll_.AddNewConnection(server_fd_);
 }

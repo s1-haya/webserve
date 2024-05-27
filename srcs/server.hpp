@@ -2,10 +2,10 @@
 #define SERVER_HPP_
 
 #include "config.hpp"
-#include "debug.hpp"    // todo: tmp
+#include "debug.hpp" // todo: tmp
+#include "epoll.hpp"
 #include <netinet/in.h> // struct sockaddr_in
 #include <string>
-#include <sys/epoll.h> // epoll
 
 class Server {
   public:
@@ -24,15 +24,13 @@ class Server {
 	const unsigned int port_;
 	// const
 	static const int          kSystemErr  = -1;
-	static const unsigned int kMaxEvents  = 1024;
 	static const unsigned int kBufferSize = 1024;
 	// socket
 	struct sockaddr_in sock_addr_;
 	socklen_t          addrlen_;
 	int                server_fd_;
-	// epoll
-	int                epoll_fd_;
-	struct epoll_event ev_;
+	// event poll
+	Epoll epoll_;
 };
 
 #endif /* SERVER_HPP_ */
