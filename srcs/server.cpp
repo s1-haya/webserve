@@ -58,6 +58,9 @@ void Server::Run() {
 				char    buffer[kBufferSize];
 				ssize_t read_ret = read(client_fd, buffer, kBufferSize);
 				if (read_ret <= 0) {
+					if (read_ret == kSystemErr) {
+						throw std::runtime_error("read failed");
+					}
 					Debug(
 						"server",
 						"disconnected client (fd: " + ToString(client_fd) + ")"
