@@ -51,7 +51,7 @@ void Server::Run() {
 					throw std::runtime_error("epoll_ctl failed");
 				}
 				Debug("server", "add new client (fd: " + ToString(new_socket) + ")");
-			} else {
+			} else if (evlist[i].events & EPOLLIN) {
 				// read,send
 				const int client_fd = evlist[i].data.fd;
 
