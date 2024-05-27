@@ -1,4 +1,5 @@
 #include "server.hpp"
+#include "string.hpp"
 #include <arpa/inet.h> // htons
 #include <errno.h>
 #include <sys/socket.h> // socket
@@ -49,6 +50,7 @@ void Server::Run() {
 					kSystemErr) {
 					throw std::runtime_error("epoll_ctl failed");
 				}
+				Debug("server", "add new client (fd: " + ToString(new_socket) + ")");
 			} else {
 				// read,send
 				const int client_fd = evlist[i].data.fd;
@@ -56,10 +58,17 @@ void Server::Run() {
 				char    buffer[kBufferSize];
 				ssize_t read_ret = read(client_fd, buffer, kBufferSize);
 				if (read_ret <= 0) {
+					Debug(
+						"server",
+						"disconnected client (fd: " + ToString(client_fd) + ")"
+					);
 					close(client_fd);
 					epoll_ctl(epoll_fd_, EPOLL_CTL_DEL, client_fd, NULL);
 				} else {
 					send(client_fd, buffer, read_ret, 0);
+					Debug(
+						"server", "send to client (fd: " + ToString(client_fd) + ")"
+					);
 				}
 			}
 		}
