@@ -20,6 +20,8 @@ class Server {
 	Server &operator=(const Server &other);
 	void    Init();
 	void    HandleEvent(const struct epoll_event &ev);
+	void    AcceptNewConnection();
+	void    EchoBackToClient(int client_fd);
 	// const variables (todo: tmp)
 	const std::string  server_name_;
 	const unsigned int port_;

@@ -38,31 +38,36 @@ void Server::Run() {
 
 void Server::HandleEvent(const struct epoll_event &ev) {
 	if (ev.data.fd == server_fd_) {
-		// accept
-		const int new_socket =
-			accept(server_fd_, (struct sockaddr *)&sock_addr_, &addrlen_);
-		if (new_socket == kSystemErr) {
-			throw std::runtime_error("accept failed");
-		}
-		epoll_.AddNewConnection(new_socket);
-		Debug("server", "add new client (fd: " + ToString(new_socket) + ")");
+		AcceptNewConnection();
 	} else if (ev.events & EPOLLIN) {
-		// read,send
-		const int client_fd = ev.data.fd;
+		EchoBackToClient(ev.data.fd);
+	}
+}
 
-		char    buffer[kBufferSize];
-		ssize_t read_ret = read(client_fd, buffer, kBufferSize);
-		if (read_ret <= 0) {
-			if (read_ret == kSystemErr) {
-				throw std::runtime_error("read failed");
-			}
-			Debug("server", "disconnected client (fd: " + ToString(client_fd) + ")");
-			close(client_fd);
-			epoll_.DeleteConnection(client_fd);
-		} else {
-			send(client_fd, buffer, read_ret, 0);
-			Debug("server", "send to client (fd: " + ToString(client_fd) + ")");
+void Server::AcceptNewConnection() {
+	const int new_socket =
+		accept(server_fd_, (struct sockaddr *)&sock_addr_, &addrlen_);
+	if (new_socket == kSystemErr) {
+		throw std::runtime_error("accept failed");
+	}
+	epoll_.AddNewConnection(new_socket);
+	Debug("server", "add new client (fd: " + ToString(new_socket) + ")");
+}
+
+void Server::EchoBackToClient(int client_fd) {
+	char buffer[kBufferSize];
+
+	ssize_t read_ret = read(client_fd, buffer, kBufferSize);
+	if (read_ret <= 0) {
+		if (read_ret == kSystemErr) {
+			throw std::runtime_error("read failed");
 		}
+		close(client_fd);
+		epoll_.DeleteConnection(client_fd);
+		Debug("server", "disconnected client (fd: " + ToString(client_fd) + ")");
+	} else {
+		send(client_fd, buffer, read_ret, 0);
+		Debug("server", "send to client (fd: " + ToString(client_fd) + ")");
 	}
 }
 
