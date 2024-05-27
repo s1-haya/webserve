@@ -1,4 +1,4 @@
-#include "Config.hpp"
+#include "config.hpp"
 
 // todo: return or throw parse error
 Config::ConfigData Config::ParseConfig(const std::string &path_config) {

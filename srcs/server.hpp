@@ -1,7 +1,7 @@
 #ifndef SERVER_HPP_
 #define SERVER_HPP_
 
-#include "Config.hpp"
+#include "config.hpp"
 #include "debug.hpp"    // todo: tmp
 #include <netinet/in.h> // struct sockaddr_in
 #include <string>

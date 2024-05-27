@@ -1,4 +1,4 @@
-#include "Server.hpp"
+#include "server.hpp"
 #include <arpa/inet.h> // htons
 #include <errno.h>
 #include <sys/socket.h> // socket

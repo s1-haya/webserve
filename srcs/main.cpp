@@ -1,5 +1,5 @@
-#include "Config.hpp"
-#include "Server.hpp"
+#include "config.hpp"
+#include "server.hpp"
 #include <cstdlib> // EXIT_
 #include <iostream>
 #include <string>
