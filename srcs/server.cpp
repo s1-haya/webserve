@@ -13,8 +13,13 @@ Server::Server(const Config::ConfigData &config)
 }
 
 Server::~Server() {
-	// todo: error handle
-	close(server_fd_);
+	// todo: close() error handle
+	if (server_fd_ != kSystemErr) {
+		close(server_fd_);
+	}
+	if (epoll_fd_ != kSystemErr) {
+		close(epoll_fd_);
+	}
 }
 
 void Server::Run() {
