@@ -1,5 +1,5 @@
-#ifndef SERVER_CONFIG_HPP_
-#define SERVER_CONFIG_HPP_
+#ifndef CONFIG_HPP_
+#define CONFIG_HPP_
 
 #include "debug.hpp" // todo: tmp
 #include <string>
@@ -15,4 +15,4 @@ class Config {
 	~Config();
 };
 
-#endif /* SERVER_CONFIG_HPP_ */
+#endif /* CONFIG_HPP_ */
