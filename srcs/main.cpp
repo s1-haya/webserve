@@ -1,3 +1,4 @@
+#include "color.hpp"
 #include "config.hpp"
 #include "server.hpp"
 #include <cstdlib> // EXIT_
@@ -6,7 +7,7 @@
 
 namespace {
 	void PrintError(const std::string &s) {
-		std::cerr << COLOR_RED "Error: " << s << COLOR_RESET << std::endl;
+		std::cerr << COLOR_RED << "Error: " << s << COLOR_RESET << std::endl;
 	}
 } // namespace
 
