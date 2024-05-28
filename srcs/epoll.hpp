@@ -4,7 +4,6 @@
 #include "debug.hpp"   // todo: tmp
 #include <sys/epoll.h> // epoll
 
-// singlton??
 class Epoll {
   public:
 	Epoll();
@@ -20,12 +19,12 @@ class Epoll {
 	Epoll(const Epoll &other);
 	Epoll &operator=(const Epoll &other);
 	// const
-	static const int          kSystemErr = -1;
-	static const unsigned int kMaxEvents = 10;
+	static const int          SYSTEM_ERROR = -1;
+	static const unsigned int MAX_EVENTS   = 10;
 	// variables
 	int                epoll_fd_;
 	struct epoll_event ev_;
-	struct epoll_event evlist_[kMaxEvents];
+	struct epoll_event evlist_[MAX_EVENTS];
 };
 
 #endif /* EPOLL_HPP_ */

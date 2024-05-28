@@ -26,8 +26,8 @@ class Server {
 	const std::string  server_name_;
 	const unsigned int port_;
 	// const
-	static const int          kSystemErr  = -1;
-	static const unsigned int kBufferSize = 1024;
+	static const int          SYSTEM_ERROR = -1;
+	static const unsigned int BUFFER_SIZE  = 1024;
 	// socket
 	struct sockaddr_in sock_addr_;
 	socklen_t          addrlen_;
