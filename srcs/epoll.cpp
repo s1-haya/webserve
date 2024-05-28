@@ -1,5 +1,7 @@
 #include "epoll.hpp"
+#include "event.hpp"
 #include <errno.h>
+#include <stdint.h> // uint32_t
 #include <unistd.h> // close
 
 Epoll::Epoll() {
@@ -40,9 +42,26 @@ int Epoll::CreateReadyList() {
 	return ready;
 }
 
-const struct epoll_event &Epoll::GetEvent(std::size_t index) const {
+namespace {
+	EventType ConvertToEventType(uint32_t event) {
+		if (event & EPOLLIN) {
+			return EVENT_READ;
+		}
+		// todo: tmp
+		return EVENT_NONE;
+	}
+
+	Event ConvertToEventDto(const struct epoll_event &event) {
+		Event ret_event;
+		ret_event.fd   = event.data.fd;
+		ret_event.type = ConvertToEventType(event.events);
+		return ret_event;
+	}
+} // namespace
+
+const Event Epoll::GetEvent(std::size_t index) const {
 	if (index >= MAX_EVENTS) {
 		throw std::out_of_range("evlist index out of range");
 	}
-	return evlist_[index];
+	return ConvertToEventDto(evlist_[index]);
 }

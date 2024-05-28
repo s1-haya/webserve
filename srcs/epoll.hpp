@@ -4,6 +4,8 @@
 #include "debug.hpp"   // todo: tmp
 #include <sys/epoll.h> // epoll
 
+struct Event;
+
 class Epoll {
   public:
 	Epoll();
@@ -12,7 +14,7 @@ class Epoll {
 	void DeleteConnection(int socket_fd);
 	int  CreateReadyList();
 	// getter
-	const struct epoll_event &GetEvent(std::size_t index) const;
+	const Event GetEvent(std::size_t index) const;
 
   private:
 	// prohibit copy

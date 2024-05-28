@@ -1,5 +1,6 @@
 #include "server.hpp"
 #include "convert.hpp"
+#include "event.hpp"
 #include <arpa/inet.h> // htons
 #include <errno.h>
 #include <sys/socket.h> // socket
@@ -36,12 +37,13 @@ void Server::Run() {
 	}
 }
 
-void Server::HandleEvent(const struct epoll_event &ev) {
-	if (ev.data.fd == server_fd_) {
+void Server::HandleEvent(const Event event) {
+	if (event.fd == server_fd_) {
 		AcceptNewConnection();
-	} else if (ev.events & EPOLLIN) {
-		EchoBackToClient(ev.data.fd);
+	} else if (event.type == EVENT_READ) {
+		EchoBackToClient(event.fd);
 	}
+	// todo: handle other EventType (switch)
 }
 
 void Server::AcceptNewConnection() {

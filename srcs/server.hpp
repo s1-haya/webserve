@@ -19,7 +19,7 @@ class Server {
 	Server(const Server &other);
 	Server &operator=(const Server &other);
 	void    Init();
-	void    HandleEvent(const struct epoll_event &ev);
+	void    HandleEvent(const Event event);
 	void    AcceptNewConnection();
 	void    EchoBackToClient(int client_fd);
 	// const variables (todo: tmp)
