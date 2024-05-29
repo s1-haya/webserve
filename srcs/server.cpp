@@ -67,10 +67,10 @@ void Server::SendResponseToClient(int client_fd) {
 		close(client_fd);
 		epoll_.DeleteConnection(client_fd);
 		Debug("server", "disconnected client (fd: " + ToString(client_fd) + ")");
-	} else {
-		send(client_fd, buffer, read_ret, 0);
-		Debug("server", "send to client (fd: " + ToString(client_fd) + ")");
+		return;
 	}
+	send(client_fd, buffer, read_ret, 0);
+	Debug("server", "send to client (fd: " + ToString(client_fd) + ")");
 }
 
 void Server::Init() {
