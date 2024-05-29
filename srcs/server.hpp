@@ -21,7 +21,7 @@ class Server {
 	void    Init();
 	void    HandleEvent(const Event event);
 	void    AcceptNewConnection();
-	void    EchoBackToClient(int client_fd);
+	void    SendResponseToClient(int client_fd);
 	// const variables (todo: tmp)
 	const std::string  server_name_;
 	const unsigned int port_;

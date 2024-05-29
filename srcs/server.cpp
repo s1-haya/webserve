@@ -41,7 +41,7 @@ void Server::HandleEvent(const Event event) {
 	if (event.fd == server_fd_) {
 		AcceptNewConnection();
 	} else if (event.type == EVENT_READ) {
-		EchoBackToClient(event.fd);
+		SendResponseToClient(event.fd);
 	}
 	// todo: handle other EventType (switch)
 }
@@ -56,7 +56,7 @@ void Server::AcceptNewConnection() {
 	Debug("server", "add new client (fd: " + ToString(new_socket) + ")");
 }
 
-void Server::EchoBackToClient(int client_fd) {
+void Server::SendResponseToClient(int client_fd) {
 	char buffer[BUFFER_SIZE];
 
 	ssize_t read_ret = read(client_fd, buffer, BUFFER_SIZE);
