@@ -14,11 +14,12 @@ class Http {
 		HTTP_STATUS
 	};
 	typedef std::map<MessageType, std::string> RequestMessage;
-	// todo: tmp
-	Http();
+	Http(const std::string &read_buf);
 	~Http();
+	std::string CreateResponse();
 
   private:
+	Http();
 	// prohibit copy
 	Http(const Http &other);
 	Http &operator=(const Http &other);
