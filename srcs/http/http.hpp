@@ -23,6 +23,8 @@ class Http {
 	// prohibit copy
 	Http(const Http &other);
 	Http &operator=(const Http &other);
+	void  ParseRequest(const std::string &read_buf);
+	void  ReadPathContent();
 	// variable
 	RequestMessage request_;
 };
