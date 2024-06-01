@@ -12,10 +12,19 @@ enum MessageType {
 
 typedef std::map<MessageType, std::string> RequestMessage;
 
-void OutputStatusLine(RequestMessage request) {
+void OutputStatusLine(const RequestMessage& request) {
 	std::cout << "HTTP/1.1"
-			  << SPACE << request[HTTP_STATUS] << SPACE << request[HTTP_STATUS_TEXT]
+			  << SPACE << request.at(HTTP_STATUS) << SPACE << request.at(HTTP_STATUS_TEXT)
 			  << std::endl;
+}
+
+void OutputBody(const RequestMessage& request) {
+	std::cout << request.at(HTTP_CONTENT) << std::endl;
+}
+
+void OutputResponse(const RequestMessage& request) {
+	OutputStatusLine(request);
+	OutputBody(request);
 }
 
 int main(void) {
@@ -26,6 +35,6 @@ int main(void) {
 	request_[HTTP_STATUS_TEXT]  = "OK";
 	request_[HTTP_CONTENT] = "<!DOCTYPE html><html<body><h1>Hello "
 							 "from webserv!(tmp)</h1></body></html>";
-	OutputStatusLine(request_);
+	OutputResponse(request_);
 	return 0;
 }
