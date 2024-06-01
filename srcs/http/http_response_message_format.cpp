@@ -1,5 +1,6 @@
 #include <iostream>
 #include <map>
+#include "character.hpp"
 
 enum MessageType {
 	HTTP_METHOD,
@@ -13,7 +14,7 @@ typedef std::map<MessageType, std::string> RequestMessage;
 
 void OutputStatusLine(RequestMessage request) {
 	std::cout << "HTTP/1.1"
-			  << " " << request[HTTP_STATUS] << " " << request[HTTP_STATUS_TEXT]
+			  << SPACE << request[HTTP_STATUS] << SPACE << request[HTTP_STATUS_TEXT]
 			  << std::endl;
 }
 
