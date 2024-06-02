@@ -18,7 +18,7 @@ void OutputStatusLine(const RequestMessage &request) {
 			  << request.at(HTTP_STATUS_TEXT) << CR << LF;
 }
 
-void OuputCRLF(void) {
+void OutputCRLF(void) {
 	std::cout << CR << LF;
 };
 
@@ -29,7 +29,7 @@ void OutputBody(const RequestMessage &request) {
 void OutputResponse(const RequestMessage &request) {
 	OutputStatusLine(request);
 	OutputHeaderFields();
-	OuputCRLF();
+	OutputCRLF();
 	OutputBody(request);
 }
 

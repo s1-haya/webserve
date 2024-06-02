@@ -1,5 +1,5 @@
-#include "character.hpp"
 #include <iostream>
+#include "character.hpp"
 
 void OutputHeaderField(void) {
 	std::cout << "field-name"
