@@ -11,8 +11,3 @@ void OutputHeaderFields(void) {
 	OutputHeaderField();
 	OutputHeaderField();
 }
-
-// int main(void) {
-// 	OutputHeaderField();
-// 	return 0;
-// }
