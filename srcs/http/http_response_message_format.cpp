@@ -18,12 +18,17 @@ void OutputStatusLine(const RequestMessage& request) {
 			  << std::endl;
 }
 
+void OuputCRLF(void) {
+	std::cout << CR << LF;
+};
+
 void OutputBody(const RequestMessage& request) {
 	std::cout << request.at(HTTP_CONTENT) << std::endl;
 }
 
 void OutputResponse(const RequestMessage& request) {
 	OutputStatusLine(request);
+	OuputCRLF();
 	OutputBody(request);
 }
 
