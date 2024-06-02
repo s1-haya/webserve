@@ -1,6 +1,6 @@
+#include "character.hpp"
 #include <iostream>
 #include <map>
-#include "character.hpp"
 
 enum MessageType {
 	HTTP_METHOD,
@@ -12,21 +12,20 @@ enum MessageType {
 
 typedef std::map<MessageType, std::string> RequestMessage;
 
-void OutputStatusLine(const RequestMessage& request) {
-	std::cout << "HTTP/1.1"
-			  << SP << request.at(HTTP_STATUS) << SP << request.at(HTTP_STATUS_TEXT)
-			  << std::endl;
+void OutputStatusLine(const RequestMessage &request) {
+	std::cout << "HTTP/1.1" << SP << request.at(HTTP_STATUS) << SP
+			  << request.at(HTTP_STATUS_TEXT) << std::endl;
 }
 
 void OuputCRLF(void) {
 	std::cout << CR << LF;
 };
 
-void OutputBody(const RequestMessage& request) {
+void OutputBody(const RequestMessage &request) {
 	std::cout << request.at(HTTP_CONTENT) << std::endl;
 }
 
-void OutputResponse(const RequestMessage& request) {
+void OutputResponse(const RequestMessage &request) {
 	OutputStatusLine(request);
 	OuputCRLF();
 	OutputBody(request);
@@ -34,12 +33,12 @@ void OutputResponse(const RequestMessage& request) {
 
 int main(void) {
 	RequestMessage request_;
-	request_[HTTP_METHOD]  = "GET";
-	request_[HTTP_PATH]    = "/html/index.html";
-	request_[HTTP_STATUS]  = "200";
-	request_[HTTP_STATUS_TEXT]  = "OK";
-	request_[HTTP_CONTENT] = "<!DOCTYPE html><html<body><h1>Hello "
-							 "from webserv!(tmp)</h1></body></html>";
+	request_[HTTP_METHOD]      = "GET";
+	request_[HTTP_PATH]        = "/html/index.html";
+	request_[HTTP_STATUS]      = "200";
+	request_[HTTP_STATUS_TEXT] = "OK";
+	request_[HTTP_CONTENT]     = "<!DOCTYPE html><html<body><h1>Hello "
+								 "from webserv!(tmp)</h1></body></html>";
 	OutputResponse(request_);
 	return 0;
 }
