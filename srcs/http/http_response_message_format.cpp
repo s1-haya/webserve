@@ -14,7 +14,7 @@ typedef std::map<MessageType, std::string> RequestMessage;
 
 void OutputStatusLine(const RequestMessage &request) {
 	std::cout << "HTTP/1.1" << SP << request.at(HTTP_STATUS) << SP
-			  << request.at(HTTP_STATUS_TEXT) << std::endl;
+			  << request.at(HTTP_STATUS_TEXT) << CR << LF;
 }
 
 void OuputCRLF(void) {
