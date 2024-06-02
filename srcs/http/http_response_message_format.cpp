@@ -11,7 +11,7 @@ enum MessageType {
 };
 
 typedef std::map<MessageType, std::string> RequestMessage;
-void OutputHeaderField(void);
+void                                       OutputHeaderFields(void);
 
 void OutputStatusLine(const RequestMessage &request) {
 	std::cout << "HTTP/1.1" << SP << request.at(HTTP_STATUS) << SP
@@ -28,7 +28,7 @@ void OutputBody(const RequestMessage &request) {
 
 void OutputResponse(const RequestMessage &request) {
 	OutputStatusLine(request);
-	OutputHeaderField();
+	OutputHeaderFields();
 	OuputCRLF();
 	OutputBody(request);
 }
