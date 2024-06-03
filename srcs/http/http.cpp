@@ -1,6 +1,8 @@
 #include "http.hpp"
 
-void CreateStatusLine(std::ostream &response_stream, const Http::RequestMessage &request);
+void CreateStatusLine(
+	std::ostream &response_stream, const Http::RequestMessage &request
+);
 void CreateCRLF(std::ostream &response_stream);
 void CreateHeaderFields(std::ostream &response_stream);
 void CreateBody(std::ostream &response_stream, const Http::RequestMessage &request);
@@ -25,11 +27,11 @@ void Http::ReadPathContent() {
 	const std::string path = request_[HTTP_PATH];
 	(void)path;
 	// todo: read path content
-	const std::string content = "<!DOCTYPE html><html<body><h1>Hello "
-								"from webserv!(tmp)</h1></body></html>";
-	request_[HTTP_CONTENT]    = content;
-	request_[HTTP_STATUS]     = "200";
-	request_[HTTP_STATUS_TEXT]     = "OK";
+	const std::string content  = "<!DOCTYPE html><html<body><h1>Hello "
+								 "from webserv!(tmp)</h1></body></html>";
+	request_[HTTP_CONTENT]     = content;
+	request_[HTTP_STATUS]      = "200";
+	request_[HTTP_STATUS_TEXT] = "OK";
 }
 
 // todo: tmp response
