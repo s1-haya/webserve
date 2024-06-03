@@ -10,6 +10,7 @@ class Http {
 	enum MessageType {
 		HTTP_METHOD,
 		HTTP_PATH,
+		HTTP_VERSION,
 		HTTP_CONTENT,
 		HTTP_STATUS
 	};
