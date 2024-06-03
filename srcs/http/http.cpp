@@ -1,9 +1,9 @@
 #include "http.hpp"
 
-void OutputStatusLine(std::ostream &response_stream, const Http::RequestMessage &request);
-void OutputCRLF(std::ostream &response_stream);
-void OutputHeaderFields(std::ostream &response_stream);
-void OutputBody(std::ostream &response_stream, const Http::RequestMessage &request);
+void CreateStatusLine(std::ostream &response_stream, const Http::RequestMessage &request);
+void CreateCRLF(std::ostream &response_stream);
+void CreateHeaderFields(std::ostream &response_stream);
+void CreateBody(std::ostream &response_stream, const Http::RequestMessage &request);
 
 Http::Http(const std::string &read_buf) {
 	ParseRequest(read_buf);
@@ -35,9 +35,9 @@ void Http::ReadPathContent() {
 // todo: tmp response
 const std::string Http::CreateResponse() {
 	std::ostringstream response_stream;
-	OutputStatusLine(response_stream, request_);
-	OutputHeaderFields(response_stream);
-	OutputCRLF(response_stream);
-	OutputBody(response_stream, request_);
+	CreateStatusLine(response_stream, request_);
+	CreateHeaderFields(response_stream);
+	CreateCRLF(response_stream);
+	CreateBody(response_stream, request_);
 	return response_stream.str();
 }
