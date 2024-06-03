@@ -19,23 +19,19 @@ void Http::ParseRequest(const std::string &read_buf) {
 }
 
 namespace {
-	bool FileExists(const std::string &file_path) {
+	std::string FileToString(const std::ifstream &file) {
+		std::stringstream ss;
+		ss << file.rdbuf();
+		return ss.str();
+	}
+
+	std::string ReadFile(const std::string &file_path) {
 		std::ifstream file(file_path.c_str());
-		return file.good();
-	}
-
-	std::ifstream open_file(const std::string &file_path) {
-		if (!FileExists(file_path)) {
-			return std::ifstream("html/404.html");
+		if (!file) {
+			std::ifstream error_file("html/404.html");
+			return FileToString(error_file);
 		}
-		return std::ifstream(file_path.c_str());
-	}
-
-	const std::string ReadFile(const std::string &file_path) {
-		std::ifstream     file = open_file(file_path);
-		std::stringstream buffer;
-		buffer << file.rdbuf();
-		return buffer.str();
+		return FileToString(file);
 	}
 } // namespace
 
