@@ -1,6 +1,7 @@
 #include "server.hpp"
 #include "convert.hpp"
 #include "event.hpp"
+#include "http.hpp"
 #include <arpa/inet.h> // htons
 #include <errno.h>
 #include <sys/socket.h> // socket
@@ -56,6 +57,13 @@ void Server::AcceptNewConnection() {
 	Debug("server", "add new client (fd: " + ToString(new_socket) + ")");
 }
 
+namespace {
+	std::string CreateHttpResponse(const std::string &read_buf) {
+		Http http(read_buf);
+		return http.CreateResponse();
+	}
+} // namespace
+
 void Server::SendResponseToClient(int client_fd) {
 	char buffer[BUFFER_SIZE];
 
@@ -69,7 +77,8 @@ void Server::SendResponseToClient(int client_fd) {
 		Debug("server", "disconnected client (fd: " + ToString(client_fd) + ")");
 		return;
 	}
-	send(client_fd, buffer, read_ret, 0);
+	const std::string response = CreateHttpResponse(buffer);
+	send(client_fd, response.c_str(), response.size(), 0);
 	Debug("server", "send to client (fd: " + ToString(client_fd) + ")");
 }
 
