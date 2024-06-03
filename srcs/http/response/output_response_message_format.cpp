@@ -1,34 +1,26 @@
 #include "character.hpp"
 #include <iostream>
 #include <map>
+#include "http.hpp"
 
-enum MessageType {
-	HTTP_METHOD,
-	HTTP_PATH,
-	HTTP_CONTENT,
-	HTTP_STATUS,
-	HTTP_STATUS_TEXT
-};
+void                                       OutputHeaderFields(std::ostream &response_stream);
 
-typedef std::map<MessageType, std::string> RequestMessage;
-void                                       OutputHeaderFields(void);
-
-void OutputStatusLine(const RequestMessage &request) {
-	std::cout << "HTTP/1.1" << SP << request.at(HTTP_STATUS) << SP
-			  << request.at(HTTP_STATUS_TEXT) << CR << LF;
+void OutputStatusLine(std::ostream &response_stream, const Http::RequestMessage &request) {
+	response_stream << "HTTP/1.1" << SP << request.at(Http::HTTP_STATUS) << SP
+			  << request.at(Http::HTTP_STATUS_TEXT) << CR << LF;
 }
 
-void OutputCRLF(void) {
-	std::cout << CR << LF;
+void OutputCRLF(std::ostream &response_stream) {
+	response_stream << CR << LF;
 }
 
-void OutputBody(const RequestMessage &request) {
-	std::cout << request.at(HTTP_CONTENT) << std::endl;
+void OutputBody(std::ostream &response_stream, const Http::RequestMessage &request) {
+	response_stream << request.at(Http::HTTP_CONTENT) << std::endl;
 }
 
-void OutputResponse(const RequestMessage &request) {
-	OutputStatusLine(request);
-	OutputHeaderFields();
-	OutputCRLF();
-	OutputBody(request);
+void OutputResponse(std::ostream &response_stream, const Http::RequestMessage &request) {
+	OutputStatusLine(response_stream, request);
+	OutputHeaderFields(response_stream);
+	OutputCRLF(response_stream);
+	OutputBody(response_stream, request);
 }

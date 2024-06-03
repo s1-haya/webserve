@@ -1,13 +1,13 @@
 #include <iostream>
 #include "character.hpp"
 
-void OutputHeaderField(void) {
-	std::cout << "field-name"
+void OutputHeaderField(std::ostream &response_stream) {
+	response_stream << "field-name"
 			  << ":" << SP << "field-value" << SP << CR << LF;
 }
 
-void OutputHeaderFields(void) {
-	OutputHeaderField();
-	OutputHeaderField();
-	OutputHeaderField();
+void OutputHeaderFields(std::ostream &response_stream) {
+	OutputHeaderField(response_stream);
+	OutputHeaderField(response_stream);
+	OutputHeaderField(response_stream);
 }
