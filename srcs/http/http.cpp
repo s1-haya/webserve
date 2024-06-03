@@ -1,12 +1,5 @@
 #include "http.hpp"
 
-void CreateStatusLine(
-	std::ostream &response_stream, const Http::RequestMessage &request
-);
-void CreateCRLF(std::ostream &response_stream);
-void CreateHeaderFields(std::ostream &response_stream);
-void CreateBody(std::ostream &response_stream, const Http::RequestMessage &request);
-
 Http::Http(const std::string &read_buf) {
 	ParseRequest(read_buf);
 	ReadPathContent();
@@ -32,14 +25,4 @@ void Http::ReadPathContent() {
 	request_[HTTP_CONTENT]     = content;
 	request_[HTTP_STATUS]      = "200";
 	request_[HTTP_STATUS_TEXT] = "OK";
-}
-
-// todo: tmp response
-const std::string Http::CreateResponse() {
-	std::ostringstream response_stream;
-	CreateStatusLine(response_stream, request_);
-	CreateHeaderFields(response_stream);
-	CreateCRLF(response_stream);
-	CreateBody(response_stream, request_);
-	return response_stream.str();
 }

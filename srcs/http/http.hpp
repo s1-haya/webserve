@@ -2,6 +2,7 @@
 #define HTTP_HPP_
 
 #include "debug.hpp" // todo: tmp
+#include <map>
 #include <string>
 
 class Http {
@@ -22,7 +23,10 @@ class Http {
 	Http();
 	// prohibit copy
 	Http(const Http &other);
-	Http &operator=(const Http &other);
+	Http          &operator=(const Http &other);
+	void           ParseRequest(const std::string &read_buf);
+	void           ReadPathContent();
+	RequestMessage request_;
 };
 
 #endif /* HTTP_HPP_ */
