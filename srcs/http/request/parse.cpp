@@ -39,7 +39,7 @@ void Http::ParseRequest(const std::string &read_buf) {
 
 	const std::vector<std::string> request_line = SplitStr(start_line, " ");
 	// set request-line(method, request-target, HTTP-version)
-	request_[HTTP_METHOD]  = request_line[0];
-	request_[HTTP_PATH]    = CreateDefaultPath(request_line[1]);
-	request_[HTTP_VERSION] = request_line[2];
+	request_[HTTP_METHOD]         = request_line[0];
+	request_[HTTP_REQUEST_TARGET] = CreateDefaultPath(request_line[1]);
+	request_[HTTP_VERSION]        = request_line[2];
 }

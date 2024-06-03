@@ -10,7 +10,7 @@ Http::~Http() {}
 
 // todo: tmp content
 void Http::ReadPathContent() {
-	const std::string path = request_[HTTP_PATH];
+	const std::string path = request_[HTTP_REQUEST_TARGET];
 	(void)path;
 	// todo: read path content
 	const std::string content = "<!DOCTYPE html><html<body><h1>Hello "
