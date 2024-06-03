@@ -77,7 +77,7 @@ void Server::SendResponseToClient(int client_fd) {
 		Debug("server", "disconnected client (fd: " + ToString(client_fd) + ")");
 		return;
 	}
-	const std::string response = CreateHttpResponse(buffer);
+	const std::string response = CreateHttpResponse(std::string(buffer, read_ret));
 	send(client_fd, response.c_str(), response.size(), 0);
 	Debug("server", "send to client (fd: " + ToString(client_fd) + ")");
 }
