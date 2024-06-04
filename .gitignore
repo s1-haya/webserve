@@ -1,6 +1,7 @@
 # ignore all
 *
 !**/
+.history
 
 # include
 !.gitignore

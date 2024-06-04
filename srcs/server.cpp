@@ -90,6 +90,12 @@ void Server::Init() {
 	if (server_fd_ == SYSTEM_ERROR) {
 		throw std::runtime_error("socket failed");
 	}
+	// set socket option to reuse address
+	int optval = 1;
+	if (setsockopt(server_fd_, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)) ==
+		SYSTEM_ERROR) {
+		throw std::runtime_error("setsockopt failed");
+	}
 	sock_addr_.sin_family      = AF_INET;
 	sock_addr_.sin_addr.s_addr = INADDR_ANY;
 	sock_addr_.sin_port        = htons(port_);
