@@ -6,17 +6,15 @@ namespace {
 	SplitStr(const std::string &str, const std::string delim) {
 		std::vector<std::string> split_str;
 
-		std::string::const_iterator it = str.begin();
-		while (it != str.end()) {
-			const std::string      head = &(*it);
-			std::string::size_type pos  = head.find(delim);
+		std::size_t start = 0;
+		while (start < str.size()) {
+			const std::string::size_type pos = str.find(delim, start);
 			if (pos == std::string::npos) {
-				split_str.push_back(head.substr(0));
+				split_str.push_back(str.substr(start));
 				break;
 			}
-			split_str.push_back(head.substr(0, pos));
-			std::advance(it, pos);
-			++it;
+			split_str.push_back(str.substr(start, pos - start));
+			start = pos + delim.size();
 		}
 		return split_str;
 	}
