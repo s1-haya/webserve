@@ -5,7 +5,7 @@
 
 # include
 !.gitignore
-!.github/workflow/openai-review.yaml
+!.coderabbit.yaml
 !.vscode/setting.json
 !.clang-format
 !sandbox/*
