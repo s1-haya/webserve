@@ -10,14 +10,6 @@ Http::Http(const std::string &read_buf) {
 
 Http::~Http() {}
 
-// todo: tmp request_
-void Http::ParseRequest(const std::string &read_buf) {
-	(void)read_buf;
-	// todo: parse
-	request_[HTTP_METHOD] = "GET";
-	request_[HTTP_PATH]   = "/html/index.html";
-}
-
 namespace {
 	std::string FileToString(const std::ifstream &file) {
 		std::stringstream ss;
@@ -37,12 +29,7 @@ namespace {
 
 // todo: tmp content
 void Http::ReadPathContent() {
-	const std::string path = request_[HTTP_PATH];
-	(void)path;
-	(void)ReadFile("test");
-	// todo: read path content
-	const std::string content  = "<!DOCTYPE html><html<body><h1>Hello "
-								 "from webserv!(tmp)</h1></body></html>";
+	const std::string content  = ReadFile(request_[HTTP_REQUEST_TARGET]);
 	request_[HTTP_CONTENT]     = content;
 	request_[HTTP_STATUS]      = "200";
 	request_[HTTP_STATUS_TEXT] = "OK";
