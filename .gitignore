@@ -9,6 +9,7 @@
 !.clang-format
 !sandbox/*
 !.github/workflows/*
+!.coderabbit.yaml
 
 !Makefile
 !*.cpp
