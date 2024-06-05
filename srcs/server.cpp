@@ -90,6 +90,7 @@ void Server::Init() {
 	if (server_fd_ == SYSTEM_ERROR) {
 		throw std::runtime_error("socket failed");
 	}
+	// set socket option to reuse address
 	int optval = 1;
 	if (setsockopt(server_fd_, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)) ==
 		SYSTEM_ERROR) {
