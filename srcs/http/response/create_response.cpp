@@ -1,4 +1,6 @@
 #include "character.hpp"
+#include "convert.hpp" // use ToString()
+#include "debug.hpp"   // tmp to do
 #include "http.hpp"
 #include <iostream>
 #include <sstream>
@@ -11,15 +13,23 @@ namespace http_response {
 						<< request.at(Http::HTTP_STATUS_TEXT) << CR << LF;
 	}
 
-	void CreateHeaderField(std::ostream &response_stream) {
-		response_stream << "field-name"
-						<< ":" << SP << "field-value" << SP << CR << LF;
+	void CreateHeaderField(
+		std::ostream      &response_stream,
+		const std::string &name,
+		const std::string &value
+	) {
+		response_stream << name << ":" << SP << value << SP << CR << LF;
 	}
 
-	void CreateHeaderFields(std::ostream &response_stream) {
-		CreateHeaderField(response_stream);
-		CreateHeaderField(response_stream);
-		CreateHeaderField(response_stream);
+	void CreateHeaderFields(
+		std::ostream &response_stream, const Http::RequestMessage &request
+	) {
+		CreateHeaderField(response_stream, "Connection", "close");
+		CreateHeaderField(
+			response_stream,
+			"Content-Length",
+			ToString(request.at(Http::HTTP_CONTENT).size())
+		);
 	}
 
 	void CreateCRLF(std::ostream &response_stream) {
@@ -28,14 +38,14 @@ namespace http_response {
 
 	void
 	CreateBody(std::ostream &response_stream, const Http::RequestMessage &request) {
-		response_stream << request.at(Http::HTTP_CONTENT) << std::endl;
+		response_stream << request.at(Http::HTTP_CONTENT);
 	}
 } // namespace http_response
 
 const std::string Http::CreateResponse() {
 	std::ostringstream response_stream;
 	http_response::CreateStatusLine(response_stream, this->request_);
-	http_response::CreateHeaderFields(response_stream);
+	http_response::CreateHeaderFields(response_stream, this->request_);
 	http_response::CreateCRLF(response_stream);
 	http_response::CreateBody(response_stream, this->request_);
 	return response_stream.str();
