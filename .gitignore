@@ -8,6 +8,7 @@
 !.vscode/setting.json
 !.clang-format
 !sandbox/*
+!.github/workflows/*
 
 !Makefile
 !*.cpp
