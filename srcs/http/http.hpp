@@ -18,7 +18,7 @@ class Http {
 	typedef std::map<MessageType, std::string> RequestMessage;
 	Http(const std::string &read_buf);
 	~Http();
-	const std::string CreateResponse();
+	std::string CreateResponse();
 
   private:
 	Http();

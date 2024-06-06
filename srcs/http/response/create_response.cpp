@@ -42,7 +42,7 @@ namespace http_response {
 	}
 } // namespace http_response
 
-const std::string Http::CreateResponse() {
+std::string Http::CreateResponse() {
 	std::ostringstream response_stream;
 	http_response::CreateStatusLine(response_stream, this->request_);
 	http_response::CreateHeaderFields(response_stream, this->request_);
