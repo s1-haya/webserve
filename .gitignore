@@ -8,7 +8,6 @@
 !.vscode/setting.json
 !.clang-format
 !sandbox/*
-!.github/workflows/*
 !.coderabbit.yaml
 
 !Makefile
@@ -18,3 +17,6 @@
 
 !Dockerfile
 !docker-compose.yml
+
+!.github/workflows/*
+!requirements.txt
