@@ -13,7 +13,7 @@
 !Makefile
 !*.cpp
 !*.hpp
-!test/*
+!test/**
 
 !Dockerfile
 !docker-compose.yml

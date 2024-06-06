@@ -1,4 +1,4 @@
 language: "ja"
 reviews:
   auto_review:
-    drafts: false
+    drafts: true

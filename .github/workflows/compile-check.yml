@@ -1,6 +1,8 @@
-name: test-python
+name: compile-test
 
-on: [push]
+on:
+  push:
+  pull_request:
 
 jobs:
   build:
@@ -15,5 +17,6 @@ jobs:
         run: |
           pip install --upgrade pip
           pip install -r requirements.txt
-      - name: Run test
-        run: pytest
+      - name: Run make
+        run: make check
+        run: make val
