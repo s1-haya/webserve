@@ -1,4 +1,4 @@
-#include "config_parse.hpp"
+#include "config.hpp"
 
 #define PATH "src/index.html"
 

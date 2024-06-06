@@ -9,7 +9,7 @@ Config::Config(std::string &file_path) : config_file_(file_path) {
 	server_.server_name_ = "localhost";
 	std::stringstream buffer;
 	buffer << config_file_.rdbuf();
-	std::cout << buffer.str() << std::endl;
+	// std::cout << buffer.str() << std::endl;
 }
 
 Config::~Config() {
