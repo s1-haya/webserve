@@ -29,4 +29,4 @@ jobs:
       - name: Run tests
         if: github.event_name == 'pull_request'
         run: |
-          pytest run_test.py
+          pytest test/run_test.py
