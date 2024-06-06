@@ -1,4 +1,7 @@
 name: test-python
+
+on: [push]
+
 jobs:
   build:
     runs-on: ubuntu-latest
