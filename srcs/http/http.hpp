@@ -12,12 +12,13 @@ class Http {
 		HTTP_REQUEST_TARGET,
 		HTTP_VERSION,
 		HTTP_CONTENT,
-		HTTP_STATUS
+		HTTP_STATUS,
+		HTTP_STATUS_TEXT
 	};
 	typedef std::map<MessageType, std::string> RequestMessage;
 	Http(const std::string &read_buf);
 	~Http();
-	std::string CreateResponse();
+	const std::string CreateResponse();
 
   private:
 	Http();

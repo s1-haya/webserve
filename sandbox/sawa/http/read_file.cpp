@@ -4,16 +4,16 @@
 
 bool FileExists(const std::string &file_path);
 
-std::ifstream OpenFile(const std::string& file_path) {
-    std::ifstream file(file_path.c_str());
-    if (!file.is_open()) {
-        return std::ifstream("404.html");
-    }
-    return file;
+std::ifstream OpenFile(const std::string &file_path) {
+	std::ifstream file(file_path.c_str());
+	if (!file.is_open()) {
+		return std::ifstream("404.html");
+	}
+	return file;
 }
 
 const std::string ReadFile(const std::string &file_path) {
-    std::ifstream file = OpenFile(file_path);
+	std::ifstream     file = OpenFile(file_path);
 	std::stringstream buffer;
 	buffer << file.rdbuf();
 	return buffer.str();
