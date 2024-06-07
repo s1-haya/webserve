@@ -1,6 +1,6 @@
 #include "split.hpp"
 
-std::vector<std::string> SplitStr(const std::string &str, const std::string delim) {
+std::vector<std::string> SplitStr(const std::string &str, const std::string &delim) {
 	std::vector<std::string> split_str;
 
 	std::size_t start = 0;
