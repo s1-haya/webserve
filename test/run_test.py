@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 import subprocess
 
 def run_pytest():
