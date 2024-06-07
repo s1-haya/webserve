@@ -21,6 +21,7 @@ namespace {
 		std::ifstream file(file_path.c_str());
 		if (!file) {
 			std::ifstream error_file("html/404.html");
+			Debug("http", "404 file not found");
 			return FileToString(error_file);
 		}
 		return FileToString(file);
