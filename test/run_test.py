@@ -9,4 +9,4 @@ def run_test():
 		print(f"pytest failed with exit code {e.returncode}")
 
 if __name__ == "__main__":
-    run_pytest()
+    run_test()
