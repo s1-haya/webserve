@@ -1,6 +1,7 @@
 # ignore all
 *
 !**/
+.history
 
 # include
 !.gitignore
@@ -14,3 +15,5 @@
 
 !Dockerfile
 !docker-compose.yml
+
+!html/**

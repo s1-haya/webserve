@@ -9,9 +9,11 @@ class Http {
   public:
 	enum MessageType {
 		HTTP_METHOD,
-		HTTP_PATH,
+		HTTP_REQUEST_TARGET,
+		HTTP_VERSION,
 		HTTP_CONTENT,
-		HTTP_STATUS
+		HTTP_STATUS,
+		HTTP_STATUS_TEXT
 	};
 	typedef std::map<MessageType, std::string> RequestMessage;
 	Http(const std::string &read_buf);
