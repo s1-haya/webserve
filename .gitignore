@@ -8,7 +8,6 @@
 !.vscode/setting.json
 !.clang-format
 !sandbox/*
-!.coderabbit.yaml
 
 !Makefile
 !*.cpp
