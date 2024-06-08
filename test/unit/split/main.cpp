@@ -1,8 +1,6 @@
 #include "color.hpp"
 #include "split.hpp"
-#include <cstdarg> // va_list
 #include <cstdlib>
-#include <cstring> // strlen
 #include <iostream>
 #include <stdexcept> // logic_error
 #include <string>
@@ -12,23 +10,10 @@ namespace {
 	typedef std::vector<std::string> Strs;
 
 	// expectedのStrsを作成
-	// templateのパラメータパックがc++11以降で使用不可なのでva_listを使用
+	// templateのパラメータパックがc++11以降なので使っていない
 	// 手動で正しいsizeをセットする必要有り
-	Strs CreateExpect(std::size_t size, const char *head, ...) {
-		Strs ret;
-
-		if (size == 0) {
-			return ret;
-		}
-		ret.push_back(std::string(head, std::strlen(head)));
-		std::va_list args;
-		va_start(args, head);
-		for (std::size_t i = 0; i + 1 < size; i++) {
-			const char *arg = va_arg(args, const char *);
-			ret.push_back(std::string(arg, std::strlen(arg)));
-		}
-		va_end(args);
-		return ret;
+	Strs CreateExpect(const std::string *array, std::size_t size) {
+		return Strs(array, array + size);
 	}
 
 	// SplitStr()の結果とexpectedを比較(他でも使用できそうなのでtemplateにしてみている)
@@ -72,51 +57,80 @@ int main() {
 		// test for SP(" "). substring:1文字
 		// ---------------------------------------------------------------------
 		// substringのみのstr
-		Run(" ", " ", CreateExpect(2, "", ""));
-		Run("  ", " ", CreateExpect(3, "", "", ""));
-		// substringがstrの中にない
-		Run("", " ", CreateExpect(1, ""));
-		Run("abbccc", " ", CreateExpect(1, "abbccc"));
+		const std::string expected_1[] = {"", ""};
+		Run(" ", " ", CreateExpect(expected_1, 2));
+		const std::string expected_2[] = {"", "", ""};
+		Run("  ", " ", CreateExpect(expected_2, 3));
+
+		// // substringがstrの中にない
+		const std::string expected_3[] = {""};
+		Run("", " ", CreateExpect(expected_3, 1));
+		const std::string expected_4[] = {"abbccc"};
+		Run("abbccc", " ", CreateExpect(expected_4, 1));
+
 		// substringが1つずつ
-		Run("a bb ccc", " ", CreateExpect(3, "a", "bb", "ccc"));
+		const std::string expected_5[] = {"a", "bb", "ccc"};
+		Run("a bb ccc", " ", CreateExpect(expected_5, 3));
 		// substringが連続
-		Run("abb   ccc", " ", CreateExpect(4, "abb", "", "", "ccc"));
+		const std::string expected_6[] = {"abb", "", "", "ccc"};
+		Run("abb   ccc", " ", CreateExpect(expected_6, 4));
+
 		// 先頭にsubstring
-		Run("  abbccc", " ", CreateExpect(3, "", "", "abbccc"));
+		const std::string expected_7[] = {"", "", "abbccc"};
+		Run("  abbccc", " ", CreateExpect(expected_7, 3));
 		// 末尾にsubstring
-		Run("abbccc ", " ", CreateExpect(2, "abbccc", ""));
+		const std::string expected_8[] = {"abbccc", ""};
+		Run("abbccc ", " ", CreateExpect(expected_8, 2));
 		// 前後にsubstring
-		Run(" abbccc   ", " ", CreateExpect(5, "", "abbccc", "", "", ""));
+		const std::string expected_9[] = {"", "abbccc", "", "", ""};
+		Run(" abbccc   ", " ", CreateExpect(expected_9, 5));
 
 		// ---------------------------------------------------------------------
 		// test for CRLF("\r\n"). substring:2文字
 		// ---------------------------------------------------------------------
 		// substringのみのstr
-		Run("\r\n", "\r\n", CreateExpect(2, "", ""));
-		Run("\r\n\r\n", "\r\n", CreateExpect(3, "", "", ""));
+		const std::string expected_10[] = {"", ""};
+		Run("\r\n", "\r\n", CreateExpect(expected_10, 2));
+		const std::string expected_11[] = {"", "", ""};
+		Run("\r\n\r\n", "\r\n", CreateExpect(expected_11, 3));
+
 		// substringがstrの中にない
-		Run("", "\r\n", CreateExpect(1, ""));
-		Run("abbccc", "\r\n", CreateExpect(1, "abbccc"));
+		const std::string expected_12[] = {""};
+		Run("", "\r\n", CreateExpect(expected_12, 1));
+		const std::string expected_13[] = {"abbccc"};
+		Run("abbccc", "\r\n", CreateExpect(expected_13, 1));
+
 		// substringが1つずつ
-		Run("a\r\nbb\r\nccc", "\r\n", CreateExpect(3, "a", "bb", "ccc"));
+		const std::string expected_14[] = {"a", "bb", "ccc"};
+		Run("a\r\nbb\r\nccc", "\r\n", CreateExpect(expected_14, 3));
 		// substringが連続
-		Run("abb\r\n\r\nccc", "\r\n", CreateExpect(3, "abb", "", "ccc"));
+		const std::string expected_15[] = {"abb", "", "ccc"};
+		Run("abb\r\n\r\nccc", "\r\n", CreateExpect(expected_15, 3));
+
 		// 先頭にsubstring
-		Run("\r\nabbccc", "\r\n", CreateExpect(2, "", "abbccc"));
+		const std::string expected_16[] = {"", "abbccc"};
+		Run("\r\nabbccc", "\r\n", CreateExpect(expected_16, 2));
 		// 末尾にsubstring
-		Run("abbccc\r\n", "\r\n", CreateExpect(2, "abbccc", ""));
+		const std::string expected_17[] = {"abbccc", ""};
+		Run("abbccc\r\n", "\r\n", CreateExpect(expected_17, 2));
 		// 前後にsubstring
-		Run("\r\nabbccc\r\n\r\n", "\r\n", CreateExpect(4, "", "abbccc", "", ""));
+		const std::string expected_18[] = {"", "abbccc", "", ""};
+		Run("\r\nabbccc\r\n\r\n", "\r\n", CreateExpect(expected_18, 4));
+
 		// substringの中のcharがあっても何も起こらない
-		Run("a\rbb\r\nccc", "\r\n", CreateExpect(2, "a\rbb", "ccc"));
-		Run("a\nbb\r\nccc", "\r\n", CreateExpect(2, "a\nbb", "ccc"));
+		const std::string expected_19[] = {"a\rbb", "ccc"};
+		Run("a\rbb\r\nccc", "\r\n", CreateExpect(expected_19, 2));
+		const std::string expected_20[] = {"a\nbb", "ccc"};
+		Run("a\nbb\r\nccc", "\r\n", CreateExpect(expected_20, 2));
 
 		// ---------------------------------------------------------------------
 		// test for another case
 		// ---------------------------------------------------------------------
 		// substringが空文字列
-		Run("", "", CreateExpect(1, ""));
-		Run("abc", "", CreateExpect(1, "abc"));
+		const std::string expected_21[] = {""};
+		Run("", "", CreateExpect(expected_21, 1));
+		const std::string expected_22[] = {"abc"};
+		Run("abc", "", CreateExpect(expected_22, 1));
 
 	} catch (const std::exception &e) {
 		std::cerr << COLOR_RED << "Error: " << e.what() << COLOR_RESET << std::endl;
