@@ -10,7 +10,7 @@ namespace utils {
 			return split_str;
 		}
 		std::size_t start = 0;
-		while (start < src.size()) {
+		while (start <= src.size()) {
 			const std::string::size_type pos = src.find(substring, start);
 			if (pos == std::string::npos) {
 				split_str.push_back(src.substr(start));
