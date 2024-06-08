@@ -4,6 +4,9 @@
 #include <string>
 #include <vector>
 
-std::vector<std::string> SplitStr(const std::string &str, const std::string &delim);
+namespace utils {
+	std::vector<std::string>
+	SplitStr(const std::string &str, const std::string &delim);
+}
 
 #endif /* UTILS_SPLIT_HPP_ */
