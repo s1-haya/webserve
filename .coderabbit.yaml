@@ -19,19 +19,3 @@ reviews:
     auto_incremental_review: true
 chat:
   auto_reply: true
-
-rules:
-  - name: "Review on request"
-    description: "Review only when explicitly requested"
-    trigger:
-      event: pull_request
-      condition:
-        - requested_reviewers: true
-    actions:
-      - review
-
-  - name: "Ignore trivial responses"
-    description: "Do not respond if no new issues are found"
-    actions:
-      - type: response
-        mode: only_new_issues
