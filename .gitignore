@@ -12,8 +12,14 @@
 !Makefile
 !*.cpp
 !*.hpp
+!test/**
 
 !Dockerfile
 !docker-compose.yml
+
+!.github/workflows/*
+!requirements.txt
+
+!.coderabbit.yaml
 
 !html/**
