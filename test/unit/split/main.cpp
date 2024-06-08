@@ -52,10 +52,15 @@ namespace {
 	// SplitStr()を実行してexpectedと比較
 	void
 	Run(const std::string &src, const std::string &substring, const Strs &expected) {
+		static unsigned int test_case = 0;
+		test_case++;
+
 		if (IsSame(utils::SplitStr(src, substring), expected)) {
-			std::cerr << COLOR_GREEN << "[OK] " << COLOR_RESET << src << std::endl;
+			std::cerr << COLOR_GREEN << test_case << ".[OK] " << COLOR_RESET << src
+					  << std::endl;
 		} else {
-			std::cerr << COLOR_RED << "[NG] " << COLOR_RESET << src << std::endl;
+			std::cerr << COLOR_RED << test_case << ".[NG] " << COLOR_RESET << src
+					  << std::endl;
 			throw std::logic_error("SplitStr()");
 		}
 	}
