@@ -19,3 +19,5 @@
 
 !.github/workflows/*
 !requirements.txt
+
+!.coderabbit.yaml
