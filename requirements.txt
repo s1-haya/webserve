@@ -1,3 +1,6 @@
 # requirements.txt
 
 pytest
+isort
+black
+mypy
