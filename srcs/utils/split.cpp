@@ -2,22 +2,22 @@
 
 namespace utils {
 	std::vector<std::string>
-	SplitStr(const std::string &str, const std::string &delim) {
+	SplitStr(const std::string &src, const std::string &substring) {
 		std::vector<std::string> split_str;
 
-		if (delim.size() == 0) {
-			split_str.push_back(str);
+		if (substring.size() == 0) {
+			split_str.push_back(src);
 			return split_str;
 		}
 		std::size_t start = 0;
-		while (start < str.size()) {
-			const std::string::size_type pos = str.find(delim, start);
+		while (start < src.size()) {
+			const std::string::size_type pos = src.find(substring, start);
 			if (pos == std::string::npos) {
-				split_str.push_back(str.substr(start));
+				split_str.push_back(src.substr(start));
 				break;
 			}
-			split_str.push_back(str.substr(start, pos - start));
-			start = pos + delim.size();
+			split_str.push_back(src.substr(start, pos - start));
+			start = pos + substring.size();
 		}
 		return split_str;
 	}
