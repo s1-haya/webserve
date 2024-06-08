@@ -10,7 +10,7 @@ namespace http_response {
 		std::ostream &response_stream, const Http::RequestMessage &request
 	) {
 		response_stream << "HTTP/1.1" << SP << request.at(Http::HTTP_STATUS) << SP
-						<< request.at(Http::HTTP_STATUS_TEXT) << CR << LF;
+						<< request.at(Http::HTTP_STATUS_TEXT) << CRLF;
 	}
 
 	void CreateHeaderField(
@@ -18,7 +18,7 @@ namespace http_response {
 		const std::string &name,
 		const std::string &value
 	) {
-		response_stream << name << ":" << SP << value << SP << CR << LF;
+		response_stream << name << ":" << SP << value << SP << CRLF;
 	}
 
 	void CreateHeaderFields(
@@ -33,7 +33,7 @@ namespace http_response {
 	}
 
 	void CreateCRLF(std::ostream &response_stream) {
-		response_stream << CR << LF;
+		response_stream << CRLF;
 	}
 
 	void

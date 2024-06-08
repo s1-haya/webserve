@@ -1,5 +1,4 @@
 #include "character.hpp"
 
-const char SP = 0x20;
-const char CR = 0x0D;
-const char LF = 0x0A;
+const std::string SP   = " ";
+const std::string CRLF = "\r\n";
