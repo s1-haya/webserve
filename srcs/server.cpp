@@ -1,6 +1,7 @@
 #include "server.hpp"
 #include "convert.hpp"
 #include "event.hpp"
+#include "http.hpp"
 #include <arpa/inet.h> // htons
 #include <errno.h>
 #include <sys/socket.h> // socket
@@ -41,7 +42,7 @@ void Server::HandleEvent(const Event event) {
 	if (event.fd == server_fd_) {
 		AcceptNewConnection();
 	} else if (event.type == EVENT_READ) {
-		EchoBackToClient(event.fd);
+		SendResponseToClient(event.fd);
 	}
 	// todo: handle other EventType (switch)
 }
@@ -56,7 +57,14 @@ void Server::AcceptNewConnection() {
 	Debug("server", "add new client (fd: " + ToString(new_socket) + ")");
 }
 
-void Server::EchoBackToClient(int client_fd) {
+namespace {
+	std::string CreateHttpResponse(const std::string &read_buf) {
+		Http http(read_buf);
+		return http.CreateResponse();
+	}
+} // namespace
+
+void Server::SendResponseToClient(int client_fd) {
 	char buffer[BUFFER_SIZE];
 
 	ssize_t read_ret = read(client_fd, buffer, BUFFER_SIZE);
@@ -67,10 +75,11 @@ void Server::EchoBackToClient(int client_fd) {
 		close(client_fd);
 		epoll_.DeleteConnection(client_fd);
 		Debug("server", "disconnected client (fd: " + ToString(client_fd) + ")");
-	} else {
-		send(client_fd, buffer, read_ret, 0);
-		Debug("server", "send to client (fd: " + ToString(client_fd) + ")");
+		return;
 	}
+	const std::string response = CreateHttpResponse(buffer);
+	send(client_fd, response.c_str(), response.size(), 0);
+	Debug("server", "send to client (fd: " + ToString(client_fd) + ")");
 }
 
 void Server::Init() {

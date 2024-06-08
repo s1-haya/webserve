@@ -21,3 +21,5 @@
 !requirements.txt
 
 !.coderabbit.yaml
+
+!html/**
