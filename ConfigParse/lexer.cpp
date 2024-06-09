@@ -1,13 +1,14 @@
 #include "lexer.hpp"
 #include <iostream>
 
-/*-----------------------------------*/
-static bool IsSpace(char c) {
-	if (c == ' ' || c == '\t' || c == CR || c == LF)
-		return true;
-	return false;
-}
-/*-----------------------------------*/
+namespace {
+	bool IsSpace(char c) {
+		if (c == ' ' || c == '\t' || c == CR || c == LF)
+			return true;
+		return false;
+	}
+
+} // namespace
 
 void Lexer::AddToken(std::string symbol, int token_type) {
 	Node *token = new Node(symbol, token_type);
@@ -29,15 +30,17 @@ void Lexer::AddTokenElem(
 	it += std::strlen(token.c_str());
 	while (IsSpace(*it))
 		++it;
-	while (*it != DELIM_CHR) {
+	while (*it != DELIM_CHR && *it != '\n') {
 		new_str += *it;
 		++it;
 	}
+	if (*it == '\n')
+		throw std::runtime_error("no delim");
 	AddToken(new_str, 10);
 	AddToken(";", DELIM);
 }
 
-Lexer::Lexer(const std::string &buffer) {
+Lexer::Lexer(const std::string &buffer) : buffer_(buffer) {
 	tokens_                   = new std::list<Node *>;
 	bool        need_space    = false;
 	bool        need_delim    = false;
@@ -49,7 +52,7 @@ Lexer::Lexer(const std::string &buffer) {
 			++it;
 			need_space = false;
 		}
-		if (!need_space) {
+		if (!need_space && !sharp_comment) {
 			if (std::strncmp(
 					&(*it), SERVER_NAME_STR, std::strlen(SERVER_NAME_STR)
 				) == 0)
@@ -64,6 +67,9 @@ Lexer::Lexer(const std::string &buffer) {
 						 &(*it), R_BRACKET_STR, std::strlen(R_BRACKET_STR)
 					 ) == 0)
 				AddTokenIncrement(R_BRACKET_STR, R_BRACKET, it);
+			else if (std::strncmp(&(*it), LOCATION_STR, std::strlen(LOCATION_STR)) ==
+					 0)
+				AddTokenIncrement(LOCATION_STR, LOCATION, it);
 			// sharp_comment = true;
 			else if (std::strncmp(&(*it), LISTEN_STR, std::strlen(LISTEN_STR)) == 0)
 				AddTokenElem(LISTEN_STR, LISTEN, it);
@@ -73,8 +79,11 @@ Lexer::Lexer(const std::string &buffer) {
 				AddTokenElem(INDEX_STR, INDEX, it);
 			else if (std::strncmp(&(*it), SLASH_STR, std::strlen(SLASH_STR)) == 0)
 				AddTokenIncrement(SLASH_STR, SLASH, it);
-			// else
-			// 	throw std::runtime_error("error"); /*適当*/
+			else if (std::strncmp(&(*it), SHARP_STR, std::strlen(SHARP_STR)) == 0) {
+				while (*it != '\n')
+					++it;
+			} else
+				throw std::runtime_error("error"); /*適当*/
 		}
 	}
 }

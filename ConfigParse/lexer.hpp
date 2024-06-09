@@ -26,6 +26,7 @@ class Lexer {
 		INDEX,
 		SLASH,
 	};
+	const std::string buffer_;
 
   public:
 	Lexer(const std::string &);
@@ -47,6 +48,7 @@ class Lexer {
 #define ROOT_STR        "root"
 #define INDEX_STR       "index"
 #define SLASH_STR       "/"
+#define SHARP_STR       "#"
 /*--------------------------------------*/
 
 #endif
