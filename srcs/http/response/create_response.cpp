@@ -1,5 +1,3 @@
-#include "convert.hpp" // use ToString()
-#include "debug.hpp"   // tmp to do
 #include "http.hpp"
 #include "http_message.hpp"
 #include <iostream>
@@ -13,10 +11,9 @@ namespace http_response {
 						<< request.at(Http::HTTP_STATUS_TEXT) << CRLF;
 	}
 
+	template <typename T>
 	void CreateHeaderField(
-		std::ostream      &response_stream,
-		const std::string &name,
-		const std::string &value
+		std::ostream &response_stream, const std::string &name, const T &value
 	) {
 		response_stream << name << ":" << SP << value << SP << CRLF;
 	}
@@ -26,9 +23,7 @@ namespace http_response {
 	) {
 		CreateHeaderField(response_stream, CONNECTION, "close");
 		CreateHeaderField(
-			response_stream,
-			CONTENT_LENGTH,
-			ToString(request.at(Http::HTTP_CONTENT).size())
+			response_stream, CONTENT_LENGTH, request.at(Http::HTTP_CONTENT).size()
 		);
 	}
 
