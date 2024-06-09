@@ -5,7 +5,7 @@
 
 # include
 !.gitignore
-!.vscode/setting.json
+!.vscode/settings.json
 !.clang-format
 !sandbox/*
 
