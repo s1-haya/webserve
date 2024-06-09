@@ -1,7 +1,7 @@
-#include "character.hpp"
 #include "convert.hpp" // use ToString()
 #include "debug.hpp"   // tmp to do
 #include "http.hpp"
+#include "http_message.hpp"
 #include <iostream>
 #include <sstream>
 
