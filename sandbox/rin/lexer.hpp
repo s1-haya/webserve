@@ -1,13 +1,13 @@
 #ifndef LEXER_HPP_
 #define LEXER_HPP_
-#include <queue>
+#include <list>
 
 #include "node.hpp"
 
 class Lexer {
   private:
-	std::queue<Node *> *tokens_;
-	void                AddToken(std::string symbol, int token_type);
+	std::list<Node *> *tokens_;
+	void               AddToken(std::string symbol, int token_type);
 
   public:
 	Lexer(std::string &);
@@ -33,6 +33,9 @@ enum {
 	L_BRACKET,
 	R_BRACKET,
 	LISTEN,
+	ROOT,
+	INDEX,
+	SLASH,
 };
 
 #define SERVER_STR      "server"
@@ -42,6 +45,9 @@ enum {
 #define R_BRACKET_STR   "}"
 #define LISTEN_STR      "listen"
 #define DELIM_CHR       ';'
+#define ROOT_STR        "root"
+#define INDEX_STR       "index"
+#define SLASH_STR       "/"
 /*--------------------------------------*/
 
 #endif
