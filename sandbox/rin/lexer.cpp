@@ -88,19 +88,6 @@ Lexer::Lexer(std::string &buffer) {
 				}
 				AddToken(new_str, 10);
 				AddToken(";", DELIM);
-			} else if (std::strncmp(&(*it), INDEX_STR, std::strlen(INDEX_STR)) ==
-					   0) {
-				AddToken(INDEX_STR, INDEX);
-				it += std::strlen(INDEX_STR);
-				while (IsSpace(*it))
-					++it;
-				new_str = "";
-				while (*it != DELIM_CHR) {
-					new_str += *it;
-					++it;
-				}
-				AddToken(new_str, 10);
-				AddToken(";", DELIM);
 			} else if (std::strncmp(&(*it), SLASH_STR, std::strlen(SLASH_STR)) ==
 					   0) {
 				AddToken(SLASH_STR, SLASH);

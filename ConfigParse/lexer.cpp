@@ -1,121 +1,107 @@
 #include "lexer.hpp"
-#include <vector>
+#include <iostream>
 
-/*統合時外す*/
-#define LF '\n'
-#define CR '\r'
-/*---*/
-
-/*仮*/
-enum {
-	CONF_ERROR,
-	CONF_OK,
-	CONF_BLOCK_START,
-	CONF_BLOCK_DONE,
-	CONF_FILE_DONE,
-};
-/*---*/
-
-namespace {
-	std::vector<std::string>
-	SplitStr(const std::string &str, const std::string delim) {
-		std::vector<std::string> split_str;
-
-		std::size_t start = 0;
-		while (start < str.size()) {
-			const std::string::size_type pos = str.find(delim, start);
-			if (pos == std::string::npos) {
-				split_str.push_back(str.substr(start));
-				break;
-			}
-			split_str.push_back(str.substr(start, pos - start));
-			start = pos + delim.size();
-		}
-		return split_str;
-	}
-} // namespace
-
-Lexer::Lexer(std::string &buffer) {}
-
-Lexer::~Lexer() {}
-
-/*namespaceに入れる*/
-
+/*-----------------------------------*/
 static bool IsSpace(char c) {
 	if (c == ' ' || c == '\t' || c == CR || c == LF)
 		return true;
 	return false;
 }
+/*-----------------------------------*/
 
-static int LexerReadToken(const std::string &buffer) {
-	bool need_space    = false;
-	bool last_space    = true;
-	bool sharp_comment = false;
-	bool found         = false;
+void Lexer::AddToken(std::string symbol, int token_type) {
+	Node *token = new Node(symbol, token_type);
+	tokens_->push_front(token);
+}
 
-	int         line_count = 0;
-	std::string data;
+void Lexer::AddTokenIncrement(
+	std::string token, int token_type, std::string::const_iterator &it
+) {
+	AddToken(token, token_type);
+	it += std::strlen(token.c_str()) - 1;
+}
 
-	for (std::string::const_iterator it = buffer.begin() + 1; it != buffer.end();
-		 ++it) {
-		if (*it == LF) {
-			++line_count;
-			if (sharp_comment)
-				sharp_comment = false;
+void Lexer::AddTokenElem(
+	std::string token, int token_type, std::string::const_iterator &it
+) {
+	std::string new_str = "";
+	AddToken(token, token_type);
+	it += std::strlen(token.c_str());
+	while (IsSpace(*it))
+		++it;
+	while (*it != DELIM_CHR) {
+		new_str += *it;
+		++it;
+	}
+	AddToken(new_str, 10);
+	AddToken(";", DELIM);
+}
+
+Lexer::Lexer(const std::string &buffer) {
+	tokens_                   = new std::list<Node *>;
+	bool        need_space    = false;
+	bool        need_delim    = false;
+	bool        sharp_comment = false;
+	std::string new_str;
+
+	for (std::string::const_iterator it = buffer.begin(); it != buffer.end(); ++it) {
+		while (IsSpace(*it)) {
+			++it;
+			need_space = false;
 		}
-		if (sharp_comment)
-			continue;
-		// // if (quoted)
-		// if (need_space)
-		// {
-		// 	if (isspace(*it)) {
-		// 		last_space = true;
-		// 		need_space = false;
-		// 		continue;
-		// 	}
-		// 	if (*it == ';')
-		// 		return CONF_OK;
-		// 	if (*it == '{')
-		// 		return CONF_BLOCK_START;
-		// }
-		if (last_space) {
-			char start = *(it - 1);
-			if (IsSpace(*it))
-				continue;
-			switch (*it) {
-			case ';':
-			case '{':
-				return CONF_BLOCK_START;
-			case '}':
-				return CONF_BLOCK_DONE;
-			case '#':
-				sharp_comment = true;
-				continue;
-			default:
-				last_space = false;
-			}
-		} else {
-			if (IsSpace(*it) || *it == ';' || *it == '{') {
-				last_space = true;
-				found      = true;
-			}
-			// if (found)
-			// {
-
-			// }
+		if (!need_space) {
+			if (std::strncmp(
+					&(*it), SERVER_NAME_STR, std::strlen(SERVER_NAME_STR)
+				) == 0)
+				AddTokenElem(SERVER_NAME_STR, SERVER_NAME, it);
+			else if (std::strncmp(&(*it), SERVER_STR, std::strlen(SERVER_STR)) == 0)
+				AddTokenIncrement(SERVER_STR, SERVER, it);
+			else if (std::strncmp(
+						 &(*it), L_BRACKET_STR, std::strlen(L_BRACKET_STR)
+					 ) == 0)
+				AddTokenIncrement(L_BRACKET_STR, L_BRACKET, it);
+			else if (std::strncmp(
+						 &(*it), R_BRACKET_STR, std::strlen(R_BRACKET_STR)
+					 ) == 0)
+				AddTokenIncrement(R_BRACKET_STR, R_BRACKET, it);
+			// sharp_comment = true;
+			else if (std::strncmp(&(*it), LISTEN_STR, std::strlen(LISTEN_STR)) == 0)
+				AddTokenElem(LISTEN_STR, LISTEN, it);
+			else if (std::strncmp(&(*it), ROOT_STR, std::strlen(ROOT_STR)) == 0)
+				AddTokenElem(ROOT_STR, ROOT, it);
+			else if (std::strncmp(&(*it), INDEX_STR, std::strlen(INDEX_STR)) == 0)
+				AddTokenElem(INDEX_STR, INDEX, it);
+			else if (std::strncmp(&(*it), SLASH_STR, std::strlen(SLASH_STR)) == 0)
+				AddTokenIncrement(SLASH_STR, SLASH, it);
+			// else
+			// 	throw std::runtime_error("error"); /*適当*/
 		}
 	}
 }
 
-/*----------*/
+Lexer::~Lexer() {}
 
-/*テスト用*/
+void Lexer::PrintTokens() {
+	std::list<Node *> tmp = *tokens_;
+	while (!tmp.empty()) {
+		Node *node = tmp.back();
+		tmp.pop_back();
+		std::cout << node->GetToken() << std::endl;
+	}
+}
 
+#include <fstream>
 #include <sstream>
 
 int main() {
-	std::fstream      fs("config");
+	std::ifstream     conf("config_samp");
 	std::stringstream ss;
-	ss << fs.rdbuf();
-	LexerReadToken(ss.str());
+	ss << conf.rdbuf();
+	std::string buffer = ss.str();
+	try {
+		Lexer lex(buffer);
+		lex.PrintTokens();
+	} catch (const std::exception &e) {
+		std::cerr << e.what() << '\n';
+	}
 }
