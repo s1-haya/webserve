@@ -16,31 +16,13 @@ namespace {
 		return Strs(array, array + size);
 	}
 
-	// SplitStr()の結果とexpectedを比較(他でも使用できそうなのでtemplateにしてみている)
-	template <typename T>
-	bool IsSame(const T &a, const T &b) {
-		if (a.size() != b.size()) {
-			return false;
-		}
-		typename T::const_iterator it_a = a.begin();
-		typename T::const_iterator it_b = b.begin();
-		while (it_a != a.end()) {
-			if (*it_a != *it_b) {
-				return false;
-			}
-			++it_a;
-			++it_b;
-		}
-		return true;
-	}
-
 	// SplitStr()を実行してexpectedと比較
 	void
 	Run(const std::string &src, const std::string &substring, const Strs &expected) {
 		static unsigned int test_case = 0;
 		test_case++;
 
-		if (IsSame(utils::SplitStr(src, substring), expected)) {
+		if (utils::SplitStr(src, substring) == expected) {
 			std::cerr << COLOR_GREEN << test_case << ".[OK] " << COLOR_RESET << src
 					  << std::endl;
 		} else {
