@@ -9,7 +9,7 @@ namespace http_response {
 	void CreateStatusLine(
 		std::ostream &response_stream, const Http::RequestMessage &request
 	) {
-		response_stream << "HTTP/1.1" << SP << request.at(Http::HTTP_STATUS) << SP
+		response_stream << HTTP_VERSION << SP << request.at(Http::HTTP_STATUS) << SP
 						<< request.at(Http::HTTP_STATUS_TEXT) << CRLF;
 	}
 
@@ -24,10 +24,10 @@ namespace http_response {
 	void CreateHeaderFields(
 		std::ostream &response_stream, const Http::RequestMessage &request
 	) {
-		CreateHeaderField(response_stream, "Connection", "close");
+		CreateHeaderField(response_stream, CONNECTION, "close");
 		CreateHeaderField(
 			response_stream,
-			"Content-Length",
+			CONTENT_LENGTH,
 			ToString(request.at(Http::HTTP_CONTENT).size())
 		);
 	}
