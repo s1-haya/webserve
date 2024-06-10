@@ -12,7 +12,8 @@
 !Makefile
 !*.cpp
 !*.hpp
-!test/**
+!test/*.py
+!test/nginx/**
 
 !Dockerfile
 !docker-compose.yml
