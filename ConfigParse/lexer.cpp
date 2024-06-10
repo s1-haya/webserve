@@ -11,7 +11,7 @@ namespace {
 
 void Lexer::AddToken(std::string symbol, int token_type) {
 	Node *token = new Node(symbol, token_type);
-	tokens_.push_front(token);
+	tokens_->push_front(token);
 }
 
 void Lexer::AddTokenIncrement(
@@ -40,6 +40,7 @@ void Lexer::AddTokenElem(
 }
 
 Lexer::Lexer(const std::string &buffer) : buffer_(buffer) {
+	tokens_                   = new std::list<Node *>;
 	bool        need_space    = false;
 	bool        need_delim    = false;
 	bool        sharp_comment = false;
@@ -88,7 +89,7 @@ Lexer::Lexer(const std::string &buffer) : buffer_(buffer) {
 Lexer::~Lexer() {}
 
 void Lexer::PrintTokens() {
-	std::list<Node *> tmp = tokens_;
+	std::list<Node *> tmp = *tokens_;
 	while (!tmp.empty()) {
 		Node *node = tmp.back();
 		tmp.pop_back();

@@ -6,11 +6,11 @@
 
 class Lexer {
   private:
-	std::list<Node *> tokens_;
-	void              AddToken(std::string symbol, int token_type);
-	void              AddTokenIncrement(
-					 std::string token, int token_type, std::string::const_iterator &it
-				 );
+	std::list<Node *> *tokens_;
+	void               AddToken(std::string symbol, int token_type);
+	void               AddTokenIncrement(
+					  std::string token, int token_type, std::string::const_iterator &it
+				  );
 	void
 	AddTokenElem(std::string token, int token_type, std::string::const_iterator &it);
 	enum {
