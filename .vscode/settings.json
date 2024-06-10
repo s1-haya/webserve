@@ -1,0 +1,11 @@
+{
+	"C_Cpp.default.cppStandard": "c++98",
+	"editor.defaultFormatter": "ms-vscode.cpptools",
+	"editor.formatOnSave": true,
+	"editor.formatOnPaste": true,
+	"[python]": {
+        "editor.defaultFormatter": "ms-python.black-formatter",
+        "editor.formatOnSave": true
+    },
+    "isort.args":["--profile", "black"]
+}
