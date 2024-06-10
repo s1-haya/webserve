@@ -1,6 +1,7 @@
 {
 	"name": "webserv",
 	"dockerFile": "./Dockerfile",
+	"context": "..",
 	"extensions": [
 		"ms-azuretools.vscode-docker"
 	],
