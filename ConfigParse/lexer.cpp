@@ -7,7 +7,6 @@ namespace {
 			return true;
 		return false;
 	}
-
 } // namespace
 
 void Lexer::AddToken(std::string symbol, int token_type) {
@@ -70,7 +69,6 @@ Lexer::Lexer(const std::string &buffer) : buffer_(buffer) {
 			else if (std::strncmp(&(*it), LOCATION_STR, std::strlen(LOCATION_STR)) ==
 					 0)
 				AddTokenIncrement(LOCATION_STR, LOCATION, it);
-			// sharp_comment = true;
 			else if (std::strncmp(&(*it), LISTEN_STR, std::strlen(LISTEN_STR)) == 0)
 				AddTokenElem(LISTEN_STR, LISTEN, it);
 			else if (std::strncmp(&(*it), ROOT_STR, std::strlen(ROOT_STR)) == 0)
@@ -83,7 +81,7 @@ Lexer::Lexer(const std::string &buffer) : buffer_(buffer) {
 				while (*it != '\n')
 					++it;
 			} else
-				throw std::runtime_error("error"); /*適当*/
+				throw std::runtime_error("error");
 		}
 	}
 }
