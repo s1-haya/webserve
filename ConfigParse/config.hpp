@@ -8,7 +8,7 @@
 
 class Config {
   private:
-	Config(std::string &file_path);
+	Config(const std::string &file_path);
 	Config(const Config &);
 	Config              &operator=(const Config &);
 	static const Config *s_cInstance;
@@ -16,7 +16,7 @@ class Config {
   public:
 	~Config();
 
-	static const Config *GetInstance();
+	static const Config *GetInstance() const;
 	static void          Create(std::string &file_path);
 	static void          Destroy();
 	ServerDir            server_;

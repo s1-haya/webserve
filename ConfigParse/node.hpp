@@ -8,10 +8,10 @@ class Node {
 	int         token_type_;
 
   public:
-	Node(std::string &token, int token_type);
+	Node(const std::string &token, int token_type);
 	~Node();
-	std::string &GetToken();
-	int          GetTokenType();
+	std::string &GetToken() const;
+	int          GetTokenType() const;
 };
 
 #endif

@@ -11,7 +11,7 @@ class Node {
 	Node(std::string &token, int token_type);
 	~Node();
 	std::string &GetToken();
-	int          GetTokenType();
+	int          GetTokenType() const;
 };
 
 Node::Node(std::string &token, int token_type)
