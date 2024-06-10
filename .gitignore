@@ -12,7 +12,7 @@
 !Makefile
 !*.cpp
 !*.hpp
-!*.py
+!test/*.py
 
 !Dockerfile
 !docker-compose.yml
