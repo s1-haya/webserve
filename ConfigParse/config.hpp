@@ -16,7 +16,7 @@ class Config {
   public:
 	~Config();
 
-	static const Config *GetInstance() const;
+	static const Config *GetInstance();
 	static void          Create(std::string &file_path);
 	static void          Destroy();
 	ServerDir            server_;

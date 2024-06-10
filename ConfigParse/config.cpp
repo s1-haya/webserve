@@ -3,7 +3,7 @@
 
 const Config *Config::s_cInstance = NULL;
 
-Config::Config(std::string &file_path) : config_file_(file_path) {
+Config::Config(const std::string &file_path) : config_file_(file_path) {
 	if (!config_file_)
 		std::cerr << "Cannot open Configuration file" << std::endl;
 	server_.server_name_ = "localhost";

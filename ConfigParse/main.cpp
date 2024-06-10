@@ -1,7 +1,5 @@
 #include "config.hpp"
 
-#define PATH "src/index.html"
-
 int main() {
 	std::string conf = "config";
 	ConfigInstance->Create(conf);
