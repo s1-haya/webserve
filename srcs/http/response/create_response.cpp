@@ -1,7 +1,5 @@
-#include "character.hpp"
-#include "convert.hpp" // use ToString()
-#include "debug.hpp"   // tmp to do
 #include "http.hpp"
+#include "http_message.hpp"
 #include <iostream>
 #include <sstream>
 
@@ -9,31 +7,28 @@ namespace http_response {
 	void CreateStatusLine(
 		std::ostream &response_stream, const Http::RequestMessage &request
 	) {
-		response_stream << "HTTP/1.1" << SP << request.at(Http::HTTP_STATUS) << SP
-						<< request.at(Http::HTTP_STATUS_TEXT) << CR << LF;
+		response_stream << HTTP_VERSION << SP << request.at(Http::HTTP_STATUS) << SP
+						<< request.at(Http::HTTP_STATUS_TEXT) << CRLF;
 	}
 
+	template <typename T>
 	void CreateHeaderField(
-		std::ostream      &response_stream,
-		const std::string &name,
-		const std::string &value
+		std::ostream &response_stream, const std::string &name, const T &value
 	) {
-		response_stream << name << ":" << SP << value << SP << CR << LF;
+		response_stream << name << ":" << SP << value << SP << CRLF;
 	}
 
 	void CreateHeaderFields(
 		std::ostream &response_stream, const Http::RequestMessage &request
 	) {
-		CreateHeaderField(response_stream, "Connection", "close");
+		CreateHeaderField(response_stream, CONNECTION, "close");
 		CreateHeaderField(
-			response_stream,
-			"Content-Length",
-			ToString(request.at(Http::HTTP_CONTENT).size())
+			response_stream, CONTENT_LENGTH, request.at(Http::HTTP_CONTENT).size()
 		);
 	}
 
 	void CreateCRLF(std::ostream &response_stream) {
-		response_stream << CR << LF;
+		response_stream << CRLF;
 	}
 
 	void
