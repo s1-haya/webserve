@@ -5,14 +5,14 @@
 
 # include
 !.gitignore
-!.vscode/setting.json
+!.vscode/settings.json
 !.clang-format
 !sandbox/*
 
 !Makefile
 !*.cpp
 !*.hpp
-!test/**
+!test/*.py
 
 !Dockerfile
 !docker-compose.yml

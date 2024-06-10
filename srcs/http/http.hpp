@@ -16,7 +16,7 @@ class Http {
 		HTTP_STATUS_TEXT
 	};
 	typedef std::map<MessageType, std::string> RequestMessage;
-	Http(const std::string &read_buf);
+	explicit Http(const std::string &read_buf);
 	~Http();
 	std::string CreateResponse();
 
