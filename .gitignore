@@ -12,7 +12,7 @@
 !Makefile
 !*.cpp
 !*.hpp
-!test/*.py
+!*.py
 !test/nginx/**
 
 !Dockerfile
