@@ -18,11 +18,12 @@ rm:
 	docker rm $(CONTAINER_NAME)
 
 .PHONY	: clean
-clean: stop rm
+clean:
+	@make stop && make rm
 
 .PHONY	: fclean
-fclean: clean
-	docker rmi $(IMAGE_NAME)
+fclean:
+	@make clean && docker rmi $(IMAGE_NAME)
 
 .PHONY	: log
 log:
