@@ -19,6 +19,12 @@ RUN apt-get update && \
     curl
 
 RUN curl -sS https://bootstrap.pypa.io/get-pip.py | python3.9
+
+# デフォルトのPythonバージョンをPython 3.9に変更
+RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.9 1
+RUN update-alternatives --set python3 /usr/bin/python3.9
+
+
 COPY requirements.txt /workspaces/webserv/requirements.txt
 RUN pip install --upgrade pip && pip install -r /workspaces/webserv/requirements.txt
 
