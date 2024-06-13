@@ -37,3 +37,19 @@ ps:
 .PHONY	: login
 login:
 	@docker exec -it $(CONTAINER_NAME) /bin/bash
+
+.PHONY	: e2e
+e2e:
+	@cd $(BUILD_CONTEXT) && pytest ./test
+
+.PHONY	: test
+test:
+	make run
+	make e2e
+	make clean
+
+.PHONY	: debug
+debug:
+	make run
+	@cd $(BUILD_CONTEXT) && pytest -s ./test
+	make clean

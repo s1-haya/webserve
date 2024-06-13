@@ -30,4 +30,5 @@ jobs:
       - name: Run tests
         if: github.event_name == 'pull_request'
         run: |
-          ./test/run_test.py
+          make -C ./test/webserv build
+          make -C ./test/webserv test
