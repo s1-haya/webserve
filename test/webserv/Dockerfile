@@ -5,7 +5,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y tzdata --no-install-recommends
 
 RUN apt-get update && \
-    apt-get install -y software-properties-common --no-install-recommends && \
+    apt-get install -y software-properties-common && \
     add-apt-repository -y ppa:deadsnakes/ppa && \
     apt-get update && \
     apt-get install -y \
@@ -16,7 +16,7 @@ RUN apt-get update && \
     valgrind \
     clang-format \
     vim \
-    curl --no-install-recommends
+    curl
 
 RUN curl -sS https://bootstrap.pypa.io/get-pip.py | python3.9
 
