@@ -2,10 +2,10 @@ FROM ubuntu:22.04
 
 # 非対話的モードを設定
 ENV DEBIAN_FRONTEND=noninteractive
-RUN apt-get update && apt-get install -y tzdata
+RUN apt-get update && apt-get install -y tzdata --no-install-recommends
 
 RUN apt-get update && \
-    apt-get install -y software-properties-common && \
+    apt-get install -y software-properties-common --no-install-recommends && \
     add-apt-repository -y ppa:deadsnakes/ppa && \
     apt-get update && \
     apt-get install -y \
@@ -16,7 +16,7 @@ RUN apt-get update && \
     valgrind \
     clang-format \
     vim \
-    curl
+    curl --no-install-recommends
 
 RUN curl -sS https://bootstrap.pypa.io/get-pip.py | python3.9
 
@@ -30,7 +30,7 @@ COPY srcs /webserv/srcs
 COPY html /webserv/html
 COPY Makefile /webserv/Makefile
 COPY requirements.txt /webserv/requirements.txt
-RUN pip install --upgrade pip && pip install -r /webserv/requirements.txt
+RUN pip install --upgrade pip && pip install --no-cache-dir -r /webserv/requirements.txt
 
 RUN rm -rf /var/lib/apt/lists/*
 
