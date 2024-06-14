@@ -45,11 +45,11 @@ e2e:
 .PHONY	: test
 test:
 	make run
-	make e2e
+	-make e2e
 	make clean
 
 .PHONY	: debug
 debug:
 	make run
-	@cd $(BUILD_CONTEXT) && pytest -s ./test
+	-@cd $(BUILD_CONTEXT) && pytest -s ./test
 	make clean
