@@ -1,14 +1,14 @@
-IMAGE_NAME := nginx
-CONTAINER_NAME := nginx-container
+IMAGE_NAME := webserv
+CONTAINER_NAME := webserv-container
 BUILD_CONTEXT := ../../
 
 .PHONY	: build
 build:
-	@cd $(BUILD_CONTEXT) && docker build -f test/nginx/Dockerfile -t $(IMAGE_NAME) .
+	@cd $(BUILD_CONTEXT) && docker build -f test/webserv/Dockerfile -t $(IMAGE_NAME) .
 
 .PHONY	: run
 run:
-	@docker run -d --name $(CONTAINER_NAME) -p 80:80 $(IMAGE_NAME)
+	@docker run -d --name $(CONTAINER_NAME) -p 8080:8080 $(IMAGE_NAME)
 
 .PHONY	: stop
 stop:
@@ -37,3 +37,19 @@ ps:
 .PHONY	: login
 login:
 	@docker exec -it $(CONTAINER_NAME) /bin/bash
+
+.PHONY	: e2e
+e2e:
+	@cd $(BUILD_CONTEXT) && pytest ./test
+
+.PHONY	: test
+test:
+	make run
+	make e2e
+	make clean
+
+.PHONY	: debug
+debug:
+	make run
+	@cd $(BUILD_CONTEXT) && pytest -s ./test
+	make clean

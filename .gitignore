@@ -13,7 +13,6 @@
 !*.cpp
 !*.hpp
 !*.py
-!test/nginx/**
 
 !Dockerfile
 !docker-compose.yml
