@@ -29,7 +29,7 @@ void Lexer::AddTokenIncrement(
 	std::string token, int token_type, std::string::const_iterator &it
 ) {
 	AddToken(token, token_type);
-	it += std::strlen(token.c_str()) - 1;
+	it += token.size() - 1;
 }
 
 void Lexer::AddTokenElem(
@@ -37,7 +37,7 @@ void Lexer::AddTokenElem(
 ) {
 	std::string new_str = "";
 	AddToken(token, token_type);
-	it += std::strlen(token.c_str());
+	it += token.size();
 	while (IsSpace(*it))
 		++it;
 	while (*it != DELIM_CHR && *it != '\n') {
@@ -46,7 +46,7 @@ void Lexer::AddTokenElem(
 	}
 	if (*it == '\n')
 		throw std::runtime_error("no delim");
-	AddToken(new_str, 10);
+	AddToken(new_str, STRING);
 	AddToken(";", DELIM);
 }
 
@@ -56,38 +56,31 @@ Lexer::Lexer(const std::string &buffer, std::list<Node>* tokens_) : buffer_(buff
 	bool        sharp_comment = false;
 	std::string new_str;
 
-	for (std::string::const_iterator it = buffer.begin(); it != buffer.end(); ++it) {
+	for (std::string::const_iterator it = buffer_.begin(); it != buffer_.end(); ++it) {
 		while (IsSpace(*it)) {
 			++it;
 			need_space = false;
 		}
 		if (!need_space && !sharp_comment) {
-			if (std::strncmp(
-					&(*it), Lexer::SERVER_NAME_STR.c_str(), std::strlen(Lexer::SERVER_NAME_STR.c_str())
-				) == 0)
-				AddTokenElem(Lexer::SERVER_NAME_STR.c_str(), SERVER_NAME, it);
-			else if (std::strncmp(&(*it), Lexer::SERVER_STR.c_str(), std::strlen(Lexer::SERVER_STR.c_str())) == 0)
-				AddTokenIncrement(Lexer::SERVER_STR.c_str(), SERVER, it);
-			else if (std::strncmp(
-						 &(*it), Lexer::L_BRACKET_STR.c_str(), std::strlen(Lexer::L_BRACKET_STR.c_str())
-					 ) == 0)
-				AddTokenIncrement(Lexer::L_BRACKET_STR.c_str(), L_BRACKET, it);
-			else if (std::strncmp(
-						 &(*it), Lexer::R_BRACKET_STR.c_str(), std::strlen(Lexer::R_BRACKET_STR.c_str())
-					 ) == 0)
-				AddTokenIncrement(Lexer::R_BRACKET_STR.c_str(), R_BRACKET, it);
-			else if (std::strncmp(&(*it), Lexer::LOCATION_STR.c_str(), std::strlen(Lexer::LOCATION_STR.c_str())) ==
-					 0)
-				AddTokenIncrement(Lexer::LOCATION_STR.c_str(), LOCATION, it);
-			else if (std::strncmp(&(*it), Lexer::LISTEN_STR.c_str(), std::strlen(Lexer::LISTEN_STR.c_str())) == 0)
-				AddTokenElem(Lexer::LISTEN_STR.c_str(), LISTEN, it);
-			else if (std::strncmp(&(*it), Lexer::ROOT_STR.c_str(), std::strlen(Lexer::ROOT_STR.c_str())) == 0)
-				AddTokenElem(Lexer::ROOT_STR.c_str(), ROOT, it);
-			else if (std::strncmp(&(*it), Lexer::INDEX_STR.c_str(), std::strlen(Lexer::INDEX_STR.c_str())) == 0)
-				AddTokenElem(Lexer::INDEX_STR.c_str(), INDEX, it);
-			else if (std::strncmp(&(*it), Lexer::SLASH_STR.c_str(), std::strlen(Lexer::SLASH_STR.c_str())) == 0)
-				AddTokenIncrement(Lexer::SLASH_STR.c_str(), SLASH, it);
-			else if (std::strncmp(&(*it), Lexer::SHARP_STR.c_str(), std::strlen(Lexer::SHARP_STR.c_str())) == 0) {
+			if (std::equal(Lexer::SERVER_NAME_STR.begin(), Lexer::SERVER_NAME_STR.end(), it))
+				AddTokenElem(Lexer::SERVER_NAME_STR, SERVER_NAME, it);
+			else if (std::equal(Lexer::SERVER_STR.begin(), Lexer::SERVER_STR.end(), it))
+				AddTokenIncrement(Lexer::SERVER_STR, SERVER, it);
+			else if (std::equal(Lexer::L_BRACKET_STR.begin(), Lexer::L_BRACKET_STR.end(), it))
+				AddTokenIncrement(Lexer::L_BRACKET_STR, L_BRACKET, it);
+			else if (std::equal(Lexer::R_BRACKET_STR.begin(), Lexer::R_BRACKET_STR.end(), it))
+				AddTokenIncrement(Lexer::R_BRACKET_STR, R_BRACKET, it);
+			else if (std::equal(Lexer::LOCATION_STR.begin(), Lexer::LOCATION_STR.end(), it))
+				AddTokenIncrement(Lexer::LOCATION_STR, LOCATION, it);
+			else if (std::equal(Lexer::LISTEN_STR.begin(), Lexer::LISTEN_STR.end(), it))
+				AddTokenElem(Lexer::LISTEN_STR, LISTEN, it);
+			else if (std::equal(Lexer::ROOT_STR.begin(), Lexer::ROOT_STR.end(), it))
+				AddTokenElem(Lexer::ROOT_STR, ROOT, it);
+			else if (std::equal(Lexer::INDEX_STR.begin(), Lexer::INDEX_STR.end(), it))
+				AddTokenElem(Lexer::INDEX_STR, INDEX, it);
+			else if (std::equal(Lexer::SLASH_STR.begin(), Lexer::SLASH_STR.end(), it))
+				AddTokenIncrement(Lexer::SLASH_STR, SLASH, it);
+			else if (std::equal(Lexer::SHARP_STR.begin(), Lexer::SHARP_STR.end(), it)) {
 				while (*it != Lexer::LF)
 					++it;
 			} else

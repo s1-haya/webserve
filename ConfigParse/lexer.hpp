@@ -26,6 +26,7 @@ class Lexer {
 		ROOT,
 		INDEX,
 		SLASH,
+		STRING,
 	};
 	const std::string buffer_;
 
