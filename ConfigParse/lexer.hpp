@@ -32,23 +32,19 @@ class Lexer {
 	Lexer(const std::string &, std::list<Node>*);
 	~Lexer();
 	void PrintTokens();
+	static const char CR = '\r';
+	static const char LF = '\n';
+	static const char DELIM_CHR = ';';
+	static const std::string SERVER_STR;
+	static const std::string SERVER_NAME_STR;
+	static const std::string LOCATION_STR;
+	static const std::string L_BRACKET_STR;
+	static const std::string R_BRACKET_STR;
+	static const std::string LISTEN_STR;
+	static const std::string ROOT_STR;
+	static const std::string INDEX_STR;
+	static const std::string SLASH_STR;
+	static const std::string SHARP_STR;
 };
-
-/*--------------------------------------*/
-#define LF              '\n'
-#define CR              '\r'
-
-#define SERVER_STR      "server"
-#define SERVER_NAME_STR "server_name"
-#define LOCATION_STR    "location"
-#define L_BRACKET_STR   "{"
-#define R_BRACKET_STR   "}"
-#define LISTEN_STR      "listen"
-#define DELIM_CHR       ';'
-#define ROOT_STR        "root"
-#define INDEX_STR       "index"
-#define SLASH_STR       "/"
-#define SHARP_STR       "#"
-/*--------------------------------------*/
 
 #endif

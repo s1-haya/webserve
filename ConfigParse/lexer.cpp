@@ -3,11 +3,22 @@
 
 namespace {
 	bool IsSpace(char c) {
-		if (c == ' ' || c == '\t' || c == CR || c == LF)
+		if (c == ' ' || c == '\t' || c == Lexer::CR || c == Lexer::LF)
 			return true;
 		return false;
 	}
 } // namespace
+
+const std::string Lexer::SERVER_STR = "server";
+const std::string Lexer::SERVER_NAME_STR = "server_name";
+const std::string Lexer::LOCATION_STR = "location";
+const std::string Lexer::L_BRACKET_STR = "{";
+const std::string Lexer::R_BRACKET_STR = "}";
+const std::string Lexer::LISTEN_STR = "listen";
+const std::string Lexer::ROOT_STR = "root";
+const std::string Lexer::INDEX_STR = "index";
+const std::string Lexer::SLASH_STR = "/";
+const std::string Lexer::SHARP_STR = "#";
 
 void Lexer::AddToken(std::string symbol, int token_type) {
 	Node token = Node(symbol, token_type);
@@ -52,32 +63,32 @@ Lexer::Lexer(const std::string &buffer, std::list<Node>* tokens_) : buffer_(buff
 		}
 		if (!need_space && !sharp_comment) {
 			if (std::strncmp(
-					&(*it), SERVER_NAME_STR, std::strlen(SERVER_NAME_STR)
+					&(*it), Lexer::SERVER_NAME_STR.c_str(), std::strlen(Lexer::SERVER_NAME_STR.c_str())
 				) == 0)
-				AddTokenElem(SERVER_NAME_STR, SERVER_NAME, it);
-			else if (std::strncmp(&(*it), SERVER_STR, std::strlen(SERVER_STR)) == 0)
-				AddTokenIncrement(SERVER_STR, SERVER, it);
+				AddTokenElem(Lexer::SERVER_NAME_STR.c_str(), SERVER_NAME, it);
+			else if (std::strncmp(&(*it), Lexer::SERVER_STR.c_str(), std::strlen(Lexer::SERVER_STR.c_str())) == 0)
+				AddTokenIncrement(Lexer::SERVER_STR.c_str(), SERVER, it);
 			else if (std::strncmp(
-						 &(*it), L_BRACKET_STR, std::strlen(L_BRACKET_STR)
+						 &(*it), Lexer::L_BRACKET_STR.c_str(), std::strlen(Lexer::L_BRACKET_STR.c_str())
 					 ) == 0)
-				AddTokenIncrement(L_BRACKET_STR, L_BRACKET, it);
+				AddTokenIncrement(Lexer::L_BRACKET_STR.c_str(), L_BRACKET, it);
 			else if (std::strncmp(
-						 &(*it), R_BRACKET_STR, std::strlen(R_BRACKET_STR)
+						 &(*it), Lexer::R_BRACKET_STR.c_str(), std::strlen(Lexer::R_BRACKET_STR.c_str())
 					 ) == 0)
-				AddTokenIncrement(R_BRACKET_STR, R_BRACKET, it);
-			else if (std::strncmp(&(*it), LOCATION_STR, std::strlen(LOCATION_STR)) ==
+				AddTokenIncrement(Lexer::R_BRACKET_STR.c_str(), R_BRACKET, it);
+			else if (std::strncmp(&(*it), Lexer::LOCATION_STR.c_str(), std::strlen(Lexer::LOCATION_STR.c_str())) ==
 					 0)
-				AddTokenIncrement(LOCATION_STR, LOCATION, it);
-			else if (std::strncmp(&(*it), LISTEN_STR, std::strlen(LISTEN_STR)) == 0)
-				AddTokenElem(LISTEN_STR, LISTEN, it);
-			else if (std::strncmp(&(*it), ROOT_STR, std::strlen(ROOT_STR)) == 0)
-				AddTokenElem(ROOT_STR, ROOT, it);
-			else if (std::strncmp(&(*it), INDEX_STR, std::strlen(INDEX_STR)) == 0)
-				AddTokenElem(INDEX_STR, INDEX, it);
-			else if (std::strncmp(&(*it), SLASH_STR, std::strlen(SLASH_STR)) == 0)
-				AddTokenIncrement(SLASH_STR, SLASH, it);
-			else if (std::strncmp(&(*it), SHARP_STR, std::strlen(SHARP_STR)) == 0) {
-				while (*it != '\n')
+				AddTokenIncrement(Lexer::LOCATION_STR.c_str(), LOCATION, it);
+			else if (std::strncmp(&(*it), Lexer::LISTEN_STR.c_str(), std::strlen(Lexer::LISTEN_STR.c_str())) == 0)
+				AddTokenElem(Lexer::LISTEN_STR.c_str(), LISTEN, it);
+			else if (std::strncmp(&(*it), Lexer::ROOT_STR.c_str(), std::strlen(Lexer::ROOT_STR.c_str())) == 0)
+				AddTokenElem(Lexer::ROOT_STR.c_str(), ROOT, it);
+			else if (std::strncmp(&(*it), Lexer::INDEX_STR.c_str(), std::strlen(Lexer::INDEX_STR.c_str())) == 0)
+				AddTokenElem(Lexer::INDEX_STR.c_str(), INDEX, it);
+			else if (std::strncmp(&(*it), Lexer::SLASH_STR.c_str(), std::strlen(Lexer::SLASH_STR.c_str())) == 0)
+				AddTokenIncrement(Lexer::SLASH_STR.c_str(), SLASH, it);
+			else if (std::strncmp(&(*it), Lexer::SHARP_STR.c_str(), std::strlen(Lexer::SHARP_STR.c_str())) == 0) {
+				while (*it != Lexer::LF)
 					++it;
 			} else
 				throw std::runtime_error("error");
