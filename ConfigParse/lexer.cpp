@@ -10,8 +10,8 @@ namespace {
 } // namespace
 
 void Lexer::AddToken(std::string symbol, int token_type) {
-	Node *token = new Node(symbol, token_type);
-	tokens_->push_back(token);
+	Node token = Node(symbol, token_type);
+	tokens_.push_back(token);
 }
 
 void Lexer::AddTokenIncrement(
@@ -39,8 +39,7 @@ void Lexer::AddTokenElem(
 	AddToken(";", DELIM);
 }
 
-Lexer::Lexer(const std::string &buffer) : buffer_(buffer) {
-	tokens_                   = new std::list<Node *>;
+Lexer::Lexer(const std::string &buffer, std::list<Node>* tokens_) : buffer_(buffer), tokens_(*tokens_) {
 	bool        need_space    = false;
 	bool        need_delim    = false;
 	bool        sharp_comment = false;
@@ -88,14 +87,17 @@ Lexer::Lexer(const std::string &buffer) : buffer_(buffer) {
 
 Lexer::~Lexer() {}
 
-void Lexer::PrintTokens() {
-	std::list<Node *> tmp = *tokens_;
-	while (!tmp.empty()) {
-		Node *node = tmp.front();
-		tmp.pop_front();
-		std::cout << node->GetToken() << std::endl;
+namespace
+{
+	void PrintTokens(std::list<Node>* tokens_) { /*デバッグ用*/
+		std::list<Node> tmp = *tokens_;
+		while (!tmp.empty()) {
+			Node node = tmp.front();
+			tmp.pop_front();
+			std::cout << node.GetToken() << std::endl;
+		}
 	}
-}
+} // namespace
 
 #include <fstream>
 #include <sstream>
@@ -106,8 +108,10 @@ int main() {
 	ss << conf.rdbuf();
 	std::string buffer = ss.str();
 	try {
-		Lexer lex(buffer);
-		lex.PrintTokens();
+		std::list<Node>* tokens_ = new std::list<Node>;
+		Lexer lex(buffer, tokens_);
+		PrintTokens(tokens_);
+		delete tokens_;
 	} catch (const std::exception &e) {
 		std::cerr << e.what() << '\n';
 	}
