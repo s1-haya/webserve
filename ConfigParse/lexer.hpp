@@ -7,6 +7,7 @@
 class Lexer {
   private:
 	std::list<Node> &tokens_;
+	Lexer();
 	void               AddToken(std::string symbol, int token_type);
 	void               AddTokenIncrement(
 					  std::string token, int token_type, std::string::const_iterator &it

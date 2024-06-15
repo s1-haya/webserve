@@ -105,7 +105,7 @@ namespace
 		while (!tmp.empty()) {
 			Node node = tmp.front();
 			tmp.pop_front();
-			std::cout << node.GetToken() << std::endl;
+			std::cout << node.token_ << std::endl;
 		}
 	}
 } // namespace
