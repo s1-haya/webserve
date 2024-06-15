@@ -14,7 +14,7 @@ class Lexer {
 				  );
 	void
 	AddTokenElem(std::string token, int token_type, std::string::const_iterator &it);
-	enum {
+	enum TokenType {
 		SERVER,
 		SERVER_NAME,
 		LOCATION,
