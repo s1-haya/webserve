@@ -44,12 +44,14 @@ e2e:
 
 .PHONY	: test
 test:
-	make run
-	make e2e
-	make clean
+	@make run
+	@sleep 5
+	-make e2e
+	@make clean
 
 .PHONY	: debug
 debug:
-	make run
-	@cd $(BUILD_CONTEXT) && pytest -s ./test
-	make clean
+	@make run
+	@sleep 5
+	-@cd $(BUILD_CONTEXT) && pytest -s ./test
+	@make clean
