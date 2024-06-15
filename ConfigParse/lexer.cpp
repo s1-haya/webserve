@@ -20,20 +20,20 @@ const std::string Lexer::INDEX_STR = "index";
 const std::string Lexer::SLASH_STR = "/";
 const std::string Lexer::SHARP_STR = "#";
 
-void Lexer::AddToken(std::string symbol, int token_type) {
+void Lexer::AddToken(const std::string& symbol, int token_type) {
 	Node token = Node(symbol, token_type);
 	tokens_.push_back(token);
 }
 
 void Lexer::AddTokenIncrement(
-	std::string token, int token_type, std::string::const_iterator &it
+	const std::string& token, int token_type, std::string::const_iterator &it
 ) {
 	AddToken(token, token_type);
 	it += token.size() - 1;
 }
 
 void Lexer::AddTokenElem(
-	std::string token, int token_type, std::string::const_iterator &it
+	const std::string& token, int token_type, std::string::const_iterator &it
 ) {
 	std::string new_str = "";
 	AddToken(token, token_type);
@@ -50,7 +50,7 @@ void Lexer::AddTokenElem(
 	AddToken(";", DELIM);
 }
 
-Lexer::Lexer(const std::string &buffer, std::list<Node>* tokens_) : buffer_(buffer), tokens_(*tokens_) {
+Lexer::Lexer(const std::string &buffer, std::list<Node>& tokens_) : buffer_(buffer), tokens_(tokens_) {
 	bool        need_space    = false;
 	bool        need_delim    = false;
 	bool        sharp_comment = false;
@@ -84,7 +84,7 @@ Lexer::Lexer(const std::string &buffer, std::list<Node>* tokens_) : buffer_(buff
 				while (*it != Lexer::LF)
 					++it;
 			} else
-				throw std::runtime_error("error");
+				throw std::runtime_error("Unknown token encountered: " + std::string(it, buffer_.end()));
 		}
 	}
 }
@@ -113,7 +113,7 @@ int main() {
 	std::string buffer = ss.str();
 	try {
 		std::list<Node>* tokens_ = new std::list<Node>;
-		Lexer lex(buffer, tokens_);
+		Lexer lex(buffer, *tokens_);
 		PrintTokens(tokens_);
 		delete tokens_;
 	} catch (const std::exception &e) {

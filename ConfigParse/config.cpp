@@ -4,8 +4,9 @@
 const Config *Config::s_cInstance = NULL;
 
 Config::Config(const std::string &file_path) : config_file_(file_path) {
-	if (!config_file_)
-		std::cerr << "Cannot open Configuration file" << std::endl;
+	if (!config_file_) {
+	    throw std::runtime_error("Cannot open Configuration file");
+	}
 	server_.server_name_ = "localhost";
 	std::stringstream buffer;
 	buffer << config_file_.rdbuf();
@@ -21,7 +22,7 @@ const Config *Config::GetInstance() {
 	return s_cInstance;
 }
 
-void Config::Create(std::string &file_path) {
+void Config::Create(const std::string &file_path) {
 	if (!s_cInstance)
 		s_cInstance = new Config(file_path);
 }

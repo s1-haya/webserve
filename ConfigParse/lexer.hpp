@@ -8,12 +8,12 @@ class Lexer {
   private:
 	std::list<Node> &tokens_;
 	Lexer();
-	void               AddToken(std::string symbol, int token_type);
+	void               AddToken(const std::string& symbol, int token_type);
 	void               AddTokenIncrement(
-					  std::string token, int token_type, std::string::const_iterator &it
+					  const std::string& token, int token_type, std::string::const_iterator &it
 				  );
 	void
-	AddTokenElem(std::string token, int token_type, std::string::const_iterator &it);
+	AddTokenElem(const std::string& token, int token_type, std::string::const_iterator &it);
 	enum TokenType {
 		SERVER,
 		SERVER_NAME,
@@ -31,7 +31,7 @@ class Lexer {
 	const std::string buffer_;
 
   public:
-	Lexer(const std::string &, std::list<Node>*);
+	Lexer(const std::string &, std::list<Node>&);
 	~Lexer();
 	void PrintTokens();
 	static const char CR = '\r';

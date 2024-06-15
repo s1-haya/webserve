@@ -17,7 +17,7 @@ class Config {
 	~Config();
 
 	static const Config *GetInstance();
-	static void          Create(std::string &file_path);
+	static void          Create(const std::string &file_path);
 	static void          Destroy();
 	ServerDir            server_;
 	std::ifstream        config_file_;
