@@ -1,10 +1,10 @@
 IMAGE_NAME := webserv
 CONTAINER_NAME := webserv-container
-BUILD_CONTEXT := ../../
+BUILD_CONTEXT := ../
 
 .PHONY	: build
 build:
-	@cd $(BUILD_CONTEXT) && docker build -f test/webserv/Dockerfile -t $(IMAGE_NAME) .
+	@cd $(BUILD_CONTEXT) && docker build -f test/Dockerfile -t $(IMAGE_NAME) .
 
 .PHONY	: run
 run:
