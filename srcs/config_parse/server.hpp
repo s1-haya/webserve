@@ -6,7 +6,7 @@
 enum Method {
 	GET,
 	POST,
-	DELETE,
+	DELETE
 };
 
 struct LocationDir {

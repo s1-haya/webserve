@@ -18,7 +18,7 @@ class Lexer {
 		L_BRACKET,
 		R_BRACKET,
 		WORD,
-		SHARP,
+		SHARP
 	};
 	const std::string buffer_;
 

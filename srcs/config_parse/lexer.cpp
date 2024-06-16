@@ -29,7 +29,7 @@ void Lexer::SkipComment(std::string::const_iterator &it) {
 }
 
 Lexer::Lexer(const std::string &buffer, std::list<Node> &tokens_)
-	: buffer_(buffer), tokens_(tokens_) {
+	: tokens_(tokens_), buffer_(buffer) {
 	bool need_space = false;
 	// bool        need_delim    = false; 使うかわからない
 	bool        sharp_comment = false;
@@ -65,32 +65,32 @@ Lexer::Lexer(const std::string &buffer, std::list<Node> &tokens_)
 
 Lexer::~Lexer() {}
 
-namespace {
-	void PrintTokens(std::list<Node> *tokens_) { /*デバッグ用*/
-		std::list<Node> tmp = *tokens_;
-		while (!tmp.empty()) {
-			Node node = tmp.front();
-			tmp.pop_front();
-			std::cout << "token: " << node.token_ << "   "
-					  << "token_type: " << node.token_type_ << std::endl;
-		}
-	}
-} // namespace
+// namespace {
+// 	void PrintTokens(std::list<Node> *tokens_) { /*デバッグ用*/
+// 		std::list<Node> tmp = *tokens_;
+// 		while (!tmp.empty()) {
+// 			Node node = tmp.front();
+// 			tmp.pop_front();
+// 			std::cout << "token: " << node.token_ << "   "
+// 					  << "token_type: " << node.token_type_ << std::endl;
+// 		}
+// 	}
+// } // namespace
 
-#include <fstream>
-#include <sstream>
+// #include <fstream>
+// #include <sstream>
 
-int main() {
-	std::ifstream     conf("config_samp");
-	std::stringstream ss;
-	ss << conf.rdbuf();
-	std::string buffer = ss.str();
-	try {
-		std::list<Node> *tokens_ = new std::list<Node>;
-		Lexer            lex(buffer, *tokens_);
-		PrintTokens(tokens_);
-		delete tokens_;
-	} catch (const std::exception &e) {
-		std::cerr << e.what() << '\n';
-	}
-}
+// int main() {
+// 	std::ifstream     conf("config_samp");
+// 	std::stringstream ss;
+// 	ss << conf.rdbuf();
+// 	std::string buffer = ss.str();
+// 	try {
+// 		std::list<Node> *tokens_ = new std::list<Node>;
+// 		Lexer            lex(buffer, *tokens_);
+// 		PrintTokens(tokens_);
+// 		delete tokens_;
+// 	} catch (const std::exception &e) {
+// 		std::cerr << e.what() << '\n';
+// 	}
+// }

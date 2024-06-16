@@ -3,9 +3,9 @@
 
 const Config *Config::s_cInstance = NULL;
 
-Config::Config(const std::string &file_path) : config_file_(file_path) {
+Config::Config(const std::string &file_path) : config_file_(file_path.c_str()) {
 	if (!config_file_) {
-	    throw std::runtime_error("Cannot open Configuration file");
+		throw std::runtime_error("Cannot open Configuration file");
 	}
 	server_.server_name_ = "localhost";
 	std::stringstream buffer;
