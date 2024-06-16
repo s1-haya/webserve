@@ -1,6 +1,4 @@
-#include "config_parse.hpp"
-
-#define PATH "src/index.html"
+#include "config.hpp"
 
 int main() {
 	std::string conf = "config";
