@@ -15,12 +15,13 @@ void Lexer::AddToken(const std::string &symbol, int token_type) {
 
 void Lexer::AddWordToken(std::string::const_iterator &it) {
 	std::string new_str = "";
-	while (!utils::IsSpace(*it) && *it != DELIM_CHR) {
+	while (!utils::IsSpace(*it) && *it != SEMICOLON_CHR) {
 		new_str += *it;
 		++it;
 	}
 	AddToken(new_str, WORD);
-	AddToken(DELIM_CHR, DELIM);
+	if (*it == SEMICOLON_CHR)
+		AddToken(SEMICOLON_CHR, DELIM);
 }
 
 void Lexer::SkipComment(std::string::const_iterator &it) {
@@ -43,8 +44,8 @@ Lexer::Lexer(const std::string &buffer, std::list<Node> &tokens_)
 		}
 		if (!need_space && !sharp_comment) {
 			switch (*it) {
-			case DELIM_CHR:
-				AddToken(DELIM_CHR, DELIM);
+			case SEMICOLON_CHR:
+				AddToken(SEMICOLON_CHR, DELIM);
 				break;
 			case L_BRACKET_CHR:
 				AddToken(L_BRACKET_CHR, L_BRACKET);

@@ -28,7 +28,7 @@ class Lexer {
 	void              PrintTokens();
 	static const char CR            = '\r';
 	static const char LF            = '\n';
-	static const char DELIM_CHR     = ';';
+	static const char SEMICOLON_CHR = ';';
 	static const char L_BRACKET_CHR = '{';
 	static const char R_BRACKET_CHR = '}';
 	static const char SHARP_CHR     = '#';
