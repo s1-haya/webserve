@@ -4,3 +4,4 @@ pytest
 isort
 black
 mypy
+requests

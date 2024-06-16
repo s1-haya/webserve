@@ -2,7 +2,7 @@ FROM ubuntu:22.04
 
 # 非対話的モードを設定
 ENV DEBIAN_FRONTEND=noninteractive
-RUN apt-get update && apt-get install -y tzdata
+RUN apt-get update && apt-get install -y tzdata --no-install-recommends
 
 RUN apt-get update && \
     apt-get install -y software-properties-common && \
@@ -24,14 +24,14 @@ RUN curl -sS https://bootstrap.pypa.io/get-pip.py | python3.9
 RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.9 1
 RUN update-alternatives --set python3 /usr/bin/python3.9
 
+WORKDIR /webserv
 
-COPY requirements.txt /workspaces/webserv/requirements.txt
-RUN pip install --upgrade pip && pip install -r /workspaces/webserv/requirements.txt
+COPY srcs /webserv/srcs
+COPY html /webserv/html
+COPY Makefile /webserv/Makefile
+COPY requirements.txt /webserv/requirements.txt
+RUN pip install --upgrade pip && pip install --no-cache-dir -r /webserv/requirements.txt
 
 RUN rm -rf /var/lib/apt/lists/*
 
-VOLUME [ "/workspaces" ]
-
-WORKDIR /workspaces/webserv
-
-CMD [ "/bin/bash" ]
+CMD ["make", "-C", "/webserv", "run"]

@@ -1,21 +1,22 @@
 IMAGE_NAME := nginx
 CONTAINER_NAME := nginx-container
+BUILD_CONTEXT := ../../
 
 .PHONY	: build
 build:
-	docker build -t $(IMAGE_NAME) .
+	@cd $(BUILD_CONTEXT) && docker build -f test/nginx/Dockerfile -t $(IMAGE_NAME) .
 
 .PHONY	: run
 run:
-	docker run -d --name $(CONTAINER_NAME) -p 8080:8080 $(IMAGE_NAME)
+	@docker run -d --name $(CONTAINER_NAME) -p 80:80 $(IMAGE_NAME)
 
 .PHONY	: stop
 stop:
-	docker stop $(CONTAINER_NAME)
+	@docker stop $(CONTAINER_NAME)
 
 .PHONY	: rm
 rm:
-	docker rm $(CONTAINER_NAME)
+	@docker rm $(CONTAINER_NAME)
 
 .PHONY	: clean
 clean:
@@ -27,12 +28,12 @@ fclean:
 
 .PHONY	: log
 log:
-	docker logs $(CONTAINER_NAME)
+	@docker logs $(CONTAINER_NAME)
 
 .PHONY	: ps
 ps:
-	docker ps -a
+	@docker ps -a
 
 .PHONY	: login
 login:
-	docker exec -it $(CONTAINER_NAME) /bin/bash
+	@docker exec -it $(CONTAINER_NAME) /bin/bash
