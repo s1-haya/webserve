@@ -1,13 +1,6 @@
 #include "lexer.hpp"
+#include "../utils/isspace.hpp"
 #include <iostream>
-
-namespace {
-	bool IsSpace(char c) {
-		if (c == ' ' || c == '\t' || c == Lexer::CR || c == Lexer::LF)
-			return true;
-		return false;
-	}
-} // namespace
 
 void Lexer::AddToken(const char symbol, int token_type) {
 	std::string symbol_str(1, symbol);
@@ -22,7 +15,7 @@ void Lexer::AddToken(const std::string &symbol, int token_type) {
 
 void Lexer::AddWordToken(std::string::const_iterator &it) {
 	std::string new_str = "";
-	while (!IsSpace(*it) && *it != DELIM_CHR) {
+	while (!utils::IsSpace(*it) && *it != DELIM_CHR) {
 		new_str += *it;
 		++it;
 	}
@@ -44,7 +37,7 @@ Lexer::Lexer(const std::string &buffer, std::list<Node> &tokens_)
 
 	for (std::string::const_iterator it = buffer_.begin(); it != buffer_.end();
 		 ++it) {
-		while (IsSpace(*it)) {
+		while (utils::IsSpace(*it)) {
 			++it;
 			need_space = false;
 		}
