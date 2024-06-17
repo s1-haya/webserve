@@ -2,12 +2,8 @@ FROM ubuntu:20.04
 
 # 非対話的モードを設定
 ENV DEBIAN_FRONTEND=noninteractive
-RUN apt-get update && apt-get install -y tzdata --no-install-recommends
 
 RUN apt-get update && \
-    apt-get install -y software-properties-common && \
-    add-apt-repository -y ppa:deadsnakes/ppa && \
-    apt-get update && \
     apt-get install -y \
     git=1:2.25.1-1ubuntu3.12 \
     python3=3.8.2-0ubuntu2 \
@@ -17,7 +13,8 @@ RUN apt-get update && \
     vim-common=2:8.1.2269-1ubuntu5.23 vim-runtime=2:8.1.2269-1ubuntu5.23 vim=2:8.1.2269-1ubuntu5.23 \
     clang-format=1:10.0-50~exp1 \
     valgrind=1:3.15.0-1ubuntu9 \
-    cppcheck=1.90-4build1
+    cppcheck=1.90-4build1 \
+    tzdata=2024a-0ubuntu0.20.04 --no-install-recommends
 
 WORKDIR /webserv
 
