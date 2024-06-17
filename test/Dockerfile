@@ -17,6 +17,7 @@ RUN apt-get update && \
     vim-common=2:8.1.2269-1ubuntu5.23 vim-runtime=2:8.1.2269-1ubuntu5.23 vim=2:8.1.2269-1ubuntu5.23 \
     clang-format=1:10.0-50~exp1 \
     valgrind=1:3.15.0-1ubuntu9 \
+    cppcheck=1.90-4build1
 
 WORKDIR /webserv
 
