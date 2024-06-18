@@ -11,6 +11,7 @@ class Epoll {
 	~Epoll();
 	void AddNewConnection(int socket_fd, EventType type);
 	void DeleteConnection(int socket_fd);
+	void AddConnectionState(const Event &event, EventType new_type);
 	int  CreateReadyList();
 	// getter
 	Event GetEvent(std::size_t index) const;

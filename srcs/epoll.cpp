@@ -76,6 +76,17 @@ int Epoll::CreateReadyList() {
 	return ready;
 }
 
+void Epoll::AddConnectionState(const Event &event, const EventType new_type) {
+	const int socket_fd = event.fd;
+
+	struct epoll_event ev;
+	ev.events  = (event.type | ConvertToEpollEventType(new_type));
+	ev.data.fd = socket_fd;
+	if (epoll_ctl(epoll_fd_, EPOLL_CTL_MOD, socket_fd, &ev) == SYSTEM_ERROR) {
+		throw std::runtime_error("epoll_ctl failed");
+	}
+}
+
 Event Epoll::GetEvent(std::size_t index) const {
 	if (index >= MAX_EVENTS) {
 		throw std::out_of_range("evlist index out of range");
