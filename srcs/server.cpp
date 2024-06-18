@@ -1,5 +1,4 @@
 #include "server.hpp"
-#include "convert.hpp"
 #include "event.hpp"
 #include "http.hpp"
 #include <arpa/inet.h> // htons
@@ -10,9 +9,9 @@
 // todo: set ConfigData -> private variables
 Server::Server(const Config::ConfigData &config)
 	: server_name_("from_config"), port_(8080) {
-	Debug("server", "init server & set config");
 	(void)config;
 	Init();
+	Debug("server", "init server & listen", server_fd_);
 }
 
 Server::~Server() {
@@ -23,7 +22,7 @@ Server::~Server() {
 }
 
 void Server::Run() {
-	Debug("server", "run server");
+	Debug("server", "run server", server_fd_);
 
 	while (true) {
 		errno           = 0;
@@ -54,7 +53,7 @@ void Server::AcceptNewConnection() {
 		throw std::runtime_error("accept failed");
 	}
 	epoll_.AddNewConnection(new_socket);
-	Debug("server", "add new client (fd: " + ToString(new_socket) + ")");
+	Debug("server", "add new client", new_socket);
 }
 
 namespace {
@@ -73,12 +72,12 @@ void Server::SendResponse(int client_fd) {
 		buffers_.Delete(client_fd);
 		close(client_fd);
 		epoll_.DeleteConnection(client_fd);
-		Debug("server", "disconnected client (fd: " + ToString(client_fd) + ")");
+		Debug("server", "disconnected client", client_fd);
 		return;
 	}
 	const std::string response = CreateHttpResponse(buffers_.GetBuffer(client_fd));
 	send(client_fd, response.c_str(), response.size(), 0);
-	Debug("server", "send to client (fd: " + ToString(client_fd) + ")");
+	Debug("server", "send response to client", client_fd);
 }
 
 void Server::Init() {
