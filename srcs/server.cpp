@@ -39,19 +39,13 @@ void Server::Run() {
 
 void Server::HandleEvent(const Event &event) {
 	if (event.fd == server_fd_) {
-		AcceptNewConnection();
-		return;
+		HandleNewConnection();
+	} else {
+		HandleExistingConnection(event);
 	}
-	if (event.type & EVENT_READ) {
-		ReadRequest(event);
-	}
-	if (event.type & EVENT_WRITE) {
-		SendResponse(event.fd);
-	}
-	// todo: handle other EventType (switch)
 }
 
-void Server::AcceptNewConnection() {
+void Server::HandleNewConnection() {
 	const int new_socket =
 		accept(server_fd_, (struct sockaddr *)&sock_addr_, &addrlen_);
 	if (new_socket == SYSTEM_ERROR) {
@@ -59,6 +53,16 @@ void Server::AcceptNewConnection() {
 	}
 	epoll_.AddNewConnection(new_socket, EVENT_READ);
 	Debug("server", "add new client", new_socket);
+}
+
+void Server::HandleExistingConnection(const Event &event) {
+	if (event.type & EVENT_READ) {
+		ReadRequest(event);
+	}
+	if (event.type & EVENT_WRITE) {
+		SendResponse(event.fd);
+	}
+	// todo: handle other EventType
 }
 
 namespace {

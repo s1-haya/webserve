@@ -21,7 +21,8 @@ class Server {
 	Server &operator=(const Server &other);
 	void    Init();
 	void    HandleEvent(const Event &event);
-	void    AcceptNewConnection();
+	void    HandleNewConnection();
+	void    HandleExistingConnection(const Event &event);
 	void    ReadRequest(const Event &event);
 	void    SendResponse(int client_fd);
 	// const variables (todo: tmp)
