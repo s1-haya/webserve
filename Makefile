@@ -61,22 +61,23 @@ check:
 req:
 	echo -n "Hello from client" | nc 127.0.0.1 8080
 
-.PHONY	: e2e
-e2e:
-	@pytest ./test
-
 .PHONY	: test
 test:
+	@make unit
+	@make e2e
+
+.PHONY	: unit
+unit:
 	@make docker-run
 	@sleep 5
-	-make e2e
+	-@pytest ./test/unit
 	@make docker-clean
 
-.PHONY	: debug
-debug:
+.PHONY	: e2e
+e2e:
 	@make docker-run
 	@sleep 5
-	-@pytest -s ./test
+	-@pytest ./test/integration
 	@make docker-clean
 
 #--------------------------------------------
