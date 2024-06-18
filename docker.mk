@@ -1,13 +1,12 @@
 IMAGE_NAME := webserv
 CONTAINER_NAME := webserv-container
-BUILD_CONTEXT := ../
 
 .PHONY	: build
 build:
-	@cd $(BUILD_CONTEXT) && docker build -f test/Dockerfile -t $(IMAGE_NAME) .
+	@docker build -t $(IMAGE_NAME) .
 
-.PHONY	: run
-run:
+.PHONY	: docker-run
+docker-run:
 	@docker run -d --name $(CONTAINER_NAME) -p 8080:8080 $(IMAGE_NAME)
 
 .PHONY	: stop
@@ -18,13 +17,13 @@ stop:
 rm:
 	@docker rm $(CONTAINER_NAME)
 
-.PHONY	: clean
-clean:
+.PHONY	: docker-clean
+docker-clean:
 	@make stop && make rm
 
-.PHONY	: fclean
-fclean:
-	@make clean && docker rmi $(IMAGE_NAME)
+.PHONY	: rmi
+rmi:
+	@make docker-clean && docker rmi $(IMAGE_NAME)
 
 .PHONY	: log
 log:
@@ -37,21 +36,3 @@ ps:
 .PHONY	: login
 login:
 	@docker exec -it $(CONTAINER_NAME) /bin/bash
-
-.PHONY	: e2e
-e2e:
-	@cd $(BUILD_CONTEXT) && pytest ./test
-
-.PHONY	: test
-test:
-	@make run
-	@sleep 5
-	-make e2e
-	@make clean
-
-.PHONY	: debug
-debug:
-	@make run
-	@sleep 5
-	-@cd $(BUILD_CONTEXT) && pytest -s ./test
-	@make clean

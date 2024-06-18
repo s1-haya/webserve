@@ -10,6 +10,7 @@
 !sandbox/*
 
 !Makefile
+!*.mk
 !*.cpp
 !*.hpp
 !*.py

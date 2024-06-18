@@ -1,3 +1,5 @@
+include docker.mk
+
 NAME		:=	webserv
 
 SRC_DIR		:=	srcs
@@ -58,6 +60,24 @@ check:
 .PHONY	: req
 req:
 	echo -n "Hello from client" | nc 127.0.0.1 8080
+
+.PHONY	: e2e
+e2e:
+	@pytest ./test
+
+.PHONY	: test
+test:
+	@make docker-run
+	@sleep 5
+	-make e2e
+	@make docker-clean
+
+.PHONY	: debug
+debug:
+	@make docker-run
+	@sleep 5
+	-@pytest -s ./test
+	@make docker-clean
 
 #--------------------------------------------
 -include $(DEPS)

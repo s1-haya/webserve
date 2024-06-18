@@ -24,7 +24,8 @@ RUN pip install --upgrade pip && pip install --no-cache-dir -r /webserv/requirem
 COPY srcs /webserv/srcs
 COPY html /webserv/html
 COPY Makefile /webserv/Makefile
+COPY docker.mk /webserv/docker.mk
 
 RUN rm -rf /var/lib/apt/lists/*
 
-CMD ["make", "-C", "/webserv", "run"]
+CMD ["make", "run"]
