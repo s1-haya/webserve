@@ -22,6 +22,7 @@ class Server {
 	void    Init();
 	void    HandleEvent(const Event &event);
 	void    AcceptNewConnection();
+	void    ReadRequest(const Event &event);
 	void    SendResponse(int client_fd);
 	// const variables (todo: tmp)
 	const std::string  server_name_;

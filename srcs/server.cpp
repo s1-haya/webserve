@@ -43,10 +43,10 @@ void Server::HandleEvent(const Event &event) {
 		return;
 	}
 	if (event.type & EVENT_READ) {
-		SendResponse(event.fd);
+		ReadRequest(event);
 	}
 	if (event.type & EVENT_WRITE) {
-		// todo
+		SendResponse(event.fd);
 	}
 	// todo: handle other EventType (switch)
 }
@@ -66,23 +66,45 @@ namespace {
 		Http http(read_buf);
 		return http.CreateResponse();
 	}
+
+	// todo: find "Connection: close"?
+	bool IsRequestReceivedComplete(const std::string &buffer) {
+		return buffer.find("\r\n\r\n") != std::string::npos;
+	}
 } // namespace
 
-void Server::SendResponse(int client_fd) {
+void Server::ReadRequest(const Event &event) {
+	const int client_fd = event.fd;
+
 	ssize_t read_ret = buffers_.Read(client_fd);
 	if (read_ret <= 0) {
 		if (read_ret == SYSTEM_ERROR) {
 			throw std::runtime_error("read failed");
 		}
-		buffers_.Delete(client_fd);
-		close(client_fd);
-		epoll_.DeleteConnection(client_fd);
-		Debug("server", "disconnected client", client_fd);
+		// todo: need?
+		// buffers_.Delete(client_fd);
+		// epoll_.DeleteConnection(client_fd);
 		return;
 	}
+	if (IsRequestReceivedComplete(buffers_.GetBuffer(client_fd))) {
+		Debug("server", "received all request from client", client_fd);
+		std::cerr << buffers_.GetBuffer(client_fd) << std::endl;
+		epoll_.AddConnectionState(event, EVENT_WRITE);
+	}
+}
+
+void Server::SendResponse(int client_fd) {
+	// todo: check if it's ready to start write/send
 	const std::string response = CreateHttpResponse(buffers_.GetBuffer(client_fd));
 	send(client_fd, response.c_str(), response.size(), 0);
 	Debug("server", "send response to client", client_fd);
+
+	// disconnect
+	buffers_.Delete(client_fd);
+	close(client_fd);
+	epoll_.DeleteConnection(client_fd);
+	Debug("server", "disconnected client", client_fd);
+	Debug("------------------------------------------");
 }
 
 void Server::Init() {
