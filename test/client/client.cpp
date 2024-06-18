@@ -7,7 +7,8 @@
 #include <sys/types.h>
 #include <unistd.h> // read,close
 
-const std::string Client::DEFAULT_MESSAGE = "Hello from client (default)";
+const std::string Client::DEFAULT_MESSAGE =
+	"GET / HTTP/1.1\r\nConnection: close \r\n\r\n";
 
 Client::Client() : port_(DEFAULT_PORT), request_message_(DEFAULT_MESSAGE) {
 	Init();
