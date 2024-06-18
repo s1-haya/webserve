@@ -69,7 +69,7 @@ namespace {
 	}
 } // namespace
 
-const Event Epoll::GetEvent(std::size_t index) const {
+Event Epoll::GetEvent(std::size_t index) const {
 	if (index >= MAX_EVENTS) {
 		throw std::out_of_range("evlist index out of range");
 	}
