@@ -18,8 +18,11 @@ RUN apt-get update && \
 
 WORKDIR /webserv
 
-COPY requirements.txt /webserv/requirements.txt
-RUN pip install --upgrade pip && pip install --no-cache-dir -r /webserv/requirements.txt
+COPY requirements.in /webserv/requirements.in
+RUN pip install --upgrade pip && \
+    pip install --no-cache-dir pip-tools && \
+    pip-compile /webserv/requirements.in --strip-extras && \
+    pip-sync
 
 COPY srcs /webserv/srcs
 COPY html /webserv/html

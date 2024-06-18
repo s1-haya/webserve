@@ -18,8 +18,11 @@ RUN apt-get update && \
 
 WORKDIR /workspaces/webserv
 
-COPY requirements.txt /workspaces/webserv/requirements.txt
-RUN pip install --upgrade pip && pip install --no-cache-dir -r /workspaces/webserv/requirements.txt
+COPY requirements.in /workspaces/webserv/requirements.in
+RUN pip install --upgrade pip && \
+    pip install --no-cache-dir pip-tools && \
+    pip-compile /workspaces/webserv/requirements.in --strip-extras && \
+    pip-sync
 
 RUN rm -rf /var/lib/apt/lists/*
 

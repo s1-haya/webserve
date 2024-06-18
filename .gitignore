@@ -19,7 +19,7 @@
 !docker-compose.yml
 
 !.github/workflows/*
-!requirements.txt
+!requirements.in
 
 !.coderabbit.yaml
 
