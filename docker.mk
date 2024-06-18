@@ -48,7 +48,7 @@ log:
 	@if [ -z "$$(docker ps -qf name=$(CONTAINER_NAME))" ]; then \
 		echo "Container $(CONTAINER_NAME) does not exist."; \
 	else \
-		@docker logs $(CONTAINER_NAME); \
+		docker logs $(CONTAINER_NAME); \
 	fi
 
 .PHONY	: ps
@@ -60,5 +60,5 @@ login:
 	@if [ -z "$$(docker ps -qf name=$(CONTAINER_NAME))" ]; then \
 		echo "Container $(CONTAINER_NAME) does not exist."; \
 	else \
-		@docker exec -it $(CONTAINER_NAME) /bin/bash; \
+		docker exec -it $(CONTAINER_NAME) /bin/bash; \
 	fi
