@@ -65,19 +65,18 @@ namespace {
 } // namespace
 
 void Server::SendResponseToClient(int client_fd) {
-	char buffer[BUFFER_SIZE];
-
-	ssize_t read_ret = read(client_fd, buffer, BUFFER_SIZE);
+	ssize_t read_ret = buffers_.Read(client_fd);
 	if (read_ret <= 0) {
 		if (read_ret == SYSTEM_ERROR) {
 			throw std::runtime_error("read failed");
 		}
+		buffers_.Delete(client_fd);
 		close(client_fd);
 		epoll_.DeleteConnection(client_fd);
 		Debug("server", "disconnected client (fd: " + ToString(client_fd) + ")");
 		return;
 	}
-	const std::string response = CreateHttpResponse(std::string(buffer, read_ret));
+	const std::string response = CreateHttpResponse(buffers_.GetBuffer(client_fd));
 	send(client_fd, response.c_str(), response.size(), 0);
 	Debug("server", "send to client (fd: " + ToString(client_fd) + ")");
 }
