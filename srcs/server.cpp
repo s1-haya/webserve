@@ -40,8 +40,13 @@ void Server::Run() {
 void Server::HandleEvent(const Event &event) {
 	if (event.fd == server_fd_) {
 		AcceptNewConnection();
-	} else if (event.type == EVENT_READ) {
+		return;
+	}
+	if (event.type & EVENT_READ) {
 		SendResponse(event.fd);
+	}
+	if (event.type & EVENT_WRITE) {
+		// todo
 	}
 	// todo: handle other EventType (switch)
 }

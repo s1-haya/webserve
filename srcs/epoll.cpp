@@ -18,11 +18,15 @@ Epoll::~Epoll() {
 
 namespace {
 	uint32_t ConvertToEpollEventType(EventType type) {
-		if (type == EVENT_READ) {
-			return EPOLLIN;
+		uint32_t ret_type = 0;
+
+		if (type & EVENT_READ) {
+			ret_type |= EPOLLIN;
 		}
-		// todo: tmp
-		return 0;
+		if (type & EVENT_WRITE) {
+			ret_type |= EPOLLOUT;
+		}
+		return ret_type;
 	}
 } // namespace
 
@@ -53,12 +57,17 @@ int Epoll::CreateReadyList() {
 }
 
 namespace {
-	EventType ConvertToEventType(uint32_t event) {
+	uint32_t ConvertToEventType(uint32_t event) {
+		uint32_t ret_type = EVENT_NONE;
+
 		if (event & EPOLLIN) {
-			return EVENT_READ;
+			ret_type |= EVENT_READ;
+		}
+		if (event & EPOLLOUT) {
+			ret_type |= EVENT_WRITE;
 		}
 		// todo: tmp
-		return EVENT_NONE;
+		return ret_type;
 	}
 
 	Event ConvertToEventDto(const struct epoll_event &event) {
