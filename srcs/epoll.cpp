@@ -28,6 +28,26 @@ namespace {
 		}
 		return ret_type;
 	}
+
+	uint32_t ConvertToEventType(uint32_t event) {
+		uint32_t ret_type = EVENT_NONE;
+
+		if (event & EPOLLIN) {
+			ret_type |= EVENT_READ;
+		}
+		if (event & EPOLLOUT) {
+			ret_type |= EVENT_WRITE;
+		}
+		// todo: tmp
+		return ret_type;
+	}
+
+	Event ConvertToEventDto(const struct epoll_event &event) {
+		Event ret_event;
+		ret_event.fd   = event.data.fd;
+		ret_event.type = ConvertToEventType(event.events);
+		return ret_event;
+	}
 } // namespace
 
 void Epoll::AddNewConnection(int socket_fd, EventType type) {
@@ -55,28 +75,6 @@ int Epoll::CreateReadyList() {
 	}
 	return ready;
 }
-
-namespace {
-	uint32_t ConvertToEventType(uint32_t event) {
-		uint32_t ret_type = EVENT_NONE;
-
-		if (event & EPOLLIN) {
-			ret_type |= EVENT_READ;
-		}
-		if (event & EPOLLOUT) {
-			ret_type |= EVENT_WRITE;
-		}
-		// todo: tmp
-		return ret_type;
-	}
-
-	Event ConvertToEventDto(const struct epoll_event &event) {
-		Event ret_event;
-		ret_event.fd   = event.data.fd;
-		ret_event.type = ConvertToEventType(event.events);
-		return ret_event;
-	}
-} // namespace
 
 Event Epoll::GetEvent(std::size_t index) const {
 	if (index >= MAX_EVENTS) {
