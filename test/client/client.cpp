@@ -51,16 +51,23 @@ void Client::SendRequestAndReceiveResponse() {
 	send(sock_fd_, request_message_.c_str(), request_message_.size(), 0);
 	DebugPrint("Message sent.");
 
-	// read response
-	static const unsigned int BUFFER_SIZE = 1024;
+	// receive response
+	static const unsigned int BUFFER_SIZE = 8;
 	char                      buffer[BUFFER_SIZE];
 
-	ssize_t read_ret = read(sock_fd_, buffer, BUFFER_SIZE);
-	if (read_ret == SYSTEM_ERROR) {
-		throw std::runtime_error("read failed");
+	std::string response;
+	while (true) {
+		ssize_t read_ret = read(sock_fd_, buffer, BUFFER_SIZE);
+		if (read_ret == SYSTEM_ERROR) {
+			throw std::runtime_error("read failed");
+		}
+		if (read_ret == 0) {
+			break;
+		}
+		response.append(std::string(buffer, read_ret));
 	}
 	DebugPrint("Response from server:");
-	std::cout << std::string(buffer, read_ret) << std::endl;
+	std::cout << response << std::endl;
 }
 
 void Client::Init() {
