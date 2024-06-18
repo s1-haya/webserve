@@ -19,11 +19,13 @@ jobs:
         run: |
           make build
   
-      - name: Run make
+      - name: Run make check
         run: |
+          make docker-run
           make check
+          make docker-clean
 
       - name: Run tests
         if: github.event_name == 'pull_request'
-        run: |
+        run:
           make test
