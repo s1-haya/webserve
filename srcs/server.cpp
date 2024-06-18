@@ -38,11 +38,11 @@ void Server::Run() {
 	}
 }
 
-void Server::HandleEvent(const Event event) {
+void Server::HandleEvent(const Event &event) {
 	if (event.fd == server_fd_) {
 		AcceptNewConnection();
 	} else if (event.type == EVENT_READ) {
-		SendResponseToClient(event.fd);
+		SendResponse(event.fd);
 	}
 	// todo: handle other EventType (switch)
 }
@@ -64,7 +64,7 @@ namespace {
 	}
 } // namespace
 
-void Server::SendResponseToClient(int client_fd) {
+void Server::SendResponse(int client_fd) {
 	ssize_t read_ret = buffers_.Read(client_fd);
 	if (read_ret <= 0) {
 		if (read_ret == SYSTEM_ERROR) {
