@@ -52,7 +52,7 @@ void Server::AcceptNewConnection() {
 	if (new_socket == SYSTEM_ERROR) {
 		throw std::runtime_error("accept failed");
 	}
-	epoll_.AddNewConnection(new_socket);
+	epoll_.AddNewConnection(new_socket, EVENT_READ);
 	Debug("server", "add new client", new_socket);
 }
 
@@ -110,5 +110,5 @@ void Server::Init() {
 	}
 
 	// add to epoll's interest list
-	epoll_.AddNewConnection(server_fd_);
+	epoll_.AddNewConnection(server_fd_, EVENT_READ);
 }

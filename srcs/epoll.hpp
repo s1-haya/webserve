@@ -1,16 +1,15 @@
 #ifndef EPOLL_HPP_
 #define EPOLL_HPP_
 
-#include "debug.hpp"   // todo: tmp
+#include "debug.hpp" // todo: tmp
+#include "event.hpp"
 #include <sys/epoll.h> // epoll
-
-struct Event;
 
 class Epoll {
   public:
 	Epoll();
 	~Epoll();
-	void AddNewConnection(int socket_fd);
+	void AddNewConnection(int socket_fd, EventType type);
 	void DeleteConnection(int socket_fd);
 	int  CreateReadyList();
 	// getter
@@ -25,7 +24,6 @@ class Epoll {
 	static const unsigned int MAX_EVENTS   = 10;
 	// variables
 	int                epoll_fd_;
-	struct epoll_event ev_;
 	struct epoll_event evlist_[MAX_EVENTS];
 };
 

@@ -1,5 +1,4 @@
 #include "epoll.hpp"
-#include "event.hpp"
 #include <errno.h>
 #include <stdint.h> // uint32_t
 #include <unistd.h> // close
@@ -17,10 +16,21 @@ Epoll::~Epoll() {
 	}
 }
 
-void Epoll::AddNewConnection(int socket_fd) {
-	ev_.events  = EPOLLIN;
-	ev_.data.fd = socket_fd;
-	if (epoll_ctl(epoll_fd_, EPOLL_CTL_ADD, socket_fd, &ev_) == SYSTEM_ERROR) {
+namespace {
+	uint32_t ConvertToEpollEventType(EventType type) {
+		if (type == EVENT_READ) {
+			return EPOLLIN;
+		}
+		// todo: tmp
+		return 0;
+	}
+} // namespace
+
+void Epoll::AddNewConnection(int socket_fd, EventType type) {
+	struct epoll_event ev;
+	ev.events  = ConvertToEpollEventType(type);
+	ev.data.fd = socket_fd;
+	if (epoll_ctl(epoll_fd_, EPOLL_CTL_ADD, socket_fd, &ev) == SYSTEM_ERROR) {
 		throw std::runtime_error("epoll_ctl failed");
 	}
 }
