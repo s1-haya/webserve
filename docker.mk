@@ -9,7 +9,7 @@ build:
 .PHONY	: docker-run
 docker-run:
 	@if [ -z "$$(docker ps -qf name=$(CONTAINER_NAME))" ]; then \
-		docker run -itd --name $(CONTAINER_NAME) -p 8080:8080 $(IMAGE_NAME); \
+		docker run -d --name $(CONTAINER_NAME) -p 8080:8080 $(IMAGE_NAME); \
 	else \
 		echo "Container $(CONTAINER_NAME) is already running."; \
 	fi
