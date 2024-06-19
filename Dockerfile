@@ -20,7 +20,7 @@ WORKDIR /webserv
 
 COPY requirements.in /webserv/requirements.in
 RUN pip install --upgrade pip && \
-    pip install --no-cache-dir pip-tools && \
+    pip install --no-cache-dir pip-tools==7.4.1 && \
     pip-compile /webserv/requirements.in --strip-extras && \
     pip-sync
 
