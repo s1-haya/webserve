@@ -68,5 +68,5 @@ docker-check:
 	@if [ -z "$$(docker ps -qf name=$(CONTAINER_NAME))" ]; then \
 		echo "Container $(CONTAINER_NAME) does not exist."; \
 	else \
-		docker exec -it $(CONTAINER_NAME) make check; \
+		docker exec -d $(CONTAINER_NAME) make check; \
 	fi
