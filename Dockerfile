@@ -13,8 +13,8 @@ RUN apt-get update && \
     clang-format=1:10.0-50~exp1 \
     valgrind=1:3.15.0-1ubuntu9 \
     cppcheck=1.90-4build1 \
-    git=1:2.43.0-1ubuntu7.1 \
-    tzdata=2024a-0ubuntu0.20.04 --no-install-recommends
+    tzdata=2024a-0ubuntu0.20.04 --no-install-recommends \
+    git=1:2.25.1-1ubuntu3.13
 
 WORKDIR /webserv
 
