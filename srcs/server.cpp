@@ -93,7 +93,7 @@ void Server::ReadRequest(const Event &event) {
 	if (IsRequestReceivedComplete(buffers_.GetBuffer(client_fd))) {
 		Debug("server", "received all request from client", client_fd);
 		std::cerr << buffers_.GetBuffer(client_fd) << std::endl;
-		epoll_.AddConnectionState(event, EVENT_WRITE);
+		epoll_.UpdateEventType(event, EVENT_WRITE);
 	}
 }
 
