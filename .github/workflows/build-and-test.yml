@@ -22,7 +22,7 @@ jobs:
       - name: Run make check
         run: |
           make docker-run
-          make check
+          make docker-check
           make docker-clean
 
       - name: Run tests

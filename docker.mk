@@ -9,7 +9,7 @@ build:
 .PHONY	: docker-run
 docker-run:
 	@if [ -z "$$(docker ps -qf name=$(CONTAINER_NAME))" ]; then \
-		docker run -d --name $(CONTAINER_NAME) -p 8080:8080 $(IMAGE_NAME); \
+		docker run -itd --name $(CONTAINER_NAME) -p 8080:8080 $(IMAGE_NAME); \
 	else \
 		echo "Container $(CONTAINER_NAME) is already running."; \
 	fi
@@ -61,4 +61,12 @@ login:
 		echo "Container $(CONTAINER_NAME) does not exist."; \
 	else \
 		docker exec -it $(CONTAINER_NAME) /bin/bash; \
+	fi
+
+.PHONY	: docker-check
+docker-check:
+	@if [ -z "$$(docker ps -qf name=$(CONTAINER_NAME))" ]; then \
+		echo "Container $(CONTAINER_NAME) does not exist."; \
+	else \
+		docker exec -it $(CONTAINER_NAME) make check; \
 	fi
