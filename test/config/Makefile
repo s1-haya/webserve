@@ -35,5 +35,11 @@ ps:
 	@docker ps -a
 
 .PHONY	: login
-login:
+login: run
 	@docker exec -it $(CONTAINER_NAME) /bin/bash
+
+.PHONY	: re
+re: fclean build
+
+.PHONY	: test
+test:
