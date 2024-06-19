@@ -11,7 +11,7 @@ class Client {
 		const std::string &message = DEFAULT_MESSAGE
 	);
 	~Client();
-	void SetMessage(const std::string &message);
+	void UpdateMessage(const std::string &message);
 	void SendRequestAndReceiveResponse();
 
   private:
@@ -24,6 +24,7 @@ class Client {
 	static const int          SYSTEM_ERROR = -1;
 	static const unsigned int DEFAULT_PORT = 8080;
 	static const std::string  DEFAULT_MESSAGE;
+	static const unsigned int BUFFER_SIZE = 1024;
 	// socket
 	unsigned int       port_;
 	std::string        request_message_;

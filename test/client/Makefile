@@ -51,10 +51,5 @@ check:
 	@cppcheck --enable=all $$(find . -type f -name "*.cpp" | tr '\n' ' ')
 
 #--------------------------------------------
-.PHONY	: req
-req:
-	echo -n "Hello from client" | nc 127.0.0.1 8080
-
-#--------------------------------------------
 
 -include $(DEPS)

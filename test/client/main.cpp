@@ -21,7 +21,7 @@ int main(int argc, char **argv) {
 		Client client(DEFAULT_PORT);
 		if (argc > 1) {
 			const std::string message = std::string(argv[1], std::strlen(argv[1]));
-			client.SetMessage(message);
+			client.UpdateMessage(message);
 		}
 		client.SendRequestAndReceiveResponse();
 	} catch (const std::exception &e) {

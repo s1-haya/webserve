@@ -1,6 +1,5 @@
 #include "client.hpp"
 #include <arpa/inet.h> // inet_pton,htons
-#include <cstring>     // strlen
 #include <iostream>
 #include <stdio.h>      // perror
 #include <sys/socket.h> // socket,connect
@@ -30,7 +29,7 @@ namespace {
 	}
 } // namespace
 
-void Client::SetMessage(const std::string &message) {
+void Client::UpdateMessage(const std::string &message) {
 	request_message_ = message;
 }
 
@@ -40,9 +39,7 @@ void Client::SendRequestAndReceiveResponse() {
 	DebugPrint("Message sent.");
 
 	// receive response
-	static const unsigned int BUFFER_SIZE = 8;
-	char                      buffer[BUFFER_SIZE];
-
+	char        buffer[BUFFER_SIZE];
 	std::string response;
 	while (true) {
 		ssize_t read_ret = read(sock_fd_, buffer, BUFFER_SIZE);
