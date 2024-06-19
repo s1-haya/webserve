@@ -10,14 +10,11 @@
 !sandbox/*
 
 !Makefile
-!*.mk
 !*.cpp
 !*.hpp
 !*.py
 
-!Dockerfile
-!docker-compose.yml
-
+!docker/*
 !.github/workflows/*
 !requirements.in
 

@@ -3,6 +3,8 @@ FROM ubuntu:20.04
 # 非対話的モードを設定
 ENV DEBIAN_FRONTEND=noninteractive
 
+WORKDIR /webserv
+
 RUN apt-get update && \
     apt-get install -y \
     python3=3.8.2-0ubuntu2 \
@@ -16,19 +18,21 @@ RUN apt-get update && \
     tzdata=2024a-0ubuntu0.20.04 --no-install-recommends \
     git=1:2.25.1-1ubuntu3.13
 
-WORKDIR /webserv
-
-COPY requirements.in /webserv/requirements.in
-RUN pip install --upgrade pip && \
-    pip install --no-cache-dir pip-tools==7.4.1 && \
-    pip-compile /webserv/requirements.in --strip-extras && \
-    pip-sync
-
 COPY srcs /webserv/srcs
 COPY html /webserv/html
 COPY Makefile /webserv/Makefile
-COPY docker.mk /webserv/docker.mk
+COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+COPY docker /webserv/docker/
+COPY requirements.in /webserv/requirements.in
+
+RUN chmod +x /webserv/docker/entrypoint.sh
+RUN mkdir -p /var/log/supervisor
+
+RUN pip install --upgrade pip && \
+    pip install pip-tools==7.4.1 && \
+    pip-compile /webserv/requirements.in --strip-extras && \
+    pip-sync
 
 RUN rm -rf /var/lib/apt/lists/*
 
-CMD ["make", "run"]
+ENTRYPOINT ["/webserv/docker/entrypoint.sh"]
