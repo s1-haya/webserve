@@ -8,7 +8,7 @@ build:
 
 .PHONY	: run
 run:
-	@docker run -d --name $(CONTAINER_NAME) -p 80:80 $(IMAGE_NAME)
+	@docker run -d --name $(CONTAINER_NAME) -p 80:80 -v ./conf_file:/etc/nginx/conf_file $(IMAGE_NAME)
 
 .PHONY	: stop
 stop:
