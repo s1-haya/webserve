@@ -6,15 +6,16 @@
 
 class Client {
   public:
-	Client();
-	explicit Client(int port);
-	explicit Client(const std::string &message);
-	Client(int port, const std::string &message);
+	Client(
+		unsigned int       port    = DEFAULT_PORT,
+		const std::string &message = DEFAULT_MESSAGE
+	);
 	~Client();
 	void SetMessage(const std::string &message);
 	void SendRequestAndReceiveResponse();
 
   private:
+	Client();
 	// prohibit copy
 	Client(const Client &other);
 	Client &operator=(const Client &other);

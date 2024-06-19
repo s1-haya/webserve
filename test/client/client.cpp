@@ -10,20 +10,7 @@
 const std::string Client::DEFAULT_MESSAGE =
 	"GET / HTTP/1.1\r\nConnection: close \r\n\r\n";
 
-Client::Client() : port_(DEFAULT_PORT), request_message_(DEFAULT_MESSAGE) {
-	Init();
-}
-
-Client::Client(int port) : port_(port), request_message_(DEFAULT_MESSAGE) {
-	Init();
-}
-
-Client::Client(const std::string &message)
-	: port_(DEFAULT_PORT), request_message_(message) {
-	Init();
-}
-
-Client::Client(int port, const std::string &message)
+Client::Client(unsigned int port, const std::string &message)
 	: port_(port), request_message_(message) {
 	Init();
 }
