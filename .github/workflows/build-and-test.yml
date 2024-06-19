@@ -16,9 +16,9 @@ jobs:
   
       - name: Run make check
         run: |
-          make docker-run
-          make docker-check
-          make docker-clean
+          make run-docker-bg
+          make check-webserv
+          make clean-docker
 
       - name: Run tests
         if: github.event_name == 'pull_request'

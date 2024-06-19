@@ -1,4 +1,5 @@
-include docker.mk
+include docker/command.mk
+include docker/exec.mk
 
 NAME		:=	webserv
 
@@ -54,13 +55,6 @@ val: all
 check:
 	@cppcheck --enable=all $$(find . -type f -name "*.cpp" | tr '\n' ' ')
 
-#--------------------------------------------
-# for test
-#--------------------------------------------
-.PHONY	: req
-req:
-	echo -n "Hello from client" | nc 127.0.0.1 8080
-
 .PHONY	: test
 test:
 	@make unit
@@ -68,17 +62,19 @@ test:
 
 .PHONY	: unit
 unit:
-	@make docker-run
+	@make run-docker-bg
+	@make run-webserv
 	@sleep 5
 	-@pytest ./test/unit
-	@make docker-clean
+	@make clean-docker
 
 .PHONY	: e2e
 e2e:
-	@make docker-run
+	@make run-docker-bg
+	@make run-webserv
 	@sleep 5
 	-@pytest ./test/integration
-	@make docker-clean
+	@make clean-docker
 
 #--------------------------------------------
 -include $(DEPS)
