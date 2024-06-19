@@ -38,13 +38,18 @@ fclean: clean
 re: fclean all
 
 #--------------------------------------------
+DEFAULT_INFILE_PATH=request_messages/200_get_root.txt
+INFILE_PATH=$(DEFAULT_INFILE_PATH)
+
+# ex) make run
+# ex) make run INFILE_PATH=request_messages/200_get_sub.txt
 .PHONY	: run
 run: all
-	@./$(NAME)
+	@./$(NAME) $(INFILE_PATH)
 
 .PHONY	: val
 val: all
-	@valgrind ./$(NAME)
+	@valgrind ./$(NAME) $(INFILE_PATH)
 
 .PHONY	: check
 check:
