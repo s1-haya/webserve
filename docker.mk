@@ -6,8 +6,16 @@ CONTAINER_NAME := webserv-container
 build:
 	@docker build -t $(IMAGE_NAME):$(IMAGE_TAG) .
 
-.PHONY	: docker-run
-docker-run:
+.PHONY	: run-docker-fg
+run-docker-fg:
+	@if [ -z "$$(docker ps -qf name=$(CONTAINER_NAME))" ]; then \
+		docker run -it --name $(CONTAINER_NAME) -p 8080:8080 -e MODE=fg $(IMAGE_NAME); \
+	else \
+		echo "Container $(CONTAINER_NAME) is already running."; \
+	fi
+
+.PHONY	: run-docker-bg
+run-docker-bg:
 	@if [ -z "$$(docker ps -qf name=$(CONTAINER_NAME))" ]; then \
 		docker run -d --name $(CONTAINER_NAME) -p 8080:8080 $(IMAGE_NAME); \
 	else \
@@ -30,13 +38,13 @@ rm:
 		docker rm $(CONTAINER_NAME); \
 	fi
 
-.PHONY	: docker-clean
-docker-clean:
+.PHONY	: clean-docker
+clean-docker:
 	@make stop && make rm
 
 .PHONY	: rmi
 rmi:
-	@make docker-clean
+	@make clean-docker
 	@if [ -z "$$(docker image ls -aqf reference=$(IMAGE_NAME):$(IMAGE_TAG))" ]; then \
 		echo "Image $(IMAGE_NAME) does not exist."; \
 	else \
@@ -63,8 +71,24 @@ login:
 		docker exec -it $(CONTAINER_NAME) /bin/bash; \
 	fi
 
-.PHONY	: docker-check
-docker-check:
+.PHONY	: run-webserv
+run-webserv:
+	@if [ -z "$$(docker ps -qf name=$(CONTAINER_NAME))" ]; then \
+		echo "Container $(CONTAINER_NAME) does not exist."; \
+	else \
+		docker exec -d $(CONTAINER_NAME) make run; \
+	fi
+
+.PHONY	: val-webserv
+val-webserv:
+	@if [ -z "$$(docker ps -qf name=$(CONTAINER_NAME))" ]; then \
+		echo "Container $(CONTAINER_NAME) does not exist."; \
+	else \
+		docker exec -d $(CONTAINER_NAME) make val; \
+	fi
+
+.PHONY	: check-webserv
+check-webserv:
 	@if [ -z "$$(docker ps -qf name=$(CONTAINER_NAME))" ]; then \
 		echo "Container $(CONTAINER_NAME) does not exist."; \
 	else \
