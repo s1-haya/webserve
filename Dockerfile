@@ -5,7 +5,6 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && \
     apt-get install -y \
-    git=1:2.25.1-1ubuntu3.12 \
     python3=3.8.2-0ubuntu2 \
     python3-pip=20.0.2-5ubuntu1.10 \
     build-essential \
@@ -14,6 +13,7 @@ RUN apt-get update && \
     clang-format=1:10.0-50~exp1 \
     valgrind=1:3.15.0-1ubuntu9 \
     cppcheck=1.90-4build1 \
+    git=1:2.43.0-1ubuntu7.1 \
     tzdata=2024a-0ubuntu0.20.04 --no-install-recommends
 
 WORKDIR /webserv
