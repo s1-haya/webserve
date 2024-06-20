@@ -10,14 +10,16 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
-      - name: Run build
-        run: |
+      - name: Run make build
+        run:
           make build
-  
+
       - name: Run make check
         run: |
           make run-docker-bg
+          sleep 1
           make check-webserv
+          sleep 1
           make clean-docker
 
       - name: Run tests
