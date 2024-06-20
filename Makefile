@@ -62,21 +62,11 @@ test:
 
 .PHONY	: unit
 unit:
-	@make run-docker-bg
-	@sleep 1
-	@make run-webserv
-	@sleep 1
 	-@pytest ./test/unit
-	@make clean-docker
 
 .PHONY	: e2e
 e2e:
-	@make run-docker-bg
-	@sleep 1
-	@make run-webserv
-	@sleep 1
 	-@pytest ./test/integration
-	@make clean-docker
 
 #--------------------------------------------
 -include $(DEPS)

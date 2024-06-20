@@ -55,3 +55,27 @@ check-webserv:
 	else \
 		docker exec -d $(CONTAINER_NAME) make check; \
 	fi
+
+.PHONY	: test-webserv
+test-webserv:
+	@if [ -z "$$(docker ps -qf name=$(CONTAINER_NAME))" ]; then \
+		echo "Container $(CONTAINER_NAME) does not exist."; \
+	else \
+		docker exec -d $(CONTAINER_NAME) make test; \
+	fi
+
+.PHONY	: unit-webserv
+unit-webserv:
+	@if [ -z "$$(docker ps -qf name=$(CONTAINER_NAME))" ]; then \
+		echo "Container $(CONTAINER_NAME) does not exist."; \
+	else \
+		docker exec -d $(CONTAINER_NAME) make unit; \
+	fi
+
+.PHONY	: e2e-webserv
+e2e-webserv:
+	@if [ -z "$$(docker ps -qf name=$(CONTAINER_NAME))" ]; then \
+		echo "Container $(CONTAINER_NAME) does not exist."; \
+	else \
+		docker exec -d $(CONTAINER_NAME) make e2e; \
+	fi
