@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [ main ]
 
+env:
+  ARCH: x64
+
 jobs:
   build:
     runs-on: ubuntu-20.04
@@ -49,7 +52,7 @@ jobs:
       - name: Build image if cache does not exist
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
-          docker build -t ${{ steps.image_tag.outputs.TAG }} .
+          docker build -t ${{ steps.image_tag.outputs.TAG }} -f docker/Dockerfile .
           mkdir -p ${{ steps.image_tag.outputs.CACHE_PATH }}
           docker save ${{ steps.image_tag.outputs.TAG }} > ${{ steps.image_tag.outputs.TAR_PATH }}
 
