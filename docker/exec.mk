@@ -29,7 +29,7 @@ log-webserv:
 	@if [ -z "$$(docker ps -qf name=$(CONTAINER_NAME))" ]; then \
 		echo "Container $(CONTAINER_NAME) does not exist."; \
 	else \
-		docker exec $(CONTAINER_NAME) cat /var/log/webserv.err.log; \
+		docker exec $(CONTAINER_NAME) cat /var/log/webserv.log; \
 	fi
 	
 .PHONY	: error-log-webserv
