@@ -14,8 +14,7 @@ jobs:
     runs-on: ubuntu-20.04
     timeout-minutes: 10
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Create image tag
         id: image_tag
@@ -39,7 +38,7 @@ jobs:
 
       - name: Enable cache
         id: cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ${{ steps.image_tag.outputs.CACHE_PATH }}
           key: ${{ steps.image_tag.outputs.CACHE_KEY }}
