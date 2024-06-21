@@ -23,10 +23,11 @@ COPY html /webserv/html
 COPY Makefile /webserv/Makefile
 COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY docker /webserv/docker/
+COPY test /webserv/test/
 COPY requirements.in /webserv/requirements.in
 
-RUN chmod +x /webserv/docker/entrypoint.sh
-RUN mkdir -p /var/log/supervisor
+RUN chmod +x /webserv/docker/entrypoint.sh && \
+    mkdir -p /var/log/supervisor
 
 RUN pip install --upgrade pip && \
     pip install pip-tools==7.4.1 && \

@@ -2,10 +2,17 @@ include docker/config.mk
 
 .PHONY	: build
 build:
-	@docker build -t $(IMAGE_NAME):$(IMAGE_TAG) -f docker/Dockerfile .
+	@docker build -t $(IMAGE_NAME):$(IMAGE_TAG) -f docker/Dockerfile .; \
 
 .PHONY	: run-docker-fg
 run-docker-fg:
+	@if [ -z "$$(docker images -q $(IMAGE_NAME))" ]; then \
+		echo "Image $(IMAGE_NAME) not found. Building the image..."; \
+		make build; \
+	else \
+		echo "Image $(IMAGE_NAME) found."; \
+	fi
+	@sleep 1
 	@if [ -z "$$(docker ps -qf name=$(CONTAINER_NAME))" ]; then \
 		docker run -it --name $(CONTAINER_NAME) -p 8080:8080 -e MODE=fg $(IMAGE_NAME); \
 	else \
@@ -14,6 +21,13 @@ run-docker-fg:
 
 .PHONY	: run-docker-bg
 run-docker-bg:
+	@if [ -z "$$(docker images -q $(IMAGE_NAME))" ]; then \
+		echo "Image $(IMAGE_NAME) not found. Building the image..."; \
+		make build; \
+	else \
+		echo "Image $(IMAGE_NAME) found."; \
+	fi
+	@sleep 1
 	@if [ -z "$$(docker ps -qf name=$(CONTAINER_NAME))" ]; then \
 		docker run -d --name $(CONTAINER_NAME) -p 8080:8080 $(IMAGE_NAME); \
 	else \

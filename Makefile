@@ -1,4 +1,3 @@
-include docker/command.mk
 include docker/exec.mk
 
 NAME		:=	webserv
@@ -57,8 +56,7 @@ check:
 
 .PHONY	: test
 test:
-	@make unit
-	@make e2e
+	@make unit && make e2e
 
 .PHONY	: unit
 unit:

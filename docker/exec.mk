@@ -1,9 +1,12 @@
 include docker/config.mk
+include docker/command.mk
 
 .PHONY	: run-webserv
 run-webserv:
 	@if [ -z "$$(docker ps -qf name=$(CONTAINER_NAME))" ]; then \
-		echo "Container $(CONTAINER_NAME) does not exist."; \
+		make run-docker-bg; \
+		sleep 1; \
+		docker exec $(CONTAINER_NAME) supervisorctl -c /etc/supervisor/conf.d/supervisord.conf start webserv; \
 	else \
 		docker exec $(CONTAINER_NAME) supervisorctl -c /etc/supervisor/conf.d/supervisord.conf start webserv; \
 	fi
@@ -43,7 +46,10 @@ error-log-webserv:
 .PHONY	: val-webserv
 val-webserv:
 	@if [ -z "$$(docker ps -qf name=$(CONTAINER_NAME))" ]; then \
-		echo "Container $(CONTAINER_NAME) does not exist."; \
+		make run-docker-bg; \
+		sleep 1; \
+		docker exec $(CONTAINER_NAME) make val; \
+		make clean-docker; \
 	else \
 		docker exec -d $(CONTAINER_NAME) make val; \
 	fi
@@ -51,7 +57,10 @@ val-webserv:
 .PHONY	: check-webserv
 check-webserv:
 	@if [ -z "$$(docker ps -qf name=$(CONTAINER_NAME))" ]; then \
-		echo "Container $(CONTAINER_NAME) does not exist."; \
+		make run-docker-bg; \
+		sleep 1; \
+		docker exec $(CONTAINER_NAME) make check; \
+		make clean-docker; \
 	else \
 		docker exec -d $(CONTAINER_NAME) make check; \
 	fi
@@ -59,23 +68,32 @@ check-webserv:
 .PHONY	: test-webserv
 test-webserv:
 	@if [ -z "$$(docker ps -qf name=$(CONTAINER_NAME))" ]; then \
-		echo "Container $(CONTAINER_NAME) does not exist."; \
+		make run-docker-bg; \
+		sleep 1; \
+		docker exec $(CONTAINER_NAME) make test; \
+		make clean-docker; \
 	else \
-		docker exec -d $(CONTAINER_NAME) make test; \
+		make test; \
 	fi
 
 .PHONY	: unit-webserv
 unit-webserv:
 	@if [ -z "$$(docker ps -qf name=$(CONTAINER_NAME))" ]; then \
-		echo "Container $(CONTAINER_NAME) does not exist."; \
+		make run-docker-bg; \
+		sleep 1; \
+		docker exec $(CONTAINER_NAME) make unit; \
+		make clean-docker; \
 	else \
-		docker exec -d $(CONTAINER_NAME) make unit; \
+		make unit; \
 	fi
 
 .PHONY	: e2e-webserv
 e2e-webserv:
 	@if [ -z "$$(docker ps -qf name=$(CONTAINER_NAME))" ]; then \
-		echo "Container $(CONTAINER_NAME) does not exist."; \
+		make run-docker-bg; \
+		sleep 1; \
+		docker exec $(CONTAINER_NAME) make e2e; \
+		make clean-docker; \
 	else \
-		docker exec -d $(CONTAINER_NAME) make e2e; \
+		make e2e; \
 	fi
