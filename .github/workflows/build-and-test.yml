@@ -12,6 +12,9 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
+      - name: Run make build
+        run:
+          make build
       - name: Run make check
         run:
           make check-webserv
