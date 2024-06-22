@@ -40,6 +40,3 @@ login: run
 
 .PHONY	: re
 re: fclean build
-
-.PHONY	: test
-test:
