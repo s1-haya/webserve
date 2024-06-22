@@ -6,10 +6,10 @@ run-webserv:
 	@if [ -z "$$(docker ps -qf name=$(CONTAINER_NAME))" ]; then \
 		make run-docker-bg; \
 		sleep 1; \
-		docker exec $(CONTAINER_NAME) supervisorctl -c /etc/supervisor/conf.d/supervisord.conf start webserv; \
 	else \
-		docker exec $(CONTAINER_NAME) supervisorctl -c /etc/supervisor/conf.d/supervisord.conf start webserv; \
+		echo "Container $(CONTAINER_NAME) already exists."; \
 	fi
+	@docker exec $(CONTAINER_NAME) supervisorctl -c /etc/supervisor/conf.d/supervisord.conf start webserv
 
 .PHONY	: stop-webserv
 stop-webserv:
@@ -67,33 +67,33 @@ check-webserv:
 
 .PHONY	: test-webserv
 test-webserv:
-	@if [ -z "$$(docker ps -qf name=$(CONTAINER_NAME))" ]; then \
-		make run-docker-bg; \
+	@if [ -z "$$(docker ps -qf name=$(CONTAINER_NAME))" ] || [ "$$(make ps-webserv | grep "make -C /webserv run" | wc -l)" -eq 0 ]; then \
+		make run-webserv; \
 		sleep 1; \
 		docker exec $(CONTAINER_NAME) make test; \
 		make clean-docker; \
 	else \
-		make test; \
+		docker exec $(CONTAINER_NAME) make test; \
 	fi
 
 .PHONY	: unit-webserv
 unit-webserv:
-	@if [ -z "$$(docker ps -qf name=$(CONTAINER_NAME))" ]; then \
-		make run-docker-bg; \
+	@if [ -z "$$(docker ps -qf name=$(CONTAINER_NAME))" ] || [ "$$(make ps-webserv | grep "make -C /webserv run" | wc -l)" -eq 0 ]; then \
+		make run-webserv; \
 		sleep 1; \
 		docker exec $(CONTAINER_NAME) make unit; \
 		make clean-docker; \
 	else \
-		make unit; \
+		docker exec $(CONTAINER_NAME) make unit; \
 	fi
 
 .PHONY	: e2e-webserv
 e2e-webserv:
-	@if [ -z "$$(docker ps -qf name=$(CONTAINER_NAME))" ]; then \
-		make run-docker-bg; \
+	@if [ -z "$$(docker ps -qf name=$(CONTAINER_NAME))" ] || [ "$$(make ps-webserv | grep "make -C /webserv run" | wc -l)" -eq 0 ]; then \
+		make run-webserv; \
 		sleep 1; \
 		docker exec $(CONTAINER_NAME) make e2e; \
 		make clean-docker; \
 	else \
-		make e2e; \
+		docker exec $(CONTAINER_NAME) make e2e; \
 	fi

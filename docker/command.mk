@@ -13,7 +13,7 @@ run-docker-fg:
 		echo "Image $(IMAGE_NAME) found."; \
 	fi
 	@sleep 1
-	@if [ -z "$$(docker ps -qf name=$(CONTAINER_NAME))" ]; then \
+	@if [ -z "$$(docker ps -aqf name=$(CONTAINER_NAME))" ]; then \
 		docker run -it --name $(CONTAINER_NAME) -p 8080:8080 -e MODE=fg $(IMAGE_NAME); \
 	else \
 		echo "Container $(CONTAINER_NAME) is already running."; \
@@ -28,7 +28,7 @@ run-docker-bg:
 		echo "Image $(IMAGE_NAME) found."; \
 	fi
 	@sleep 1
-	@if [ -z "$$(docker ps -qf name=$(CONTAINER_NAME))" ]; then \
+	@if [ -z "$$(docker ps -aqf name=$(CONTAINER_NAME))" ]; then \
 		docker run -d --name $(CONTAINER_NAME) -p 8080:8080 $(IMAGE_NAME); \
 	else \
 		echo "Container $(CONTAINER_NAME) is already running."; \
