@@ -1,7 +1,6 @@
-# requirements.txt
-
 pytest
 isort
 black
 mypy
 requests
+supervisor

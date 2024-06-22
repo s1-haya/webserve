@@ -1,37 +1,31 @@
-FROM ubuntu:22.04
+FROM ubuntu:20.04
 
 # 非対話的モードを設定
 ENV DEBIAN_FRONTEND=noninteractive
-RUN apt-get update && apt-get install -y tzdata
 
 RUN apt-get update && \
-    apt-get install -y software-properties-common && \
-    add-apt-repository -y ppa:deadsnakes/ppa && \
-    apt-get update && \
     apt-get install -y \
-    python3.9 python3.9-distutils \
+    git=1:2.25.1-1ubuntu3.12 \
+    python3=3.8.2-0ubuntu2 \
+    python3-pip=20.0.2-5ubuntu1.10 \
     build-essential \
-    git \
-    telnet \
-    valgrind \
-    clang-format \
-    vim \
-    curl
+    curl=7.68.0-1ubuntu2.22 \
+    vim-common=2:8.1.2269-1ubuntu5.23 vim-runtime=2:8.1.2269-1ubuntu5.23 vim=2:8.1.2269-1ubuntu5.23 \
+    clang-format=1:10.0-50~exp1 \
+    valgrind=1:3.15.0-1ubuntu9 \
+    cppcheck=1.90-4build1 \
+    tzdata=2024a-0ubuntu0.20.04 --no-install-recommends
 
-RUN curl -sS https://bootstrap.pypa.io/get-pip.py | python3.9
+WORKDIR /workspaces/webserv
 
-# デフォルトのPythonバージョンをPython 3.9に変更
-RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.9 1
-RUN update-alternatives --set python3 /usr/bin/python3.9
-
-
-COPY requirements.txt /workspaces/webserv/requirements.txt
-RUN pip install --upgrade pip && pip install -r /workspaces/webserv/requirements.txt
+COPY requirements.in /workspaces/webserv/requirements.in
+RUN pip install --upgrade pip && \
+    pip install --no-cache-dir pip-tools==7.4.1 && \
+    pip-compile /workspaces/webserv/requirements.in --strip-extras && \
+    pip-sync
 
 RUN rm -rf /var/lib/apt/lists/*
 
 VOLUME [ "/workspaces" ]
-
-WORKDIR /workspaces/webserv
 
 CMD [ "/bin/bash" ]

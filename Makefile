@@ -1,3 +1,5 @@
+include docker/exec.mk
+
 NAME		:=	webserv
 
 SRC_DIR		:=	srcs
@@ -52,12 +54,17 @@ val: all
 check:
 	@cppcheck --enable=all $$(find . -type f -name "*.cpp" | tr '\n' ' ')
 
-#--------------------------------------------
-# for test
-#--------------------------------------------
-.PHONY	: req
-req:
-	echo -n "Hello from client" | nc 127.0.0.1 8080
+.PHONY	: test
+test:
+	@make unit && make e2e
+
+.PHONY	: unit
+unit:
+	-@pytest ./test/unit
+
+.PHONY	: e2e
+e2e:
+	-@pytest ./test/integration
 
 #--------------------------------------------
 -include $(DEPS)
