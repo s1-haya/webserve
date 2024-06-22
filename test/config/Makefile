@@ -8,23 +8,23 @@ build:
 
 .PHONY	: run
 run:
-	@docker run -d --name $(CONTAINER_NAME) -p 80:80 -v ./conf_file:/etc/nginx/conf_file $(IMAGE_NAME)
+	@docker run -d --name $(CONTAINER_NAME) -v ./conf_file:/etc/nginx/conf_file $(IMAGE_NAME)
 
 .PHONY	: stop
 stop:
-	@docker stop $(CONTAINER_NAME)
+	-@docker stop $(CONTAINER_NAME)
 
 .PHONY	: rm
 rm:
-	@docker rm $(CONTAINER_NAME)
+	-@docker rm $(CONTAINER_NAME)
 
 .PHONY	: clean
 clean:
-	@make stop && make rm
+	-@make stop && make rm
 
 .PHONY	: fclean
 fclean:
-	@make clean && docker rmi $(IMAGE_NAME)
+	-@make clean && docker rmi $(IMAGE_NAME)
 
 .PHONY	: log
 log:
@@ -34,9 +34,13 @@ log:
 ps:
 	@docker ps -a
 
+.PHONY	: check_container
+check_container:
+	@docker inspect -f '{{.State.Status}}' $(CONTAINER_NAME) 2>/dev/null | grep -q 'running' || $(MAKE) run
+
 .PHONY	: login
-login: run
-	@docker exec -it $(CONTAINER_NAME) /bin/bash
+login: check_container
+	@docker exec -it $(CONTAINER_NAME) /bin/bash;
 
 .PHONY	: re
 re: fclean build
