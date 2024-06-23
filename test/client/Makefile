@@ -38,8 +38,8 @@ fclean: clean
 re: fclean all
 
 #--------------------------------------------
-DEFAULT_PORT=8080
-PORT=$(DEFAULT_PORT)
+DEFAULT_PORT	:=	8080
+PORT			:=	$(DEFAULT_PORT)
 
 # ex) make run INFILE_PATH=request_messages/200_get_sub.txt
 # ex) make run PORT=4242 INFILE_PATH=request_messages/200_get_sub.txt
