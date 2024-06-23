@@ -49,7 +49,7 @@ val-webserv:
 		make run-docker-bg; \
 		sleep 1; \
 		docker exec $(CONTAINER_NAME) make val; \
-		make clean-docker; \
+		make rmi; \
 	else \
 		docker exec -d $(CONTAINER_NAME) make val; \
 	fi
@@ -60,7 +60,7 @@ check-webserv:
 		make run-docker-bg; \
 		sleep 1; \
 		docker exec $(CONTAINER_NAME) make check; \
-		make clean-docker; \
+		make rmi; \
 	else \
 		docker exec -d $(CONTAINER_NAME) make check; \
 	fi
@@ -71,7 +71,7 @@ test-webserv:
 		make run-webserv; \
 		sleep 1; \
 		docker exec $(CONTAINER_NAME) make test; \
-		make clean-docker; \
+		make rmi; \
 	else \
 		docker exec $(CONTAINER_NAME) make test; \
 	fi
@@ -82,7 +82,7 @@ unit-webserv:
 		make run-webserv; \
 		sleep 1; \
 		docker exec $(CONTAINER_NAME) make unit; \
-		make clean-docker; \
+		make rmi; \
 	else \
 		docker exec $(CONTAINER_NAME) make unit; \
 	fi
@@ -93,7 +93,7 @@ e2e-webserv:
 		make run-webserv; \
 		sleep 1; \
 		docker exec $(CONTAINER_NAME) make e2e; \
-		make clean-docker; \
+		make rmi; \
 	else \
 		docker exec $(CONTAINER_NAME) make e2e; \
 	fi

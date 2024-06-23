@@ -58,6 +58,11 @@ check:
 test:
 	@make unit && make e2e
 
+.PHONY	: debug
+debug:
+	-@pytest -s ./test/unit
+	-@pytest -s ./test/integration
+
 .PHONY	: unit
 unit:
 	-@pytest ./test/unit
