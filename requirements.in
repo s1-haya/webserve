@@ -3,4 +3,3 @@ isort
 black
 mypy
 requests
-supervisor
