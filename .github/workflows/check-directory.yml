@@ -1,0 +1,17 @@
+name: check-directory.yml
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    timeout-minutes: 10
+      - name: Print working directory
+        run: pwd
+
+      - name: List files
+        run: ls -la
