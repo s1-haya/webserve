@@ -28,7 +28,6 @@ jobs:
       
       - name: Install Python dependencies
         run: |
-          cd /workspaces/webserv
           pip-compile requirements.in --strip-extras
           pip-sync
 
@@ -39,5 +38,4 @@ jobs:
 
       - name: Run tests
         run: |
-          cd /workspaces/webserv
           make test
