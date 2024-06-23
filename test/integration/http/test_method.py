@@ -14,3 +14,15 @@ class TestStatusCode:
             con.close()
         except HTTPException as e:
             print(f"Request faild: {e}" )
+
+    def test_ok_in_sub_directory(self):
+        try:
+            con = HTTPConnection("localhost", 8080)
+            con.request("GET", "/sub")
+            response = con.getresponse()
+            assert_status_line(HTTPStatus.OK, response)
+            assert_header("Connection", "close", response)
+            assert_body("./html/sub/index.html", response)
+            con.close()
+        except HTTPException as e:
+            print(f"Request faild: {e}" )
