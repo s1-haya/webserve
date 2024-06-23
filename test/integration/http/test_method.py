@@ -26,3 +26,15 @@ class TestStatusCode:
             con.close()
         except HTTPException as e:
             print(f"Request faild: {e}" )
+
+    def test_not_found(self):
+        try:
+            con = HTTPConnection("localhost", 8080)
+            con.request("GET", "/no-exist-path")
+            response = con.getresponse()
+            assert_status_line(HTTPStatus.NOT_FOUND, response)
+            assert_header("Connection", "close", response)
+            assert_body("./html/404.html", response)
+            con.close()
+        except HTTPException as e:
+            print(f"Request faild: {e}" )
