@@ -6,10 +6,6 @@
 #include <sstream> // stringstream
 
 namespace {
-	static const unsigned int DEFAULT_PORT = 8080;
-	static const std::string  DEFAULT_INFILE_PATH =
-		"request_messages/200_get_root.txt";
-
 	static const std::string COLOR_RED   = "\033[31m";
 	static const std::string COLOR_RESET = "\033[0m";
 
@@ -42,27 +38,19 @@ namespace {
 	}
 } // namespace
 
-// default port & message  : ./client
-// original port & message : ./client PORT INFILE_PATH
+// ./client PORT INFILE_PATH
 int main(int argc, char **argv) {
-	if (argc != 1 && argc != 3) {
+	if (argc != 3) {
 		PrintError("Error: invalid arguments");
 		return EXIT_FAILURE;
 	}
 
 	try {
-		unsigned int port;
-		std::string  request_message;
-		if (argc == 1) {
-			port            = DEFAULT_PORT;
-			request_message = ReadFileStr(DEFAULT_INFILE_PATH);
-		} else {
-			port = ConvertStrToUint(argv[1]);
-			request_message =
-				ReadFileStr(std::string(argv[2], std::strlen(argv[2])));
-		}
-		Client client(port, request_message);
-		client.SendRequestAndReceiveResponse();
+		const unsigned int port = ConvertStrToUint(argv[1]);
+		const std::string  request_message =
+			ReadFileStr(std::string(argv[2], std::strlen(argv[2])));
+		Client client(port);
+		client.SendRequestAndReceiveResponse(request_message);
 	} catch (const std::exception &e) {
 		PrintError(e.what());
 		return EXIT_FAILURE;
