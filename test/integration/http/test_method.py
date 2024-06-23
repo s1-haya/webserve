@@ -1,4 +1,4 @@
-from assert_http_response import assert_status_line
+from assert_http_response import assert_status_line, assert_body
 from http.client import HTTPConnection, HTTPException
 from http import HTTPStatus
 
@@ -9,6 +9,7 @@ class TestStatusCode:
             con.request("GET", "/")
             response = con.getresponse()
             assert_status_line(HTTPStatus.OK, response)
+            assert_body("./html/index.html", response)
             con.close()
-        except http.client.HTTPException as e:
-            print(f"Request failed: {e}")
+        except HTTPException as e:
+            print(f"Request faild: {e}" )
