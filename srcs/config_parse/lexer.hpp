@@ -6,20 +6,25 @@
 
 class Lexer {
   private:
-	std::list<Node> &tokens_;
-	Lexer();
-
-	void AddToken(const char symbol, int token_type);
-	void AddToken(const std::string &symbol, int token_type);
-	void AddWordToken(std::string::const_iterator &it);
-	void SkipComment(std::string::const_iterator &it);
+	std::list<Node>         &tokens_;
+	std::vector<std::string> context_;
+	std::vector<std::string> directive_;
 	enum TokenType {
 		DELIM,
 		L_BRACKET,
 		R_BRACKET,
-		WORD,
-		SHARP
+		SHARP,
+		CONTEXT,
+		DIRECTIVE,
+		WORD
 	};
+
+	Lexer();
+	void              AddToken(const char symbol, int token_type);
+	void              AddToken(const std::string &symbol, int token_type);
+	void              AddWordToken(std::string::const_iterator &it);
+	void              SkipComment(std::string::const_iterator &it);
+	void              Init();
 	const std::string buffer_;
 
   public:

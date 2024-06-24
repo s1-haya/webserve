@@ -29,12 +29,24 @@ void Lexer::SkipComment(std::string::const_iterator &it) {
 		++it;
 }
 
+void Lexer::Init() {
+	context_.push_back("server");
+	context_.push_back("location");
+
+	directive_.push_back("server_name");
+	directive_.push_back("listen");
+	directive_.push_back("rewrite");
+	directive_.push_back("root");
+	directive_.push_back("index");
+}
+
 Lexer::Lexer(const std::string &buffer, std::list<Node> &tokens_)
 	: tokens_(tokens_), buffer_(buffer) {
 	bool need_space = false;
 	// bool        need_delim    = false; 使うかわからない
 	bool        sharp_comment = false;
 	std::string new_str;
+	Init();
 
 	for (std::string::const_iterator it = buffer_.begin(); it != buffer_.end();
 		 ++it) {
