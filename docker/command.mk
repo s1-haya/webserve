@@ -4,40 +4,25 @@ include docker/config.mk
 build:
 	@docker build -t $(IMAGE_NAME):$(IMAGE_TAG) -f docker/Dockerfile .; \
 
-.PHONY	: run-docker-fg
-run-docker-fg:
+.PHONY	: run-webserv
+run-webserv:
 	@if [ -z "$$(docker images -q $(IMAGE_NAME))" ]; then \
-		echo "Image $(IMAGE_NAME) not found. Building the image..."; \
+		echo "$(IMAGE_NAME) not found. Building the image..."; \
 		make build; \
 	else \
-		echo "Image $(IMAGE_NAME) found."; \
-	fi
-	@sleep 1
-	@if [ -z "$$(docker ps -aqf name=$(CONTAINER_NAME))" ]; then \
-		docker run -it --name $(CONTAINER_NAME) -p $(PORT):$(PORT) -e MODE=fg $(IMAGE_NAME); \
-	else \
-		echo "Container $(CONTAINER_NAME) is already running."; \
-	fi
-
-.PHONY	: run-docker-bg
-run-docker-bg:
-	@if [ -z "$$(docker images -q $(IMAGE_NAME))" ]; then \
-		echo "Image $(IMAGE_NAME) not found. Building the image..."; \
-		make build; \
-	else \
-		echo "Image $(IMAGE_NAME) found."; \
+		echo "$(IMAGE_NAME) found."; \
 	fi
 	@sleep 1
 	@if [ -z "$$(docker ps -aqf name=$(CONTAINER_NAME))" ]; then \
 		docker run -d --name $(CONTAINER_NAME) -p $(PORT):$(PORT) $(IMAGE_NAME); \
 	else \
-		echo "Container $(CONTAINER_NAME) is already running."; \
+		echo "$(CONTAINER_NAME) is already running."; \
 	fi
 
 .PHONY	: stop
 stop:
 	@if [ -z "$$(docker ps -qf name=$(CONTAINER_NAME))" ]; then \
-		echo "Container $(CONTAINER_NAME) already stopped."; \
+		echo "$(CONTAINER_NAME) already stopped."; \
 	else \
 		docker stop $(CONTAINER_NAME); \
 	fi
@@ -45,20 +30,20 @@ stop:
 .PHONY	: rm
 rm:
 	@if [ -z "$$(docker ps -aqf name=$(CONTAINER_NAME))" ]; then \
-		echo "Container $(CONTAINER_NAME) does not exist."; \
+		echo "$(CONTAINER_NAME) does not exist."; \
 	else \
 		docker rm $(CONTAINER_NAME); \
 	fi
 
-.PHONY	: clean-docker
-clean-docker:
+.PHONY	: clean-webserv
+clean-webserv:
 	@make stop && make rm
 
 .PHONY	: rmi
 rmi:
-	@make clean-docker
+	@make clean-webserv
 	@if [ -z "$$(docker image ls -aqf reference=$(IMAGE_NAME):$(IMAGE_TAG))" ]; then \
-		echo "Image $(IMAGE_NAME) does not exist."; \
+		echo "$(IMAGE_NAME) does not exist."; \
 	else \
 		docker rmi $(IMAGE_NAME):$(IMAGE_TAG); \
 	fi
@@ -66,19 +51,19 @@ rmi:
 .PHONY	: log
 log:
 	@if [ -z "$$(docker ps -qf name=$(CONTAINER_NAME))" ]; then \
-		echo "Container $(CONTAINER_NAME) does not exist."; \
+		echo "$(CONTAINER_NAME) does not exist."; \
 	else \
 		docker logs $(CONTAINER_NAME); \
 	fi
 
-.PHONY	: ps-docker
-ps-docker:
+.PHONY	: ps
+ps:
 	@docker ps -a
 
 .PHONY	: login
 login:
 	@if [ -z "$$(docker ps -qf name=$(CONTAINER_NAME))" ]; then \
-		echo "Container $(CONTAINER_NAME) does not exist."; \
+		echo "$(CONTAINER_NAME) does not exist."; \
 	else \
 		docker exec -it $(CONTAINER_NAME) /bin/bash; \
 	fi

@@ -1,4 +1,4 @@
-include docker/exec.mk
+include docker/command.mk
 
 NAME		:=	webserv
 
