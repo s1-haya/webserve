@@ -6,26 +6,21 @@
 
 class Client {
   public:
-	Client();
-	explicit Client(int port);
-	explicit Client(const std::string &message);
-	Client(int port, const std::string &message);
+	explicit Client(unsigned int port);
 	~Client();
-	void SetMessage(const std::string &message);
-	void SendRequestAndReceiveResponse();
+	void SendRequestAndReceiveResponse(const std::string &message);
 
   private:
+	Client();
 	// prohibit copy
 	Client(const Client &other);
 	Client &operator=(const Client &other);
 	void    Init();
 	// const
 	static const int          SYSTEM_ERROR = -1;
-	static const unsigned int DEFAULT_PORT = 8080;
-	static const std::string  DEFAULT_MESSAGE;
+	static const unsigned int BUFFER_SIZE  = 1024;
 	// socket
 	unsigned int       port_;
-	std::string        request_message_;
 	int                sock_fd_;
 	struct sockaddr_in sock_addr_;
 };

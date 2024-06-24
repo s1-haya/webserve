@@ -1,5 +1,4 @@
 #include "server.hpp"
-#include "convert.hpp"
 #include "event.hpp"
 #include "http.hpp"
 #include <arpa/inet.h> // htons
@@ -10,9 +9,9 @@
 // todo: set ConfigData -> private variables
 Server::Server(const Config::ConfigData &config)
 	: server_name_("from_config"), port_(8080) {
-	Debug("server", "init server & set config");
 	(void)config;
 	Init();
+	Debug("server", "init server & listen", server_fd_);
 }
 
 Server::~Server() {
@@ -23,7 +22,7 @@ Server::~Server() {
 }
 
 void Server::Run() {
-	Debug("server", "run server");
+	Debug("server", "run server", server_fd_);
 
 	while (true) {
 		errno           = 0;
@@ -38,23 +37,32 @@ void Server::Run() {
 	}
 }
 
-void Server::HandleEvent(const Event event) {
+void Server::HandleEvent(const Event &event) {
 	if (event.fd == server_fd_) {
-		AcceptNewConnection();
-	} else if (event.type == EVENT_READ) {
-		SendResponseToClient(event.fd);
+		HandleNewConnection();
+	} else {
+		HandleExistingConnection(event);
 	}
-	// todo: handle other EventType (switch)
 }
 
-void Server::AcceptNewConnection() {
+void Server::HandleNewConnection() {
 	const int new_socket =
 		accept(server_fd_, (struct sockaddr *)&sock_addr_, &addrlen_);
 	if (new_socket == SYSTEM_ERROR) {
 		throw std::runtime_error("accept failed");
 	}
-	epoll_.AddNewConnection(new_socket);
-	Debug("server", "add new client (fd: " + ToString(new_socket) + ")");
+	epoll_.AddNewConnection(new_socket, EVENT_READ);
+	Debug("server", "add new client", new_socket);
+}
+
+void Server::HandleExistingConnection(const Event &event) {
+	if (event.type & EVENT_READ) {
+		ReadRequest(event);
+	}
+	if (event.type & EVENT_WRITE) {
+		SendResponse(event.fd);
+	}
+	// todo: handle other EventType
 }
 
 namespace {
@@ -62,24 +70,45 @@ namespace {
 		Http http(read_buf);
 		return http.CreateResponse();
 	}
+
+	// todo: find "Connection: close"?
+	bool IsRequestReceivedComplete(const std::string &buffer) {
+		return buffer.find("\r\n\r\n") != std::string::npos;
+	}
 } // namespace
 
-void Server::SendResponseToClient(int client_fd) {
-	char buffer[BUFFER_SIZE];
+void Server::ReadRequest(const Event &event) {
+	const int client_fd = event.fd;
 
-	ssize_t read_ret = read(client_fd, buffer, BUFFER_SIZE);
+	ssize_t read_ret = buffers_.Read(client_fd);
 	if (read_ret <= 0) {
 		if (read_ret == SYSTEM_ERROR) {
 			throw std::runtime_error("read failed");
 		}
-		close(client_fd);
-		epoll_.DeleteConnection(client_fd);
-		Debug("server", "disconnected client (fd: " + ToString(client_fd) + ")");
+		// todo: need?
+		// buffers_.Delete(client_fd);
+		// epoll_.DeleteConnection(client_fd);
 		return;
 	}
-	const std::string response = CreateHttpResponse(std::string(buffer, read_ret));
+	if (IsRequestReceivedComplete(buffers_.GetBuffer(client_fd))) {
+		Debug("server", "received all request from client", client_fd);
+		std::cerr << buffers_.GetBuffer(client_fd) << std::endl;
+		epoll_.UpdateEventType(event, EVENT_WRITE);
+	}
+}
+
+void Server::SendResponse(int client_fd) {
+	// todo: check if it's ready to start write/send
+	const std::string response = CreateHttpResponse(buffers_.GetBuffer(client_fd));
 	send(client_fd, response.c_str(), response.size(), 0);
-	Debug("server", "send to client (fd: " + ToString(client_fd) + ")");
+	Debug("server", "send response to client", client_fd);
+
+	// disconnect
+	buffers_.Delete(client_fd);
+	close(client_fd);
+	epoll_.DeleteConnection(client_fd);
+	Debug("server", "disconnected client", client_fd);
+	Debug("------------------------------------------");
 }
 
 void Server::Init() {
@@ -112,5 +141,5 @@ void Server::Init() {
 	}
 
 	// add to epoll's interest list
-	epoll_.AddNewConnection(server_fd_);
+	epoll_.AddNewConnection(server_fd_, EVENT_READ);
 }

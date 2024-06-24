@@ -15,4 +15,10 @@ void Debug(const std::string &title, const T &x) {
 	std::cerr << COLOR_GLAY << "[" << title << "] " << x << COLOR_RESET << std::endl;
 }
 
+template <typename T, typename U>
+void Debug(const std::string &title, const T &x, const U &y) {
+	std::cerr << COLOR_GLAY << "[" << title << "] " << x << "(" << y << ")"
+			  << COLOR_RESET << std::endl;
+}
+
 #endif /* UTILS_DEBUG_HPP_ */
