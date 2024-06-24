@@ -5,7 +5,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && \
     apt-get install -y \
-    git=1:2.25.1-1ubuntu3.12 \
+    git=1:2.25.1-1ubuntu3.13 \
     python3=3.8.2-0ubuntu2 \
     python3-pip=20.0.2-5ubuntu1.10 \
     build-essential \
