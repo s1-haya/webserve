@@ -28,4 +28,4 @@ RUN rm -rf /var/lib/apt/lists/*
 
 VOLUME [ "/workspaces" ]
 
-CMD [ "/bin/bash" ]
+ENTRYPOINT [ "/bin/bash" ]

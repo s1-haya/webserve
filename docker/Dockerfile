@@ -16,4 +16,4 @@ COPY docker /webserv/docker/
 
 RUN rm -rf /var/lib/apt/lists/*
 
-CMD ["make", "run"]
+ENTRYPOINT ["make", "run"]
