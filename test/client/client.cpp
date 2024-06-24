@@ -1,30 +1,11 @@
 #include "client.hpp"
 #include <arpa/inet.h> // inet_pton,htons
-#include <cstring>     // strlen
 #include <iostream>
-#include <stdio.h>      // perror
 #include <sys/socket.h> // socket,connect
 #include <sys/types.h>
 #include <unistd.h> // read,close
 
-const std::string Client::DEFAULT_MESSAGE =
-	"GET / HTTP/1.1\r\nConnection: close \r\n\r\n";
-
-Client::Client() : port_(DEFAULT_PORT), request_message_(DEFAULT_MESSAGE) {
-	Init();
-}
-
-Client::Client(int port) : port_(port), request_message_(DEFAULT_MESSAGE) {
-	Init();
-}
-
-Client::Client(const std::string &message)
-	: port_(DEFAULT_PORT), request_message_(message) {
-	Init();
-}
-
-Client::Client(int port, const std::string &message)
-	: port_(port), request_message_(message) {
+Client::Client(unsigned int port) : port_(port) {
 	Init();
 }
 
@@ -43,19 +24,13 @@ namespace {
 	}
 } // namespace
 
-void Client::SetMessage(const std::string &message) {
-	request_message_ = message;
-}
-
-void Client::SendRequestAndReceiveResponse() {
+void Client::SendRequestAndReceiveResponse(const std::string &message) {
 	// send request message
-	send(sock_fd_, request_message_.c_str(), request_message_.size(), 0);
+	send(sock_fd_, message.c_str(), message.size(), 0);
 	DebugPrint("Message sent.");
 
 	// receive response
-	static const unsigned int BUFFER_SIZE = 8;
-	char                      buffer[BUFFER_SIZE];
-
+	char        buffer[BUFFER_SIZE];
 	std::string response;
 	while (true) {
 		ssize_t read_ret = read(sock_fd_, buffer, BUFFER_SIZE);
