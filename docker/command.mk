@@ -1,5 +1,3 @@
-include docker/config.mk
-
 .PHONY	: build
 build:
 	@docker build -t $(IMAGE_NAME):$(IMAGE_TAG) -f docker/Dockerfile .; \
@@ -67,3 +65,5 @@ login:
 	else \
 		docker exec -it $(CONTAINER_NAME) /bin/bash; \
 	fi
+
+-include docker/config.mk

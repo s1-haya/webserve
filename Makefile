@@ -1,5 +1,3 @@
-include docker/command.mk
-
 NAME		:=	webserv
 
 SRC_DIR		:=	srcs
@@ -68,3 +66,4 @@ e2e:
 
 #--------------------------------------------
 -include $(DEPS)
+-include docker/command.mk
