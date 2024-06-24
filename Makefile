@@ -60,16 +60,16 @@ test:
 
 .PHONY	: debug
 debug:
-	-@pytest -s ./test/unit
-	-@pytest -s ./test/integration
+	@pytest -sv ./test/unit
+	@pytest -sv ./test/integration
 
 .PHONY	: unit
 unit:
-	-@pytest ./test/unit
+	@pytest ./test/unit
 
 .PHONY	: e2e
 e2e:
-	-@pytest ./test/integration
+	@pytest ./test/integration
 
 #--------------------------------------------
 -include $(DEPS)
