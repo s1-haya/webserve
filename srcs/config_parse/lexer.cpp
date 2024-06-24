@@ -19,7 +19,12 @@ void Lexer::AddWordToken(std::string::const_iterator &it) {
 		new_str += *it;
 		++it;
 	}
-	AddToken(new_str, WORD);
+	if (SearchWordTokenType(new_str) == CONTEXT)
+		AddToken(new_str, CONTEXT);
+	else if (SearchWordTokenType(new_str) == DIRECTIVE)
+		AddToken(new_str, DIRECTIVE);
+	else
+		AddToken(new_str, WORD);
 	if (*it == SEMICOLON_CHR)
 		AddToken(SEMICOLON_CHR, DELIM);
 }
@@ -27,6 +32,15 @@ void Lexer::AddWordToken(std::string::const_iterator &it) {
 void Lexer::SkipComment(std::string::const_iterator &it) {
 	while (*it != '\n')
 		++it;
+}
+
+Lexer::TokenType Lexer::SearchWordTokenType(std::string &word) {
+	if (std::find(context_.begin(), context_.end(), word) != context_.end())
+		return CONTEXT;
+	else if (std::find(directive_.begin(), directive_.end(), word) !=
+			 directive_.end())
+		return DIRECTIVE;
+	return WORD;
 }
 
 void Lexer::Init() {

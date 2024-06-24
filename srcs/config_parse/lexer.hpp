@@ -1,6 +1,8 @@
 #ifndef LEXER_HPP_
 #define LEXER_HPP_
+#include <algorithm>
 #include <list>
+#include <vector>
 
 #include "node.hpp"
 
@@ -25,6 +27,7 @@ class Lexer {
 	void              AddWordToken(std::string::const_iterator &it);
 	void              SkipComment(std::string::const_iterator &it);
 	void              Init();
+	TokenType         SearchWordTokenType(std::string &);
 	const std::string buffer_;
 
   public:
