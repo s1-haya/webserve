@@ -18,7 +18,7 @@ RUN apt-get update && \
 
 WORKDIR /workspaces/webserv
 
-COPY requirements.in /workspaces/webserv/requirements.in
+COPY / /workspaces/webserv/
 RUN pip install --upgrade pip && \
     pip install --no-cache-dir pip-tools==7.4.1 && \
     pip-compile /workspaces/webserv/requirements.in --strip-extras && \

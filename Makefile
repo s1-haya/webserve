@@ -16,6 +16,7 @@ DEPS		:=	$(OBJS:.o=.d)
 MKDIR		:=	mkdir -p
 
 #--------------------------------------------
+
 .PHONY	: all
 all		: $(NAME)
 
@@ -38,6 +39,7 @@ fclean: clean
 re: fclean all
 
 #--------------------------------------------
+
 PATH_CONFIG	:=	default.conf
 
 .PHONY	: run
@@ -56,13 +58,18 @@ check:
 test:
 	@make unit && make e2e
 
+.PHONY	: debug
+debug:
+	@pytest -sv ./test/unit
+	@pytest -sv ./test/integration
+
 .PHONY	: unit
 unit:
-	-@pytest ./test/unit
+	@pytest -v ./test/unit
 
 .PHONY	: e2e
 e2e:
-	-@pytest ./test/integration
+	@pytest -v ./test/integration
 
 #--------------------------------------------
 
@@ -127,10 +134,6 @@ log-webserv:
 		docker logs $(WEBSERV_CONTAINER_NAME); \
 	fi
 
-.PHONY	: ps
-ps:
-	@docker ps -a
-
 .PHONY	: login-webserv
 login-webserv:
 	@if [ -z "$$(docker ps -qf name=$(WEBSERV_CONTAINER_NAME))" ]; then \
@@ -138,6 +141,81 @@ login-webserv:
 	else \
 		docker exec -it $(WEBSERV_CONTAINER_NAME) /bin/bash; \
 	fi
+
+#--------------------------------------------
+
+DEV_IMAGE_NAME := dev-image
+DEV_IMAGE_TAG := development
+DEV_CONTAINER_NAME := dev-container
+DEV_PORT := 49152
+
+.PHONY	: build-dev
+build-dev:
+	@docker build -t $(DEV_IMAGE_NAME):$(DEV_IMAGE_TAG) -f .devcontainer/Dockerfile .; \
+
+.PHONY	: run-dev
+run-dev:
+	@if [ -z "$$(docker images -q $(DEV_IMAGE_NAME):$(DEV_IMAGE_TAG))" ]; then \
+		echo "$(DEV_IMAGE_NAME):$(DEV_IMAGE_TAG) not found. Building the image..."; \
+		make build-dev; \
+	else \
+		echo "$(DEV_IMAGE_NAME):$(DEV_IMAGE_TAG) found."; \
+	fi
+	@sleep 1
+	@if [ -z "$$(docker ps -aqf name=$(DEV_CONTAINER_NAME))" ]; then \
+		docker run -it --name $(DEV_CONTAINER_NAME) -p $(DEV_PORT):$(WEBSERV_PORT) $(DEV_IMAGE_NAME):$(DEV_IMAGE_TAG); \
+	else \
+		echo "$(DEV_CONTAINER_NAME) is already running."; \
+	fi
+
+.PHONY	: stop-dev
+stop-dev:
+	@if [ -z "$$(docker ps -qf name=$(DEV_CONTAINER_NAME))" ]; then \
+		echo "$(DEV_CONTAINER_NAME) already stopped."; \
+	else \
+		docker stop $(DEV_CONTAINER_NAME); \
+	fi
+
+.PHONY	: rm-dev
+rm-dev:
+	@if [ -z "$$(docker ps -aqf name=$(DEV_CONTAINER_NAME))" ]; then \
+		echo "$(DEV_CONTAINER_NAME) does not exist."; \
+	else \
+		docker rm $(DEV_CONTAINER_NAME); \
+	fi
+
+.PHONY	: clean-dev
+clean-dev:
+	@make stop-dev && make rm-dev
+
+.PHONY	: fclean-dev
+fclean-dev:
+	@make clean-dev
+	@if [ -z "$$(docker image ls -aqf reference=$(DEV_IMAGE_NAME):$(DEV_IMAGE_TAG))" ]; then \
+		echo "$(DEV_IMAGE_NAME):$(DEV_IMAGE_TAG) does not exist."; \
+	else \
+		docker rmi $(DEV_IMAGE_NAME):$(DEV_IMAGE_TAG); \
+	fi
+
+.PHONY	: log-dev
+log-dev:
+	@if [ -z "$$(docker ps -qf name=$(DEV_CONTAINER_NAME))" ]; then \
+		echo "$(DEV_CONTAINER_NAME) does not exist."; \
+	else \
+		docker logs $(DEV_CONTAINER_NAME); \
+	fi
+
+.PHONY	: login-dev
+login-dev:
+	@if [ -z "$$(docker ps -qf name=$(DEV_CONTAINER_NAME))" ]; then \
+		echo "$(DEV_CONTAINER_NAME) does not exist."; \
+	else \
+		docker exec -it $(DEV_CONTAINER_NAME) /bin/bash; \
+	fi
+
+.PHONY	: ps
+ps:
+	@docker ps -a
 
 #--------------------------------------------
 
