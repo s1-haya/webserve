@@ -20,20 +20,19 @@ class Lexer {
 		DIRECTIVE,
 		WORD
 	};
+	const std::string buffer_;
 
 	Lexer();
-	void              AddToken(const char symbol, int token_type);
-	void              AddToken(const std::string &symbol, int token_type);
-	void              AddWordToken(std::string::const_iterator &it);
-	void              SkipComment(std::string::const_iterator &it);
-	void              Init();
-	TokenType         SearchWordTokenType(std::string &);
-	const std::string buffer_;
+	void      Init();
+	void      AddToken(const char symbol, int token_type);
+	void      AddToken(const std::string &symbol, int token_type);
+	void      AddWordToken(std::string::const_iterator &it);
+	void      SkipComment(std::string::const_iterator &it);
+	TokenType SearchWordTokenType(std::string &);
 
   public:
 	Lexer(const std::string &, std::list<Node> &);
 	~Lexer();
-	void              PrintTokens();
 	static const char CR            = '\r';
 	static const char LF            = '\n';
 	static const char SEMICOLON_CHR = ';';
