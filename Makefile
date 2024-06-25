@@ -52,7 +52,7 @@ val: all
 
 .PHONY	: check
 check:
-	@cppcheck --enable=all $$(find . -type f -name "*.cpp" | tr '\n' ' ')
+	@cppcheck --enable=all $$(find srcs test -type f -name "*.cpp" | tr '\n' ' ')
 
 .PHONY	: test
 test:
@@ -167,6 +167,10 @@ run-dev:
 	else \
 		echo "$(DEV_CONTAINER_NAME) is already running."; \
 	fi
+
+.PHONY	: re-run-dev
+re-run-dev:
+	@make fclean-dev && make run-dev
 
 .PHONY	: stop-dev
 stop-dev:
