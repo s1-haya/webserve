@@ -12,7 +12,7 @@ RUN apt-get update && \
 COPY srcs /webserv/srcs
 COPY html /webserv/html
 COPY Makefile /webserv/Makefile
-COPY docker /webserv/docker/
+COPY Dockerfile /webserv/Dockerfile
 
 RUN rm -rf /var/lib/apt/lists/*
 
