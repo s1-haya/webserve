@@ -97,6 +97,10 @@ run-webserv:
 		echo "$(WEBSERV_CONTAINER_NAME) is already running."; \
 	fi
 
+.PHONY	: re-run-webserv
+re-run-webserv:
+	@make fclean-webserv && make run-webserv
+
 .PHONY	: stop-webserv
 stop-webserv:
 	@if [ -z "$$(docker ps -qf name=$(WEBSERV_CONTAINER_NAME))" ]; then \
