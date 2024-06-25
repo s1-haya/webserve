@@ -56,9 +56,6 @@ void Lexer::Init() {
 
 Lexer::Lexer(const std::string &buffer, std::list<Node> &tokens_)
 	: tokens_(tokens_), buffer_(buffer) {
-	bool need_space = false;
-	// bool        need_delim    = false; 使うかわからない
-	bool        sharp_comment = false;
 	std::string new_str;
 	Init();
 
@@ -66,26 +63,23 @@ Lexer::Lexer(const std::string &buffer, std::list<Node> &tokens_)
 		 ++it) {
 		while (utils::IsSpace(*it)) {
 			++it;
-			need_space = false;
 		}
-		if (!need_space && !sharp_comment) {
-			switch (*it) {
-			case SEMICOLON_CHR:
-				AddToken(SEMICOLON_CHR, DELIM);
-				break;
-			case L_BRACKET_CHR:
-				AddToken(L_BRACKET_CHR, L_BRACKET);
-				break;
-			case R_BRACKET_CHR:
-				AddToken(R_BRACKET_CHR, R_BRACKET);
-				break;
-			case SHARP_CHR:
-				SkipComment(it);
-				break;
-			default:
-				AddWordToken(it);
-				break;
-			}
+		switch (*it) {
+		case SEMICOLON_CHR:
+			AddToken(SEMICOLON_CHR, DELIM);
+			break;
+		case L_BRACKET_CHR:
+			AddToken(L_BRACKET_CHR, L_BRACKET);
+			break;
+		case R_BRACKET_CHR:
+			AddToken(R_BRACKET_CHR, R_BRACKET);
+			break;
+		case SHARP_CHR:
+			SkipComment(it);
+			break;
+		default:
+			AddWordToken(it);
+			break;
 		}
 	}
 }
