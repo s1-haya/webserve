@@ -8,6 +8,8 @@
 #include <netinet/in.h> // struct sockaddr_in
 #include <string>
 
+namespace server {
+
 class Server {
   public:
 	explicit Server(const Config::ConfigData &config);
@@ -39,5 +41,7 @@ class Server {
 	// request buffers
 	Buffer buffers_;
 };
+
+} // namespace server
 
 #endif /* SERVER_HPP_ */

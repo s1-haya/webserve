@@ -6,6 +6,8 @@
 #include <string>
 #include <sys/types.h> // ssize_t
 
+namespace server {
+
 class Buffer {
   public:
 	// int: fd, std::string: buffer
@@ -26,5 +28,7 @@ class Buffer {
 	// request buffers
 	Buffers buffers_;
 };
+
+} // namespace server
 
 #endif /* SERVER_BUFFER_HPP_ */

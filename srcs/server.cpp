@@ -6,6 +6,8 @@
 #include <sys/socket.h> // socket
 #include <unistd.h>     // close
 
+namespace server {
+
 // todo: set ConfigData -> private variables
 Server::Server(const Config::ConfigData &config) : server_name_("from_config"), port_(8080) {
 	(void)config;
@@ -141,3 +143,5 @@ void Server::Init() {
 	// add to epoll's interest list
 	epoll_.AddNewConnection(server_fd_, EVENT_READ);
 }
+
+} // namespace server

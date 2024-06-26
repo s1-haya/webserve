@@ -30,7 +30,7 @@ int main(int argc, char **argv) {
 	Config::ConfigData config = Config::ParseConfig(path_config);
 
 	try {
-		Server server(config);
+		server::Server server(config);
 		server.Run();
 	} catch (const std::exception &e) {
 		PrintError(e.what());
