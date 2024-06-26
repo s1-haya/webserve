@@ -1,5 +1,5 @@
 #include "buffer.hpp"
-#include <stdio.h>  // perror
+#include <cstdio>   // perror
 #include <unistd.h> // read
 
 namespace server {
