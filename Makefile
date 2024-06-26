@@ -93,6 +93,8 @@ run-webserv:
 	@sleep 1
 	@if [ -z "$$(docker ps -aqf name=$(WEBSERV_CONTAINER_NAME))" ]; then \
 		docker run -d --name $(WEBSERV_CONTAINER_NAME) -p $(WEBSERV_PORT):$(WEBSERV_PORT) $(WEBSERV_IMAGE_NAME):$(WEBSERV_IMAGE_TAG); \
+	elif [ -z "$$(docker ps -qf name=$(WEBSERV_CONTAINER_NAME))" ]; then \
+		docker start $(WEBSERV_CONTAINER_NAME); \
 	else \
 		echo "$(WEBSERV_CONTAINER_NAME) is already running."; \
 	fi
@@ -168,6 +170,8 @@ run-dev:
 	@sleep 1
 	@if [ -z "$$(docker ps -aqf name=$(DEV_CONTAINER_NAME))" ]; then \
 		docker run -it --name $(DEV_CONTAINER_NAME) -p $(DEV_PORT):$(WEBSERV_PORT) $(DEV_IMAGE_NAME):$(DEV_IMAGE_TAG); \
+	elif [ -z "$$(docker ps -qf name=$(DEV_CONTAINER_NAME))" ]; then \
+		docker start $(DEV_CONTAINER_NAME); \
 	else \
 		echo "$(DEV_CONTAINER_NAME) is already running."; \
 	fi
