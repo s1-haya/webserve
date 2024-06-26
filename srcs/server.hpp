@@ -36,7 +36,7 @@ class Server {
 	socklen_t          addrlen_;
 	int                server_fd_;
 	// event poll
-	epoll::Epoll epoll_;
+	epoll::Epoll monitor_;
 	// request buffers
 	Buffer buffers_;
 };

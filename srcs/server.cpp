@@ -29,13 +29,13 @@ void Server::Run() {
 
 	while (true) {
 		errno           = 0;
-		const int ready = epoll_.CreateReadyList();
+		const int ready = monitor_.CreateReadyList();
 		// todo: error handle
 		if (ready == SYSTEM_ERROR && errno == EINTR) {
 			continue;
 		}
 		for (std::size_t i = 0; i < static_cast<std::size_t>(ready); ++i) {
-			HandleEvent(epoll_.GetEvent(i));
+			HandleEvent(monitor_.GetEvent(i));
 		}
 	}
 }
@@ -53,7 +53,7 @@ void Server::HandleNewConnection() {
 	if (new_socket == SYSTEM_ERROR) {
 		throw std::runtime_error("accept failed");
 	}
-	epoll_.AddNewConnection(new_socket, event::EVENT_READ);
+	monitor_.AddNewConnection(new_socket, event::EVENT_READ);
 	utils::Debug("server", "add new client", new_socket);
 }
 
@@ -91,13 +91,13 @@ void Server::ReadRequest(const event::Event &event) {
 		}
 		// todo: need?
 		// buffers_.Delete(client_fd);
-		// epoll_.DeleteConnection(client_fd);
+		// monitor_.DeleteConnection(client_fd);
 		return;
 	}
 	if (IsRequestReceivedComplete(buffers_.GetBuffer(client_fd))) {
 		utils::Debug("server", "received all request from client", client_fd);
 		std::cerr << buffers_.GetBuffer(client_fd) << std::endl;
-		epoll_.UpdateEventType(event, event::EVENT_WRITE);
+		monitor_.UpdateEventType(event, event::EVENT_WRITE);
 	}
 }
 
@@ -110,7 +110,7 @@ void Server::SendResponse(int client_fd) {
 	// disconnect
 	buffers_.Delete(client_fd);
 	close(client_fd);
-	epoll_.DeleteConnection(client_fd);
+	monitor_.DeleteConnection(client_fd);
 	utils::Debug("server", "disconnected client", client_fd);
 	utils::Debug("------------------------------------------");
 }
@@ -143,7 +143,7 @@ void Server::Init() {
 	}
 
 	// add to epoll's interest list
-	epoll_.AddNewConnection(server_fd_, event::EVENT_READ);
+	monitor_.AddNewConnection(server_fd_, event::EVENT_READ);
 }
 
 } // namespace server
