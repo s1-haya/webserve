@@ -1,6 +1,5 @@
 #include "http.hpp"
 #include "http_message.hpp"
-#include <iostream>
 #include <sstream>
 
 namespace http {
