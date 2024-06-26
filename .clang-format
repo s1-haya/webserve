@@ -4,7 +4,7 @@ IndentWidth: 4
 TabWidth: 4
 AllowShortFunctionsOnASingleLine: Empty
 IndentCaseLabels: false
-NamespaceIndentation: All
+NamespaceIndentation: None
 BreakConstructorInitializers: BeforeColon
 AlwaysBreakTemplateDeclarations: Yes
 SpacesInAngles: Leave
