@@ -5,6 +5,8 @@
 #include <map>
 #include <string>
 
+namespace http {
+
 class Http {
   public:
 	enum MessageType {
@@ -30,5 +32,7 @@ class Http {
 	// variable
 	RequestMessage request_;
 };
+
+} // namespace http
 
 #endif /* HTTP_HPP_ */

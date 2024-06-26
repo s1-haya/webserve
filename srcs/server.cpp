@@ -69,7 +69,7 @@ void Server::HandleExistingConnection(const Event &event) {
 namespace {
 
 std::string CreateHttpResponse(const std::string &read_buf) {
-	Http http(read_buf);
+	http::Http http(read_buf);
 	return http.CreateResponse();
 }
 

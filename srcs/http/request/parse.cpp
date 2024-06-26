@@ -3,6 +3,7 @@
 #include "split.hpp"
 #include <vector>
 
+namespace http {
 namespace {
 
 // todo: create path (/, /aaa, /aaa/)
@@ -28,3 +29,5 @@ void Http::ParseRequest(const std::string &read_buf) {
 	request_[HTTP_REQUEST_TARGET] = CreateDefaultPath(request_line[1]);
 	request_[HTTP_VERSION]        = request_line[2];
 }
+
+} // namespace http

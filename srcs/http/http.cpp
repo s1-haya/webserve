@@ -3,6 +3,8 @@
 #include <fstream>
 #include <sstream>
 
+namespace http {
+
 Http::Http(const std::string &read_buf) {
 	ParseRequest(read_buf);
 	ReadPathContent();
@@ -37,3 +39,5 @@ void Http::ReadPathContent() {
 	request_[HTTP_STATUS]      = "200";
 	request_[HTTP_STATUS_TEXT] = "OK";
 }
+
+} // namespace http

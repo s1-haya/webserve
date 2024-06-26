@@ -3,7 +3,8 @@
 #include <iostream>
 #include <sstream>
 
-namespace http_response {
+namespace http {
+namespace {
 
 void CreateStatusLine(std::ostream &response_stream, const Http::RequestMessage &request) {
 	response_stream << HTTP_VERSION << SP << request.at(Http::HTTP_STATUS) << SP
@@ -28,13 +29,15 @@ void CreateBody(std::ostream &response_stream, const Http::RequestMessage &reque
 	response_stream << request.at(Http::HTTP_CONTENT);
 }
 
-} // namespace http_response
+} // namespace
 
 std::string Http::CreateResponse() {
 	std::ostringstream response_stream;
-	http_response::CreateStatusLine(response_stream, this->request_);
-	http_response::CreateHeaderFields(response_stream, this->request_);
-	http_response::CreateCRLF(response_stream);
-	http_response::CreateBody(response_stream, this->request_);
+	CreateStatusLine(response_stream, this->request_);
+	CreateHeaderFields(response_stream, this->request_);
+	CreateCRLF(response_stream);
+	CreateBody(response_stream, this->request_);
 	return response_stream.str();
 }
+
+} // namespace http
