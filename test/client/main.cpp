@@ -48,10 +48,9 @@ int main(int argc, char **argv) {
 	}
 
 	try {
-		const unsigned int port = ConvertStrToUint(argv[1]);
-		const std::string  request_message =
-			ReadFileStr(std::string(argv[2], std::strlen(argv[2])));
-		Client client(port);
+		const unsigned int port           = ConvertStrToUint(argv[1]);
+		const std::string request_message = ReadFileStr(std::string(argv[2], std::strlen(argv[2])));
+		Client            client(port);
 		client.SendRequestAndReceiveResponse(request_message);
 	} catch (const std::exception &e) {
 		PrintError(e.what());

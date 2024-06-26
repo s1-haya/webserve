@@ -5,27 +5,19 @@
 
 namespace http_response {
 
-void CreateStatusLine(
-	std::ostream &response_stream, const Http::RequestMessage &request
-) {
+void CreateStatusLine(std::ostream &response_stream, const Http::RequestMessage &request) {
 	response_stream << HTTP_VERSION << SP << request.at(Http::HTTP_STATUS) << SP
 					<< request.at(Http::HTTP_STATUS_TEXT) << CRLF;
 }
 
 template <typename T>
-void CreateHeaderField(
-	std::ostream &response_stream, const std::string &name, const T &value
-) {
+void CreateHeaderField(std::ostream &response_stream, const std::string &name, const T &value) {
 	response_stream << name << ":" << SP << value << SP << CRLF;
 }
 
-void CreateHeaderFields(
-	std::ostream &response_stream, const Http::RequestMessage &request
-) {
+void CreateHeaderFields(std::ostream &response_stream, const Http::RequestMessage &request) {
 	CreateHeaderField(response_stream, CONNECTION, "close");
-	CreateHeaderField(
-		response_stream, CONTENT_LENGTH, request.at(Http::HTTP_CONTENT).size()
-	);
+	CreateHeaderField(response_stream, CONTENT_LENGTH, request.at(Http::HTTP_CONTENT).size());
 }
 
 void CreateCRLF(std::ostream &response_stream) {

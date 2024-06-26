@@ -2,8 +2,7 @@
 
 namespace utils {
 
-std::vector<std::string>
-SplitStr(const std::string &src, const std::string &substring) {
+std::vector<std::string> SplitStr(const std::string &src, const std::string &substring) {
 	std::vector<std::string> split_str;
 	const std::size_t        src_size    = src.size();
 	const std::size_t        substr_size = substring.size();
