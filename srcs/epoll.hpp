@@ -5,6 +5,8 @@
 #include "event.hpp"
 #include <sys/epoll.h> // epoll
 
+namespace epoll {
+
 class Epoll {
   public:
 	Epoll();
@@ -27,5 +29,7 @@ class Epoll {
 	int                epoll_fd_;
 	struct epoll_event evlist_[MAX_EVENTS];
 };
+
+} // namespace epoll
 
 #endif /* EPOLL_HPP_ */

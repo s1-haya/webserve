@@ -3,6 +3,8 @@
 #include <stdint.h> // uint32_t
 #include <unistd.h> // close
 
+namespace epoll {
+
 Epoll::Epoll() {
 	epoll_fd_ = epoll_create1(EPOLL_CLOEXEC);
 	if (epoll_fd_ == SYSTEM_ERROR) {
@@ -96,3 +98,5 @@ Event Epoll::GetEvent(std::size_t index) const {
 	}
 	return ConvertToEventDto(evlist_[index]);
 }
+
+} // namespace epoll
