@@ -66,15 +66,17 @@ void Server::HandleExistingConnection(const Event &event) {
 }
 
 namespace {
-	std::string CreateHttpResponse(const std::string &read_buf) {
-		Http http(read_buf);
-		return http.CreateResponse();
-	}
 
-	// todo: find "Connection: close"?
-	bool IsRequestReceivedComplete(const std::string &buffer) {
-		return buffer.find("\r\n\r\n") != std::string::npos;
-	}
+std::string CreateHttpResponse(const std::string &read_buf) {
+	Http http(read_buf);
+	return http.CreateResponse();
+}
+
+// todo: find "Connection: close"?
+bool IsRequestReceivedComplete(const std::string &buffer) {
+	return buffer.find("\r\n\r\n") != std::string::npos;
+}
+
 } // namespace
 
 void Server::ReadRequest(const Event &event) {

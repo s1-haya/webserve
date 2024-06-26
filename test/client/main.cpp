@@ -6,36 +6,38 @@
 #include <sstream> // stringstream
 
 namespace {
-	static const std::string COLOR_RED   = "\033[31m";
-	static const std::string COLOR_RESET = "\033[0m";
 
-	void PrintError(const std::string &s) {
-		std::cerr << COLOR_RED << "Error: " << s << COLOR_RESET << std::endl;
-	}
+static const std::string COLOR_RED   = "\033[31m";
+static const std::string COLOR_RESET = "\033[0m";
 
-	unsigned int ConvertStrToUint(const std::string &str) {
-		std::stringstream ss(str);
-		int               num;
-		ss >> num;
-		if (num < 0 || !ss.eof() || ss.fail()) {
-			throw std::logic_error("invalid port");
-		}
-		return static_cast<unsigned int>(num);
-	}
+void PrintError(const std::string &s) {
+	std::cerr << COLOR_RED << "Error: " << s << COLOR_RESET << std::endl;
+}
 
-	std::string FileToString(const std::ifstream &file) {
-		std::stringstream ss;
-		ss << file.rdbuf();
-		return ss.str();
+unsigned int ConvertStrToUint(const std::string &str) {
+	std::stringstream ss(str);
+	int               num;
+	ss >> num;
+	if (num < 0 || !ss.eof() || ss.fail()) {
+		throw std::logic_error("invalid port");
 	}
+	return static_cast<unsigned int>(num);
+}
 
-	std::string ReadFileStr(const std::string &file_path) {
-		std::ifstream file(file_path.c_str());
-		if (!file) {
-			throw std::runtime_error("error infile");
-		}
-		return FileToString(file);
+std::string FileToString(const std::ifstream &file) {
+	std::stringstream ss;
+	ss << file.rdbuf();
+	return ss.str();
+}
+
+std::string ReadFileStr(const std::string &file_path) {
+	std::ifstream file(file_path.c_str());
+	if (!file) {
+		throw std::runtime_error("error infile");
 	}
+	return FileToString(file);
+}
+
 } // namespace
 
 // ./client PORT INFILE_PATH

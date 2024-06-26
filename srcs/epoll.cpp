@@ -17,37 +17,39 @@ Epoll::~Epoll() {
 }
 
 namespace {
-	uint32_t ConvertToEpollEventType(EventType type) {
-		uint32_t ret_type = 0;
 
-		if (type & EVENT_READ) {
-			ret_type |= EPOLLIN;
-		}
-		if (type & EVENT_WRITE) {
-			ret_type |= EPOLLOUT;
-		}
-		return ret_type;
+uint32_t ConvertToEpollEventType(EventType type) {
+	uint32_t ret_type = 0;
+
+	if (type & EVENT_READ) {
+		ret_type |= EPOLLIN;
 	}
-
-	uint32_t ConvertToEventType(uint32_t event) {
-		uint32_t ret_type = EVENT_NONE;
-
-		if (event & EPOLLIN) {
-			ret_type |= EVENT_READ;
-		}
-		if (event & EPOLLOUT) {
-			ret_type |= EVENT_WRITE;
-		}
-		// todo: tmp
-		return ret_type;
+	if (type & EVENT_WRITE) {
+		ret_type |= EPOLLOUT;
 	}
+	return ret_type;
+}
 
-	Event ConvertToEventDto(const struct epoll_event &event) {
-		Event ret_event;
-		ret_event.fd   = event.data.fd;
-		ret_event.type = ConvertToEventType(event.events);
-		return ret_event;
+uint32_t ConvertToEventType(uint32_t event) {
+	uint32_t ret_type = EVENT_NONE;
+
+	if (event & EPOLLIN) {
+		ret_type |= EVENT_READ;
 	}
+	if (event & EPOLLOUT) {
+		ret_type |= EVENT_WRITE;
+	}
+	// todo: tmp
+	return ret_type;
+}
+
+Event ConvertToEventDto(const struct epoll_event &event) {
+	Event ret_event;
+	ret_event.fd   = event.data.fd;
+	ret_event.type = ConvertToEventType(event.events);
+	return ret_event;
+}
+
 } // namespace
 
 void Epoll::AddNewConnection(int socket_fd, EventType type) {

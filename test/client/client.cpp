@@ -16,12 +16,14 @@ Client::~Client() {
 }
 
 namespace {
-	static const std::string COLOR_GRAY  = "\033[30m";
-	static const std::string COLOR_RESET = "\033[0m";
 
-	void DebugPrint(const std::string &s) {
-		std::cerr << COLOR_GRAY << s << COLOR_RESET << std::endl;
-	}
+static const std::string COLOR_GRAY  = "\033[30m";
+static const std::string COLOR_RESET = "\033[0m";
+
+void DebugPrint(const std::string &s) {
+	std::cerr << COLOR_GRAY << s << COLOR_RESET << std::endl;
+}
+
 } // namespace
 
 void Client::SendRequestAndReceiveResponse(const std::string &message) {
