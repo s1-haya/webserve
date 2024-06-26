@@ -52,7 +52,7 @@ val: all
 
 .PHONY	: check
 check:
-	@cppcheck --enable=all $$(find srcs test -type f -name "*.cpp" | tr '\n' ' ')
+	@cppcheck --enable=all srcs test
 
 .PHONY	: test
 test:
