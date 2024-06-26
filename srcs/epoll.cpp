@@ -1,4 +1,5 @@
 #include "epoll.hpp"
+#include "utils.hpp"
 #include <errno.h>
 #include <stdint.h> // uint32_t
 #include <unistd.h> // close

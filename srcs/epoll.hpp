@@ -1,8 +1,8 @@
 #ifndef EPOLL_HPP_
 #define EPOLL_HPP_
 
-#include "debug.hpp" // todo: tmp
 #include "event.hpp"
+#include <cstddef>     // size_t
 #include <sys/epoll.h> // epoll
 
 namespace epoll {

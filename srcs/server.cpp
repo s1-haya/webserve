@@ -1,6 +1,7 @@
 #include "server.hpp"
 #include "event.hpp"
 #include "http.hpp"
+#include "utils.hpp"
 #include <arpa/inet.h> // htons
 #include <errno.h>
 #include <sys/socket.h> // socket

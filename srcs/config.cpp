@@ -1,4 +1,5 @@
 #include "config.hpp"
+#include "utils.hpp"
 
 namespace config {
 

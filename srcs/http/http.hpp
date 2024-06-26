@@ -1,7 +1,6 @@
 #ifndef HTTP_HPP_
 #define HTTP_HPP_
 
-#include "debug.hpp" // todo: tmp
 #include <map>
 #include <string>
 

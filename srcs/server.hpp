@@ -3,7 +3,6 @@
 
 #include "buffer.hpp"
 #include "config.hpp"
-#include "debug.hpp" // todo: tmp
 #include "epoll.hpp"
 #include <netinet/in.h> // struct sockaddr_in
 #include <string>
