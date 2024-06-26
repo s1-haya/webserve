@@ -11,17 +11,17 @@ namespace utils {
 
 template <typename T>
 void Debug(const T &x) {
-	std::cerr << COLOR_GLAY << x << COLOR_RESET << std::endl;
+	std::cerr << color::GLAY << x << color::RESET << std::endl;
 }
 
 template <typename T>
 void Debug(const std::string &title, const T &x) {
-	std::cerr << COLOR_GLAY << "[" << title << "] " << x << COLOR_RESET << std::endl;
+	std::cerr << color::GLAY << "[" << title << "] " << x << color::RESET << std::endl;
 }
 
 template <typename T, typename U>
 void Debug(const std::string &title, const T &x, const U &y) {
-	std::cerr << COLOR_GLAY << "[" << title << "] " << x << "(" << y << ")" << COLOR_RESET
+	std::cerr << color::GLAY << "[" << title << "] " << x << "(" << y << ")" << color::RESET
 			  << std::endl;
 }
 

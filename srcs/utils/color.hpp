@@ -2,14 +2,16 @@
 #define UTILS_COLOR_HPP_
 
 namespace utils {
+namespace color {
 
-extern const char *COLOR_GLAY;
-extern const char *COLOR_RED;
-extern const char *COLOR_GREEN;
-extern const char *COLOR_BLUE;
-extern const char *COLOR_PINK;
-extern const char *COLOR_RESET;
+extern const char *GLAY;
+extern const char *RED;
+extern const char *GREEN;
+extern const char *BLUE;
+extern const char *PINK;
+extern const char *RESET;
 
+} // namespace color
 } // namespace utils
 
 #endif /* UTILS_COLOR_HPP_ */

@@ -8,7 +8,7 @@
 namespace {
 
 void PrintError(const std::string &s) {
-	std::cerr << utils::COLOR_RED << "Error: " << s << utils::COLOR_RESET << std::endl;
+	std::cerr << utils::color::RED << "Error: " << s << utils::color::RESET << std::endl;
 }
 
 } // namespace
