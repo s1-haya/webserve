@@ -11,12 +11,12 @@ class Epoll {
   public:
 	Epoll();
 	~Epoll();
-	void AddNewConnection(int socket_fd, EventType type);
+	void AddNewConnection(int socket_fd, event::Type type);
 	void DeleteConnection(int socket_fd);
-	void UpdateEventType(const Event &event, EventType new_type);
+	void UpdateEventType(const event::Event &event, event::Type new_type);
 	int  CreateReadyList();
 	// getter
-	Event GetEvent(std::size_t index) const;
+	event::Event GetEvent(std::size_t index) const;
 
   private:
 	// prohibit copy

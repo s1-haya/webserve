@@ -21,10 +21,10 @@ class Server {
 	Server(const Server &other);
 	Server &operator=(const Server &other);
 	void    Init();
-	void    HandleEvent(const Event &event);
+	void    HandleEvent(const event::Event &event);
 	void    HandleNewConnection();
-	void    HandleExistingConnection(const Event &event);
-	void    ReadRequest(const Event &event);
+	void    HandleExistingConnection(const event::Event &event);
+	void    ReadRequest(const event::Event &event);
 	void    SendResponse(int client_fd);
 	// const variables (todo: tmp)
 	const std::string  server_name_;
