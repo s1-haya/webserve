@@ -4,6 +4,8 @@
 #include "debug.hpp" // todo: tmp
 #include <string>
 
+namespace config {
+
 class Config {
   public:
 	typedef std::string ConfigData;
@@ -14,5 +16,7 @@ class Config {
 	Config();
 	~Config();
 };
+
+} // namespace config
 
 #endif /* CONFIG_HPP_ */

@@ -27,7 +27,7 @@ int main(int argc, char **argv) {
 	} else {
 		path_config = std::string(argv[1]);
 	}
-	Config::ConfigData config = Config::ParseConfig(path_config);
+	config::Config::ConfigData config = config::Config::ParseConfig(path_config);
 
 	try {
 		server::Server server(config);

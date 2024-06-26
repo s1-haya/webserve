@@ -12,7 +12,7 @@ namespace server {
 
 class Server {
   public:
-	explicit Server(const Config::ConfigData &config);
+	explicit Server(const config::Config::ConfigData &config);
 	~Server();
 	void Run();
 
