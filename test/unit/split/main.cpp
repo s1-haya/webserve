@@ -6,31 +6,30 @@
 #include <string>
 
 namespace {
-	// 比較する型
-	typedef std::vector<std::string> Strs;
 
-	// expectedのStrsを作成
-	// templateのパラメータパックがc++11以降なので使っていない
-	// 手動で正しいsizeをセットする必要有り
-	Strs CreateExpect(const std::string *array, std::size_t size) {
-		return Strs(array, array + size);
+// 比較する型
+typedef std::vector<std::string> Strs;
+
+// expectedのStrsを作成
+// templateのパラメータパックがc++11以降なので使っていない
+// 手動で正しいsizeをセットする必要有り
+Strs CreateExpect(const std::string *array, std::size_t size) {
+	return Strs(array, array + size);
+}
+
+// SplitStr()を実行してexpectedと比較
+void Run(const std::string &src, const std::string &substring, const Strs &expected) {
+	static unsigned int test_case = 0;
+	test_case++;
+
+	if (utils::SplitStr(src, substring) == expected) {
+		std::cerr << COLOR_GREEN << test_case << ".[OK] " << COLOR_RESET << src << std::endl;
+	} else {
+		std::cerr << COLOR_RED << test_case << ".[NG] " << COLOR_RESET << src << std::endl;
+		throw std::logic_error("SplitStr()");
 	}
+}
 
-	// SplitStr()を実行してexpectedと比較
-	void
-	Run(const std::string &src, const std::string &substring, const Strs &expected) {
-		static unsigned int test_case = 0;
-		test_case++;
-
-		if (utils::SplitStr(src, substring) == expected) {
-			std::cerr << COLOR_GREEN << test_case << ".[OK] " << COLOR_RESET << src
-					  << std::endl;
-		} else {
-			std::cerr << COLOR_RED << test_case << ".[NG] " << COLOR_RESET << src
-					  << std::endl;
-			throw std::logic_error("SplitStr()");
-		}
-	}
 } // namespace
 
 int main() {

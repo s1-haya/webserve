@@ -4,15 +4,17 @@
 #include <vector>
 
 namespace {
-	// todo: create path (/, /aaa, /aaa/)
-	std::string CreateDefaultPath(const std::string &path) {
-		static const std::string location = "html";
 
-		if (path.size() == 1) {
-			return location + "/index.html";
-		}
-		return location + path + "/index.html";
+// todo: create path (/, /aaa, /aaa/)
+std::string CreateDefaultPath(const std::string &path) {
+	static const std::string location = "html";
+
+	if (path.size() == 1) {
+		return location + "/index.html";
 	}
+	return location + path + "/index.html";
+}
+
 } // namespace
 
 // todo: tmp request_

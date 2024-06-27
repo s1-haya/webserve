@@ -16,12 +16,14 @@ Client::~Client() {
 }
 
 namespace {
-	static const std::string COLOR_GRAY  = "\033[30m";
-	static const std::string COLOR_RESET = "\033[0m";
 
-	void DebugPrint(const std::string &s) {
-		std::cerr << COLOR_GRAY << s << COLOR_RESET << std::endl;
-	}
+static const std::string COLOR_GRAY  = "\033[30m";
+static const std::string COLOR_RESET = "\033[0m";
+
+void DebugPrint(const std::string &s) {
+	std::cerr << COLOR_GRAY << s << COLOR_RESET << std::endl;
+}
+
 } // namespace
 
 void Client::SendRequestAndReceiveResponse(const std::string &message) {
@@ -56,14 +58,11 @@ void Client::Init() {
 
 	// convert address
 	if (inet_pton(AF_INET, "127.0.0.1", &sock_addr_.sin_addr) <= 0) {
-		throw std::runtime_error(
-			"inet_pton failed. Invalid address / Address not supported"
-		);
+		throw std::runtime_error("inet_pton failed. Invalid address / Address not supported");
 	}
 
 	// connect sock_fd & sock_addr_
-	if (connect(sock_fd_, (struct sockaddr *)&sock_addr_, sizeof(sock_addr_)) ==
-		SYSTEM_ERROR) {
+	if (connect(sock_fd_, (struct sockaddr *)&sock_addr_, sizeof(sock_addr_)) == SYSTEM_ERROR) {
 		throw std::runtime_error("connect failed");
 	}
 }
