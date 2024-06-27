@@ -34,7 +34,14 @@ jobs:
           pip-compile requirements.in --strip-extras
           pip-sync
 
-      - name: Run webserv && tests
-        run: |
+      - name: Run webserv
+        run:
           make run-webserv
+
+      - name: Wait for webserv to start
+        run:
+          sleep 3
+
+      - name: Run tests
+        run:
           make test
