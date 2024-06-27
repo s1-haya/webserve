@@ -14,7 +14,7 @@
 !*.hpp
 !*.py
 
-!docker/*
+!Dockerfile
 !.github/workflows/*
 !requirements.in
 

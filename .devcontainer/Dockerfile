@@ -5,7 +5,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && \
     apt-get install -y \
-    git=1:2.25.1-1ubuntu3.12 \
+    git=1:2.25.1-1ubuntu3.13 \
     python3=3.8.2-0ubuntu2 \
     python3-pip=20.0.2-5ubuntu1.10 \
     build-essential \
@@ -18,7 +18,7 @@ RUN apt-get update && \
 
 WORKDIR /workspaces/webserv
 
-COPY requirements.in /workspaces/webserv/requirements.in
+COPY / /workspaces/webserv/
 RUN pip install --upgrade pip && \
     pip install --no-cache-dir pip-tools==7.4.1 && \
     pip-compile /workspaces/webserv/requirements.in --strip-extras && \
@@ -28,4 +28,4 @@ RUN rm -rf /var/lib/apt/lists/*
 
 VOLUME [ "/workspaces" ]
 
-CMD [ "/bin/bash" ]
+ENTRYPOINT [ "/bin/bash" ]

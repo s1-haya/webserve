@@ -1,14 +1,11 @@
 #include "client.hpp"
 #include <arpa/inet.h> // inet_pton,htons
-#include <cstring>     // strlen
 #include <iostream>
-#include <stdio.h>      // perror
 #include <sys/socket.h> // socket,connect
 #include <sys/types.h>
 #include <unistd.h> // read,close
 
-const std::string Client::DEFAULT_MESSAGE =
-	"GET / HTTP/1.1\r\nConnection: close \r\n\r\n";
+const std::string Client::DEFAULT_MESSAGE = "Hello from client (default)";
 
 Client::Client() : port_(DEFAULT_PORT), request_message_(DEFAULT_MESSAGE) {
 	Init();
@@ -18,13 +15,11 @@ Client::Client(int port) : port_(port), request_message_(DEFAULT_MESSAGE) {
 	Init();
 }
 
-Client::Client(const std::string &message)
-	: port_(DEFAULT_PORT), request_message_(message) {
+Client::Client(const std::string &message) : port_(DEFAULT_PORT), request_message_(message) {
 	Init();
 }
 
-Client::Client(int port, const std::string &message)
-	: port_(port), request_message_(message) {
+Client::Client(int port, const std::string &message) : port_(port), request_message_(message) {
 	Init();
 }
 
@@ -35,27 +30,23 @@ Client::~Client() {
 }
 
 namespace {
-	static const std::string COLOR_GRAY  = "\033[30m";
-	static const std::string COLOR_RESET = "\033[0m";
 
-	void DebugPrint(const std::string &s) {
-		std::cerr << COLOR_GRAY << s << COLOR_RESET << std::endl;
-	}
-} // namespace
+static const std::string COLOR_GRAY  = "\033[30m";
+static const std::string COLOR_RESET = "\033[0m";
 
-void Client::SetMessage(const std::string &message) {
-	request_message_ = message;
+void DebugPrint(const std::string &s) {
+	std::cerr << COLOR_GRAY << s << COLOR_RESET << std::endl;
 }
 
-void Client::SendRequestAndReceiveResponse() {
+} // namespace
+
+void Client::SendRequestAndReceiveResponse(const std::string &message) {
 	// send request message
-	send(sock_fd_, request_message_.c_str(), request_message_.size(), 0);
+	send(sock_fd_, message.c_str(), message.size(), 0);
 	DebugPrint("Message sent.");
 
 	// receive response
-	static const unsigned int BUFFER_SIZE = 8;
-	char                      buffer[BUFFER_SIZE];
-
+	char        buffer[BUFFER_SIZE];
 	std::string response;
 	while (true) {
 		ssize_t read_ret = read(sock_fd_, buffer, BUFFER_SIZE);
@@ -81,14 +72,11 @@ void Client::Init() {
 
 	// convert address
 	if (inet_pton(AF_INET, "127.0.0.1", &sock_addr_.sin_addr) <= 0) {
-		throw std::runtime_error(
-			"inet_pton failed. Invalid address / Address not supported"
-		);
+		throw std::runtime_error("inet_pton failed. Invalid address / Address not supported");
 	}
 
 	// connect sock_fd & sock_addr_
-	if (connect(sock_fd_, (struct sockaddr *)&sock_addr_, sizeof(sock_addr_)) ==
-		SYSTEM_ERROR) {
+	if (connect(sock_fd_, (struct sockaddr *)&sock_addr_, sizeof(sock_addr_)) == SYSTEM_ERROR) {
 		throw std::runtime_error("connect failed");
 	}
 }

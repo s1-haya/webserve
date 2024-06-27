@@ -6,9 +6,11 @@
 #include <string>
 
 namespace {
-	void PrintError(const std::string &s) {
-		std::cerr << COLOR_RED << "Error: " << s << COLOR_RESET << std::endl;
-	}
+
+void PrintError(const std::string &s) {
+	std::cerr << COLOR_RED << "Error: " << s << COLOR_RESET << std::endl;
+}
+
 } // namespace
 
 // ./webserv [configuration file]

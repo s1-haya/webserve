@@ -38,22 +38,22 @@ fclean: clean
 re: fclean all
 
 #--------------------------------------------
+DEFAULT_PORT	:=	8080
+PORT			:=	$(DEFAULT_PORT)
+
+# ex) make run INFILE_PATH=request_messages/200_get_sub.txt
+# ex) make run PORT=4242 INFILE_PATH=request_messages/200_get_sub.txt
 .PHONY	: run
 run: all
-	@./$(NAME)
+	@./$(NAME) $(PORT) $(INFILE_PATH)
 
 .PHONY	: val
 val: all
-	@valgrind ./$(NAME)
+	@valgrind ./$(NAME) $(PORT) $(INFILE_PATH)
 
 .PHONY	: check
 check:
 	@cppcheck --enable=all $$(find . -type f -name "*.cpp" | tr '\n' ' ')
-
-#--------------------------------------------
-.PHONY	: req
-req:
-	echo -n "Hello from client" | nc 127.0.0.1 8080
 
 #--------------------------------------------
 

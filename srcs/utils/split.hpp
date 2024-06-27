@@ -5,8 +5,9 @@
 #include <vector>
 
 namespace utils {
-	std::vector<std::string>
-	SplitStr(const std::string &src, const std::string &substring);
+
+std::vector<std::string> SplitStr(const std::string &src, const std::string &substring);
+
 }
 
 #endif /* UTILS_SPLIT_HPP_ */

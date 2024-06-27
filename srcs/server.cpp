@@ -7,8 +7,7 @@
 #include <unistd.h>     // close
 
 // todo: set ConfigData -> private variables
-Server::Server(const Config::ConfigData &config)
-	: server_name_("from_config"), port_(8080) {
+Server::Server(const Config::ConfigData &config) : server_name_("from_config"), port_(8080) {
 	(void)config;
 	Init();
 	Debug("server", "init server & listen", server_fd_);
@@ -46,8 +45,7 @@ void Server::HandleEvent(const Event &event) {
 }
 
 void Server::HandleNewConnection() {
-	const int new_socket =
-		accept(server_fd_, (struct sockaddr *)&sock_addr_, &addrlen_);
+	const int new_socket = accept(server_fd_, (struct sockaddr *)&sock_addr_, &addrlen_);
 	if (new_socket == SYSTEM_ERROR) {
 		throw std::runtime_error("accept failed");
 	}
@@ -66,15 +64,17 @@ void Server::HandleExistingConnection(const Event &event) {
 }
 
 namespace {
-	std::string CreateHttpResponse(const std::string &read_buf) {
-		Http http(read_buf);
-		return http.CreateResponse();
-	}
 
-	// todo: find "Connection: close"?
-	bool IsRequestReceivedComplete(const std::string &buffer) {
-		return buffer.find("\r\n\r\n") != std::string::npos;
-	}
+std::string CreateHttpResponse(const std::string &read_buf) {
+	Http http(read_buf);
+	return http.CreateResponse();
+}
+
+// todo: find "Connection: close"?
+bool IsRequestReceivedComplete(const std::string &buffer) {
+	return buffer.find("\r\n\r\n") != std::string::npos;
+}
+
 } // namespace
 
 void Server::ReadRequest(const Event &event) {
@@ -121,8 +121,7 @@ void Server::Init() {
 	}
 	// set socket option to reuse address
 	int optval = 1;
-	if (setsockopt(server_fd_, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)) ==
-		SYSTEM_ERROR) {
+	if (setsockopt(server_fd_, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)) == SYSTEM_ERROR) {
 		throw std::runtime_error("setsockopt failed");
 	}
 	sock_addr_.sin_family      = AF_INET;
@@ -130,8 +129,7 @@ void Server::Init() {
 	sock_addr_.sin_port        = htons(port_);
 
 	// bind
-	if (bind(server_fd_, (const struct sockaddr *)&sock_addr_, addrlen_) ==
-		SYSTEM_ERROR) {
+	if (bind(server_fd_, (const struct sockaddr *)&sock_addr_, addrlen_) == SYSTEM_ERROR) {
 		throw std::runtime_error("bind failed");
 	}
 
