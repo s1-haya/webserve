@@ -6,3 +6,4 @@ venv
 !nginx/**
 !apache/**
 !*.sh
+!apache/**
