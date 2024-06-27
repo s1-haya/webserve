@@ -34,11 +34,7 @@ jobs:
           pip-compile requirements.in --strip-extras
           pip-sync
 
-      - uses: actions/checkout@v4
-      - name: Run webserv
-        run:
-          make run-webserv
-
-      - name: Run tests
+      - name: Run webserv && tests
         run: |
+          make run-webserv
           make test
