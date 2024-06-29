@@ -1,5 +1,6 @@
 #include "lexer.hpp"
 #include "../utils/isspace.hpp"
+#include <algorithm>
 #include <iostream>
 
 Lexer::Lexer(const std::string &buffer, std::list<Node> &tokens_)

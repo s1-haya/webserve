@@ -1,10 +1,8 @@
 #ifndef LEXER_HPP_
 #define LEXER_HPP_
-#include <algorithm>
+#include "node.hpp"
 #include <list>
 #include <vector>
-
-#include "node.hpp"
 
 class Lexer {
   private:
@@ -27,10 +25,10 @@ class Lexer {
 	void LexBuffer();
 
 	// Token Handler
-	void      AddToken(const char symbol, int token_type);
-	void      AddToken(const std::string &symbol, int token_type);
-	void      AddWordToken(std::string::const_iterator &it);
-	void      SkipComment(std::string::const_iterator &it);
+	void      AddToken(const char, int);
+	void      AddToken(const std::string &, int);
+	void      AddWordToken(std::string::const_iterator &);
+	void      SkipComment(std::string::const_iterator &);
 	TokenType SearchWordTokenType(std::string &);
 
 	// Prohibit Copy
