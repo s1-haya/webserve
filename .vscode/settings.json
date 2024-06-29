@@ -7,12 +7,5 @@
         "editor.defaultFormatter": "ms-python.black-formatter",
         "editor.formatOnSave": true
     },
-	"isort.args": [
-		"--profile",
-		"black"
-	],
-	"files.associations": {
-		"*.tpp": "cpp",
-		"fstream": "cpp"
-	}
+    "isort.args":["--profile", "black"]
 }

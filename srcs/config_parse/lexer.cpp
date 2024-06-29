@@ -1,5 +1,5 @@
 #include "lexer.hpp"
-#include "../utils/isspace.hpp"
+#include "../utils/utils.hpp"
 #include <algorithm>
 #include <iostream>
 
