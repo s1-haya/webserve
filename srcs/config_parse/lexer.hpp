@@ -23,16 +23,25 @@ class Lexer {
 	const std::string buffer_;
 
 	Lexer();
-	void      Init();
+	void InitDefinition();
+	void LexBuffer();
+
+	// Token Handler
 	void      AddToken(const char symbol, int token_type);
 	void      AddToken(const std::string &symbol, int token_type);
 	void      AddWordToken(std::string::const_iterator &it);
 	void      SkipComment(std::string::const_iterator &it);
 	TokenType SearchWordTokenType(std::string &);
 
+	// Prohibit Copy
+	Lexer(const Lexer &);
+	Lexer &operator=(const Lexer &);
+
   public:
 	Lexer(const std::string &, std::list<Node> &);
 	~Lexer();
+
+	// Definition
 	static const char CR            = '\r';
 	static const char LF            = '\n';
 	static const char SEMICOLON_CHR = ';';

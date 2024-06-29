@@ -2,48 +2,16 @@
 #include "../utils/isspace.hpp"
 #include <iostream>
 
-void Lexer::AddToken(const char symbol, int token_type) {
-	std::string symbol_str(1, symbol);
-	Node        token(symbol_str, token_type);
-	tokens_.push_back(token);
+Lexer::Lexer(const std::string &buffer, std::list<Node> &tokens_)
+	: tokens_(tokens_), buffer_(buffer) {
+	std::string new_str;
+	InitDefinition();
+	LexBuffer();
 }
 
-void Lexer::AddToken(const std::string &symbol, int token_type) {
-	Node token(symbol, token_type);
-	tokens_.push_back(token);
-}
+Lexer::~Lexer() {}
 
-void Lexer::AddWordToken(std::string::const_iterator &it) {
-	std::string new_str = "";
-	while (!utils::IsSpace(*it) && *it != SEMICOLON_CHR) {
-		new_str += *it;
-		++it;
-	}
-	if (SearchWordTokenType(new_str) == CONTEXT)
-		AddToken(new_str, CONTEXT);
-	else if (SearchWordTokenType(new_str) == DIRECTIVE)
-		AddToken(new_str, DIRECTIVE);
-	else
-		AddToken(new_str, WORD);
-	if (*it == SEMICOLON_CHR)
-		AddToken(SEMICOLON_CHR, DELIM);
-}
-
-void Lexer::SkipComment(std::string::const_iterator &it) {
-	while (*it != '\n')
-		++it;
-}
-
-Lexer::TokenType Lexer::SearchWordTokenType(std::string &word) {
-	if (std::find(context_.begin(), context_.end(), word) != context_.end())
-		return CONTEXT;
-	else if (std::find(directive_.begin(), directive_.end(), word) !=
-			 directive_.end())
-		return DIRECTIVE;
-	return WORD;
-}
-
-void Lexer::Init() {
+void Lexer::InitDefinition() {
 	context_.push_back("server");
 	context_.push_back("location");
 
@@ -54,11 +22,7 @@ void Lexer::Init() {
 	directive_.push_back("index");
 }
 
-Lexer::Lexer(const std::string &buffer, std::list<Node> &tokens_)
-	: tokens_(tokens_), buffer_(buffer) {
-	std::string new_str;
-	Init();
-
+void Lexer::LexBuffer() {
 	for (std::string::const_iterator it = buffer_.begin(); it != buffer_.end();
 		 ++it) {
 		while (utils::IsSpace(*it)) {
@@ -84,4 +48,44 @@ Lexer::Lexer(const std::string &buffer, std::list<Node> &tokens_)
 	}
 }
 
-Lexer::~Lexer() {}
+// For char
+void Lexer::AddToken(const char symbol, int token_type) {
+	std::string symbol_str(1, symbol);
+	Node        token(symbol_str, token_type);
+	tokens_.push_back(token);
+}
+
+// For string
+void Lexer::AddToken(const std::string &symbol, int token_type) {
+	Node token(symbol, token_type);
+	tokens_.push_back(token);
+}
+
+void Lexer::AddWordToken(std::string::const_iterator &it) {
+	std::string new_str = "";
+	while (!utils::IsSpace(*it) && *it != SEMICOLON_CHR) {
+		new_str += *it;
+		++it;
+	}
+	if (SearchWordTokenType(new_str) == CONTEXT) // 予約語の検索
+		AddToken(new_str, CONTEXT);
+	else if (SearchWordTokenType(new_str) == DIRECTIVE) // ..
+		AddToken(new_str, DIRECTIVE);
+	else
+		AddToken(new_str, WORD);
+	it -= 1; // loopでWordの次の文字から処理
+}
+
+void Lexer::SkipComment(std::string::const_iterator &it) {
+	while (*it != '\n')
+		++it;
+}
+
+Lexer::TokenType Lexer::SearchWordTokenType(std::string &word) {
+	if (std::find(context_.begin(), context_.end(), word) != context_.end())
+		return CONTEXT;
+	else if (std::find(directive_.begin(), directive_.end(), word) !=
+			 directive_.end())
+		return DIRECTIVE;
+	return WORD;
+}
