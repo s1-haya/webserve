@@ -3,9 +3,6 @@ __pycache__
 .pytest_cache
 venv
 
-<<<<<<< HEAD
 !nginx/**
 !apache/**
-=======
->>>>>>> main
 !*.sh

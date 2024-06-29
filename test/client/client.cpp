@@ -5,21 +5,7 @@
 #include <sys/types.h>
 #include <unistd.h> // read,close
 
-const std::string Client::DEFAULT_MESSAGE = "Hello from client (default)";
-
-Client::Client() : port_(DEFAULT_PORT), request_message_(DEFAULT_MESSAGE) {
-	Init();
-}
-
-Client::Client(int port) : port_(port), request_message_(DEFAULT_MESSAGE) {
-	Init();
-}
-
-Client::Client(const std::string &message) : port_(DEFAULT_PORT), request_message_(message) {
-	Init();
-}
-
-Client::Client(int port, const std::string &message) : port_(port), request_message_(message) {
+Client::Client(unsigned int port) : port_(port) {
 	Init();
 }
 
