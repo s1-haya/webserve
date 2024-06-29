@@ -1,20 +1,22 @@
 #ifndef EPOLL_HPP_
 #define EPOLL_HPP_
 
-#include "debug.hpp" // todo: tmp
 #include "event.hpp"
+#include <cstddef>     // size_t
 #include <sys/epoll.h> // epoll
+
+namespace epoll {
 
 class Epoll {
   public:
 	Epoll();
 	~Epoll();
-	void AddNewConnection(int socket_fd, EventType type);
+	void AddNewConnection(int socket_fd, event::Type type);
 	void DeleteConnection(int socket_fd);
-	void UpdateEventType(const Event &event, EventType new_type);
+	void UpdateEventType(const event::Event &event, event::Type new_type);
 	int  CreateReadyList();
 	// getter
-	Event GetEvent(std::size_t index) const;
+	event::Event GetEvent(std::size_t index) const;
 
   private:
 	// prohibit copy
@@ -27,5 +29,7 @@ class Epoll {
 	int                epoll_fd_;
 	struct epoll_event evlist_[MAX_EVENTS];
 };
+
+} // namespace epoll
 
 #endif /* EPOLL_HPP_ */

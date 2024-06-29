@@ -1,7 +1,10 @@
 #include "epoll.hpp"
+#include "utils.hpp"
 #include <errno.h>
 #include <stdint.h> // uint32_t
 #include <unistd.h> // close
+
+namespace epoll {
 
 Epoll::Epoll() {
 	epoll_fd_ = epoll_create1(EPOLL_CLOEXEC);
@@ -17,40 +20,42 @@ Epoll::~Epoll() {
 }
 
 namespace {
-	uint32_t ConvertToEpollEventType(EventType type) {
-		uint32_t ret_type = 0;
 
-		if (type & EVENT_READ) {
-			ret_type |= EPOLLIN;
-		}
-		if (type & EVENT_WRITE) {
-			ret_type |= EPOLLOUT;
-		}
-		return ret_type;
+uint32_t ConvertToEpollEventType(event::Type type) {
+	uint32_t ret_type = 0;
+
+	if (type & event::EVENT_READ) {
+		ret_type |= EPOLLIN;
 	}
-
-	uint32_t ConvertToEventType(uint32_t event) {
-		uint32_t ret_type = EVENT_NONE;
-
-		if (event & EPOLLIN) {
-			ret_type |= EVENT_READ;
-		}
-		if (event & EPOLLOUT) {
-			ret_type |= EVENT_WRITE;
-		}
-		// todo: tmp
-		return ret_type;
+	if (type & event::EVENT_WRITE) {
+		ret_type |= EPOLLOUT;
 	}
+	return ret_type;
+}
 
-	Event ConvertToEventDto(const struct epoll_event &event) {
-		Event ret_event;
-		ret_event.fd   = event.data.fd;
-		ret_event.type = ConvertToEventType(event.events);
-		return ret_event;
+uint32_t ConvertToEventType(uint32_t event) {
+	uint32_t ret_type = event::EVENT_NONE;
+
+	if (event & EPOLLIN) {
+		ret_type |= event::EVENT_READ;
 	}
+	if (event & EPOLLOUT) {
+		ret_type |= event::EVENT_WRITE;
+	}
+	// todo: tmp
+	return ret_type;
+}
+
+event::Event ConvertToEventDto(const struct epoll_event &event) {
+	event::Event ret_event;
+	ret_event.fd   = event.data.fd;
+	ret_event.type = ConvertToEventType(event.events);
+	return ret_event;
+}
+
 } // namespace
 
-void Epoll::AddNewConnection(int socket_fd, EventType type) {
+void Epoll::AddNewConnection(int socket_fd, event::Type type) {
 	struct epoll_event ev;
 	ev.events  = ConvertToEpollEventType(type);
 	ev.data.fd = socket_fd;
@@ -77,7 +82,7 @@ int Epoll::CreateReadyList() {
 }
 
 // override with new_type
-void Epoll::UpdateEventType(const Event &event, const EventType new_type) {
+void Epoll::UpdateEventType(const event::Event &event, const event::Type new_type) {
 	const int socket_fd = event.fd;
 
 	struct epoll_event ev;
@@ -88,9 +93,11 @@ void Epoll::UpdateEventType(const Event &event, const EventType new_type) {
 	}
 }
 
-Event Epoll::GetEvent(std::size_t index) const {
+event::Event Epoll::GetEvent(std::size_t index) const {
 	if (index >= MAX_EVENTS) {
 		throw std::out_of_range("evlist index out of range");
 	}
 	return ConvertToEventDto(evlist_[index]);
 }
+
+} // namespace epoll
