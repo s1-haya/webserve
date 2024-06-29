@@ -7,6 +7,7 @@ Config::Config(const std::string &file_path) : config_file_(file_path.c_str()) {
 	if (!config_file_) {
 		throw std::runtime_error("Cannot open Configuration file");
 	}
+	server_.server_name_ = "localhost";
 	std::stringstream buffer;
 	buffer << config_file_.rdbuf();
 	// std::cout << buffer.str() << std::endl;
