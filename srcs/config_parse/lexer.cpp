@@ -24,8 +24,7 @@ void Lexer::InitDefinition() {
 }
 
 void Lexer::LexBuffer() {
-	for (std::string::const_iterator it = buffer_.begin(); it != buffer_.end();
-		 ++it) {
+	for (std::string::const_iterator it = buffer_.begin(); it != buffer_.end(); ++it) {
 		while (utils::IsSpace(*it)) {
 			++it;
 		}
@@ -85,8 +84,7 @@ void Lexer::SkipComment(std::string::const_iterator &it) {
 Lexer::TokenType Lexer::SearchWordTokenType(std::string &word) {
 	if (std::find(context_.begin(), context_.end(), word) != context_.end())
 		return CONTEXT;
-	else if (std::find(directive_.begin(), directive_.end(), word) !=
-			 directive_.end())
+	else if (std::find(directive_.begin(), directive_.end(), word) != directive_.end())
 		return DIRECTIVE;
 	return WORD;
 }
