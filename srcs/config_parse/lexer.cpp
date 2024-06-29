@@ -67,13 +67,8 @@ void Lexer::AddWordToken(std::string::const_iterator &it) {
 		new_str += *it;
 		++it;
 	}
-	if (SearchWordTokenType(new_str) == CONTEXT) // 予約語の検索
-		AddToken(new_str, CONTEXT);
-	else if (SearchWordTokenType(new_str) == DIRECTIVE) // ..
-		AddToken(new_str, DIRECTIVE);
-	else
-		AddToken(new_str, WORD);
-	it -= 1; // loopでWordの次の文字から処理
+	AddToken(new_str, SearchWordTokenType(new_str)); // 予約語の検索
+	it -= 1;                                         // loopでWordの次の文字から処理
 }
 
 void Lexer::SkipComment(std::string::const_iterator &it) {
