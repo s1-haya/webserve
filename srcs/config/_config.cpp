@@ -1,7 +1,7 @@
-#include "config.hpp"
+#include "_config.hpp"
 #include "utils.hpp"
 
-namespace config {
+namespace _config {
 
 // todo: return or throw parse error
 Config::ConfigData Config::ParseConfig(const std::string &path_config) {

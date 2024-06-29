@@ -10,7 +10,7 @@
 namespace server {
 
 // todo: set ConfigData -> private variables
-Server::Server(const config::Config::ConfigData &config)
+Server::Server(const _config::Config::ConfigData &config)
 	: server_name_("from_config"), port_(8080) {
 	(void)config;
 	Init();
