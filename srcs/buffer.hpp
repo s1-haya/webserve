@@ -1,10 +1,11 @@
 #ifndef SERVER_BUFFER_HPP_
 #define SERVER_BUFFER_HPP_
 
-#include "debug.hpp" // todo: tmp
 #include <map>
 #include <string>
 #include <sys/types.h> // ssize_t
+
+namespace server {
 
 class Buffer {
   public:
@@ -26,5 +27,7 @@ class Buffer {
 	// request buffers
 	Buffers buffers_;
 };
+
+} // namespace server
 
 #endif /* SERVER_BUFFER_HPP_ */

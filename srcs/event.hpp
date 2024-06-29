@@ -3,7 +3,9 @@
 
 #include <stdint.h> // uint32_t
 
-enum EventType {
+namespace event {
+
+enum Type {
 	EVENT_NONE   = 1 << 0, // todo: tmp
 	EVENT_READ   = 1 << 1,
 	EVENT_WRITE  = 1 << 2,
@@ -12,8 +14,10 @@ enum EventType {
 };
 
 struct Event {
-	int      fd;
-	uint32_t type;
+	int     fd;
+	int32_t type;
 };
+
+} // namespace event
 
 #endif /* EVENT_HPP_ */

@@ -1,6 +1,8 @@
 #include "buffer.hpp"
-#include <stdio.h>  // perror
+#include <cstdio>   // perror
 #include <unistd.h> // read
+
+namespace server {
 
 Buffer::Buffer() {}
 
@@ -28,3 +30,5 @@ std::string Buffer::GetBuffer(int fd) const {
 	// todo: fd error handle
 	return buffers_.at(fd);
 }
+
+} // namespace server
