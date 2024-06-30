@@ -3,14 +3,15 @@
 
 #include "buffer.hpp"
 #include "config.hpp"
-#include "debug.hpp" // todo: tmp
 #include "epoll.hpp"
 #include <netinet/in.h> // struct sockaddr_in
 #include <string>
 
+namespace server {
+
 class Server {
   public:
-	explicit Server(const Config::ConfigData &config);
+	explicit Server(const config::Config::ConfigData &config);
 	~Server();
 	void Run();
 
@@ -20,10 +21,10 @@ class Server {
 	Server(const Server &other);
 	Server &operator=(const Server &other);
 	void    Init();
-	void    HandleEvent(const Event &event);
+	void    HandleEvent(const event::Event &event);
 	void    HandleNewConnection();
-	void    HandleExistingConnection(const Event &event);
-	void    ReadRequest(const Event &event);
+	void    HandleExistingConnection(const event::Event &event);
+	void    ReadRequest(const event::Event &event);
 	void    SendResponse(int client_fd);
 	// const variables (todo: tmp)
 	const std::string  server_name_;
@@ -35,9 +36,11 @@ class Server {
 	socklen_t          addrlen_;
 	int                server_fd_;
 	// event poll
-	Epoll epoll_;
+	epoll::Epoll monitor_;
 	// request buffers
 	Buffer buffers_;
 };
+
+} // namespace server
 
 #endif /* SERVER_HPP_ */

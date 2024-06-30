@@ -1,9 +1,10 @@
 #ifndef HTTP_HPP_
 #define HTTP_HPP_
 
-#include "debug.hpp" // todo: tmp
 #include <map>
 #include <string>
+
+namespace http {
 
 class Http {
   public:
@@ -30,5 +31,7 @@ class Http {
 	// variable
 	RequestMessage request_;
 };
+
+} // namespace http
 
 #endif /* HTTP_HPP_ */

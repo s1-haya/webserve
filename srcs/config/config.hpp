@@ -1,8 +1,9 @@
 #ifndef CONFIG_HPP_
 #define CONFIG_HPP_
 
-#include "debug.hpp" // todo: tmp
 #include <string>
+
+namespace config {
 
 class Config {
   public:
@@ -14,5 +15,7 @@ class Config {
 	Config();
 	~Config();
 };
+
+} // namespace config
 
 #endif /* CONFIG_HPP_ */

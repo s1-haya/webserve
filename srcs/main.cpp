@@ -6,9 +6,11 @@
 #include <string>
 
 namespace {
-	void PrintError(const std::string &s) {
-		std::cerr << COLOR_RED << "Error: " << s << COLOR_RESET << std::endl;
-	}
+
+void PrintError(const std::string &s) {
+	std::cerr << utils::color::RED << "Error: " << s << utils::color::RESET << std::endl;
+}
+
 } // namespace
 
 // ./webserv [configuration file]
@@ -25,10 +27,10 @@ int main(int argc, char **argv) {
 	} else {
 		path_config = std::string(argv[1]);
 	}
-	Config::ConfigData config = Config::ParseConfig(path_config);
+	config::Config::ConfigData config = config::Config::ParseConfig(path_config);
 
 	try {
-		Server server(config);
+		server::Server server(config);
 		server.Run();
 	} catch (const std::exception &e) {
 		PrintError(e.what());

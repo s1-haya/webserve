@@ -2,33 +2,43 @@ name: build-and-test
 
 on:
   push:
+    branches: [ main ]
   pull_request:
+    branches: [ main ]
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
-    timeout-minutes: 30
+    runs-on: ubuntu-20.04
+    timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v4
         with:
-          python-version: '3.9'
+          python-version: 3.8.2
 
-      - name: Install dependencies
+      - name: Install system dependencies
         run: |
-          pip install --upgrade pip
-          pip install -r requirements.txt
+          sudo apt-get update
+          sudo apt-get install -y python3=3.8.2-0ubuntu2 python3-pip=20.0.2-5ubuntu1.10
 
-      - name: Install cppcheck
-        run: sudo apt-get update && sudo apt-get install -y cppcheck
-
-      - name: Run make
+      - name: Upgrade pip and install pip-tools
         run: |
-          make check
+          python3 -m pip install --upgrade pip
+          python3 -m pip install --no-cache-dir pip-tools==7.4.1
+      
+      - name: Install Python dependencies
+        run: |
+          pip-compile requirements.in --strip-extras
+          pip-sync
+
+      - uses: actions/checkout@v4
+      - name: Run webserv
+        run:
+          make run-webserv
 
       - name: Run tests
-        if: github.event_name == 'pull_request'
         run: |
-          make -C ./test build
-          make -C ./test test
+          make test
