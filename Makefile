@@ -52,7 +52,16 @@ val: all
 
 .PHONY	: check
 check:
-	@cppcheck --enable=all srcs test
+	@make check-srcs
+	@make check-test
+
+.PHONY	: check-srcs
+check-srcs:
+	@cppcheck --enable=all srcs
+
+.PHONY	: check-test
+check-test:
+	@mypy test
 
 .PHONY	: format
 format:
