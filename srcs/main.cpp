@@ -1,5 +1,5 @@
+#include "_config.hpp"
 #include "color.hpp"
-#include "config.hpp"
 #include "server.hpp"
 #include <cstdlib> // EXIT_
 #include <iostream>
