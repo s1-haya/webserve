@@ -3,10 +3,8 @@
 #include <string>
 
 struct Node {
-	std::string token_;
-	int         token_type_;
-	Node(const std::string &token, int token_type);
-	~Node();
+	std::string token;
+	int         token_type;
 };
 
 #endif
