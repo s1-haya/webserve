@@ -1,16 +1,20 @@
 #include "server.hpp"
 #include "event.hpp"
 #include "http.hpp"
+#include "utils.hpp"
 #include <arpa/inet.h> // htons
 #include <errno.h>
 #include <sys/socket.h> // socket
 #include <unistd.h>     // close
 
+namespace server {
+
 // todo: set ConfigData -> private variables
-Server::Server(const Config::ConfigData &config) : server_name_("from_config"), port_(8080) {
+Server::Server(const config::Config::ConfigData &config)
+	: server_name_("from_config"), port_(8080) {
 	(void)config;
 	Init();
-	Debug("server", "init server & listen", server_fd_);
+	utils::Debug("server", "init server & listen", server_fd_);
 }
 
 Server::~Server() {
@@ -21,22 +25,22 @@ Server::~Server() {
 }
 
 void Server::Run() {
-	Debug("server", "run server", server_fd_);
+	utils::Debug("server", "run server", server_fd_);
 
 	while (true) {
 		errno           = 0;
-		const int ready = epoll_.CreateReadyList();
+		const int ready = monitor_.CreateReadyList();
 		// todo: error handle
 		if (ready == SYSTEM_ERROR && errno == EINTR) {
 			continue;
 		}
 		for (std::size_t i = 0; i < static_cast<std::size_t>(ready); ++i) {
-			HandleEvent(epoll_.GetEvent(i));
+			HandleEvent(monitor_.GetEvent(i));
 		}
 	}
 }
 
-void Server::HandleEvent(const Event &event) {
+void Server::HandleEvent(const event::Event &event) {
 	if (event.fd == server_fd_) {
 		HandleNewConnection();
 	} else {
@@ -49,15 +53,15 @@ void Server::HandleNewConnection() {
 	if (new_socket == SYSTEM_ERROR) {
 		throw std::runtime_error("accept failed");
 	}
-	epoll_.AddNewConnection(new_socket, EVENT_READ);
-	Debug("server", "add new client", new_socket);
+	monitor_.AddNewConnection(new_socket, event::EVENT_READ);
+	utils::Debug("server", "add new client", new_socket);
 }
 
-void Server::HandleExistingConnection(const Event &event) {
-	if (event.type & EVENT_READ) {
+void Server::HandleExistingConnection(const event::Event &event) {
+	if (event.type & event::EVENT_READ) {
 		ReadRequest(event);
 	}
-	if (event.type & EVENT_WRITE) {
+	if (event.type & event::EVENT_WRITE) {
 		SendResponse(event.fd);
 	}
 	// todo: handle other EventType
@@ -66,7 +70,7 @@ void Server::HandleExistingConnection(const Event &event) {
 namespace {
 
 std::string CreateHttpResponse(const std::string &read_buf) {
-	Http http(read_buf);
+	http::Http http(read_buf);
 	return http.CreateResponse();
 }
 
@@ -77,7 +81,7 @@ bool IsRequestReceivedComplete(const std::string &buffer) {
 
 } // namespace
 
-void Server::ReadRequest(const Event &event) {
+void Server::ReadRequest(const event::Event &event) {
 	const int client_fd = event.fd;
 
 	ssize_t read_ret = buffers_.Read(client_fd);
@@ -87,13 +91,13 @@ void Server::ReadRequest(const Event &event) {
 		}
 		// todo: need?
 		// buffers_.Delete(client_fd);
-		// epoll_.DeleteConnection(client_fd);
+		// monitor_.DeleteConnection(client_fd);
 		return;
 	}
 	if (IsRequestReceivedComplete(buffers_.GetBuffer(client_fd))) {
-		Debug("server", "received all request from client", client_fd);
+		utils::Debug("server", "received all request from client", client_fd);
 		std::cerr << buffers_.GetBuffer(client_fd) << std::endl;
-		epoll_.UpdateEventType(event, EVENT_WRITE);
+		monitor_.UpdateEventType(event, event::EVENT_WRITE);
 	}
 }
 
@@ -101,14 +105,14 @@ void Server::SendResponse(int client_fd) {
 	// todo: check if it's ready to start write/send
 	const std::string response = CreateHttpResponse(buffers_.GetBuffer(client_fd));
 	send(client_fd, response.c_str(), response.size(), 0);
-	Debug("server", "send response to client", client_fd);
+	utils::Debug("server", "send response to client", client_fd);
 
 	// disconnect
 	buffers_.Delete(client_fd);
 	close(client_fd);
-	epoll_.DeleteConnection(client_fd);
-	Debug("server", "disconnected client", client_fd);
-	Debug("------------------------------------------");
+	monitor_.DeleteConnection(client_fd);
+	utils::Debug("server", "disconnected client", client_fd);
+	utils::Debug("------------------------------------------");
 }
 
 void Server::Init() {
@@ -139,5 +143,7 @@ void Server::Init() {
 	}
 
 	// add to epoll's interest list
-	epoll_.AddNewConnection(server_fd_, EVENT_READ);
+	monitor_.AddNewConnection(server_fd_, event::EVENT_READ);
 }
+
+} // namespace server

@@ -1,7 +1,9 @@
 #include "http.hpp"
-#include "convert.hpp"
+#include "utils.hpp"
 #include <fstream>
 #include <sstream>
+
+namespace http {
 
 Http::Http(const std::string &read_buf) {
 	ParseRequest(read_buf);
@@ -22,7 +24,7 @@ std::string ReadFile(const std::string &file_path) {
 	std::ifstream file(file_path.c_str());
 	if (!file) {
 		std::ifstream error_file("html/404.html");
-		Debug("http", "404 file not found");
+		utils::Debug("http", "404 file not found");
 		return FileToString(error_file);
 	}
 	return FileToString(file);
@@ -37,3 +39,5 @@ void Http::ReadPathContent() {
 	request_[HTTP_STATUS]      = "200";
 	request_[HTTP_STATUS_TEXT] = "OK";
 }
+
+} // namespace http
