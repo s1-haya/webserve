@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 # 環境変数の取得
+my $user = $ENV{'USER'};
 my $auth_type = $ENV{'AUTH_TYPE'};
 my $content_length = $ENV{'CONTENT_LENGTH'};
 my $content_type = $ENV{'CONTENT_TYPE'};
@@ -12,6 +13,8 @@ my $path_info = $ENV{'PATH_INFO'};
 my $path_translated = $ENV{'PATH_TRANSLATED'};
 my $query_string = $ENV{'QUERY_STRING'};
 my $remote_addr = $ENV{'REMOTE_ADDR'};
+my $remote_host = $ENV{'REMOTE_HOST'};
+my $remote_ident = $ENV{'REMOTE_IDENT'};
 my $remote_user = $ENV{'REMOTE_USER'};
 my $request_method = $ENV{'REQUEST_METHOD'};
 my $script_name = $ENV{'SCRIPT_NAME'};
@@ -26,14 +29,17 @@ my $server_software  = $ENV{'SERVER_SOFTWARE'};
 print "Content-type: text/plain\n\n";
 
 # 環境変数の値を出力
+print "USER: $user\n";
 print "AUTH_TYPE: $auth_type\n";
 print "CONTENT_LENGTH: $content_length\n";
+print "CONTENT_TYPE: $content_type\n";
 print "GATEWAY_INTERFACE: $gateway_interface\n";
 print "PATH_INFO: $path_info\n";
 print "PATH_TRANSLATED: $path_translated\n";
-print "CONTENT_TYPE: $content_type\n";
 print "QUERY_STRING: $query_string\n";
 print "REMOTE_ADDR: $remote_addr\n";
+print "REMOTE_HOST: $remote_host\n";
+print "REMOTE_IDENT: $remote_ident\n";
 print "REMOTE_USER: $remote_user\n";
 print "REQUEST_METHOD: $request_method\n";
 print "SCRIPT_NAME: $script_name\n";
