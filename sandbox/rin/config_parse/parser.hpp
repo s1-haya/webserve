@@ -16,7 +16,7 @@ class Parser {
 	~Parser();
 
 	void ServerContext(std::list<Node>::iterator &);
-	void LocationContext(std::list<Node>::iterator &, ServerCon);
+	void LocationContext(std::list<Node>::iterator &, ServerCon *);
 };
 
 #endif

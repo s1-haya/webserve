@@ -2,6 +2,7 @@
 #define SERVER_HPP_
 
 #include <iostream>
+#include <list>
 
 enum Method {
 	GET,
@@ -27,9 +28,9 @@ struct LocationCon {
 };
 
 struct ServerCon {
-	int         port_;
-	std::string server_name_;
-	LocationCon location_dir_;
+	int                    port_;
+	std::string            server_name_;
+	std::list<LocationCon> location_con_;
 };
 
 #endif
