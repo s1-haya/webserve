@@ -45,6 +45,7 @@ uint32_t ConvertToEventType(uint32_t event) {
 
 Event ConvertToEventDto(const struct epoll_event &event) {
 	Event ret_event;
+
 	ret_event.fd   = event.data.fd;
 	ret_event.type = ConvertToEventType(event.events);
 	return ret_event;
@@ -69,6 +70,7 @@ void Epoll::DeleteConnection(int socket_fd) {
 int Epoll::CreateReadyList() {
 	errno           = 0;
 	const int ready = epoll_wait(epoll_fd_, evlist_, MAX_EVENTS, -1);
+
 	if (ready == SYSTEM_ERROR) {
 		if (errno == EINTR) {
 			return ready;

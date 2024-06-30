@@ -54,6 +54,22 @@ val: all
 check:
 	@cppcheck --enable=all srcs test
 
+.PHONY	: format
+format:
+	@make format-srcs
+	@make format-test
+	@echo "srcs and test format done!"
+
+.PHONY	: format-srcs
+format-srcs:
+	@find srcs -name "*.cpp" -exec clang-format -i {} +
+	@find srcs -name "*.hpp" -exec clang-format -i {} +
+
+.PHONY	: format-test
+format-test:
+	@black test
+	@isort test
+
 .PHONY	: test
 test:
 	@make unit && make e2e
