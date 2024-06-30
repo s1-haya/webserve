@@ -23,7 +23,7 @@ def assert_header(
     if response_header_value is None:
         raise ValueError(f"Header {expected_header_name} not found in the response")
     # Header valueは末尾に空白があるためstrip()使用
-    response_header_value = response_header_value.strip()
+    response_header_value = response_header_value.rstrip()
     assert (
         response_header_value == expected_header_value
     ), f"Expected header value {expected_header_value}, but got {response_header_value}"
