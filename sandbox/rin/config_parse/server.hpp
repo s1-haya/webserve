@@ -20,6 +20,7 @@ enum TokenType { /*仮置き*/
 };
 
 struct LocationCon {
+	std::string location_; // 変える??
 	std::string root_;
 	std::string index_;
 	std::string allowed_method_;

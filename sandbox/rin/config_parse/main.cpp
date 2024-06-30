@@ -45,6 +45,7 @@
 
 /*-----------------Parser----------------*/
 #include "lexer.hpp"
+#include "parser.hpp"
 #include <iostream>
 
 namespace {
@@ -57,6 +58,17 @@ void PrintTokens(std::list<Node> *tokens_) { /*デバッグ用*/
 				  << "token_type: " << node.token_type_ << std::endl;
 	}
 }
+
+void PrintServers(std::list<ServerCon> *servers_) { /*デバッグ用*/
+	std::list<ServerCon> tmp = *servers_;
+	while (!tmp.empty()) {
+		ServerCon server = tmp.front();
+		tmp.pop_front();
+		std::cout << "server_name: " << server.server_name_ << "   "
+				  << "port: " << server.port_ << std::endl;
+	}
+}
+
 } // namespace
 
 #include <fstream>
@@ -71,7 +83,8 @@ int main() {
 	try {
 		std::list<Node> *tokens_ = new std::list<Node>;
 		Lexer            lex(buffer, *tokens_);
-		PrintTokens(tokens_);
+		// PrintTokens(tokens_);
+		Parser par(*tokens_);
 		delete tokens_;
 	} catch (const std::exception &e) {
 		std::cerr << e.what() << '\n';
