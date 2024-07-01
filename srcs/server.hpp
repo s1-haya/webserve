@@ -1,8 +1,8 @@
 #ifndef SERVER_HPP_
 #define SERVER_HPP_
 
+#include "_config.hpp"
 #include "buffer.hpp"
-#include "config.hpp"
 #include "epoll.hpp"
 #include <netinet/in.h> // struct sockaddr_in
 #include <string>
@@ -11,7 +11,7 @@ namespace server {
 
 class Server {
   public:
-	explicit Server(const config::Config::ConfigData &config);
+	explicit Server(const _config::Config::ConfigData &config);
 	~Server();
 	void Run();
 

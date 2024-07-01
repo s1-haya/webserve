@@ -34,6 +34,8 @@ std::string ToString(T value) {
 
 std::vector<std::string> SplitStr(const std::string &src, const std::string &substring);
 
+bool IsSpace(char c);
+
 } // namespace utils
 
 #endif /* UTILS_HPP_ */

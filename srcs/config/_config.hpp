@@ -3,7 +3,7 @@
 
 #include <string>
 
-namespace config {
+namespace _config {
 
 class Config {
   public:
