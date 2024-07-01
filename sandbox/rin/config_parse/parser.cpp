@@ -65,20 +65,23 @@ void Parser::ServerContext(std::list<Node>::iterator &it) {
 					throw std::logic_error("listen");           // 仮
 				server.port_ = std::atoi((*it).token_.c_str()); // TODO: atoi
 			}
+			break;
 		case CONTEXT:
-			if ((*it).token_ == "server")
-				ServerContext(++it);
-			else if ((*it).token_ == "location")
+			if ((*it).token_ == "location")
 				LocationContext(++it, &server);
+			else
+				throw std::logic_error("context in Invalid context");
+			break;
 		case DELIM:
 			break;
 		default:
 			throw std::logic_error("unknown token");
 			break;
 		}
-		// if !} throw err
 		++it;
 	}
+	if (it == tokens_.end())
+		throw std::logic_error("no }");
 	servers_.push_back(server);
 }
 
@@ -106,15 +109,17 @@ void Parser::LocationContext(std::list<Node>::iterator &it, ServerCon *server) {
 					throw std::logic_error("index"); // 仮
 				location.index_ = (*it).token_;
 			}
+			break;
 		case DELIM:
 			break;
 		default: // CONTEXT?
 			throw std::logic_error("unknown token");
 			break;
 		}
-		// if !} throw err
 		++it;
 	}
+	if (it == tokens_.end())
+		throw std::logic_error("no }");
 	// PrintLocation(&location);
 	server->location_con_.push_back(location);
 }
