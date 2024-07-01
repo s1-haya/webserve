@@ -38,7 +38,7 @@ void PrintServersLocation(std::list<ServerCon> *servers_) { /*デバッグ用*/
 Parser::Parser(std::list<Node> &tokens) : tokens_(tokens) {
 	for (std::list<Node>::iterator it = tokens_.begin(); it != tokens_.end(); ++it) {
 		if ((*it).token_type_ == CONTEXT && (*it).token_ == "server") {
-			ServerContext(++it);
+			servers_.push_back(ServerContext(++it));
 		}
 	}
 	PrintServersLocation(&servers_);
@@ -46,7 +46,7 @@ Parser::Parser(std::list<Node> &tokens) : tokens_(tokens) {
 
 Parser::~Parser() {}
 
-void Parser::ServerContext(std::list<Node>::iterator &it) {
+ServerCon Parser::ServerContext(std::list<Node>::iterator &it) {
 	ServerCon server;
 
 	if ((*it).token_type_ != L_BRACKET)
@@ -69,7 +69,7 @@ void Parser::ServerContext(std::list<Node>::iterator &it) {
 			break;
 		case CONTEXT:
 			if ((*it).token_ == "location")
-				LocationContext(++it, &server);
+				server.location_con_.push_back(LocationContext(++it));
 			else
 				throw std::logic_error("context in Invalid context");
 			break;
@@ -83,10 +83,10 @@ void Parser::ServerContext(std::list<Node>::iterator &it) {
 	}
 	if (it == tokens_.end())
 		throw std::logic_error("no }");
-	servers_.push_back(server);
+	return server;
 }
 
-void Parser::LocationContext(std::list<Node>::iterator &it, ServerCon *server) {
+LocationCon Parser::LocationContext(std::list<Node>::iterator &it) {
 	LocationCon location;
 
 	if ((*it).token_type_ != WORD)
@@ -125,7 +125,7 @@ void Parser::LocationContext(std::list<Node>::iterator &it, ServerCon *server) {
 	if (it == tokens_.end())
 		throw std::logic_error("no }");
 	// PrintLocation(&location);
-	server->location_con_.push_back(location);
+	return location;
 }
 
 #include "lexer.hpp"
