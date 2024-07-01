@@ -1,6 +1,5 @@
 from http import HTTPStatus
 from http.client import HTTPResponse
-from typing import Optional
 
 
 def assert_status_line(response: HTTPResponse, expected_code: HTTPStatus) -> None:
@@ -33,7 +32,7 @@ def assert_body(response: HTTPResponse, path: str) -> None:
     response_body = response.read()
     expected_body = b""
     with open(path) as f:
-        expected_body = f.read().encode('utf-8')
+        expected_body = f.read().encode("utf-8")
     assert (
         response_body == expected_body
     ), f"Expected response body {expected_body.decode('utf-8')}, but got {response_body.decode('utf-8')}"
