@@ -32,6 +32,7 @@ void PrintServersLocation(std::list<ServerCon> *servers_) { /*デバッグ用*/
 		}
 	}
 }
+
 } // namespace
 
 Parser::Parser(std::list<Node> &tokens) : tokens_(tokens) {
@@ -63,7 +64,7 @@ void Parser::ServerContext(std::list<Node>::iterator &it) {
 				++it;
 				if ((*it).token_type_ != WORD)
 					throw std::logic_error("listen");           // 仮
-				server.port_ = std::atoi((*it).token_.c_str()); // TODO: atoi
+				server.port_ = std::atoi((*it).token_.c_str()); // TODO: atoi、複数
 			}
 			break;
 		case CONTEXT:
@@ -89,7 +90,7 @@ void Parser::LocationContext(std::list<Node>::iterator &it, ServerCon *server) {
 	LocationCon location;
 
 	if ((*it).token_type_ != WORD)
-		throw std::logic_error("no after location");
+		throw std::logic_error("no word after location");
 	location.location_ = (*it).token_;
 	++it; // skip /www/
 	if ((*it).token_type_ != L_BRACKET)
@@ -111,6 +112,9 @@ void Parser::LocationContext(std::list<Node>::iterator &it, ServerCon *server) {
 			}
 			break;
 		case DELIM:
+			break;
+		case CONTEXT:
+			throw std::logic_error("Invalid nest");
 			break;
 		default: // CONTEXT?
 			throw std::logic_error("unknown token");
