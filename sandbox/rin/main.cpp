@@ -10,20 +10,20 @@
 #include <iostream>
 
 namespace {
-	void PrintTokens(std::list<Node> *tokens_) { /*デバッグ用*/
-		std::list<Node> tmp = *tokens_;
-		while (!tmp.empty()) {
-			Node node = tmp.front();
-			tmp.pop_front();
-			std::cout << "token: " << node.token_ << "   "
-					  << "token_type: " << node.token_type_ << std::endl;
-		}
+void PrintTokens(std::list<Node> *tokens_) { /*デバッグ用*/
+	std::list<Node> tmp = *tokens_;
+	while (!tmp.empty()) {
+		Node node = tmp.front();
+		tmp.pop_front();
+		std::cout << "token: " << node.token << "   "
+				  << "token_type: " << node.token_type << std::endl;
 	}
+}
 } // namespace
 
 #include <fstream>
 #include <sstream>
-// c++ main.cpp lexer.cpp node.cpp ../utils/isspace.cpp
+// c++ main.cpp lexer.cpp ../utils/isspace.cpp
 
 int main() {
 	std::ifstream     conf("config_samp");
