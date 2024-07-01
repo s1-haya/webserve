@@ -3,6 +3,8 @@
 #include <algorithm>
 #include <iostream>
 
+namespace Lexer {
+
 Lexer::Lexer(const std::string &buffer, std::list<Node> &tokens)
 	: tokens_(tokens), buffer_(buffer) {
 	InitDefinition();
@@ -82,3 +84,5 @@ Lexer::TokenType Lexer::SearchWordTokenType(std::string &word) {
 		return DIRECTIVE;
 	return WORD;
 }
+
+} // namespace Lexer

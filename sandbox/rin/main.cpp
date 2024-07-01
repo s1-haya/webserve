@@ -23,7 +23,7 @@ void PrintTokens(std::list<Node> *tokens_) { /*デバッグ用*/
 
 #include <fstream>
 #include <sstream>
-// c++ main.cpp lexer.cpp ../utils/isspace.cpp
+// c++ -Wall -Wextra -Werror main.cpp lexer.cpp ../utils/isspace.cpp
 
 int main() {
 	std::ifstream     conf("config_samp");
@@ -32,7 +32,7 @@ int main() {
 	std::string buffer = ss.str();
 	try {
 		std::list<Node> *tokens_ = new std::list<Node>;
-		Lexer            lex(buffer, *tokens_);
+		Lexer::Lexer     lex(buffer, *tokens_);
 		PrintTokens(tokens_);
 		delete tokens_;
 	} catch (const std::exception &e) {

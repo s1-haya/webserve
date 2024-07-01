@@ -4,6 +4,8 @@
 #include <list>
 #include <vector>
 
+namespace Lexer {
+
 class Lexer {
   private:
 	std::list<Node>         &tokens_;
@@ -46,5 +48,7 @@ class Lexer {
 	static const char R_BRACKET_CHR = '}';
 	static const char SHARP_CHR     = '#';
 };
+
+} // namespace Lexer
 
 #endif
