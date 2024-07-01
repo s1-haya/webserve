@@ -23,9 +23,9 @@ std::map<std::string, std::string> create_request_meta_variables() {
 	return (request_meta_variables);
 }
 
-int main(void) {
-	std::map<std::string, std::string> request_meta_variables = create_request_meta_variables();
-	std::cout << request_meta_variables["HELLO"] << std::endl;
-	std::cout << request_meta_variables["SERVER_NAME"] << std::endl;
-	return (0);
-}
+// int main(void) {
+// 	std::map<std::string, std::string> request_meta_variables = create_request_meta_variables();
+// 	std::cout << request_meta_variables["HELLO"] << std::endl;
+// 	std::cout << request_meta_variables["SERVER_NAME"] << std::endl;
+// 	return (0);
+// }
