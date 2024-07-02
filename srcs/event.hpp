@@ -1,6 +1,7 @@
 #ifndef EVENT_HPP_
 #define EVENT_HPP_
 
+#include "sock_info.hpp"
 #include <stdint.h> // uint32_t
 
 namespace event {
@@ -14,8 +15,8 @@ enum Type {
 };
 
 struct Event {
-	int     fd;
-	int32_t type;
+	int32_t           type;
+	server::SockInfo *sock_info;
 };
 
 } // namespace event

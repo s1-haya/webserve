@@ -2,6 +2,7 @@
 #define EPOLL_HPP_
 
 #include "event.hpp"
+#include "sock_info.hpp"
 #include <cstddef>     // size_t
 #include <sys/epoll.h> // epoll
 
@@ -11,9 +12,9 @@ class Epoll {
   public:
 	Epoll();
 	~Epoll();
-	void AddNewConnection(int socket_fd, event::Type type);
-	void DeleteConnection(int socket_fd);
-	void UpdateEventType(const event::Event &event, event::Type new_type);
+	void AddNewConnection(server::SockInfo *server, event::Type type);
+	void DeleteConnection(server::SockInfo *server);
+	void UpdateEventType(int socket_fd, server::SockInfo *server, event::Type new_type);
 	int  CreateReadyList();
 	// getter
 	event::Event GetEvent(std::size_t index) const;

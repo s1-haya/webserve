@@ -4,8 +4,9 @@
 #include "_config.hpp"
 #include "buffer.hpp"
 #include "epoll.hpp"
-#include <netinet/in.h> // struct sockaddr_in
+#include <map>
 #include <string>
+#include <vector>
 
 namespace server {
 
@@ -14,27 +15,25 @@ class Server {
 	explicit Server(const _config::Config::ConfigData &config);
 	~Server();
 	void Run();
+	// todo: tmp
+	typedef std::pair<std::string, int>      TempConfig;
+	typedef std::map<unsigned int, SockInfo> SockInfos;
 
   private:
 	Server();
 	// prohibit copy
 	Server(const Server &other);
 	Server &operator=(const Server &other);
-	void    Init();
+	void    Init(const std::vector<TempConfig> &servers);
 	void    HandleEvent(const event::Event &event);
-	void    HandleNewConnection();
+	void    HandleNewConnection(const event::Event &event);
 	void    HandleExistingConnection(const event::Event &event);
 	void    ReadRequest(const event::Event &event);
-	void    SendResponse(int client_fd);
-	// const variables (todo: tmp)
-	const std::string  server_name_;
-	const unsigned int port_;
+	void    SendResponse(const event::Event &event);
 	// const
 	static const int SYSTEM_ERROR = -1;
-	// socket
-	struct sockaddr_in sock_addr_;
-	socklen_t          addrlen_;
-	int                server_fd_;
+	// SockInfo instances
+	SockInfos sock_infos_;
 	// event poll
 	epoll::Epoll monitor_;
 	// request buffers

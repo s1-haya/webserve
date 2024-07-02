@@ -48,30 +48,33 @@ uint32_t ConvertToEventType(uint32_t event) {
 
 event::Event ConvertToEventDto(const struct epoll_event &event) {
 	event::Event ret_event;
-	ret_event.fd   = event.data.fd;
-	ret_event.type = ConvertToEventType(event.events);
+	ret_event.type      = ConvertToEventType(event.events);
+	ret_event.sock_info = static_cast<server::SockInfo *>(event.data.ptr);
 	return ret_event;
 }
 
 } // namespace
 
-void Epoll::AddNewConnection(int socket_fd, event::Type type) {
+void Epoll::AddNewConnection(server::SockInfo *sock_info, event::Type type) {
 	struct epoll_event ev;
-	ev.events  = ConvertToEpollEventType(type);
-	ev.data.fd = socket_fd;
-	if (epoll_ctl(epoll_fd_, EPOLL_CTL_ADD, socket_fd, &ev) == SYSTEM_ERROR) {
+	ev.events   = ConvertToEpollEventType(type);
+	ev.data.ptr = sock_info;
+	if (epoll_ctl(epoll_fd_, EPOLL_CTL_ADD, sock_info->fd, &ev) == SYSTEM_ERROR) {
 		throw std::runtime_error("epoll_ctl failed");
 	}
 }
 
 // todo: error?
-void Epoll::DeleteConnection(int socket_fd) {
-	epoll_ctl(epoll_fd_, EPOLL_CTL_DEL, socket_fd, NULL);
+void Epoll::DeleteConnection(server::SockInfo *sock_info) {
+	const int client_fd = sock_info->fd;
+	delete sock_info;
+	epoll_ctl(epoll_fd_, EPOLL_CTL_DEL, client_fd, NULL);
 }
 
 int Epoll::CreateReadyList() {
 	errno           = 0;
 	const int ready = epoll_wait(epoll_fd_, evlist_, MAX_EVENTS, -1);
+	utils::Debug("epoll", "ready list", ready);
 	if (ready == SYSTEM_ERROR) {
 		if (errno == EINTR) {
 			return ready;
@@ -82,12 +85,12 @@ int Epoll::CreateReadyList() {
 }
 
 // override with new_type
-void Epoll::UpdateEventType(const event::Event &event, const event::Type new_type) {
-	const int socket_fd = event.fd;
-
+void Epoll::UpdateEventType(
+	int socket_fd, server::SockInfo *sock_info, const event::Type new_type
+) {
 	struct epoll_event ev;
-	ev.events  = ConvertToEpollEventType(new_type);
-	ev.data.fd = socket_fd;
+	ev.events   = ConvertToEpollEventType(new_type);
+	ev.data.ptr = sock_info;
 	if (epoll_ctl(epoll_fd_, EPOLL_CTL_MOD, socket_fd, &ev) == SYSTEM_ERROR) {
 		throw std::runtime_error("epoll_ctl failed");
 	}
