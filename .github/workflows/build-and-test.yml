@@ -39,8 +39,10 @@ jobs:
           make run-webserv
 
       - name: Wait for webserv to start
-        run:
-          sleep 3
+        run: |
+          while ! nc -z localhost 8080; do
+            sleep 1
+          done
 
       - name: Run tests
         run:

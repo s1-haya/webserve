@@ -14,6 +14,13 @@ std::map<std::string, std::string> create_request_meta_variables();
 // メタ変数から環境変数を作成する関数
 const char **create_cgi_env(const std::map<std::string, std::string> &request_meta_variables);
 
+void free_cgi_env(const char **cgi_env) {
+	for (size_t i = 0; cgi_env[i] != NULL; ++i) {
+		delete[] cgi_env[i];
+	}
+	delete[] cgi_env;
+}
+
 int main(void) {
 	const std::string expected[] = {
 		"AUTH_TYPE",
@@ -53,6 +60,6 @@ int main(void) {
 	for (size_t i = 0; cgi_env[i] != NULL; i++) {
 		std::cout << cgi_env[i] << std::endl;
 	}
-	delete[] cgi_env;
+	free_cgi_env(cgi_env);
 	return (0);
 }
