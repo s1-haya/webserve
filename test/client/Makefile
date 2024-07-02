@@ -1,13 +1,14 @@
 NAME		:=	client
 
+UTILS_DIR	:=	../../srcs/utils
 SRCS		:=	client.cpp \
-				main.cpp
+				main.cpp \
+				$(UTILS_DIR)/color.cpp
 
 OBJ_DIR		:=	objs
 OBJS		:=	$(SRCS:%.cpp=$(OBJ_DIR)/%.o)
 
-INCLUDE_DIR	:=	includes
-INCLUDES	:=	-I./$(INCLUDE_DIR)/
+INCLUDES	:=	-I. -I$(UTILS_DIR)/
 
 CXX			:=	c++
 CXXFLAGS	:=	-std=c++98 -Wall -Wextra -Werror -MMD -MP -pedantic

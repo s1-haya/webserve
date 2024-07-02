@@ -1,4 +1,5 @@
 #include "client.hpp"
+#include "utils.hpp"
 #include <arpa/inet.h> // inet_pton,htons
 #include <iostream>
 #include <sys/socket.h> // socket,connect
@@ -17,11 +18,8 @@ Client::~Client() {
 
 namespace {
 
-static const std::string COLOR_GRAY  = "\033[30m";
-static const std::string COLOR_RESET = "\033[0m";
-
 void DebugPrint(const std::string &s) {
-	std::cerr << COLOR_GRAY << s << COLOR_RESET << std::endl;
+	std::cerr << utils::color::GLAY << s << utils::color::RESET << std::endl;
 }
 
 } // namespace

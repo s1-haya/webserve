@@ -1,4 +1,5 @@
 #include "client.hpp"
+#include "utils.hpp"
 #include <cstdlib>
 #include <cstring> // strlen
 #include <fstream> // ifstream
@@ -7,11 +8,8 @@
 
 namespace {
 
-static const std::string COLOR_RED   = "\033[31m";
-static const std::string COLOR_RESET = "\033[0m";
-
 void PrintError(const std::string &s) {
-	std::cerr << COLOR_RED << "Error: " << s << COLOR_RESET << std::endl;
+	std::cerr << utils::color::RED << "Error: " << s << utils::color::RESET << std::endl;
 }
 
 unsigned int ConvertStrToUint(const std::string &str) {
