@@ -1,5 +1,8 @@
 NAME		:=	a.out
 
+LOG_DIR		:=	log
+LOG_FILE	:=	$(LOG_DIR)/log_unit_test.txt
+
 UTILS_DIR	:=	../../srcs/utils
 
 SRC_DIR		:=	srcs
@@ -47,11 +50,13 @@ re: fclean all
 #--------------------------------------------
 .PHONY	: run
 run: all
-	@./$(NAME)
+	@$(MKDIR) $(LOG_DIR)
+	@./$(NAME) >$(LOG_FILE) 2>&1 | cat
 
 .PHONY	: val
 val: all
-	@valgrind ./$(NAME)
+	@$(MKDIR) $(LOG_DIR)
+	@valgrind ./$(NAME) >$(LOG_FILE) 2>&1 | cat
 
 #--------------------------------------------
 -include $(DEPS)
