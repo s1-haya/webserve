@@ -4,7 +4,7 @@
 namespace utils {
 namespace color {
 
-extern const char *GLAY;
+extern const char *GRAY;
 extern const char *RED;
 extern const char *GREEN;
 extern const char *BLUE;
