@@ -2,6 +2,9 @@
 #include <iostream>
 #include <map>
 
+// cgi_scriptを実行する関数
+void execv_cgi_script(const char *script_name);
+
 // メタ変数を作成する関数
 // RFC3875 https://datatracker.ietf.org/doc/html/rfc3875#section-4.1
 // meta-variable-name = "AUTH_TYPE" | "CONTENT_LENGTH" | "CONTENT_TYPE" | "GATEWAY_INTERFACE" |
@@ -14,6 +17,7 @@ std::map<std::string, std::string> create_request_meta_variables();
 // メタ変数から環境変数を作成する関数
 const char **create_cgi_env(const std::map<std::string, std::string> &request_meta_variables);
 
+// cgi_envをfreeする関数
 void free_cgi_env(const char **cgi_env) {
 	for (size_t i = 0; cgi_env[i] != NULL; ++i) {
 		delete[] cgi_env[i];
@@ -61,5 +65,7 @@ int main(void) {
 		std::cout << cgi_env[i] << std::endl;
 	}
 	free_cgi_env(cgi_env);
+
+	execv_cgi_script("./first.pl");
 	return (0);
 }
