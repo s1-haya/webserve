@@ -61,6 +61,7 @@ check-srcs:
 
 .PHONY	: check-test
 check-test:
+	@cppcheck --enable=all test
 	@mypy test
 
 .PHONY	: format
