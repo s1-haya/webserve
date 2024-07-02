@@ -3,7 +3,7 @@
 namespace utils {
 namespace color {
 
-const char *GLAY  = "\033[30m";
+const char *GRAY  = "\033[30m";
 const char *RED   = "\033[31m";
 const char *GREEN = "\033[32m";
 const char *BLUE  = "\033[34m";

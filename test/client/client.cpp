@@ -19,7 +19,7 @@ Client::~Client() {
 namespace {
 
 void DebugPrint(const std::string &s) {
-	std::cerr << utils::color::GLAY << s << utils::color::RESET << std::endl;
+	std::cerr << utils::color::GRAY << s << utils::color::RESET << std::endl;
 }
 
 } // namespace
