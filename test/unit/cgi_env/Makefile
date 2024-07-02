@@ -1,11 +1,16 @@
 NAME		:=	a.out
 
+TARGET_DIR	:=	../../../srcs/utils
+
 SRCS		:=	main.cpp \
 				create_cgi_env.cpp \
-				create_request_meta_variables.cpp
+				create_request_meta_variables.cpp \
+				$(TARGET_DIR)/color.cpp
 
 OBJ_DIR		:=	objs
 OBJS		:=	$(patsubst %.cpp, $(OBJ_DIR)/%.o, $(notdir $(SRCS)))
+
+INCLUDES	:=	-I$(TARGET_DIR)/
 
 CXX			:=	c++
 CXXFLAGS	:=	-std=c++98 -Wall -Wextra -Werror -MMD -MP -pedantic
@@ -22,11 +27,11 @@ $(NAME): $(OBJS)
 
 $(OBJ_DIR)/%.o: %.cpp
 	@$(MKDIR) $(dir $@)
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
 
 $(OBJ_DIR)/%.o: $(TARGET_DIR)/%.cpp
 	@$(MKDIR) $(dir $@)
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
 
 .PHONY	: clean
 clean:
