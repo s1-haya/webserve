@@ -1,15 +1,16 @@
 NAME		:=	a.out
 
-TARGET_DIR	:=	../../../srcs/utils
+UTILS_DIR	:=	../../srcs/utils
 
-SRCS		:=	main.cpp \
-				$(TARGET_DIR)/split.cpp \
-				$(TARGET_DIR)/color.cpp
+SRC_DIR		:=	srcs
+SRCS		:=	$(shell find $(SRC_DIR) -type f -name "*.cpp") \
+				$(UTILS_DIR)/color.cpp \
+				$(UTILS_DIR)/split.cpp
 
 OBJ_DIR		:=	objs
 OBJS		:=	$(patsubst %.cpp, $(OBJ_DIR)/%.o, $(notdir $(SRCS)))
 
-INCLUDES	:=	-I$(TARGET_DIR)/
+INCLUDES	:=	-I$(SRC_DIR) -I$(UTILS_DIR)
 
 CXX			:=	c++
 CXXFLAGS	:=	-std=c++98 -Wall -Wextra -Werror -MMD -MP -pedantic
@@ -24,11 +25,11 @@ all		: $(NAME)
 $(NAME): $(OBJS)
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
-$(OBJ_DIR)/%.o: %.cpp
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	@$(MKDIR) $(dir $@)
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
 
-$(OBJ_DIR)/%.o: $(TARGET_DIR)/%.cpp
+$(OBJ_DIR)/%.o: $(UTILS_DIR)/%.cpp
 	@$(MKDIR) $(dir $@)
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
 

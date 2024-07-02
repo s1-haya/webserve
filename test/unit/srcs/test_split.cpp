@@ -1,10 +1,10 @@
-#include "color.hpp"
 #include "utils.hpp"
 #include <cstdlib>
 #include <iostream>
 #include <stdexcept> // logic_error
 #include <string>
 
+namespace test_split {
 namespace {
 
 #define ARRAY_SIZE(array) (sizeof(array) / sizeof(array[0]))
@@ -55,7 +55,7 @@ int RunTestCases(const TestCase test_cases[], std::size_t num_test_cases) {
 
 } // namespace
 
-int main() {
+int RunTest() {
 	int ret_code = 0;
 
 	// ---------------------------------------------------------------------
@@ -150,3 +150,5 @@ int main() {
 
 	return ret_code;
 }
+
+} // namespace test_split
