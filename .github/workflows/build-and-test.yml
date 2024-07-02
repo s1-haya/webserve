@@ -40,9 +40,7 @@ jobs:
 
       - name: Wait for webserv to start
         run: |
-          while ! nc -z localhost 8080; do
-            sleep 1
-          done
+          sleep 3
 
       - name: Run tests
         run:
