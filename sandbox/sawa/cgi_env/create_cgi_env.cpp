@@ -12,9 +12,12 @@ const char **create_cgi_env(const std::map<std::string, std::string> &request_me
 		 ite++) {
 		const std::string element = ite->first + "=" + ite->second;
 		cgi_env[i]                = new char[element.size() + 1];
+		// error
+		if (cgi_env[i] == NULL)
+			return (NULL);
 		std::strcpy(const_cast<char *>(cgi_env[i]), element.c_str());
 		i++;
 	}
 	cgi_env[i] = NULL;
-	return (cgi_env);
+	return cgi_env;
 }
