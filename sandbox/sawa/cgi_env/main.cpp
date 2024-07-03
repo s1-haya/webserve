@@ -4,8 +4,6 @@
 
 // CGIを実行する関数
 void run_cgi(const char *scirpt_name);
-// cgi_scriptを実行する関数
-void execve_cgi_script(const char *script_name);
 
 // メタ変数を作成する関数
 // RFC3875 https://datatracker.ietf.org/doc/html/rfc3875#section-4.1
@@ -25,6 +23,22 @@ void free_cgi_env(const char **cgi_env) {
 		delete[] cgi_env[i];
 	}
 	delete[] cgi_env;
+}
+
+// cgiスクリプトの実行権限を確認する関数
+bool is_executable(const char *file_path);
+
+void test_run_cgi(const char *script_name) {
+	if (is_executable(script_name)) {
+		std::cout << utils::color::GREEN << "[OK] " << utils::color::RESET << std::endl;
+		std::cout << "The file " << script_name << " is executable." << std::endl;
+		run_cgi(script_name);
+	}
+	else {
+		std::cerr << utils::color::RED << "[NG] " << utils::color::RESET << std::endl;
+		std::cerr << "The file "
+				  << script_name << " is not executable or does not exist." << std::endl;
+	}
 }
 
 int main(void) {
@@ -68,9 +82,14 @@ int main(void) {
 	}
 	free_cgi_env(cgi_env);
 
-	// 親プロセスをkillせずにCGIスクリプトが実行できているかどうかテスト
-	run_cgi("./first.pl");
-	execve_cgi_script("./first.pl");
-	std::cout << utils::color::GREEN << "[OK] " << utils::color::RESET << std::endl;
-	return (0);
+	// run_cgi テスト
+	// - 親プロセスをkillせずにCGIスクリプトが実行できているかどうか
+	// - CGIスクリプトが標準出力されてるか？（first.plが標準出力してればOK）
+	// - script_nameは実行権限があるかどうか、存在しているかどうか
+	test_run_cgi("../../../test/apache/cgi/print_stdout.pl");
+	test_run_cgi("../../../test/apache/cgi/print_stdin.pl");
+	test_run_cgi("../../../test/apache/cgi/print_env.pl");
+	test_run_cgi("../../../test/apache/cgi/not_executable.pl");
+	test_run_cgi("../../../test/apache/cgi/not_file.pl");
+	return 0;
 }

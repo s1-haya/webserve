@@ -7,6 +7,7 @@ SRCS		:=	main.cpp \
 				create_request_meta_variables.cpp \
 				execve_cgi_script.cpp \
 				run_cgi.cpp \
+				is_executable.cpp \
 				$(TARGET_DIR)/color.cpp
 
 OBJ_DIR		:=	objs
@@ -20,7 +21,7 @@ CXXFLAGS	:=	-std=c++98 -Wall -Wextra -Werror -MMD -MP -pedantic
 DEPS		:=	$(OBJS:.o=.d)
 MKDIR		:=	mkdir -p
 
-#--------------------------------------------
+#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 .PHONY	: all
 all		: $(NAME)
 
@@ -46,7 +47,7 @@ fclean: clean
 .PHONY	: re
 re: fclean all
 
-#--------------------------------------------
+#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 .PHONY	: run
 run: all
 	@./$(NAME)
@@ -55,5 +56,5 @@ run: all
 val: all
 	@valgrind ./$(NAME)
 
-#--------------------------------------------
+#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 -include $(DEPS)

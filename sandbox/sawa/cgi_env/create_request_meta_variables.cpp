@@ -4,7 +4,7 @@
 std::map<std::string, std::string> create_request_meta_variables() {
 	std::map<std::string, std::string> request_meta_variables;
 	request_meta_variables["AUTH_TYPE"];
-	request_meta_variables["CONTENT_LENGTH"];
+	request_meta_variables["CONTENT_LENGTH"] = "26";
 	request_meta_variables["CONTENT_TYPE"];
 	request_meta_variables["GATEWAY_INTERFACE"] = "CGI/1.1";
 	request_meta_variables["PATH_INFO"];
@@ -20,7 +20,7 @@ std::map<std::string, std::string> create_request_meta_variables() {
 	request_meta_variables["SERVER_PORT"]     = "8080";
 	request_meta_variables["SERVER_PROTOCOL"] = "HTTP/1.1";
 	request_meta_variables["SERVER_SOFTWARE"] = "Webserv/1.1";
-	return (request_meta_variables);
+	return request_meta_variables;
 }
 
 // int main(void) {
