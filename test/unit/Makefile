@@ -1,5 +1,9 @@
 NAME	:=	a.out
 
+# unit test's log file path
+LOG_DIR		:=	log
+LOG_FILE	:=	$(LOG_DIR)/log_unit_test.txt
+
 # for test main
 SRC_DIR	:=	srcs
 SRCS	:=	$(SRC_DIR)/main.cpp
@@ -57,7 +61,11 @@ re: fclean all
 #--------------------------------------------
 .PHONY	: run
 run: all
-	@./$(NAME)
+	@$(MKDIR) $(dir $(LOG_FILE))
+	@./$(NAME) 2>&1 | tee $(LOG_FILE); \
+	status=$${PIPESTATUS[0]}; \
+	echo -e "\nunit test's log =>" $(LOG_FILE); \
+	exit $$status;
 
 .PHONY	: val
 val: all
