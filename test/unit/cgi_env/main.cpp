@@ -2,8 +2,10 @@
 #include <iostream>
 #include <map>
 
+// CGIを実行する関数
+void run_cgi(const char *scirpt_name);
 // cgi_scriptを実行する関数
-void execv_cgi_script(const char *script_name);
+void execve_cgi_script(const char *script_name);
 
 // メタ変数を作成する関数
 // RFC3875 https://datatracker.ietf.org/doc/html/rfc3875#section-4.1
@@ -66,6 +68,9 @@ int main(void) {
 	}
 	free_cgi_env(cgi_env);
 
-	execv_cgi_script("./first.pl");
+	// 親プロセスをkillせずにCGIスクリプトが実行できているかどうかテスト
+	run_cgi("./first.pl");
+	execve_cgi_script("./first.pl");
+	std::cout << utils::color::GREEN << "[OK] " << utils::color::RESET << std::endl;
 	return (0);
 }

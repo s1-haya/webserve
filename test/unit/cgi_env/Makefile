@@ -5,7 +5,8 @@ TARGET_DIR	:=	../../../srcs/utils
 SRCS		:=	main.cpp \
 				create_cgi_env.cpp \
 				create_request_meta_variables.cpp \
-				execv_cgi_script.cpp \
+				execve_cgi_script.cpp \
+				run_cgi.cpp \
 				$(TARGET_DIR)/color.cpp
 
 OBJ_DIR		:=	objs
