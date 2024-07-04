@@ -59,6 +59,9 @@ fclean: clean
 re: fclean all
 
 #--------------------------------------------
+# PIPESTATUSがbash固有のため
+SHELL=/bin/bash
+
 .PHONY	: run
 run: all
 	@$(MKDIR) $(dir $(LOG_FILE))
