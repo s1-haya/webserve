@@ -1,6 +1,36 @@
 #include "sock_info.hpp"
+#include <arpa/inet.h> // htons
+#include <cstring>     // memset
 
 namespace server {
+
+SockInfo::SockInfo() : fd_(0), name_(""), port_(0), addrlen_(sizeof(sock_addr_)) {
+	std::memset(&sock_addr_, 0, addrlen_);
+}
+
+SockInfo::SockInfo(const std::string &name, unsigned int port)
+	: fd_(0), name_(name), port_(port), addrlen_(sizeof(sock_addr_)) {
+	sock_addr_.sin_family      = AF_INET;
+	sock_addr_.sin_addr.s_addr = INADDR_ANY;
+	sock_addr_.sin_port        = htons(port);
+}
+
+SockInfo::~SockInfo() {}
+
+SockInfo::SockInfo(const SockInfo &other) {
+	*this = other;
+}
+
+SockInfo &SockInfo::operator=(const SockInfo &other) {
+	if (this != &other) {
+		fd_        = other.fd_;
+		name_      = other.name_;
+		port_      = other.port_;
+		sock_addr_ = other.sock_addr_;
+		addrlen_   = other.addrlen_;
+	}
+	return *this;
+}
 
 int SockInfo::GetFd() const {
 	return fd_;
