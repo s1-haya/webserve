@@ -26,9 +26,10 @@ void Buffer::Delete(int fd) {
 	buffers_[fd].erase();
 }
 
-std::string Buffer::GetBuffer(int fd) const {
+// In C++98, the map's "at" method is unavailable, not using const qualifiers.
+std::string &Buffer::GetBuffer(int fd) {
 	// todo: fd error handle
-	return buffers_.at(fd);
+	return buffers_[fd];
 }
 
 } // namespace server
