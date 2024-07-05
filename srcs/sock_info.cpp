@@ -4,12 +4,12 @@
 
 namespace server {
 
-SockInfo::SockInfo() : fd_(0), name_(""), port_(0), addrlen_(sizeof(sock_addr_)) {
+SockInfo::SockInfo() : fd_(0), name_(""), port_(0), addrlen_(sizeof(sock_addr_)), peer_fd_(0) {
 	std::memset(&sock_addr_, 0, addrlen_);
 }
 
 SockInfo::SockInfo(const std::string &name, unsigned int port)
-	: fd_(0), name_(name), port_(port), addrlen_(sizeof(sock_addr_)) {
+	: fd_(0), name_(name), port_(port), addrlen_(sizeof(sock_addr_)), peer_fd_(0) {
 	sock_addr_.sin_family      = AF_INET;
 	sock_addr_.sin_addr.s_addr = INADDR_ANY;
 	sock_addr_.sin_port        = htons(port);
@@ -28,6 +28,7 @@ SockInfo &SockInfo::operator=(const SockInfo &other) {
 		port_      = other.port_;
 		sock_addr_ = other.sock_addr_;
 		addrlen_   = other.addrlen_;
+		peer_fd_   = other.peer_fd_;
 	}
 	return *this;
 }
@@ -46,6 +47,10 @@ socklen_t SockInfo::GetAddrlen() const {
 
 void SockInfo::SetSockFd(int fd) {
 	fd_ = fd;
+}
+
+void SockInfo::SetPeerSockFd(int fd) {
+	peer_fd_ = fd;
 }
 
 } // namespace server

@@ -29,6 +29,8 @@ class SockInfo {
 	// todo: use struct sockaddr
 	struct sockaddr_in sock_addr_;
 	socklen_t          addrlen_;
+	// peer socket info(client)
+	int peer_fd_;
 };
 
 } // namespace server
