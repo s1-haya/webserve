@@ -35,5 +35,6 @@ def assert_body(response: HTTPResponse, path: str) -> None:
         expected_body = f.read().encode("utf-8")
     assert (
         response_body == expected_body
-    ), f"Expected response body {expected_body.decode('utf-8')}, but got {response_body.decode('utf-8')}"
+    ), f"Expected response body\n\n {expected_body.decode('utf-8')}\n, but got\n\n {response_body.decode('utf-8')}"
+    assert_header(response, "Content-Length", str(len(expected_body)))
     assert_header(response, "Content-Length", str(len(expected_body)))
