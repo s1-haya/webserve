@@ -1,7 +1,7 @@
+#include "cgi.hpp"
 #include "color.hpp"
 #include <iostream>
 #include <map>
-#include "cgi.hpp"
 
 // CGIを実行する関数
 void run_cgi(const char *scirpt_name);
@@ -34,11 +34,10 @@ void test_run_cgi(const char *script_name) {
 		std::cout << utils::color::GREEN << "[OK] " << utils::color::RESET << std::endl;
 		std::cout << "The file " << script_name << " is executable." << std::endl;
 		run_cgi(script_name);
-	}
-	else {
+	} else {
 		std::cerr << utils::color::RED << "[NG] " << utils::color::RESET << std::endl;
-		std::cerr << "The file "
-				  << script_name << " is not executable or does not exist." << std::endl;
+		std::cerr << "The file " << script_name << " is not executable or does not exist."
+				  << std::endl;
 	}
 }
 
@@ -94,7 +93,7 @@ int main(void) {
 	// test_run_cgi("../../../test/apache/cgi/not_executable.pl");
 	// test_run_cgi("../../../test/apache/cgi/not_file.pl");
 
-	cgi::CGI a("../../../test/apache/cgi/print_env.pl");
-	a.Run();
+	cgi::CGI a;
+	a.Run("../../../test/apache/cgi/print_env.pl", "POST");
 	return 0;
 }

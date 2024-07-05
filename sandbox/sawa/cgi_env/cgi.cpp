@@ -1,30 +1,28 @@
 #include "cgi.hpp"
-#include <iostream>
-#include <map>
-#include <unistd.h>
-#include <sys/wait.h>
 #include <cstring>
+#include <iostream>
+#include <sys/wait.h>
+#include <unistd.h>
 
 namespace cgi {
 
-CGI::CGI(const char *script_name) : cgi_script_(script_name) {
-	Init();
-	std::cout << "Init: " << script_name << std::endl;
+CGI::CGI() {}
+
+CGI::~CGI() {}
+
+int CGI::Run(const char *script_name, const std::string &method) {
+	Init(script_name, method);
+	Execve();
+	Free();
+	return (this->exit_status_);
 }
 
-CGI::~CGI() {
-	for (size_t i = 0; this->env_[i] != NULL; ++i) {
-		delete[] this->env_[i];
-	}
-	delete[] this->env_;
-}
-
-void CGI::Run() {
+void CGI::Execve() {
 	int cgi_request[2];
 	int cgi_response[2];
 	// class private: method
 	std::string method = "POST";
-	if (method == "POST" && pipe(cgi_request) == -1) {
+	if (method_ == "POST" && pipe(cgi_request) == -1) {
 		std::cerr << "Error: pipe" << std::endl;
 		return;
 	}
@@ -38,7 +36,6 @@ void CGI::Run() {
 		return;
 	} else if (p == 0) {
 		// 親と子でプロセス空間が違うため、親プロセス自体の標準出力に影響はない。
-		std::cout << "child" << std::endl;
 		if (method == "POST") {
 			close(cgi_request[W]);
 			dup2(cgi_request[R], STDIN_FILENO);
@@ -59,7 +56,6 @@ void CGI::Run() {
 		}
 		wait(NULL);
 		char buf;
-		std::cout << "parent" << std::endl;
 		close(cgi_response[W]);
 		while (read(cgi_response[R], &buf, 1) > 0) {
 			write(0, &buf, 1);
@@ -68,15 +64,57 @@ void CGI::Run() {
 	}
 }
 
-void CGI::ExecveCgiScript(){
+void CGI::Free() {
+	for (size_t i = 0; this->argv_[i] != NULL; ++i) {
+		delete[] this->argv_[i];
+	}
+	delete[] this->argv_;
+	for (size_t i = 0; this->env_[i] != NULL; ++i) {
+		delete[] this->env_[i];
+	}
+	delete[] this->env_;
+}
+
+void CGI::ExecveCgiScript() {
 	// classでcgiの環境変数を保持
-	char *const argv[] = {const_cast<char *>(cgi_script_), NULL};
-	execve(cgi_script_, argv, env_);
+	this->exit_status_ = execve(cgi_script_, argv_, env_);
 	// perror("execve"); // execveが失敗した場合のエラーメッセージ出力
 }
 
-void CGI::Init() {
-	this->env_ = InitCgiEnv();
+// おそらくCGIParseのCGIリクエストの構造体が引数になる。
+void CGI::Init(const char *script_name, const std::string &method) {
+	this->argv_       = InitCgiArgv();
+	this->env_        = InitCgiEnv();
+	this->cgi_script_ = script_name;
+	this->method_     = method;
+}
+
+char **CGI::InitCgiArgv() {
+	// CGIスクリプトに引数を渡す場合の引数リストの初期化
+	char **argv = new char *[2];
+	argv[0]     = const_cast<char *>(cgi_script_);
+	argv[1]     = NULL;
+	return argv;
+}
+
+char **CGI::InitCgiEnv() {
+	const std::map<std::string, std::string> &request_meta_variables =
+		create_request_meta_variables();
+	char **cgi_env = new char *[request_meta_variables.size() + 1];
+	size_t i       = 0;
+	for (std::map<std::string, std::string>::const_iterator ite = request_meta_variables.begin();
+		 ite != request_meta_variables.end();
+		 ite++) {
+		const std::string element = ite->first + "=" + ite->second;
+		cgi_env[i]                = new char[element.size() + 1];
+		// error
+		if (cgi_env[i] == NULL)
+			return (NULL);
+		std::strcpy(const_cast<char *>(cgi_env[i]), element.c_str());
+		i++;
+	}
+	cgi_env[i] = NULL;
+	return cgi_env;
 }
 
 std::map<std::string, std::string> create_request_meta_variables() {
@@ -101,23 +139,4 @@ std::map<std::string, std::string> create_request_meta_variables() {
 	return request_meta_variables;
 }
 
-char ** CGI::InitCgiEnv() {
-	const std::map<std::string, std::string> &request_meta_variables =
-		create_request_meta_variables();
-	char **cgi_env = new char *[request_meta_variables.size() + 1];
-	size_t       i       = 0;
-	for (std::map<std::string, std::string>::const_iterator ite = request_meta_variables.begin();
-		 ite != request_meta_variables.end();
-		 ite++) {
-		const std::string element = ite->first + "=" + ite->second;
-		cgi_env[i]                = new char[element.size() + 1];
-		// error
-		if (cgi_env[i] == NULL)
-			return (NULL);
-		std::strcpy(const_cast<char *>(cgi_env[i]), element.c_str());
-		i++;
-	}
-	cgi_env[i] = NULL;
-	return cgi_env;
-}
 } // namespace cgi

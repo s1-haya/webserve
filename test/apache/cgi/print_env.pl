@@ -4,7 +4,6 @@ use strict;
 use warnings;
 
 # 環境変数の取得
-my $user = $ENV{'USER'};
 my $auth_type = $ENV{'AUTH_TYPE'};
 my $content_length = $ENV{'CONTENT_LENGTH'};
 my $content_type = $ENV{'CONTENT_TYPE'};
@@ -29,7 +28,6 @@ my $server_software  = $ENV{'SERVER_SOFTWARE'};
 print "Content-type: text/plain\n\n";
 
 # 環境変数の値を出力
-print "USER: $user\n";
 print "AUTH_TYPE: $auth_type\n";
 print "CONTENT_LENGTH: $content_length\n";
 print "CONTENT_TYPE: $content_type\n";
