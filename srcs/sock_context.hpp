@@ -13,6 +13,9 @@ class SockContext {
 	typedef std::map<int, SockInfo> SockInfos;
 	SockContext();
 	~SockContext();
+	// functions
+	void AddSockInfo(int fd, const SockInfo &sock_info);
+	void DeleteSockInfo(int fd);
 	// getter
 	SockInfo &GetSockInfo(int fd);
 
