@@ -2,8 +2,8 @@
 #include "connection.hpp"
 #include "event.hpp"
 #include "http.hpp"
+#include "sock_info.hpp"
 #include "utils.hpp"
-#include <arpa/inet.h> // htons
 #include <errno.h>
 #include <sys/socket.h> // socket
 #include <unistd.h>     // close
@@ -11,22 +11,15 @@
 namespace server {
 
 // todo: set ConfigData -> private variables
-Server::Server(const _config::Config::ConfigData &config)
-	: server_name_("from_config"), port_(8080) {
+Server::Server(const _config::Config::ConfigData &config) {
 	(void)config;
-	Init();
-	utils::Debug("server", "init server & listen", server_fd_);
+	Init("localhost", 8080);
 }
 
-Server::~Server() {
-	// todo: close() error handle
-	if (server_fd_ != SYSTEM_ERROR) {
-		close(server_fd_);
-	}
-}
+Server::~Server() {}
 
 void Server::Run() {
-	utils::Debug("server", "run server", server_fd_);
+	utils::Debug("server", "run server");
 
 	while (true) {
 		errno           = 0;
@@ -52,18 +45,26 @@ bool IsListenServerFd(int sock_fd, const Server::FdSet &listen_server_fds) {
 void Server::HandleEvent(const event::Event &event) {
 	const int sock_fd = event.fd;
 	if (IsListenServerFd(sock_fd, listen_server_fds_)) {
-		HandleNewConnection();
+		HandleNewConnection(sock_fd);
 	} else {
 		HandleExistingConnection(event);
 	}
 }
 
-void Server::HandleNewConnection() {
+void Server::HandleNewConnection(int sock_fd) {
+	SockInfo &sock_info = context_.GetSockInfo(sock_fd);
+
 	// A new socket that has established a connection with the peer socket.
-	const int new_sock_fd = Connection::Accept(server_fd_, sock_addr_, &addrlen_);
+	const int new_sock_fd = Connection::Accept(sock_info);
 	if (new_sock_fd == SYSTEM_ERROR) {
 		throw std::runtime_error("accept failed");
 	}
+
+	SockInfo new_sock_info = sock_info;
+	new_sock_info.SetPeerSockFd(new_sock_fd);
+	// add to context
+	context_.AddSockInfo(new_sock_fd, new_sock_info);
+	// add to epoll's interest list
 	monitor_.AddNewConnection(new_sock_fd, event::EVENT_READ);
 	utils::Debug("server", "add new client", new_sock_fd);
 }
@@ -120,22 +121,25 @@ void Server::SendResponse(int client_fd) {
 
 	// disconnect
 	buffers_.Delete(client_fd);
-	close(client_fd);
+	context_.DeleteSockInfo(client_fd);
 	monitor_.DeleteConnection(client_fd);
+	close(client_fd);
 	utils::Debug("server", "disconnected client", client_fd);
 	utils::Debug("------------------------------------------");
 }
 
-void Server::Init() {
-	sock_addr_.sin_family      = AF_INET;
-	sock_addr_.sin_addr.s_addr = INADDR_ANY;
-	sock_addr_.sin_port        = htons(port_);
-	addrlen_                   = sizeof(sock_addr_);
+void Server::Init(const std::string &server_name, unsigned int port) {
+	SockInfo server_sock_info(server_name, port);
+	// connect & listen
+	const int server_fd = Connection::Init(server_sock_info);
+	server_sock_info.SetSockFd(server_fd);
 
-	server_fd_ = Connection::Init(sock_addr_, addrlen_);
-	listen_server_fds_.insert(server_fd_);
+	listen_server_fds_.insert(server_fd);
+	// add to context
+	context_.AddSockInfo(server_fd, server_sock_info);
 	// add to epoll's interest list
-	monitor_.AddNewConnection(server_fd_, event::EVENT_READ);
+	monitor_.AddNewConnection(server_fd, event::EVENT_READ);
+	utils::Debug("server", "init server & listen", server_fd);
 }
 
 } // namespace server

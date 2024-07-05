@@ -6,10 +6,12 @@
 
 namespace server {
 
+class SockInfo;
+
 class Connection {
   public:
-	static int Init(struct sockaddr_in &sock_addr, socklen_t addrlen);
-	static int Accept(int server_fd, struct sockaddr_in &sock_addr, socklen_t *addrlen);
+	static int Init(SockInfo &server_sock_info);
+	static int Accept(SockInfo &sock_info);
 
   private:
 	Connection();

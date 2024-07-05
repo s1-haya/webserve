@@ -1,11 +1,12 @@
 #include "connection.hpp"
 #include "server.hpp"
+#include "sock_info.hpp"
 #include <stdexcept>    // runtime_error
 #include <sys/socket.h> // socket,setsockopt,bind,listen,accept
 
 namespace server {
 
-int Connection::Init(struct sockaddr_in &sock_addr, socklen_t addrlen) {
+int Connection::Init(SockInfo &server_sock_info) {
 	// socket
 	const int server_fd = socket(AF_INET, SOCK_STREAM, 0);
 	if (server_fd == SYSTEM_ERROR) {
@@ -18,6 +19,8 @@ int Connection::Init(struct sockaddr_in &sock_addr, socklen_t addrlen) {
 		throw std::runtime_error("setsockopt failed");
 	}
 
+	struct sockaddr_in &sock_addr = server_sock_info.GetSockAddr();
+	const socklen_t     addrlen   = server_sock_info.GetAddrlen();
 	// bind
 	if (bind(server_fd, (const struct sockaddr *)&sock_addr, addrlen) == SYSTEM_ERROR) {
 		throw std::runtime_error("bind failed");
@@ -30,8 +33,14 @@ int Connection::Init(struct sockaddr_in &sock_addr, socklen_t addrlen) {
 	return server_fd;
 }
 
-int Connection::Accept(int server_fd, struct sockaddr_in &sock_addr, socklen_t *addrlen) {
-	const int new_socket = accept(server_fd, (struct sockaddr *)&sock_addr, addrlen);
+int Connection::Accept(SockInfo &sock_info) {
+	const int           server_fd = sock_info.GetFd();
+	struct sockaddr_in &sock_addr = sock_info.GetSockAddr();
+	socklen_t           addrlen   = sock_info.GetAddrlen();
+
+	const socklen_t new_socket = accept(server_fd, (struct sockaddr *)&sock_addr, &addrlen);
+	// retrieve the client's IP address, port, etc.
+
 	// todo: need?
 	// if (new_socket == SYSTEM_ERROR) {
 	// 	throw std::runtime_error("accept failed");
