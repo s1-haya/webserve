@@ -1,5 +1,4 @@
 #include "server.hpp"
-#include "connection.hpp"
 #include "event.hpp"
 #include "http.hpp"
 #include "sock_info.hpp"
@@ -57,17 +56,9 @@ void Server::Run() {
 	}
 }
 
-namespace {
-
-bool IsListenServerFd(int sock_fd, const Server::FdSet &listen_server_fds) {
-	return listen_server_fds.count(sock_fd) == 1;
-}
-
-} // namespace
-
 void Server::HandleEvent(const event::Event &event) {
 	const int sock_fd = event.fd;
-	if (IsListenServerFd(sock_fd, listen_server_fds_)) {
+	if (connection_.IsListenServerFd(sock_fd)) {
 		HandleNewConnection(sock_fd);
 	} else {
 		HandleExistingConnection(event);
@@ -156,10 +147,9 @@ void Server::Init(const SockInfos &sock_infos) {
 	for (Itr it = sock_infos.begin(); it != sock_infos.end(); ++it) {
 		SockInfo server_sock_info = *it;
 		// connect & listen
-		const int server_fd = Connection::Init(server_sock_info);
+		const int server_fd = connection_.Connect(server_sock_info);
 		server_sock_info.SetSockFd(server_fd);
 
-		listen_server_fds_.insert(server_fd);
 		// add to context
 		context_.AddSockInfo(server_fd, server_sock_info);
 		// add to epoll's interest list

@@ -3,9 +3,9 @@
 
 #include "_config.hpp"
 #include "buffer.hpp"
+#include "connection.hpp"
 #include "epoll.hpp"
 #include "sock_context.hpp"
-#include <set>
 #include <string>
 #include <vector>
 
@@ -15,7 +15,6 @@ class Server {
   public:
 	typedef std::pair<std::string, int> TempConfig; // todo: tmp
 	typedef std::vector<SockInfo>       SockInfos;
-	typedef std::set<int>               FdSet;
 	explicit Server(const _config::Config::ConfigData &config);
 	~Server();
 	void Run();
@@ -33,9 +32,10 @@ class Server {
 	void    SendResponse(int client_fd);
 	// const
 	static const int SYSTEM_ERROR = -1;
+	// connection
+	Connection connection_;
 	// context
 	SockContext context_;
-	FdSet       listen_server_fds_;
 	// event poll
 	epoll::Epoll monitor_;
 	// request buffers

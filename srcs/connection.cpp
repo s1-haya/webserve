@@ -6,7 +6,11 @@
 
 namespace server {
 
-int Connection::Init(SockInfo &server_sock_info) {
+Connection::Connection() {}
+
+Connection::~Connection() {}
+
+int Connection::Connect(SockInfo &server_sock_info) {
 	// socket
 	const int server_fd = socket(AF_INET, SOCK_STREAM, 0);
 	if (server_fd == SYSTEM_ERROR) {
@@ -30,6 +34,8 @@ int Connection::Init(SockInfo &server_sock_info) {
 	if (listen(server_fd, 3) == SYSTEM_ERROR) {
 		throw std::runtime_error("listen failed");
 	}
+	listen_server_fds_.insert(server_fd);
+
 	return server_fd;
 }
 
@@ -46,6 +52,10 @@ int Connection::Accept(SockInfo &sock_info) {
 	// 	throw std::runtime_error("accept failed");
 	// }
 	return new_socket;
+}
+
+bool Connection::IsListenServerFd(int sock_fd) const {
+	return listen_server_fds_.count(sock_fd) == 1;
 }
 
 } // namespace server
