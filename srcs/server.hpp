@@ -5,12 +5,14 @@
 #include "buffer.hpp"
 #include "epoll.hpp"
 #include <netinet/in.h> // struct sockaddr_in
+#include <set>
 #include <string>
 
 namespace server {
 
 class Server {
   public:
+	typedef std::set<int> FdSet;
 	explicit Server(const _config::Config::ConfigData &config);
 	~Server();
 	void Run();
@@ -35,6 +37,7 @@ class Server {
 	struct sockaddr_in sock_addr_;
 	socklen_t          addrlen_;
 	int                server_fd_;
+	FdSet              listen_server_fds_;
 	// event poll
 	epoll::Epoll monitor_;
 	// request buffers

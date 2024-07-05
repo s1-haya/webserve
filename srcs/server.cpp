@@ -41,8 +41,17 @@ void Server::Run() {
 	}
 }
 
+namespace {
+
+bool IsListenServerFd(int sock_fd, const Server::FdSet &listen_server_fds) {
+	return listen_server_fds.count(sock_fd) == 1;
+}
+
+} // namespace
+
 void Server::HandleEvent(const event::Event &event) {
-	if (event.fd == server_fd_) {
+	const int sock_fd = event.fd;
+	if (IsListenServerFd(sock_fd, listen_server_fds_)) {
 		HandleNewConnection();
 	} else {
 		HandleExistingConnection(event);
@@ -124,6 +133,7 @@ void Server::Init() {
 	addrlen_                   = sizeof(sock_addr_);
 
 	server_fd_ = Connection::Init(sock_addr_, addrlen_);
+	listen_server_fds_.insert(server_fd_);
 	// add to epoll's interest list
 	monitor_.AddNewConnection(server_fd_, event::EVENT_READ);
 }
