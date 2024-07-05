@@ -11,6 +11,8 @@ class SockInfo;
 class SockContext {
   public:
 	typedef std::map<int, SockInfo> SockInfos;
+	// getter
+	SockInfo &GetSockInfo(int fd);
 
   private:
 	SockContext();
