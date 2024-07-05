@@ -11,12 +11,12 @@ class SockInfo;
 class SockContext {
   public:
 	typedef std::map<int, SockInfo> SockInfos;
+	SockContext();
+	~SockContext();
 	// getter
 	SockInfo &GetSockInfo(int fd);
 
   private:
-	SockContext();
-	~SockContext();
 	// prohibit copy
 	SockContext(const SockContext &other);
 	SockContext &operator=(const SockContext &other);
