@@ -14,7 +14,7 @@ const char **create_cgi_env(const std::map<std::string, std::string> &request_me
 
 void execve_cgi_script(const char *script_name) {
 	// classでcgiの環境変数を保持
+	char *const argv[] = {const_cast<char*>(script_name), NULL};
 	const char **envp = create_cgi_env(create_request_meta_variables());
-	execve(script_name, NULL, const_cast<char *const *>(envp));
-	perror("execve"); // execveが失敗した場合のエラーメッセージ出力
+	execve(script_name, argv, const_cast<char *const *>(envp));
 }

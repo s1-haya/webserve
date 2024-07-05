@@ -1,6 +1,7 @@
 #include "color.hpp"
 #include <iostream>
 #include <map>
+#include "cgi.hpp"
 
 // CGIを実行する関数
 void run_cgi(const char *scirpt_name);
@@ -86,10 +87,14 @@ int main(void) {
 	// - 親プロセスをkillせずにCGIスクリプトが実行できているかどうか
 	// - CGIスクリプトが標準出力されてるか？（first.plが標準出力してればOK）
 	// - script_nameは実行権限があるかどうか、存在しているかどうか
-	test_run_cgi("../../../test/apache/cgi/print_stdout.pl");
-	test_run_cgi("../../../test/apache/cgi/print_stdin.pl");
-	test_run_cgi("../../../test/apache/cgi/print_env.pl");
-	test_run_cgi("../../../test/apache/cgi/not_executable.pl");
-	test_run_cgi("../../../test/apache/cgi/not_file.pl");
+
+	// test_run_cgi("../../../test/apache/cgi/print_stdout.pl");
+	// test_run_cgi("../../../test/apache/cgi/print_stdin.pl");
+	// test_run_cgi("../../../test/apache/cgi/print_env.pl");
+	// test_run_cgi("../../../test/apache/cgi/not_executable.pl");
+	// test_run_cgi("../../../test/apache/cgi/not_file.pl");
+
+	cgi::CGI a("../../../test/apache/cgi/print_env.pl");
+	a.Run();
 	return 0;
 }

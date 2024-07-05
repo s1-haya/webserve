@@ -8,12 +8,13 @@ SRCS		:=	main.cpp \
 				execve_cgi_script.cpp \
 				run_cgi.cpp \
 				is_executable.cpp \
+				cgi.cpp \
 				$(TARGET_DIR)/color.cpp
 
 OBJ_DIR		:=	objs
 OBJS		:=	$(patsubst %.cpp, $(OBJ_DIR)/%.o, $(notdir $(SRCS)))
 
-INCLUDES	:=	-I$(TARGET_DIR)/
+INCLUDES	:=	-I$(TARGET_DIR)/ -I .
 
 CXX			:=	c++
 CXXFLAGS	:=	-std=c++98 -Wall -Wextra -Werror -MMD -MP -pedantic
