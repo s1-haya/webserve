@@ -1,6 +1,7 @@
 #include "sock_context.hpp"
 #include "sock_info.hpp"
-#include <unistd.h> // close
+#include <stdexcept> // logic_error
+#include <unistd.h>  // close
 
 namespace server {
 
@@ -17,7 +18,9 @@ SockContext::~SockContext() {
 }
 
 void SockContext::AddSockInfo(int fd, const SockInfo &sock_info) {
-	// todo: fd already exist, throw logic_error
+	if (context_.count(fd) > 0) {
+		throw std::logic_error("SockInfo already exists");
+	}
 	context_[fd] = sock_info;
 }
 
@@ -27,7 +30,9 @@ void SockContext::DeleteSockInfo(int fd) {
 
 SockInfo &SockContext::GetSockInfo(int fd) {
 	SockInfo &sock_info = context_.at(fd);
-	// todo: fd doesn't exist, throw logic_error
+	if (context_.count(fd) == 0) {
+		throw std::logic_error("SockInfo doesn't exist");
+	}
 	return sock_info;
 }
 
