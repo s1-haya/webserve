@@ -1,3 +1,4 @@
+#include "cgi.hpp"
 #include "color.hpp"
 #include <iostream>
 #include <map>
@@ -32,11 +33,10 @@ void test_run_cgi(const char *script_name) {
 		std::cout << utils::color::GREEN << "[OK] " << utils::color::RESET << std::endl;
 		std::cout << "The file " << script_name << " is executable." << std::endl;
 		run_cgi(script_name);
-	}
-	else {
+	} else {
 		std::cerr << utils::color::RED << "[NG] " << utils::color::RESET << std::endl;
-		std::cerr << "The file "
-				  << script_name << " is not executable or does not exist." << std::endl;
+		std::cerr << "The file " << script_name << " is not executable or does not exist."
+				  << std::endl;
 	}
 }
 
@@ -85,10 +85,14 @@ int main(void) {
 	// - 親プロセスをkillせずにCGIスクリプトが実行できているかどうか
 	// - CGIスクリプトが標準出力されてるか？（first.plが標準出力してればOK）
 	// - script_nameは実行権限があるかどうか、存在しているかどうか
-	test_run_cgi("../../../test/apache/cgi/print_stdout.pl");
-	test_run_cgi("../../../test/apache/cgi/print_stdin.pl");
-	test_run_cgi("../../../test/apache/cgi/print_env.pl");
-	test_run_cgi("../../../test/apache/cgi/not_executable.pl");
-	test_run_cgi("../../../test/apache/cgi/not_file.pl");
+
+	// test_run_cgi("../../../test/apache/cgi/print_stdout.pl");
+	// test_run_cgi("../../../test/apache/cgi/print_stdin.pl");
+	// test_run_cgi("../../../test/apache/cgi/print_env.pl");
+	// test_run_cgi("../../../test/apache/cgi/not_executable.pl");
+	// test_run_cgi("../../../test/apache/cgi/not_file.pl");
+
+	cgi::CGI a;
+	a.Run("../../../test/apache/cgi/print_env.pl", "POST");
 	return 0;
 }
