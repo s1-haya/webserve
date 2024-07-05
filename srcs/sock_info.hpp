@@ -7,6 +7,15 @@
 namespace server {
 
 class SockInfo {
+  public:
+	// getter
+	int                 GetFd() const;
+	struct sockaddr_in &GetSockAddr();
+	socklen_t           GetAddrlen() const;
+	// setter
+	void SetSockFd(int fd);
+	void SetPeerSockFd(int fd);
+
   private:
 	SockInfo();
 	~SockInfo();
