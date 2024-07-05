@@ -9,13 +9,36 @@
 #include <unistd.h>     // close
 
 namespace server {
+namespace {
+
+Server::SockInfos ConvertConfigToSockInfos(std::vector<Server::TempConfig> server_configs) {
+	Server::SockInfos sock_infos;
+
+	typedef std::vector<Server::TempConfig>::const_iterator Itr;
+	for (Itr it = server_configs.begin(); it != server_configs.end(); ++it) {
+		const std::string  server_name = it->first;
+		const unsigned int port        = it->second;
+
+		SockInfo server_sock_info(server_name, port);
+		sock_infos.push_back(server_sock_info);
+	}
+	return sock_infos;
+}
+
+} // namespace
 
 // todo: set ConfigData -> private variables
 Server::Server(const _config::Config::ConfigData &config) {
 	(void)config;
-	Init("localhost", 8080);
-}
 
+	// todo: tmp
+	std::vector<TempConfig> server_configs;
+	server_configs.push_back(std::make_pair("localhost", 8080));
+	server_configs.push_back(std::make_pair("tmp_server_name", 12345));
+
+	SockInfos sock_infos = ConvertConfigToSockInfos(server_configs);
+	Init(sock_infos);
+}
 Server::~Server() {}
 
 void Server::Run() {
@@ -128,18 +151,21 @@ void Server::SendResponse(int client_fd) {
 	utils::Debug("------------------------------------------");
 }
 
-void Server::Init(const std::string &server_name, unsigned int port) {
-	SockInfo server_sock_info(server_name, port);
-	// connect & listen
-	const int server_fd = Connection::Init(server_sock_info);
-	server_sock_info.SetSockFd(server_fd);
+void Server::Init(const SockInfos &sock_infos) {
+	typedef SockInfos::const_iterator Itr;
+	for (Itr it = sock_infos.begin(); it != sock_infos.end(); ++it) {
+		SockInfo server_sock_info = *it;
+		// connect & listen
+		const int server_fd = Connection::Init(server_sock_info);
+		server_sock_info.SetSockFd(server_fd);
 
-	listen_server_fds_.insert(server_fd);
-	// add to context
-	context_.AddSockInfo(server_fd, server_sock_info);
-	// add to epoll's interest list
-	monitor_.AddNewConnection(server_fd, event::EVENT_READ);
-	utils::Debug("server", "init server & listen", server_fd);
+		listen_server_fds_.insert(server_fd);
+		// add to context
+		context_.AddSockInfo(server_fd, server_sock_info);
+		// add to epoll's interest list
+		monitor_.AddNewConnection(server_fd, event::EVENT_READ);
+		utils::Debug("server", "init server & listen", server_fd);
+	}
 }
 
 } // namespace server
