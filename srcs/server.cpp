@@ -1,4 +1,5 @@
 #include "server.hpp"
+#include "connection.hpp"
 #include "event.hpp"
 #include "http.hpp"
 #include "utils.hpp"
@@ -49,12 +50,13 @@ void Server::HandleEvent(const event::Event &event) {
 }
 
 void Server::HandleNewConnection() {
-	const int new_socket = accept(server_fd_, (struct sockaddr *)&sock_addr_, &addrlen_);
-	if (new_socket == SYSTEM_ERROR) {
+	// A new socket that has established a connection with the peer socket.
+	const int new_sock_fd = Connection::Accept(server_fd_, sock_addr_, &addrlen_);
+	if (new_sock_fd == SYSTEM_ERROR) {
 		throw std::runtime_error("accept failed");
 	}
-	monitor_.AddNewConnection(new_socket, event::EVENT_READ);
-	utils::Debug("server", "add new client", new_socket);
+	monitor_.AddNewConnection(new_sock_fd, event::EVENT_READ);
+	utils::Debug("server", "add new client", new_sock_fd);
 }
 
 void Server::HandleExistingConnection(const event::Event &event) {
@@ -116,32 +118,12 @@ void Server::SendResponse(int client_fd) {
 }
 
 void Server::Init() {
-	addrlen_ = sizeof(sock_addr_);
-
-	// socket
-	server_fd_ = socket(AF_INET, SOCK_STREAM, 0);
-	if (server_fd_ == SYSTEM_ERROR) {
-		throw std::runtime_error("socket failed");
-	}
-	// set socket option to reuse address
-	int optval = 1;
-	if (setsockopt(server_fd_, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)) == SYSTEM_ERROR) {
-		throw std::runtime_error("setsockopt failed");
-	}
 	sock_addr_.sin_family      = AF_INET;
 	sock_addr_.sin_addr.s_addr = INADDR_ANY;
 	sock_addr_.sin_port        = htons(port_);
+	addrlen_                   = sizeof(sock_addr_);
 
-	// bind
-	if (bind(server_fd_, (const struct sockaddr *)&sock_addr_, addrlen_) == SYSTEM_ERROR) {
-		throw std::runtime_error("bind failed");
-	}
-
-	// listen
-	if (listen(server_fd_, 3) == SYSTEM_ERROR) {
-		throw std::runtime_error("listen failed");
-	}
-
+	server_fd_ = Connection::Init(sock_addr_, addrlen_);
 	// add to epoll's interest list
 	monitor_.AddNewConnection(server_fd_, event::EVENT_READ);
 }
