@@ -4,7 +4,7 @@
 #include <list>
 #include <vector>
 
-namespace Lexer {
+namespace lexer {
 
 class Lexer {
   private:
@@ -49,6 +49,6 @@ class Lexer {
 	static const char SHARP_CHR     = '#';
 };
 
-} // namespace Lexer
+} // namespace lexer
 
 #endif

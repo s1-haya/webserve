@@ -95,9 +95,9 @@ int main() {
 	std::string buffer = ss.str();
 	try {
 		std::list<Node> *tokens_ = new std::list<Node>;
-		Lexer::Lexer     lex(buffer, *tokens_);
+		lexer::Lexer     lex(buffer, *tokens_);
 		// PrintTokens(tokens_);
-		Parser               par(*tokens_);
+		parser::Parser       par(*tokens_);
 		std::list<ServerCon> servers = par.ReturnServers();
 		PrintServersLocation(&servers);
 		delete tokens_;

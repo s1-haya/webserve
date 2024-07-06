@@ -1,5 +1,6 @@
 #include "parser.hpp"
-// #include <iterator>
+
+namespace parser {
 
 namespace {
 
@@ -113,3 +114,5 @@ LocationCon Parser::LocationContext(std::list<Node>::iterator &it) {
 std::list<ServerCon> Parser::ReturnServers() {
 	return this->servers_;
 }
+
+} // namespace parser

@@ -6,6 +6,8 @@
 #include <list>
 #include <vector>
 
+namespace parser {
+
 class Parser {
   private:
 	std::list<Node>     &tokens_;
@@ -22,5 +24,7 @@ class Parser {
 
 	std::list<ServerCon> ReturnServers();
 };
+
+} // namespace parser
 
 #endif
