@@ -1,4 +1,5 @@
 #include "parser.hpp"
+// #include <iterator>
 
 namespace {
 
@@ -14,6 +15,8 @@ void HandleServerContextDirective(ServerCon &server, std::list<Node>::iterator &
 			throw std::logic_error("invalid number of arguments in 'listen' directive");
 		server.port = std::atoi((*it).token_.c_str()); // TODO: atoi、複数Listen
 	}
+	if ((*++it).token_type_ != DELIM)
+		throw std::logic_error("expect ';' after arguments");
 }
 
 void HandleLocationContextDirective(LocationCon &location, std::list<Node>::iterator &it) {
@@ -28,6 +31,8 @@ void HandleLocationContextDirective(LocationCon &location, std::list<Node>::iter
 			throw std::logic_error("invalid number of arguments in 'index' directive");
 		location.index = (*it).token_;
 	}
+	if ((*++it).token_type_ != DELIM)
+		throw std::logic_error("expect ';' after arguments");
 }
 
 } // namespace
@@ -46,7 +51,7 @@ ServerCon Parser::ServerContext(std::list<Node>::iterator &it) {
 	ServerCon server;
 
 	if ((*it).token_type_ != L_BRACKET)
-		throw std::logic_error("expect {");
+		throw std::logic_error("expect { after server");
 	++it; // skip L_BRACKET
 	while ((*it).token_type_ != R_BRACKET && it != tokens_.end()) {
 		switch ((*it).token_type_) {
@@ -60,6 +65,7 @@ ServerCon Parser::ServerContext(std::list<Node>::iterator &it) {
 				throw std::logic_error("invalid nest of 'server' directive");
 			break;
 		case DELIM:
+			throw std::logic_error("unexpected ';'");
 			break;
 		default:
 			throw std::logic_error("unknown token");
@@ -80,7 +86,7 @@ LocationCon Parser::LocationContext(std::list<Node>::iterator &it) {
 	location.location = (*it).token_;
 	++it; // skip /www/
 	if ((*it).token_type_ != L_BRACKET)
-		throw std::logic_error("expect {");
+		throw std::logic_error("expect { after location argument");
 	++it; // skip L_BRACKET
 	while ((*it).token_type_ != R_BRACKET && it != tokens_.end()) {
 		switch ((*it).token_type_) {
@@ -88,6 +94,7 @@ LocationCon Parser::LocationContext(std::list<Node>::iterator &it) {
 			HandleLocationContextDirective(location, it);
 			break;
 		case DELIM:
+			throw std::logic_error("unexpected ';'");
 			break;
 		case CONTEXT:
 			throw std::logic_error("invalid nest of 'location' directive"); // nginxではok
