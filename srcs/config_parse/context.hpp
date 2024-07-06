@@ -1,8 +1,10 @@
-#ifndef SERVER_HPP_
-#define SERVER_HPP_
+#ifndef CONTEXT_HPP_
+#define CONTEXT_HPP_
 
 #include <list>
 #include <string>
+
+namespace context {
 
 struct LocationCon {
 	std::string location;
@@ -16,5 +18,7 @@ struct ServerCon {
 	std::string            server_name;
 	std::list<LocationCon> location_con;
 };
+
+} // namespace context
 
 #endif

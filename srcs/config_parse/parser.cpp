@@ -6,7 +6,7 @@ namespace parser {
 
 namespace {
 
-void HandleServerContextDirective(ServerCon &server, std::list<node::Node>::iterator &it) {
+void HandleServerContextDirective(context::ServerCon &server, std::list<node::Node>::iterator &it) {
 	if ((*it).token == "server_name") {
 		++it;
 		if ((*it).token_type != node::WORD)
@@ -25,7 +25,9 @@ void HandleServerContextDirective(ServerCon &server, std::list<node::Node>::iter
 		throw std::runtime_error("expect ';' after arguments");
 }
 
-void HandleLocationContextDirective(LocationCon &location, std::list<node::Node>::iterator &it) {
+void HandleLocationContextDirective(
+	context::LocationCon &location, std::list<node::Node>::iterator &it
+) {
 	if ((*it).token == "root") {
 		++it;
 		if ((*it).token_type != node::WORD)
@@ -53,8 +55,8 @@ Parser::Parser(std::list<node::Node> &tokens) : tokens_(tokens) {
 
 Parser::~Parser() {}
 
-ServerCon Parser::ServerContext(std::list<node::Node>::iterator &it) {
-	ServerCon server;
+context::ServerCon Parser::ServerContext(std::list<node::Node>::iterator &it) {
+	context::ServerCon server;
 
 	if ((*it).token_type != node::L_BRACKET)
 		throw std::runtime_error("expect { after server");
@@ -84,8 +86,8 @@ ServerCon Parser::ServerContext(std::list<node::Node>::iterator &it) {
 	return server;
 }
 
-LocationCon Parser::LocationContext(std::list<node::Node>::iterator &it) {
-	LocationCon location;
+context::LocationCon Parser::LocationContext(std::list<node::Node>::iterator &it) {
+	context::LocationCon location;
 
 	if ((*it).token_type != node::WORD)
 		throw std::runtime_error("invalid number of arguments in 'location' directive");
@@ -116,7 +118,7 @@ LocationCon Parser::LocationContext(std::list<node::Node>::iterator &it) {
 	return location;
 }
 
-std::list<ServerCon> Parser::ReturnServers() {
+std::list<context::ServerCon> Parser::ReturnServers() {
 	return this->servers_;
 }
 

@@ -1,7 +1,6 @@
 #ifndef LEXER_HPP_
 #define LEXER_HPP_
 #include "node.hpp"
-#include "server.hpp"
 #include <list>
 #include <vector>
 

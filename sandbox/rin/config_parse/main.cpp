@@ -52,10 +52,10 @@
 
 namespace {
 
-void PrintServers(std::list<ServerCon> *servers_) { /*デバッグ用*/
-	std::list<ServerCon> tmp = *servers_;
+void PrintServers(std::list<context::ServerCon> *servers_) { /*デバッグ用*/
+	std::list<context::ServerCon> tmp = *servers_;
 	while (!tmp.empty()) {
-		ServerCon server = tmp.front();
+		context::ServerCon server = tmp.front();
 		tmp.pop_front();
 		std::cout << "server_name: " << server.server_name << "   "
 				  << "port: ";
@@ -66,17 +66,17 @@ void PrintServers(std::list<ServerCon> *servers_) { /*デバッグ用*/
 	}
 }
 
-void PrintLocation(LocationCon *location_) { /*デバッグ用*/
-	LocationCon tmp = *location_;
+void PrintLocation(context::LocationCon *location_) { /*デバッグ用*/
+	context::LocationCon tmp = *location_;
 	std::cout << "location: " << location_->location << "   "
 			  << "root: " << location_->root << "   "
 			  << "index: " << location_->index << std::endl;
 }
 
-void PrintServersLocation(std::list<ServerCon> *servers) { /*デバッグ用*/
-	std::list<ServerCon> tmp = *servers;
+void PrintServersLocation(std::list<context::ServerCon> *servers) { /*デバッグ用*/
+	std::list<context::ServerCon> tmp = *servers;
 	while (!tmp.empty()) {
-		ServerCon server = tmp.front();
+		context::ServerCon server = tmp.front();
 		tmp.pop_front();
 		std::cout << "server_name: " << server.server_name << "   "
 				  << "port: ";
@@ -84,7 +84,7 @@ void PrintServersLocation(std::list<ServerCon> *servers) { /*デバッグ用*/
 			std::cout << *it << " ";
 		}
 		std::cout << std::endl;
-		std::list<LocationCon> tmp_loc = server.location_con;
+		std::list<context::LocationCon> tmp_loc = server.location_con;
 		while (!tmp_loc.empty()) {
 			PrintLocation(&tmp_loc.front());
 			tmp_loc.pop_front();
@@ -105,8 +105,8 @@ int main() {
 		std::list<node::Node> *tokens_ = new std::list<node::Node>;
 		lexer::Lexer           lex(buffer, *tokens_);
 		// PrintTokens(tokens_);
-		parser::Parser       par(*tokens_);
-		std::list<ServerCon> servers = par.ReturnServers();
+		parser::Parser                par(*tokens_);
+		std::list<context::ServerCon> servers = par.ReturnServers();
 		PrintServersLocation(&servers);
 		delete tokens_;
 		return EXIT_SUCCESS;
