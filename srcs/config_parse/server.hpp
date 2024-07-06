@@ -14,7 +14,6 @@ enum TokenType { /*仮置き*/
 	DELIM,
 	L_BRACKET,
 	R_BRACKET,
-	SHARP,
 	CONTEXT,
 	DIRECTIVE,
 	WORD

@@ -86,7 +86,7 @@ void PrintServersLocation(std::list<ServerCon> *servers) { /*デバッグ用*/
 #include <fstream>
 #include <iostream>
 #include <sstream>
-  // c++ main.cpp parser.cpp lexer.cpp node.cpp ../utils/isspace.cpp
+  // c++ main.cpp parser.cpp lexer.cpp ../utils/isspace.cpp
 
 int main() {
 	std::ifstream     conf("config_samp");
@@ -95,7 +95,7 @@ int main() {
 	std::string buffer = ss.str();
 	try {
 		std::list<Node> *tokens_ = new std::list<Node>;
-		Lexer            lex(buffer, *tokens_);
+		Lexer::Lexer     lex(buffer, *tokens_);
 		// PrintTokens(tokens_);
 		Parser               par(*tokens_);
 		std::list<ServerCon> servers = par.ReturnServers();
