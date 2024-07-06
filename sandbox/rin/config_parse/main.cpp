@@ -44,7 +44,11 @@
 // }
 
 /*-----------------Parser----------------*/
+#include "lexer.hpp"
 #include "parser.hpp"
+#include <fstream>
+#include <iostream>
+#include <sstream>
 
 namespace {
 
@@ -90,11 +94,7 @@ void PrintServersLocation(std::list<ServerCon> *servers) { /*デバッグ用*/
 
 } // namespace
 
-#include "lexer.hpp"
-#include <fstream>
-#include <iostream>
-#include <sstream>
-  // c++ main.cpp parser.cpp lexer.cpp ../utils/isspace.cpp
+// c++ main.cpp parser.cpp lexer.cpp ../utils/isspace.cpp
 
 int main() {
 	std::ifstream     conf("config_samp");

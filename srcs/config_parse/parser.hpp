@@ -4,7 +4,6 @@
 #include "node.hpp"
 #include "server.hpp"
 #include <list>
-#include <vector>
 
 namespace parser {
 
@@ -14,7 +13,8 @@ class Parser {
 	std::list<ServerCon> servers_;
 	// Prohibit Copy
 	Parser(const Parser &);
-	Parser     &operator=(const Parser &);
+	Parser &operator=(const Parser &);
+
 	ServerCon   ServerContext(std::list<Node>::iterator &);
 	LocationCon LocationContext(std::list<Node>::iterator &);
 
