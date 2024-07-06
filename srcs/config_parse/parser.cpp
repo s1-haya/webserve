@@ -7,12 +7,12 @@ void HandleServerContextDirective(ServerCon &server, std::list<Node>::iterator &
 		++it;
 		if ((*it).token_type_ != WORD)
 			throw std::logic_error("invalid number of arguments in 'server_name' directive");
-		server.server_name_ = (*it).token_; // TODO: 複数の名前
+		server.server_name = (*it).token_; // TODO: 複数の名前
 	} else if ((*it).token_ == "listen") {
 		++it;
 		if ((*it).token_type_ != WORD)
 			throw std::logic_error("invalid number of arguments in 'listen' directive");
-		server.port_ = std::atoi((*it).token_.c_str()); // TODO: atoi、複数Listen
+		server.port = std::atoi((*it).token_.c_str()); // TODO: atoi、複数Listen
 	}
 }
 
@@ -21,12 +21,12 @@ void HandleLocationContextDirective(LocationCon &location, std::list<Node>::iter
 		++it;
 		if ((*it).token_type_ != WORD)
 			throw std::logic_error("invalid number of arguments in 'root' directive");
-		location.root_ = (*it).token_;
+		location.root = (*it).token_;
 	} else if ((*it).token_ == "index") {
 		++it;
 		if ((*it).token_type_ != WORD)
 			throw std::logic_error("invalid number of arguments in 'index' directive");
-		location.index_ = (*it).token_;
+		location.index = (*it).token_;
 	}
 }
 
@@ -55,7 +55,7 @@ ServerCon Parser::ServerContext(std::list<Node>::iterator &it) {
 			break;
 		case CONTEXT:
 			if ((*it).token_ == "location")
-				server.location_con_.push_back(LocationContext(++it));
+				server.location_con.push_back(LocationContext(++it));
 			else
 				throw std::logic_error("invalid nest of 'server' directive");
 			break;
@@ -77,7 +77,7 @@ LocationCon Parser::LocationContext(std::list<Node>::iterator &it) {
 
 	if ((*it).token_type_ != WORD)
 		throw std::logic_error("invalid number of arguments in 'location' directive");
-	location.location_ = (*it).token_;
+	location.location = (*it).token_;
 	++it; // skip /www/
 	if ((*it).token_type_ != L_BRACKET)
 		throw std::logic_error("expect {");

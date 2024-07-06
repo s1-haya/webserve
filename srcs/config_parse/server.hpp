@@ -21,16 +21,16 @@ enum TokenType { /*仮置き*/
 };
 
 struct LocationCon {
-	std::string location_; // 変える??
-	std::string root_;
-	std::string index_;
-	std::string allowed_method_;
+	std::string location; // 変える??
+	std::string root;
+	std::string index;
+	std::string allowed_method;
 };
 
 struct ServerCon {
-	int                    port_;
-	std::string            server_name_;
-	std::list<LocationCon> location_con_;
+	int                    port;
+	std::string            server_name;
+	std::list<LocationCon> location_con;
 };
 
 #endif
