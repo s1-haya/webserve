@@ -9,7 +9,7 @@ namespace lexer {
 
 class Lexer {
   private:
-	std::list<Node>         &tokens_;
+	std::list<node::Node>   &tokens_;
 	std::vector<std::string> context_;
 	std::vector<std::string> directive_;
 	const std::string        buffer_;
@@ -19,18 +19,18 @@ class Lexer {
 	void LexBuffer();
 
 	// Token Handler
-	void      AddToken(char, TokenType);
-	void      AddToken(const std::string &, TokenType);
-	void      AddWordToken(std::string::const_iterator &);
-	void      SkipComment(std::string::const_iterator &);
-	TokenType SearchWordTokenType(std::string &);
+	void            AddToken(char, node::TokenType);
+	void            AddToken(const std::string &, node::TokenType);
+	void            AddWordToken(std::string::const_iterator &);
+	void            SkipComment(std::string::const_iterator &);
+	node::TokenType SearchWordTokenType(std::string &);
 
 	// Prohibit Copy
 	Lexer(const Lexer &);
 	Lexer &operator=(const Lexer &);
 
   public:
-	Lexer(const std::string &, std::list<Node> &);
+	Lexer(const std::string &, std::list<node::Node> &);
 	~Lexer();
 
 	// Definition

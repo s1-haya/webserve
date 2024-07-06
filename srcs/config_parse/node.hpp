@@ -2,6 +2,8 @@
 #define NODE_HPP_
 #include <string>
 
+namespace node {
+
 struct Node {
 	std::string token;
 	int         token_type;
@@ -15,5 +17,7 @@ enum TokenType {
 	DIRECTIVE,
 	WORD
 };
+
+} // namespace node
 
 #endif

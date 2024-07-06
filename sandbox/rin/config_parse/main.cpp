@@ -102,8 +102,8 @@ int main() {
 	ss << conf.rdbuf();
 	std::string buffer = ss.str();
 	try {
-		std::list<Node> *tokens_ = new std::list<Node>;
-		lexer::Lexer     lex(buffer, *tokens_);
+		std::list<node::Node> *tokens_ = new std::list<node::Node>;
+		lexer::Lexer           lex(buffer, *tokens_);
 		// PrintTokens(tokens_);
 		parser::Parser       par(*tokens_);
 		std::list<ServerCon> servers = par.ReturnServers();
