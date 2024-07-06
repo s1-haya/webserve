@@ -77,7 +77,7 @@ void Lexer::SkipComment(std::string::const_iterator &it) {
 		++it;
 }
 
-Lexer::TokenType Lexer::SearchWordTokenType(std::string &word) {
+TokenType Lexer::SearchWordTokenType(std::string &word) {
 	if (std::find(context_.begin(), context_.end(), word) != context_.end())
 		return CONTEXT;
 	else if (std::find(directive_.begin(), directive_.end(), word) != directive_.end())

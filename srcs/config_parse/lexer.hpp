@@ -1,6 +1,7 @@
 #ifndef LEXER_HPP_
 #define LEXER_HPP_
 #include "node.hpp"
+#include "server.hpp"
 #include <list>
 #include <vector>
 
@@ -11,15 +12,7 @@ class Lexer {
 	std::list<Node>         &tokens_;
 	std::vector<std::string> context_;
 	std::vector<std::string> directive_;
-	enum TokenType {
-		DELIM,
-		L_BRACKET,
-		R_BRACKET,
-		CONTEXT,
-		DIRECTIVE,
-		WORD
-	};
-	const std::string buffer_;
+	const std::string        buffer_;
 
 	Lexer();
 	void InitDefinition();

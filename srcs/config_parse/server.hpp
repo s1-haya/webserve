@@ -4,23 +4,8 @@
 #include <list>
 #include <string>
 
-enum Method {
-	GET,
-	POST,
-	DELETE
-};
-
-enum TokenType { /*仮置き*/
-	DELIM,
-	L_BRACKET,
-	R_BRACKET,
-	CONTEXT,
-	DIRECTIVE,
-	WORD
-};
-
 struct LocationCon {
-	std::string location; // 変える??
+	std::string location;
 	std::string root;
 	std::string index;
 	std::string allowed_method;

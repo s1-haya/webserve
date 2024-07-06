@@ -7,4 +7,13 @@ struct Node {
 	int         token_type;
 };
 
+enum TokenType {
+	DELIM,
+	L_BRACKET,
+	R_BRACKET,
+	CONTEXT,
+	DIRECTIVE,
+	WORD
+};
+
 #endif
