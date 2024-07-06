@@ -1,4 +1,5 @@
 #include "parser.hpp"
+#include <cstdlib> // atoi
 
 namespace parser {
 
