@@ -53,16 +53,16 @@ void PrintServers(std::list<ServerCon> *servers_) { /*デバッグ用*/
 	while (!tmp.empty()) {
 		ServerCon server = tmp.front();
 		tmp.pop_front();
-		std::cout << "server_name: " << server.server_name_ << "   "
-				  << "port: " << server.port_ << std::endl;
+		std::cout << "server_name: " << server.server_name << "   "
+				  << "port: " << server.port << std::endl;
 	}
 }
 
 void PrintLocation(LocationCon *location_) { /*デバッグ用*/
 	LocationCon tmp = *location_;
-	std::cout << "location: " << location_->location_ << "   "
-			  << "root: " << location_->root_ << "   "
-			  << "index: " << location_->index_ << std::endl;
+	std::cout << "location: " << location_->location << "   "
+			  << "root: " << location_->root << "   "
+			  << "index: " << location_->index << std::endl;
 }
 
 void PrintServersLocation(std::list<ServerCon> *servers) { /*デバッグ用*/
@@ -70,9 +70,9 @@ void PrintServersLocation(std::list<ServerCon> *servers) { /*デバッグ用*/
 	while (!tmp.empty()) {
 		ServerCon server = tmp.front();
 		tmp.pop_front();
-		std::cout << "server_name: " << server.server_name_ << "   "
-				  << "port: " << server.port_ << "   " << std::endl;
-		std::list<LocationCon> tmp_loc = server.location_con_;
+		std::cout << "server_name: " << server.server_name << "   "
+				  << "port: " << server.port << "   " << std::endl;
+		std::list<LocationCon> tmp_loc = server.location_con;
 		while (!tmp_loc.empty()) {
 			PrintLocation(&tmp_loc.front());
 			tmp_loc.pop_front();
@@ -89,7 +89,7 @@ void PrintServersLocation(std::list<ServerCon> *servers) { /*デバッグ用*/
   // c++ main.cpp parser.cpp lexer.cpp node.cpp ../utils/isspace.cpp
 
 int main() {
-	std::ifstream     conf("config_samp.conf");
+	std::ifstream     conf("config_samp");
 	std::stringstream ss;
 	ss << conf.rdbuf();
 	std::string buffer = ss.str();
@@ -101,7 +101,9 @@ int main() {
 		std::list<ServerCon> servers = par.ReturnServers();
 		PrintServersLocation(&servers);
 		delete tokens_;
+		return EXIT_SUCCESS;
 	} catch (const std::exception &e) {
 		std::cerr << e.what() << '\n';
+		return EXIT_FAILURE;
 	}
 }
