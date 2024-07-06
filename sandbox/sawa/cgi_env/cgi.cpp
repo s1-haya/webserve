@@ -6,10 +6,13 @@
 
 namespace cgi {
 
+// CGIリクエストの構造体を渡す？
 CGI::CGI() {}
 
+// CGIリクエストの構造体の場合、Freeは削除する。んでデストラクターでfree
 CGI::~CGI() {}
 
+// CGIリクエストの情報を持つ構造体を引数に渡す
 int CGI::Run(const char *script_name, const std::string &method) {
 	Init(script_name, method);
 	Execve();
@@ -20,8 +23,7 @@ int CGI::Run(const char *script_name, const std::string &method) {
 void CGI::Execve() {
 	int cgi_request[2];
 	int cgi_response[2];
-	// class private: method
-	std::string method = "POST";
+
 	if (method_ == "POST" && pipe(cgi_request) == -1) {
 		std::cerr << "Error: pipe" << std::endl;
 		return;
@@ -49,9 +51,10 @@ void CGI::Execve() {
 		if (method == "POST") {
 			// Send POST data to child process
 			close(cgi_request[R]);
-			std::string post_data = "name=ChatGPT&message=Hello";
-			std::cout << post_data.length() << std::endl;
-			write(cgi_request[W], post_data.c_str(), post_data.length());
+			// 標準入力でボディメッセージの情報を受け取る
+			// std::string post_data = "name=ChatGPT&message=Hello";
+			// std::cout << post_data.length() << std::endl;
+			// write(cgi_request[W], post_data.c_str(), post_data.length());
 			close(cgi_response[W]);
 		}
 		wait(NULL);
@@ -64,6 +67,7 @@ void CGI::Execve() {
 	}
 }
 
+// CGIのリクエスト情報をパースする
 void CGI::Free() {
 	for (size_t i = 0; this->argv_[i] != NULL; ++i) {
 		delete[] this->argv_[i];
@@ -81,7 +85,7 @@ void CGI::ExecveCgiScript() {
 	// perror("execve"); // execveが失敗した場合のエラーメッセージ出力
 }
 
-// おそらくCGIParseのCGIリクエストの構造体が引数になる。
+// Initは必要ないかも、CGIクラスを呼ぶときに情報を渡す。
 void CGI::Init(const char *script_name, const std::string &method) {
 	this->argv_       = InitCgiArgv();
 	this->env_        = InitCgiEnv();
