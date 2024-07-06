@@ -10,13 +10,17 @@ class Parser {
   private:
 	std::list<Node>     &tokens_;
 	std::list<ServerCon> servers_;
+	// Prohibit Copy
+	Parser(const Parser &);
+	Parser     &operator=(const Parser &);
+	ServerCon   ServerContext(std::list<Node>::iterator &);
+	LocationCon LocationContext(std::list<Node>::iterator &);
 
   public:
 	Parser(std::list<Node> &);
 	~Parser();
 
-	ServerCon   ServerContext(std::list<Node>::iterator &);
-	LocationCon LocationContext(std::list<Node>::iterator &);
+	std::list<ServerCon> ReturnServers();
 };
 
 #endif
