@@ -3,9 +3,10 @@
 #include <algorithm>
 #include <iostream>
 
-Lexer::Lexer(const std::string &buffer, std::list<Node> &tokens_)
-	: tokens_(tokens_), buffer_(buffer) {
-	std::string new_str;
+namespace Lexer {
+
+Lexer::Lexer(const std::string &buffer, std::list<Node> &tokens)
+	: tokens_(tokens), buffer_(buffer) {
 	InitDefinition();
 	LexBuffer();
 }
@@ -49,15 +50,15 @@ void Lexer::LexBuffer() {
 }
 
 // For char
-void Lexer::AddToken(const char symbol, int token_type) {
-	std::string symbol_str(1, symbol);
-	Node        token(symbol_str, token_type);
+void Lexer::AddToken(char symbol, TokenType token_type) {
+	const std::string symbol_str(1, symbol);
+	const Node        token = {symbol_str, token_type};
 	tokens_.push_back(token);
 }
 
 // For string
-void Lexer::AddToken(const std::string &symbol, int token_type) {
-	Node token(symbol, token_type);
+void Lexer::AddToken(const std::string &symbol, TokenType token_type) {
+	const Node token = {symbol, token_type};
 	tokens_.push_back(token);
 }
 
@@ -68,7 +69,7 @@ void Lexer::AddWordToken(std::string::const_iterator &it) {
 		++it;
 	}
 	AddToken(new_str, SearchWordTokenType(new_str)); // 予約語の検索
-	it -= 1;                                         // loopでWordの次の文字から処理
+	--it;                                            // loopでWordの次の文字から処理
 }
 
 void Lexer::SkipComment(std::string::const_iterator &it) {
@@ -83,3 +84,5 @@ Lexer::TokenType Lexer::SearchWordTokenType(std::string &word) {
 		return DIRECTIVE;
 	return WORD;
 }
+
+} // namespace Lexer

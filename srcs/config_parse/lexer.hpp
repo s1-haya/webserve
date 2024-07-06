@@ -4,6 +4,8 @@
 #include <list>
 #include <vector>
 
+namespace Lexer {
+
 class Lexer {
   private:
 	std::list<Node>         &tokens_;
@@ -13,7 +15,6 @@ class Lexer {
 		DELIM,
 		L_BRACKET,
 		R_BRACKET,
-		SHARP,
 		CONTEXT,
 		DIRECTIVE,
 		WORD
@@ -25,8 +26,8 @@ class Lexer {
 	void LexBuffer();
 
 	// Token Handler
-	void      AddToken(const char, int);
-	void      AddToken(const std::string &, int);
+	void      AddToken(char, TokenType);
+	void      AddToken(const std::string &, TokenType);
 	void      AddWordToken(std::string::const_iterator &);
 	void      SkipComment(std::string::const_iterator &);
 	TokenType SearchWordTokenType(std::string &);
@@ -47,5 +48,7 @@ class Lexer {
 	static const char R_BRACKET_CHR = '}';
 	static const char SHARP_CHR     = '#';
 };
+
+} // namespace Lexer
 
 #endif

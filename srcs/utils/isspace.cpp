@@ -3,10 +3,7 @@
 namespace utils {
 
 bool IsSpace(char c) {
-	const char CR = '\r';
-	const char LF = '\n';
-
-	if (c == ' ' || c == '\t' || c == CR || c == LF)
+	if (c == ' ' || c == '\t' || c == '\r' || c == '\n')
 		return true;
 	return false;
 }
