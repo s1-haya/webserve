@@ -27,7 +27,7 @@ struct LocationCon {
 };
 
 struct ServerCon {
-	int                    port;
+	std::list<int>         port;
 	std::string            server_name;
 	std::list<LocationCon> location_con;
 };

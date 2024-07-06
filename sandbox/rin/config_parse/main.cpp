@@ -54,7 +54,11 @@ void PrintServers(std::list<ServerCon> *servers_) { /*デバッグ用*/
 		ServerCon server = tmp.front();
 		tmp.pop_front();
 		std::cout << "server_name: " << server.server_name << "   "
-				  << "port: " << server.port << std::endl;
+				  << "port: ";
+		for (std::list<int>::iterator it = server.port.begin(); it != server.port.end(); ++it) {
+			std::cout << *it << " ";
+		}
+		std::cout << std::endl;
 	}
 }
 
@@ -71,7 +75,11 @@ void PrintServersLocation(std::list<ServerCon> *servers) { /*デバッグ用*/
 		ServerCon server = tmp.front();
 		tmp.pop_front();
 		std::cout << "server_name: " << server.server_name << "   "
-				  << "port: " << server.port << "   " << std::endl;
+				  << "port: ";
+		for (std::list<int>::iterator it = server.port.begin(); it != server.port.end(); ++it) {
+			std::cout << *it << " ";
+		}
+		std::cout << std::endl;
 		std::list<LocationCon> tmp_loc = server.location_con;
 		while (!tmp_loc.empty()) {
 			PrintLocation(&tmp_loc.front());

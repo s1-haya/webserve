@@ -10,14 +10,17 @@ void HandleServerContextDirective(ServerCon &server, std::list<Node>::iterator &
 		++it;
 		if ((*it).token_type != WORD)
 			throw std::logic_error("invalid number of arguments in 'server_name' directive");
-		server.server_name = (*it).token; // TODO: 複数の名前
+		server.server_name = (*it++).token; // TODO: 複数の名前
 	} else if ((*it).token == "listen") {
 		++it;
 		if ((*it).token_type != WORD)
 			throw std::logic_error("invalid number of arguments in 'listen' directive");
-		server.port = std::atoi((*it).token.c_str()); // TODO: atoi、複数Listen
+		while ((*it).token_type == WORD) {
+			server.port.push_back(std::atoi((*it++).token.c_str())
+			); // TODO: atoi, validation, 重複チェック
+		}
 	}
-	if ((*++it).token_type != DELIM)
+	if ((*it).token_type != DELIM)
 		throw std::logic_error("expect ';' after arguments");
 }
 
@@ -26,14 +29,14 @@ void HandleLocationContextDirective(LocationCon &location, std::list<Node>::iter
 		++it;
 		if ((*it).token_type != WORD)
 			throw std::logic_error("invalid number of arguments in 'root' directive");
-		location.root = (*it).token;
+		location.root = (*it++).token;
 	} else if ((*it).token == "index") {
 		++it;
 		if ((*it).token_type != WORD)
 			throw std::logic_error("invalid number of arguments in 'index' directive");
-		location.index = (*it).token;
+		location.index = (*it++).token;
 	}
-	if ((*++it).token_type != DELIM)
+	if ((*it).token_type != DELIM)
 		throw std::logic_error("expect ';' after arguments");
 }
 
