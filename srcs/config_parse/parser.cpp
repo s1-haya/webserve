@@ -53,7 +53,7 @@ ServerCon Parser::ServerContext(std::list<Node>::iterator &it) {
 	if ((*it).token_type_ != L_BRACKET)
 		throw std::logic_error("expect { after server");
 	++it; // skip L_BRACKET
-	while ((*it).token_type_ != R_BRACKET && it != tokens_.end()) {
+	while (it != tokens_.end() && (*it).token_type_ != R_BRACKET) {
 		switch ((*it).token_type_) {
 		case DIRECTIVE:
 			HandleServerContextDirective(server, it);
@@ -88,7 +88,7 @@ LocationCon Parser::LocationContext(std::list<Node>::iterator &it) {
 	if ((*it).token_type_ != L_BRACKET)
 		throw std::logic_error("expect { after location argument");
 	++it; // skip L_BRACKET
-	while ((*it).token_type_ != R_BRACKET && it != tokens_.end()) {
+	while (it != tokens_.end() && (*it).token_type_ != R_BRACKET) {
 		switch ((*it).token_type_) {
 		case DIRECTIVE:
 			HandleLocationContextDirective(location, it);
