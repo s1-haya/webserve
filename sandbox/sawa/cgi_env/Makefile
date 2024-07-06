@@ -8,6 +8,7 @@ SRCS		:=	main.cpp \
 				execve_cgi_script.cpp \
 				run_cgi.cpp \
 				is_executable.cpp \
+				cgi.cpp \
 				$(TARGET_DIR)/color.cpp
 
 OBJ_DIR		:=	objs
