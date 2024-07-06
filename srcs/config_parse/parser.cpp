@@ -9,35 +9,35 @@ void HandleServerContextDirective(ServerCon &server, std::list<Node>::iterator &
 	if ((*it).token == "server_name") {
 		++it;
 		if ((*it).token_type != WORD)
-			throw std::logic_error("invalid number of arguments in 'server_name' directive");
+			throw std::runtime_error("invalid number of arguments in 'server_name' directive");
 		server.server_name = (*it++).token; // TODO: 複数の名前
 	} else if ((*it).token == "listen") {
 		++it;
 		if ((*it).token_type != WORD)
-			throw std::logic_error("invalid number of arguments in 'listen' directive");
+			throw std::runtime_error("invalid number of arguments in 'listen' directive");
 		while ((*it).token_type == WORD) {
 			server.port.push_back(std::atoi((*it++).token.c_str())
 			); // TODO: atoi, validation, 重複チェック
 		}
 	}
 	if ((*it).token_type != DELIM)
-		throw std::logic_error("expect ';' after arguments");
+		throw std::runtime_error("expect ';' after arguments");
 }
 
 void HandleLocationContextDirective(LocationCon &location, std::list<Node>::iterator &it) {
 	if ((*it).token == "root") {
 		++it;
 		if ((*it).token_type != WORD)
-			throw std::logic_error("invalid number of arguments in 'root' directive");
+			throw std::runtime_error("invalid number of arguments in 'root' directive");
 		location.root = (*it++).token;
 	} else if ((*it).token == "index") {
 		++it;
 		if ((*it).token_type != WORD)
-			throw std::logic_error("invalid number of arguments in 'index' directive");
+			throw std::runtime_error("invalid number of arguments in 'index' directive");
 		location.index = (*it++).token;
 	}
 	if ((*it).token_type != DELIM)
-		throw std::logic_error("expect ';' after arguments");
+		throw std::runtime_error("expect ';' after arguments");
 }
 
 } // namespace
@@ -56,7 +56,7 @@ ServerCon Parser::ServerContext(std::list<Node>::iterator &it) {
 	ServerCon server;
 
 	if ((*it).token_type != L_BRACKET)
-		throw std::logic_error("expect { after server");
+		throw std::runtime_error("expect { after server");
 	++it; // skip L_BRACKET
 	while (it != tokens_.end() && (*it).token_type != R_BRACKET) {
 		switch ((*it).token_type) {
@@ -67,19 +67,19 @@ ServerCon Parser::ServerContext(std::list<Node>::iterator &it) {
 			if ((*it).token == "location")
 				server.location_con.push_back(LocationContext(++it));
 			else
-				throw std::logic_error("invalid nest of 'server' directive");
+				throw std::runtime_error("invalid nest of 'server' directive");
 			break;
 		case DELIM:
-			throw std::logic_error("unexpected ';'");
+			throw std::runtime_error("unexpected ';'");
 			break;
 		default:
-			throw std::logic_error("unknown token");
+			throw std::runtime_error("unknown token");
 			break;
 		}
 		++it;
 	}
 	if (it == tokens_.end())
-		throw std::logic_error("expect }");
+		throw std::runtime_error("expect }");
 	return server;
 }
 
@@ -87,11 +87,11 @@ LocationCon Parser::LocationContext(std::list<Node>::iterator &it) {
 	LocationCon location;
 
 	if ((*it).token_type != WORD)
-		throw std::logic_error("invalid number of arguments in 'location' directive");
+		throw std::runtime_error("invalid number of arguments in 'location' directive");
 	location.location = (*it).token;
 	++it; // skip /www/
 	if ((*it).token_type != L_BRACKET)
-		throw std::logic_error("expect { after location argument");
+		throw std::runtime_error("expect { after location argument");
 	++it; // skip L_BRACKET
 	while (it != tokens_.end() && (*it).token_type != R_BRACKET) {
 		switch ((*it).token_type) {
@@ -99,19 +99,19 @@ LocationCon Parser::LocationContext(std::list<Node>::iterator &it) {
 			HandleLocationContextDirective(location, it);
 			break;
 		case DELIM:
-			throw std::logic_error("unexpected ';'");
+			throw std::runtime_error("unexpected ';'");
 			break;
 		case CONTEXT:
-			throw std::logic_error("invalid nest of 'location' directive"); // nginxではok
+			throw std::runtime_error("invalid nest of 'location' directive"); // nginxではok
 			break;
 		default:
-			throw std::logic_error("unknown token");
+			throw std::runtime_error("unknown token");
 			break;
 		}
 		++it;
 	}
 	if (it == tokens_.end())
-		throw std::logic_error("expect }");
+		throw std::runtime_error("expect }");
 	return location;
 }
 
