@@ -10,8 +10,8 @@
 namespace server {
 namespace {
 
-Server::SockInfos ConvertConfigToSockInfos(std::vector<Server::TempConfig> server_configs) {
-	Server::SockInfos sock_infos;
+Server::SockInfoVec ConvertConfigToSockInfoVec(std::vector<Server::TempConfig> server_configs) {
+	Server::SockInfoVec sock_infos;
 
 	typedef std::vector<Server::TempConfig>::const_iterator Itr;
 	for (Itr it = server_configs.begin(); it != server_configs.end(); ++it) {
@@ -35,7 +35,7 @@ Server::Server(const _config::Config::ConfigData &config) {
 	server_configs.push_back(std::make_pair("localhost", 8080));
 	server_configs.push_back(std::make_pair("tmp_server_name", 12345));
 
-	SockInfos sock_infos = ConvertConfigToSockInfos(server_configs);
+	SockInfoVec sock_infos = ConvertConfigToSockInfoVec(server_configs);
 	Init(sock_infos);
 }
 Server::~Server() {}
@@ -142,8 +142,8 @@ void Server::SendResponse(int client_fd) {
 	utils::Debug("------------------------------------------");
 }
 
-void Server::Init(const SockInfos &sock_infos) {
-	typedef SockInfos::const_iterator Itr;
+void Server::Init(const SockInfoVec &sock_infos) {
+	typedef SockInfoVec::const_iterator Itr;
 	for (Itr it = sock_infos.begin(); it != sock_infos.end(); ++it) {
 		SockInfo server_sock_info = *it;
 		// connect & listen
