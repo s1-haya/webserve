@@ -10,7 +10,7 @@ class SockInfo;
 // Store socket informations for each fd
 class SockContext {
   public:
-	typedef std::map<int, SockInfo> SockInfos;
+	typedef std::map<int, SockInfo> SockInfoMap;
 	SockContext();
 	~SockContext();
 	// functions
@@ -26,7 +26,7 @@ class SockContext {
 	// const
 	static const int SYSTEM_ERROR = -1;
 	// variables
-	SockInfos context_;
+	SockInfoMap context_;
 };
 
 } // namespace server
