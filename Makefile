@@ -91,7 +91,7 @@ debug:
 
 .PHONY	: unit
 unit:
-	@pytest -v ./test/unit
+	@make -C ./test/unit run
 
 .PHONY	: e2e
 e2e:
