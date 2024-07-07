@@ -3,10 +3,9 @@
 #include <stdexcept>
 
 namespace parser {
-
 namespace {
 
-void HandleServerContextDirective(context::ServerCon &server, std::list<node::Node>::iterator &it) {
+void HandleServerContextDirective(context::ServerCon &server, NodeItr &it) {
 	if ((*it).token == "server_name") {
 		++it;
 		if ((*it).token_type != node::WORD)
@@ -25,9 +24,7 @@ void HandleServerContextDirective(context::ServerCon &server, std::list<node::No
 		throw std::runtime_error("expect ';' after arguments");
 }
 
-void HandleLocationContextDirective(
-	context::LocationCon &location, std::list<node::Node>::iterator &it
-) {
+void HandleLocationContextDirective(context::LocationCon &location, NodeItr &it) {
 	if ((*it).token == "root") {
 		++it;
 		if ((*it).token_type != node::WORD)
@@ -46,7 +43,7 @@ void HandleLocationContextDirective(
 } // namespace
 
 Parser::Parser(std::list<node::Node> &tokens) : tokens_(tokens) {
-	for (std::list<node::Node>::iterator it = tokens_.begin(); it != tokens_.end(); ++it) {
+	for (NodeItr it = tokens_.begin(); it != tokens_.end(); ++it) {
 		if ((*it).token_type == node::CONTEXT && (*it).token == "server") {
 			servers_.push_back(ServerContext(++it));
 		}
@@ -55,7 +52,7 @@ Parser::Parser(std::list<node::Node> &tokens) : tokens_(tokens) {
 
 Parser::~Parser() {}
 
-context::ServerCon Parser::ServerContext(std::list<node::Node>::iterator &it) {
+context::ServerCon Parser::ServerContext(NodeItr &it) {
 	context::ServerCon server;
 
 	if ((*it).token_type != node::L_BRACKET)
@@ -86,7 +83,7 @@ context::ServerCon Parser::ServerContext(std::list<node::Node>::iterator &it) {
 	return server;
 }
 
-context::LocationCon Parser::LocationContext(std::list<node::Node>::iterator &it) {
+context::LocationCon Parser::LocationContext(NodeItr &it) {
 	context::LocationCon location;
 
 	if ((*it).token_type != node::WORD)

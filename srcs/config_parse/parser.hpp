@@ -7,6 +7,8 @@
 
 namespace parser {
 
+typedef std::list<node::Node>::iterator NodeItr;
+
 class Parser {
   private:
 	std::list<node::Node>        &tokens_;
@@ -15,8 +17,8 @@ class Parser {
 	Parser(const Parser &);
 	Parser &operator=(const Parser &);
 
-	context::ServerCon   ServerContext(std::list<node::Node>::iterator &);
-	context::LocationCon LocationContext(std::list<node::Node>::iterator &);
+	context::ServerCon   ServerContext(NodeItr &);
+	context::LocationCon LocationContext(NodeItr &);
 
   public:
 	Parser(std::list<node::Node> &);
