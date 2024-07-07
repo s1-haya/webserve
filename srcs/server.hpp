@@ -37,7 +37,7 @@ class Server {
 	// context
 	SockContext context_;
 	// event poll
-	epoll::Epoll monitor_;
+	epoll::Epoll event_monitor_;
 	// request buffers
 	Buffer buffers_;
 };
