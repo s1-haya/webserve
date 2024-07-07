@@ -55,7 +55,8 @@ event::Event ConvertToEventDto(const struct epoll_event &event) {
 
 } // namespace
 
-void Epoll::AddNewConnection(int socket_fd, event::Type type) {
+// add socket_fd to epoll's interest list
+void Epoll::Add(int socket_fd, event::Type type) {
 	struct epoll_event ev;
 	ev.events  = ConvertToEpollEventType(type);
 	ev.data.fd = socket_fd;
@@ -64,8 +65,9 @@ void Epoll::AddNewConnection(int socket_fd, event::Type type) {
 	}
 }
 
-// todo: error?
-void Epoll::DeleteConnection(int socket_fd) {
+// remove socket_fd from epoll's interest list
+void Epoll::Delete(int socket_fd) {
+	// todo: error?
 	epoll_ctl(epoll_fd_, EPOLL_CTL_DEL, socket_fd, NULL);
 }
 
@@ -82,8 +84,8 @@ int Epoll::CreateReadyList() {
 	return ready;
 }
 
-// override with new_type
-void Epoll::UpdateEventType(const event::Event &event, const event::Type new_type) {
+// update epoll's interest list with new_type
+void Epoll::Update(const event::Event &event, const event::Type new_type) {
 	const int socket_fd = event.fd;
 
 	struct epoll_event ev;

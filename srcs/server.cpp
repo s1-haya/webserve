@@ -78,8 +78,7 @@ void Server::HandleNewConnection(int sock_fd) {
 	new_sock_info.SetPeerSockFd(new_sock_fd);
 	// add to context
 	context_.AddSockInfo(new_sock_fd, new_sock_info);
-	// add to epoll's interest list
-	event_monitor_.AddNewConnection(new_sock_fd, event::EVENT_READ);
+	event_monitor_.Add(new_sock_fd, event::EVENT_READ);
 	utils::Debug("server", "add new client", new_sock_fd);
 }
 
@@ -117,13 +116,13 @@ void Server::ReadRequest(const event::Event &event) {
 		}
 		// todo: need?
 		// buffers_.Delete(client_fd);
-		// event_monitor_.DeleteConnection(client_fd);
+		// event_monitor_.Delete(client_fd);
 		return;
 	}
 	if (IsRequestReceivedComplete(buffers_.GetBuffer(client_fd))) {
 		utils::Debug("server", "received all request from client", client_fd);
 		std::cerr << buffers_.GetBuffer(client_fd) << std::endl;
-		event_monitor_.UpdateEventType(event, event::EVENT_WRITE);
+		event_monitor_.Update(event, event::EVENT_WRITE);
 	}
 }
 
@@ -136,7 +135,7 @@ void Server::SendResponse(int client_fd) {
 	// disconnect
 	buffers_.Delete(client_fd);
 	context_.DeleteSockInfo(client_fd);
-	event_monitor_.DeleteConnection(client_fd);
+	event_monitor_.Delete(client_fd);
 	close(client_fd);
 	utils::Debug("server", "disconnected client", client_fd);
 	utils::Debug("------------------------------------------");
@@ -152,8 +151,7 @@ void Server::Init(const SockInfoVec &sock_infos) {
 
 		// add to context
 		context_.AddSockInfo(server_fd, server_sock_info);
-		// add to epoll's interest list
-		event_monitor_.AddNewConnection(server_fd, event::EVENT_READ);
+		event_monitor_.Add(server_fd, event::EVENT_READ);
 		utils::Debug("server", "init server & listen", server_fd);
 	}
 }
