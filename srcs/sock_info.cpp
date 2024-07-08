@@ -37,6 +37,14 @@ int SockInfo::GetFd() const {
 	return fd_;
 }
 
+std::string SockInfo::GetName() const {
+	return name_;
+}
+
+unsigned int SockInfo::GetPort() const {
+	return port_;
+}
+
 struct sockaddr_in &SockInfo::GetSockAddr() {
 	return sock_addr_;
 }

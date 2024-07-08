@@ -16,6 +16,8 @@ class SockInfo {
 	SockInfo &operator=(const SockInfo &other);
 	// getter
 	int                 GetFd() const;
+	std::string         GetName() const;
+	unsigned int        GetPort() const;
 	struct sockaddr_in &GetSockAddr();
 	socklen_t           GetAddrlen() const;
 	// setter
