@@ -24,7 +24,7 @@ void CGI::Execve() {
 	int cgi_request[2];
 	int cgi_response[2];
 
-	if (meta_variables_["REQUEST_METHOD"] == "POST" && pipe(cgi_request) == -1) {
+	if (method_ == "POST" && pipe(cgi_request) == -1) {
 		std::cerr << "Error: pipe" << std::endl;
 		return;
 	}
@@ -38,7 +38,7 @@ void CGI::Execve() {
 		return;
 	} else if (p == 0) {
 		// 親と子でプロセス空間が違うため、親プロセス自体の標準出力に影響はない。
-		if (meta_variables_["REQUEST_METHOD"] == "POST") {
+		if (method_ == "POST") {
 			close(cgi_request[W]);
 			// close(STDIN_FILENO);
 			dup2(cgi_request[R], STDIN_FILENO);
@@ -49,7 +49,7 @@ void CGI::Execve() {
 		close(cgi_response[W]);
 		ExecveCgiScript();
 	} else {
-		if (meta_variables_["REQUEST_METHOD"] == "POST") {
+		if (method_ == "POST") {
 			// Send POST data to child process
 			close(cgi_request[R]);
 			write(cgi_request[W], body_message_.c_str(), body_message_.length());
@@ -65,11 +65,7 @@ void CGI::Execve() {
 	}
 }
 
-// CGIのリクエスト情報をパースする
 void CGI::Free() {
-	// for (size_t i = 0; this->argv_[i] != NULL; ++i) {
-	// 	delete[] this->argv_[i];
-	// }
 	delete[] this->argv_;
 	for (size_t i = 0; this->env_[i] != NULL; ++i) {
 		delete[] this->env_[i];
@@ -78,37 +74,38 @@ void CGI::Free() {
 }
 
 void CGI::ExecveCgiScript() {
-	// classでcgiの環境変数を保持
-	this->exit_status_ = execve(meta_variables_["SCRIPT_NAME"].c_str(), argv_, env_);
+	this->exit_status_ = execve(cgi_script_.c_str(), argv_, env_);
 	// perror("execve"); // execveが失敗した場合のエラーメッセージ出力
 }
 
-// Setは必要ないかも、CGIクラスを呼ぶときに情報を渡す。
-void CGI::Set(const cgi::CGIRequest &request) {
-	this->meta_variables_ = request.meta_variables;
-	this->body_message_   = request.body_message;
-	this->argv_           = SetCgiArgv();
-	this->env_            = SetCgiEnv();
+void CGI::Set(cgi::CGIRequest request) {
+	this->method_       = request.meta_variables["REQUEST_METHOD"];
+	this->cgi_script_   = request.meta_variables["SCRIPT_NAME"];
+	this->body_message_ = request.body_message;
+	this->argv_         = SetCgiArgv();
+	this->env_          = SetCgiEnv(request.meta_variables);
 }
 
 char **CGI::SetCgiArgv() {
 	// CGIスクリプトに引数を渡す場合の引数リストの初期化
 	char **argv = new char *[2];
-	argv[0]     = const_cast<char *>(meta_variables_["SCRIPT_NAME"].c_str());
+	argv[0]     = const_cast<char *>(cgi_script_.c_str());
 	argv[1]     = NULL;
 	return argv;
 }
 
-char **CGI::SetCgiEnv() {
-	char                          **cgi_env = new char *[meta_variables_.size() + 1];
+char **CGI::SetCgiEnv(const MetaMap &meta_variables) {
+	char                          **cgi_env = new char *[meta_variables.size() + 1];
 	typedef MetaMap::const_iterator It;
 	size_t                          i = 0;
-	for (It it = meta_variables_.begin(); it != meta_variables_.end(); it++) {
+	for (It it = meta_variables.begin(); it != meta_variables.end(); it++) {
 		const std::string element = it->first + "=" + it->second;
-		cgi_env[i]                = new char[element.size() + 1];
+		char             *dest    = new char[element.size() + 1];
 		// error
-		if (cgi_env[i] == NULL)
+		if (dest == NULL)
 			return (NULL);
+		std::strcpy(dest, element.c_str());
+		cgi_env[i] = dest;
 		std::strcpy(const_cast<char *>(cgi_env[i]), element.c_str());
 		i++;
 	}

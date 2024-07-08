@@ -93,11 +93,20 @@ int main(void) {
 	// test_run_cgi("../../../test/apache/cgi/not_executable.pl");
 	// test_run_cgi("../../../test/apache/cgi/not_file.pl");
 
-	cgi::CGI        a;
-	cgi::CGIRequest request;
-	request.meta_variables = create_request_meta_variables();
-	request.body_message   = "name=ChatGPT&message=Hello";
-	std::cout << "CGI Run: " << request.meta_variables["SCRIPT_NAME"] << std::endl;
-	a.Run(request);
+	// cgi::CGIRequest request;
+	// request.meta_variables = create_request_meta_variables();
+	// request.body_message   = "name=ChatGPT&message=Hello";
+	cgi::CGI    cgi;
+	std::string http_request = "tmp";
+	// std::string http_request = "POST /cgi-bin/print_stdin.pl HTTP/1.1\r\n"
+	// 							"Host: localhost:8080\r\n"
+	// 							"Server: Apache/2.4.59 (Unix)\r\n"
+	// 							"Content-Type: application/x-www-form-urlencoded\r\n"
+	// 							"Content-Length: 26\r\n"
+	// 							"\r\n"
+	// 							"name=ChatGPT&message=Hello";
+	cgi::CGIParse   parser;
+	cgi::CGIRequest request = parser.parse(http_request);
+	cgi.Run(request);
 	return 0;
 }

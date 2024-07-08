@@ -17,17 +17,18 @@ class CGI {
   private:
 	CGI(const CGI &cgi);
 	CGI   &operator=(const CGI &cgi);
-	void   Set(const cgi::CGIRequest &request);
-	char **SetCgiEnv();
+	void   Set(cgi::CGIRequest request);
+	char **SetCgiEnv(const MetaMap &meta_variables);
 	char **SetCgiArgv();
 	void   Execve();
 	void   ExecveCgiScript();
 	void   Free();
-	// cgi env;
-	char      **env_;
-	char      **argv_;
-	MetaMap     meta_variables_;
+	// cgi info;
+	std::string method_;
+	std::string cgi_script_;
 	std::string body_message_;
+	char      **argv_;
+	char      **env_;
 	int         exit_status_;
 	// R, W
 	static const int R = 0;

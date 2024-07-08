@@ -13,13 +13,13 @@ struct CGIRequest {
 	std::string  body_message;
 };
 
-// CGIリクエスト情報をパースするクラス
+// HTTPリクエストをパースしてCGIRequestを作成するクラス
 class CGIParse {
   public:
+	// 引数は要相談（クライアントとサーバーの情報を追加するかも）
 	CGIRequest parse(const std::string &http_request);
 
   private:
-	std::map<std::string, std::string> parse_headers(const std::string &header_section);
-	std::string get_value_from_header(const std::string &header, const std::string &key);
+	CGI::MetaMap create_request_meta_variables();
 }; // namespace cgi class CGIParse
 } // namespace cgi
