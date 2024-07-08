@@ -1,4 +1,5 @@
 #include "cgi.hpp"
+#include "cgi_parse.hpp"
 #include <cstring>
 #include <iostream>
 #include <sys/wait.h>
@@ -11,9 +12,9 @@ CGI::CGI() {}
 // CGIリクエストの構造体の場合、Freeは削除する。んでデストラクターでfree
 CGI::~CGI() {}
 
-// CGIリクエストの情報を持つ構造体を引数に渡す
-int CGI::Run(const char *script_name, const std::string &method) {
-	Init(script_name, method);
+// CGIリクエストの情報を持つ構造体を引数に渡す。返り値enumを返す
+int CGI::Run(const cgi::CGIRequest &request) {
+	Set(request);
 	Execve();
 	Free();
 	return (this->exit_status_);
@@ -23,7 +24,7 @@ void CGI::Execve() {
 	int cgi_request[2];
 	int cgi_response[2];
 
-	if (method_ == "POST" && pipe(cgi_request) == -1) {
+	if (meta_variables_["REQUEST_METHOD"] == "POST" && pipe(cgi_request) == -1) {
 		std::cerr << "Error: pipe" << std::endl;
 		return;
 	}
@@ -37,8 +38,9 @@ void CGI::Execve() {
 		return;
 	} else if (p == 0) {
 		// 親と子でプロセス空間が違うため、親プロセス自体の標準出力に影響はない。
-		if (method == "POST") {
+		if (meta_variables_["REQUEST_METHOD"] == "POST") {
 			close(cgi_request[W]);
+			// close(STDIN_FILENO);
 			dup2(cgi_request[R], STDIN_FILENO);
 			close(cgi_request[R]);
 		}
@@ -47,20 +49,17 @@ void CGI::Execve() {
 		close(cgi_response[W]);
 		ExecveCgiScript();
 	} else {
-		if (method == "POST") {
+		if (meta_variables_["REQUEST_METHOD"] == "POST") {
 			// Send POST data to child process
 			close(cgi_request[R]);
-			// 標準入力でボディメッセージの情報を受け取る
-			// std::string post_data = "name=ChatGPT&message=Hello";
-			// std::cout << post_data.length() << std::endl;
-			// write(cgi_request[W], post_data.c_str(), post_data.length());
-			close(cgi_response[W]);
+			write(cgi_request[W], body_message_.c_str(), body_message_.length());
+			close(cgi_request[W]);
 		}
+		close(cgi_response[W]);
 		wait(NULL);
 		char buf;
-		close(cgi_response[W]);
 		while (read(cgi_response[R], &buf, 1) > 0) {
-			write(0, &buf, 1);
+			write(STDOUT_FILENO, &buf, 1);
 		}
 		close(cgi_response[R]);
 	}
@@ -68,9 +67,9 @@ void CGI::Execve() {
 
 // CGIのリクエスト情報をパースする
 void CGI::Free() {
-	for (size_t i = 0; this->argv_[i] != NULL; ++i) {
-		delete[] this->argv_[i];
-	}
+	// for (size_t i = 0; this->argv_[i] != NULL; ++i) {
+	// 	delete[] this->argv_[i];
+	// }
 	delete[] this->argv_;
 	for (size_t i = 0; this->env_[i] != NULL; ++i) {
 		delete[] this->env_[i];
@@ -80,35 +79,32 @@ void CGI::Free() {
 
 void CGI::ExecveCgiScript() {
 	// classでcgiの環境変数を保持
-	this->exit_status_ = execve(cgi_script_, argv_, env_);
+	this->exit_status_ = execve(meta_variables_["SCRIPT_NAME"].c_str(), argv_, env_);
 	// perror("execve"); // execveが失敗した場合のエラーメッセージ出力
 }
 
-// Initは必要ないかも、CGIクラスを呼ぶときに情報を渡す。
-void CGI::Init(const char *script_name, const std::string &method) {
-	this->argv_       = InitCgiArgv();
-	this->env_        = InitCgiEnv();
-	this->cgi_script_ = script_name;
-	this->method_     = method;
+// Setは必要ないかも、CGIクラスを呼ぶときに情報を渡す。
+void CGI::Set(const cgi::CGIRequest &request) {
+	this->meta_variables_ = request.meta_variables;
+	this->body_message_   = request.body_message;
+	this->argv_           = SetCgiArgv();
+	this->env_            = SetCgiEnv();
 }
 
-char **CGI::InitCgiArgv() {
+char **CGI::SetCgiArgv() {
 	// CGIスクリプトに引数を渡す場合の引数リストの初期化
 	char **argv = new char *[2];
-	argv[0]     = const_cast<char *>(cgi_script_);
+	argv[0]     = const_cast<char *>(meta_variables_["SCRIPT_NAME"].c_str());
 	argv[1]     = NULL;
 	return argv;
 }
 
-char **CGI::InitCgiEnv() {
-	const std::map<std::string, std::string> &request_meta_variables =
-		create_request_meta_variables();
-	char **cgi_env = new char *[request_meta_variables.size() + 1];
-	size_t i       = 0;
-	for (std::map<std::string, std::string>::const_iterator ite = request_meta_variables.begin();
-		 ite != request_meta_variables.end();
-		 ite++) {
-		const std::string element = ite->first + "=" + ite->second;
+char **CGI::SetCgiEnv() {
+	char                          **cgi_env = new char *[meta_variables_.size() + 1];
+	typedef MetaMap::const_iterator It;
+	size_t                          i = 0;
+	for (It it = meta_variables_.begin(); it != meta_variables_.end(); it++) {
+		const std::string element = it->first + "=" + it->second;
 		cgi_env[i]                = new char[element.size() + 1];
 		// error
 		if (cgi_env[i] == NULL)

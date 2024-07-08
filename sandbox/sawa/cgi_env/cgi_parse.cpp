@@ -1,7 +1,9 @@
 #include "cgi_parse.hpp"
 
-std::map<std::string, std::string> create_request_meta_variables() {
-	std::map<std::string, std::string> request_meta_variables;
+namespace cgi {
+
+CGI::MetaMap create_request_meta_variables() {
+	CGI::MetaMap request_meta_variables;
 	request_meta_variables["AUTH_TYPE"];
 	request_meta_variables["CONTENT_LENGTH"] = "26";
 	request_meta_variables["CONTENT_TYPE"];
@@ -13,8 +15,8 @@ std::map<std::string, std::string> create_request_meta_variables() {
 	request_meta_variables["REMOTE_HOST"];
 	request_meta_variables["REMOTE_IDENT"];
 	request_meta_variables["REMOTE_USER"];
-	request_meta_variables["REQUEST_METHOD"];
-	request_meta_variables["SCRIPT_NAME"]     = "/cgi-bin/print_env.pl";
+	request_meta_variables["REQUEST_METHOD"]  = "POST";
+	request_meta_variables["SCRIPT_NAME"]     = "../../../test/apache/cgi/print_stdin.pl";
 	request_meta_variables["SERVER_NAME"]     = "localhost";
 	request_meta_variables["SERVER_PORT"]     = "8080";
 	request_meta_variables["SERVER_PROTOCOL"] = "HTTP/1.1";
@@ -96,27 +98,29 @@ std::string CGIParse::get_value_from_header(const std::string &header, const std
 	return "";
 }
 
+} // namespace cgi
+
 // テスト用のメイン関数
-int main() {
-	std::string http_request = "POST /cgi-bin/print_stdin.pl HTTP/1.1\r\n"
-							   "Host: localhost:8080\r\n"
-							   "Server: Apache/2.4.59 (Unix)\r\n"
-							   "Content-Type: application/x-www-form-urlencoded\r\n"
-							   "Content-Length: 26\r\n"
-							   "WWW-Authenticate: Basic realm=\" Basic Auth \"6\r\n"
-							   "\r\n"
-							   "name=ChatGPT&message=Hello";
+// int main() {
+// 	std::string http_request = "POST /cgi-bin/print_stdin.pl HTTP/1.1\r\n"
+// 							   "Host: localhost:8080\r\n"
+// 							   "Server: Apache/2.4.59 (Unix)\r\n"
+// 							   "Content-Type: application/x-www-form-urlencoded\r\n"
+// 							   "Content-Length: 26\r\n"
+// 							   "WWW-Authenticate: Basic realm=\" Basic Auth \"6\r\n"
+// 							   "\r\n"
+// 							   "name=ChatGPT&message=Hello";
 
-	CGIParse   parser;
-	CGIRequest request = parser.parse(http_request);
+// 	cgi_parse::CGIParse   parser;
+// 	cgi_parse::CGIRequest request = parser.parse(http_request);
 
-	// パース結果の表示
-	std::cout << "Method: " << request.meta_variables["REQUEST_METHOD"] << std::endl;
-	std::cout << "Script Name: " << request.meta_variables["SCRIPT_NAME"] << std::endl;
-	std::cout << "Query String: " << request.meta_variables["QUERY_STRING"] << std::endl;
-	std::cout << "Content Type: " << request.meta_variables["CONTENT_TYPE"] << std::endl;
-	std::cout << "Content Length: " << request.meta_variables["CONTENT_LENGTH"] << std::endl;
-	std::cout << "Post Data: " << request.body_message << std::endl;
+// 	// パース結果の表示
+// 	std::cout << "Method: " << request.meta_variables["REQUEST_METHOD"] << std::endl;
+// 	std::cout << "Script Name: " << request.meta_variables["SCRIPT_NAME"] << std::endl;
+// 	std::cout << "Query String: " << request.meta_variables["QUERY_STRING"] << std::endl;
+// 	std::cout << "Content Type: " << request.meta_variables["CONTENT_TYPE"] << std::endl;
+// 	std::cout << "Content Length: " << request.meta_variables["CONTENT_LENGTH"] << std::endl;
+// 	std::cout << "Post Data: " << request.body_message << std::endl;
 
-	return 0;
-}
+// 	return 0;
+// }

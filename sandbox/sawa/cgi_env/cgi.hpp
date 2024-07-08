@@ -5,33 +5,33 @@
 #include <string>
 
 namespace cgi {
-
-std::map<std::string, std::string> create_request_meta_variables();
+struct CGIRequest;
 
 class CGI {
   public:
+	typedef std::map<std::string, std::string> MetaMap;
 	CGI();
 	~CGI();
-	int Run(const char *script_name, const std::string &method);
+	int Run(const cgi::CGIRequest &request);
 
   private:
 	CGI(const CGI &cgi);
 	CGI   &operator=(const CGI &cgi);
-	void   Init(const char *script_name, const std::string &method);
-	char **InitCgiEnv();
-	char **InitCgiArgv();
+	void   Set(const cgi::CGIRequest &request);
+	char **SetCgiEnv();
+	char **SetCgiArgv();
 	void   Execve();
 	void   ExecveCgiScript();
 	void   Free();
 	// cgi env;
 	char      **env_;
 	char      **argv_;
-	const char *cgi_script_;
-	std::string method_;
+	MetaMap     meta_variables_;
+	std::string body_message_;
 	int         exit_status_;
 	// R, W
 	static const int R = 0;
-	static const int W = 0;
+	static const int W = 1;
 };
 
 } // namespace cgi

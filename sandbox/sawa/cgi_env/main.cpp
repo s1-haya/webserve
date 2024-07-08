@@ -1,4 +1,5 @@
 #include "cgi.hpp"
+#include "cgi_parse.hpp"
 #include "color.hpp"
 #include <iostream>
 #include <map>
@@ -92,7 +93,11 @@ int main(void) {
 	// test_run_cgi("../../../test/apache/cgi/not_executable.pl");
 	// test_run_cgi("../../../test/apache/cgi/not_file.pl");
 
-	cgi::CGI a;
-	a.Run("../../../test/apache/cgi/print_env.pl", "POST");
+	cgi::CGI        a;
+	cgi::CGIRequest request;
+	request.meta_variables = create_request_meta_variables();
+	request.body_message   = "name=ChatGPT&message=Hello";
+	std::cout << "CGI Run: " << request.meta_variables["SCRIPT_NAME"] << std::endl;
+	a.Run(request);
 	return 0;
 }

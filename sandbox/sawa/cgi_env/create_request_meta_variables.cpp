@@ -14,8 +14,8 @@ std::map<std::string, std::string> create_request_meta_variables() {
 	request_meta_variables["REMOTE_HOST"];
 	request_meta_variables["REMOTE_IDENT"];
 	request_meta_variables["REMOTE_USER"];
-	request_meta_variables["REQUEST_METHOD"];
-	request_meta_variables["SCRIPT_NAME"]     = "/cgi-bin/print_env.pl";
+	request_meta_variables["REQUEST_METHOD"]  = "POST";
+	request_meta_variables["SCRIPT_NAME"]     = "../../../test/apache/cgi/print_stdin.pl";
 	request_meta_variables["SERVER_NAME"]     = "localhost";
 	request_meta_variables["SERVER_PORT"]     = "8080";
 	request_meta_variables["SERVER_PROTOCOL"] = "HTTP/1.1";
