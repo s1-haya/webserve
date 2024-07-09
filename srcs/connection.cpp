@@ -5,6 +5,7 @@
 #include <netdb.h>      // getaddrinfo,freeaddrinfo
 #include <stdexcept>    // runtime_error
 #include <sys/socket.h> // socket,setsockopt,bind,listen,accept
+#include <unistd.h>     // close
 
 namespace server {
 
@@ -39,34 +40,42 @@ Connection::AddrInfo *Connection::GetAddrInfoList(const SockInfo &server_sock_in
 
 int Connection::Connect(SockInfo &server_sock_info) {
 	AddrInfo *addrinfo_list = GetAddrInfoList(server_sock_info);
-	(void)addrinfo_list;
 
-	// socket
-	const int server_fd = socket(AF_INET, SOCK_STREAM, 0);
-	if (server_fd == SYSTEM_ERROR) {
-		throw std::runtime_error("socket failed");
-	}
-	// set socket option to reuse address
-	// optval : Specify a non-zero value to enable the boolean option, or zero to disable it
-	int optval = 1;
-	if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)) == SYSTEM_ERROR) {
-		throw std::runtime_error("setsockopt failed");
-	}
+	// todo: init 0?
+	int server_fd = -1;
+	for (; addrinfo_list != NULL; addrinfo_list = addrinfo_list->ai_next) {
+		// socket
+		server_fd = socket(
+			addrinfo_list->ai_family, addrinfo_list->ai_socktype, addrinfo_list->ai_protocol
+		);
+		if (server_fd == SYSTEM_ERROR) {
+			throw std::runtime_error("socket failed");
+		}
+		// set socket option to reuse address
+		// optval : Specify a non-zero value to enable the boolean option, or zero to disable it
+		int optval = 1;
+		if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)) ==
+			SYSTEM_ERROR) {
+			close(server_fd);
+			throw std::runtime_error("setsockopt failed");
+		}
 
-	struct sockaddr_in &sock_addr = server_sock_info.GetSockAddr();
-	const socklen_t     addrlen   = server_sock_info.GetAddrlen();
-	// bind
-	if (bind(server_fd, (const struct sockaddr *)&sock_addr, addrlen) == SYSTEM_ERROR) {
-		throw std::runtime_error("bind failed");
-	}
+		// bind
+		if (bind(server_fd, addrinfo_list->ai_addr, addrinfo_list->ai_addrlen) == SYSTEM_ERROR) {
+			close(server_fd);
+			throw std::runtime_error("bind failed");
+		}
 
-	// todo / listen() : set an appropriate backlog value
-	// listen
-	if (listen(server_fd, 3) == SYSTEM_ERROR) {
-		throw std::runtime_error("listen failed");
+		// todo / listen() : set an appropriate backlog value
+		// listen
+		if (listen(server_fd, 3) == SYSTEM_ERROR) {
+			close(server_fd);
+			throw std::runtime_error("listen failed");
+		}
+		listen_server_fds_.insert(server_fd);
+		break;
 	}
-	listen_server_fds_.insert(server_fd);
-
+	freeaddrinfo(addrinfo_list);
 	return server_fd;
 }
 
