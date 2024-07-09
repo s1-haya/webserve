@@ -30,6 +30,7 @@ int Connection::Connect(SockInfo &server_sock_info) {
 		throw std::runtime_error("bind failed");
 	}
 
+	// todo / listen() : set an appropriate backlog value
 	// listen
 	if (listen(server_fd, 3) == SYSTEM_ERROR) {
 		throw std::runtime_error("listen failed");
