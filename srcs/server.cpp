@@ -65,21 +65,21 @@ void Server::HandleEvent(const event::Event &event) {
 	}
 }
 
-void Server::HandleNewConnection(int sock_fd) {
-	SockInfo &sock_info = context_.GetSockInfo(sock_fd);
+void Server::HandleNewConnection(int server_fd) {
+	SockInfo &tmp_server_sock_info = context_.GetSockInfo(server_fd);
 
 	// A new socket that has established a connection with the peer socket.
-	const int new_sock_fd = Connection::Accept(sock_info);
-	if (new_sock_fd == SYSTEM_ERROR) {
+	const int client_fd = Connection::Accept(tmp_server_sock_info);
+	if (client_fd == SYSTEM_ERROR) {
 		throw std::runtime_error("accept failed");
 	}
 
-	SockInfo new_sock_info = sock_info;
-	new_sock_info.SetPeerSockFd(new_sock_fd);
+	SockInfo new_sock_info = tmp_server_sock_info;
+	new_sock_info.SetPeerSockFd(client_fd);
 	// add to context
-	context_.AddSockInfo(new_sock_fd, new_sock_info);
-	event_monitor_.Add(new_sock_fd, event::EVENT_READ);
-	utils::Debug("server", "add new client", new_sock_fd);
+	context_.AddSockInfo(client_fd, new_sock_info);
+	event_monitor_.Add(client_fd, event::EVENT_READ);
+	utils::Debug("server", "add new client", client_fd);
 }
 
 void Server::HandleExistingConnection(const event::Event &event) {

@@ -26,7 +26,7 @@ class Server {
 	Server &operator=(const Server &other);
 	void    Init(const SockInfoVec &sock_infos);
 	void    HandleEvent(const event::Event &event);
-	void    HandleNewConnection(int sock_fd);
+	void    HandleNewConnection(int server_fd);
 	void    HandleExistingConnection(const event::Event &event);
 	void    ReadRequest(const event::Event &event);
 	void    SendResponse(int client_fd);
