@@ -33,7 +33,8 @@ Server::Server(const _config::Config::ConfigData &config) {
 	// todo: tmp
 	std::vector<TempConfig> server_configs;
 	server_configs.push_back(std::make_pair("localhost", 8080));
-	server_configs.push_back(std::make_pair("tmp_server_name", 12345));
+	server_configs.push_back(std::make_pair("localhost", 12345));
+	server_configs.push_back(std::make_pair("::1", 8080));
 
 	SockInfoVec sock_infos = ConvertConfigToSockInfoVec(server_configs);
 	Init(sock_infos);
