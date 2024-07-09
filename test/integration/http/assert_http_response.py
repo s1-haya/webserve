@@ -8,7 +8,7 @@ def assert_status_line(response: HTTPResponse, expected_code: HTTPStatus) -> Non
     ), f"Expected status code {expected_code}, but got {response.status}"
     assert (
         response.reason == expected_code.phrase
-    ), f"Expected status code reason {expected_code.phrase}, but got {response.reason}"
+    ), f"Expected status code reason\n\n {expected_code.phrase}, but got\n\n {response.reason}"
     assert response.version == 11, f"Expected version 1.1, but got {response.version}"
 
 
@@ -25,7 +25,7 @@ def assert_header(
     response_header_value = response_header_value.rstrip()
     assert (
         response_header_value == expected_header_value
-    ), f"Expected header value {expected_header_value}, but got {response_header_value}"
+    ), f"Expected header value\n\n {expected_header_value}, but got\n\n {response_header_value}"
 
 
 def assert_body(response: HTTPResponse, path: str) -> None:
@@ -35,5 +35,5 @@ def assert_body(response: HTTPResponse, path: str) -> None:
         expected_body = f.read().encode("utf-8")
     assert (
         response_body == expected_body
-    ), f"Expected response body {expected_body.decode('utf-8')}, but got {response_body.decode('utf-8')}"
+    ), f"Expected response body\n\n {expected_body.decode('utf-8')}\n, but got\n\n {response_body.decode('utf-8')}"
     assert_header(response, "Content-Length", str(len(expected_body)))
