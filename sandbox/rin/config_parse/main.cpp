@@ -106,7 +106,7 @@ int main() {
 		lexer::Lexer           lex(buffer, *tokens_);
 		// PrintTokens(tokens_);
 		parser::Parser                par(*tokens_);
-		std::list<context::ServerCon> servers = par.ReturnServers();
+		std::list<context::ServerCon> servers = par.GetServers();
 		PrintServersLocation(&servers);
 		delete tokens_;
 		return EXIT_SUCCESS;

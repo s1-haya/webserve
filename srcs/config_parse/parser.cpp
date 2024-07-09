@@ -45,14 +45,14 @@ void HandleLocationContextDirective(context::LocationCon &location, NodeItr &it)
 Parser::Parser(std::list<node::Node> &tokens) : tokens_(tokens) {
 	for (NodeItr it = tokens_.begin(); it != tokens_.end(); ++it) {
 		if ((*it).token_type == node::CONTEXT && (*it).token == "server") {
-			servers_.push_back(ServerContext(++it));
+			servers_.push_back(CreateServerContext(++it));
 		}
 	}
 }
 
 Parser::~Parser() {}
 
-context::ServerCon Parser::ServerContext(NodeItr &it) {
+context::ServerCon Parser::CreateServerContext(NodeItr &it) {
 	context::ServerCon server;
 
 	if ((*it).token_type != node::L_BRACKET)
@@ -65,7 +65,7 @@ context::ServerCon Parser::ServerContext(NodeItr &it) {
 			break;
 		case node::CONTEXT:
 			if ((*it).token == "location")
-				server.location_con.push_back(LocationContext(++it));
+				server.location_con.push_back(CreateLocationContext(++it));
 			else
 				throw std::runtime_error("invalid nest of 'server' directive");
 			break;
@@ -83,7 +83,7 @@ context::ServerCon Parser::ServerContext(NodeItr &it) {
 	return server;
 }
 
-context::LocationCon Parser::LocationContext(NodeItr &it) {
+context::LocationCon Parser::CreateLocationContext(NodeItr &it) {
 	context::LocationCon location;
 
 	if ((*it).token_type != node::WORD)
@@ -115,7 +115,7 @@ context::LocationCon Parser::LocationContext(NodeItr &it) {
 	return location;
 }
 
-std::list<context::ServerCon> Parser::ReturnServers() {
+std::list<context::ServerCon> Parser::GetServers() const {
 	return this->servers_;
 }
 

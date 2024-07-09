@@ -17,14 +17,14 @@ class Parser {
 	Parser(const Parser &);
 	Parser &operator=(const Parser &);
 
-	context::ServerCon   ServerContext(NodeItr &);
-	context::LocationCon LocationContext(NodeItr &);
+	context::ServerCon   CreateServerContext(NodeItr &);
+	context::LocationCon CreateLocationContext(NodeItr &);
 
   public:
 	Parser(std::list<node::Node> &);
 	~Parser();
 
-	std::list<context::ServerCon> ReturnServers();
+	std::list<context::ServerCon> GetServers() const;
 };
 
 } // namespace parser
