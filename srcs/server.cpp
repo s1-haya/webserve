@@ -15,9 +15,14 @@ Server::SockInfoVec ConvertConfigToSockInfoVec(std::vector<Server::TempConfig> s
 
 	typedef std::vector<Server::TempConfig>::const_iterator Itr;
 	for (Itr it = server_configs.begin(); it != server_configs.end(); ++it) {
-		const std::string  server_name = it->first;
-		const unsigned int port        = it->second;
+		const std::string &server_name = it->first;
+		unsigned int       port;
+		if (!utils::ConvertStrToUint(it->second, port)) {
+			// todo: original exception
+			throw std::logic_error("wrong port number");
+		}
 
+		// todo: validate server_name, port, etc?
 		SockInfo server_sock_info(server_name, port);
 		sock_infos.push_back(server_sock_info);
 	}
@@ -32,9 +37,9 @@ Server::Server(const _config::Config::ConfigData &config) {
 
 	// todo: tmp
 	std::vector<TempConfig> server_configs;
-	server_configs.push_back(std::make_pair("localhost", 8080));
-	server_configs.push_back(std::make_pair("localhost", 12345));
-	// server_configs.push_back(std::make_pair("::1", 8080));
+	server_configs.push_back(std::make_pair("localhost", "8080"));
+	server_configs.push_back(std::make_pair("localhost", "12345"));
+	// server_configs.push_back(std::make_pair("::1", "8080"));
 
 	SockInfoVec sock_infos = ConvertConfigToSockInfoVec(server_configs);
 	Init(sock_infos);
