@@ -3,6 +3,7 @@
 #include "sock_info.hpp"
 #include "utils.hpp"    // ConvertUintToStr
 #include <netdb.h>      // getaddrinfo,freeaddrinfo
+#include <netinet/in.h> // struct sockaddr
 #include <stdexcept>    // runtime_error
 #include <sys/socket.h> // socket,setsockopt,bind,listen,accept
 #include <unistd.h>     // close
@@ -79,19 +80,17 @@ int Connection::Connect(SockInfo &server_sock_info) {
 	return server_fd;
 }
 
-int Connection::Accept(SockInfo &sock_info) {
-	const int           server_fd = sock_info.GetFd();
-	struct sockaddr_in &sock_addr = sock_info.GetSockAddr();
-	socklen_t           addrlen   = sock_info.GetAddrlen();
-
-	const socklen_t new_socket = accept(server_fd, (struct sockaddr *)&sock_addr, &addrlen);
+int Connection::Accept(int server_fd) {
+	struct sockaddr sock_addr;
+	socklen_t       addrlen   = sizeof(sock_addr);
+	const socklen_t client_fd = accept(server_fd, (struct sockaddr *)&sock_addr, &addrlen);
 	// retrieve the client's IP address, port, etc.
 
 	// todo: need?
-	// if (new_socket == SYSTEM_ERROR) {
+	// if (client_fd == SYSTEM_ERROR) {
 	// 	throw std::runtime_error("accept failed");
 	// }
-	return new_socket;
+	return client_fd;
 }
 
 bool Connection::IsListenServerFd(int sock_fd) const {

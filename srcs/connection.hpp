@@ -17,7 +17,7 @@ class Connection {
 	~Connection();
 	// function
 	int        Connect(SockInfo &server_sock_info);
-	static int Accept(SockInfo &sock_info);
+	static int Accept(int server_fd);
 	bool       IsListenServerFd(int sock_fd) const;
 
   private:

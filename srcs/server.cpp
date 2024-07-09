@@ -72,15 +72,13 @@ void Server::HandleEvent(const event::Event &event) {
 }
 
 void Server::HandleNewConnection(int server_fd) {
-	SockInfo &tmp_server_sock_info = context_.GetSockInfo(server_fd);
-
 	// A new socket that has established a connection with the peer socket.
-	const int client_fd = Connection::Accept(tmp_server_sock_info);
+	const int client_fd = Connection::Accept(server_fd);
 	if (client_fd == SYSTEM_ERROR) {
 		throw std::runtime_error("accept failed");
 	}
 
-	SockInfo new_sock_info = tmp_server_sock_info;
+	SockInfo new_sock_info;
 	new_sock_info.SetPeerSockFd(client_fd);
 	// add to context
 	context_.AddSockInfo(client_fd, new_sock_info);
