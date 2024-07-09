@@ -1,6 +1,8 @@
 #include "connection.hpp"
 #include "server.hpp"
 #include "sock_info.hpp"
+#include "utils.hpp"    // ConvertUintToStr
+#include <netdb.h>      // getaddrinfo,freeaddrinfo
 #include <stdexcept>    // runtime_error
 #include <sys/socket.h> // socket,setsockopt,bind,listen,accept
 
@@ -10,7 +12,35 @@ Connection::Connection() {}
 
 Connection::~Connection() {}
 
+namespace {
+
+void InitHints(Connection::AddrInfo *hints) {
+	hints->ai_socktype = SOCK_STREAM;
+	hints->ai_family   = AF_UNSPEC;
+	hints->ai_flags    = AI_PASSIVE | AI_NUMERICSERV;
+}
+
+} // namespace
+
+// result: dynamic allocated by getaddrinfo()
+Connection::AddrInfo *Connection::GetAddrInfoList(const SockInfo &server_sock_info) {
+	const std::string &host  = server_sock_info.GetName();
+	const std::string &port  = utils::ConvertUintToStr(server_sock_info.GetPort());
+	AddrInfo           hints = {};
+	InitHints(&hints);
+
+	AddrInfo *result;
+	const int status = getaddrinfo(host.c_str(), port.c_str(), &hints, &result);
+	if (status != 0) {
+		throw std::runtime_error("getaddrinfo failed: " + std::string(gai_strerror(status)));
+	}
+	return result;
+}
+
 int Connection::Connect(SockInfo &server_sock_info) {
+	AddrInfo *addrinfo_list = GetAddrInfoList(server_sock_info);
+	(void)addrinfo_list;
+
 	// socket
 	const int server_fd = socket(AF_INET, SOCK_STREAM, 0);
 	if (server_fd == SYSTEM_ERROR) {
