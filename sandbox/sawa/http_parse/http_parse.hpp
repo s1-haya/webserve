@@ -25,6 +25,9 @@ class HTTPParse {
 	HTTPParse();
 	~HTTPParse();
 	HTTPRequest Run(const std::string &buf);
+
+  private:
+	StatusLine SetStatusLine(const std::vector<std::string> &request_line);
 };
 
 } // namespace http
