@@ -57,7 +57,7 @@ event::Event ConvertToEventDto(const struct epoll_event &event) {
 
 // add socket_fd to epoll's interest list
 void Epoll::Add(int socket_fd, event::Type type) {
-	struct epoll_event ev;
+	struct epoll_event ev = {};
 	ev.events  = ConvertToEpollEventType(type);
 	ev.data.fd = socket_fd;
 	if (epoll_ctl(epoll_fd_, EPOLL_CTL_ADD, socket_fd, &ev) == SYSTEM_ERROR) {
@@ -88,7 +88,7 @@ int Epoll::CreateReadyList() {
 void Epoll::Update(const event::Event &event, const event::Type new_type) {
 	const int socket_fd = event.fd;
 
-	struct epoll_event ev;
+	struct epoll_event ev = {};
 	ev.events  = ConvertToEpollEventType(new_type);
 	ev.data.fd = socket_fd;
 	if (epoll_ctl(epoll_fd_, EPOLL_CTL_MOD, socket_fd, &ev) == SYSTEM_ERROR) {
