@@ -28,8 +28,9 @@ void SockContext::DeleteSockInfo(int fd) {
 	context_.erase(fd);
 }
 
+// In C++98, the map's "at" method is unavailable, not using const qualifiers.
 SockInfo &SockContext::GetSockInfo(int fd) {
-	SockInfo &sock_info = context_.at(fd);
+	SockInfo &sock_info = context_[fd];
 	if (context_.count(fd) == 0) {
 		throw std::logic_error("SockInfo doesn't exist");
 	}
