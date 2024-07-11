@@ -39,16 +39,15 @@ Connection::AddrInfo *Connection::GetAddrInfoList(const SockInfo &server_sock_in
 	return result;
 }
 
+// todo: call freeaddrinfo() for each error
 int Connection::Connect(SockInfo &server_sock_info) {
 	AddrInfo *addrinfo_list = GetAddrInfoList(server_sock_info);
 
 	// todo: init 0?
 	int server_fd = -1;
-	for (; addrinfo_list != NULL; addrinfo_list = addrinfo_list->ai_next) {
+	for (AddrInfo *addrinfo = addrinfo_list; addrinfo != NULL; addrinfo = addrinfo->ai_next) {
 		// socket
-		server_fd = socket(
-			addrinfo_list->ai_family, addrinfo_list->ai_socktype, addrinfo_list->ai_protocol
-		);
+		server_fd = socket(addrinfo->ai_family, addrinfo->ai_socktype, addrinfo->ai_protocol);
 		if (server_fd == SYSTEM_ERROR) {
 			throw std::runtime_error("socket failed");
 		}
@@ -62,7 +61,7 @@ int Connection::Connect(SockInfo &server_sock_info) {
 		}
 
 		// bind
-		if (bind(server_fd, addrinfo_list->ai_addr, addrinfo_list->ai_addrlen) == SYSTEM_ERROR) {
+		if (bind(server_fd, addrinfo->ai_addr, addrinfo->ai_addrlen) == SYSTEM_ERROR) {
 			close(server_fd);
 			throw std::runtime_error("bind failed");
 		}
