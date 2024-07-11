@@ -24,8 +24,9 @@ class Connection {
 	// prohibit copy
 	Connection(const Connection &other);
 	Connection &operator=(const Connection &other);
-	// function
+	// functions
 	AddrInfo *GetAddrInfoList(const SockInfo &server_sock_info);
+	int       TryBind(AddrInfo *addrinfo) const;
 	// const
 	static const int SYSTEM_ERROR = -1;
 	// variable

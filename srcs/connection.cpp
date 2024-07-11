@@ -40,17 +40,16 @@ Connection::AddrInfo *Connection::GetAddrInfoList(const SockInfo &server_sock_in
 	return result;
 }
 
-// todo: call freeaddrinfo() for each error
-int Connection::Connect(SockInfo &server_sock_info) {
-	AddrInfo *addrinfo_list = GetAddrInfoList(server_sock_info);
-
+// todo: return Result<int, err>?
+int Connection::TryBind(AddrInfo *addrinfo) const {
 	// todo: init 0?
 	int server_fd = -1;
-	for (AddrInfo *addrinfo = addrinfo_list; addrinfo != NULL; addrinfo = addrinfo->ai_next) {
+
+	for (; addrinfo != NULL; addrinfo = addrinfo->ai_next) {
 		// socket
 		server_fd = socket(addrinfo->ai_family, addrinfo->ai_socktype, addrinfo->ai_protocol);
 		if (server_fd == SYSTEM_ERROR) {
-			throw std::runtime_error("socket failed");
+			continue;
 		}
 		// set socket option to reuse address
 		// optval : Specify a non-zero value to enable the boolean option, or zero to disable it
@@ -58,25 +57,37 @@ int Connection::Connect(SockInfo &server_sock_info) {
 		if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)) ==
 			SYSTEM_ERROR) {
 			close(server_fd);
-			throw std::runtime_error("setsockopt failed");
+			continue;
 		}
 
 		// bind
 		if (bind(server_fd, addrinfo->ai_addr, addrinfo->ai_addrlen) == SYSTEM_ERROR) {
 			close(server_fd);
-			throw std::runtime_error("bind failed");
+			continue;
 		}
-
-		// todo / listen() : set an appropriate backlog value
-		// listen
-		if (listen(server_fd, 3) == SYSTEM_ERROR) {
-			close(server_fd);
-			throw std::runtime_error("listen failed");
-		}
-		listen_server_fds_.insert(server_fd);
-		break;
+		// bind success
+		return server_fd;
 	}
+	// failed
+	return SYSTEM_ERROR;
+}
+
+int Connection::Connect(SockInfo &server_sock_info) {
+	AddrInfo *addrinfo_list = GetAddrInfoList(server_sock_info);
+	const int server_fd     = TryBind(addrinfo_list);
 	freeaddrinfo(addrinfo_list);
+	if (server_fd == SYSTEM_ERROR) {
+		throw std::runtime_error("bind failed");
+	}
+
+	// todo / listen() : set an appropriate backlog value
+	// listen
+	if (listen(server_fd, 3) == SYSTEM_ERROR) {
+		close(server_fd);
+		throw std::runtime_error("listen failed");
+	}
+	listen_server_fds_.insert(server_fd);
+
 	return server_fd;
 }
 
