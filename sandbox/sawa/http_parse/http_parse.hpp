@@ -29,6 +29,7 @@ class HTTPParse {
   private:
 	RequestLine  SetRequestLine(const std::vector<std::string> &request_line);
 	HeaderFields SetHeaderFields(const std::vector<std::string> &header_fields_info);
+	std::string  SetMessageBody(const std::vector<std::string> &message_body_info);
 };
 
 } // namespace http

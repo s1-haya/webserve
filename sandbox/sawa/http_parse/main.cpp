@@ -28,7 +28,7 @@ int main(void) {
 	assert("HTTP/1.1" == test3.status_line.version);
 	assert("www.example.com" == test3.header_fields["Host"]);
 	assert("keep-alive" == test3.header_fields["Connection"]);
-	// assert("bodymessage" == test3.message_body);
+	assert("bodymessage" == test3.message_body);
 
 	// StatusLineとHeader、Body(改行バージョン)を含むHTTPリクエスト
 	http::HTTPRequest test4 =
