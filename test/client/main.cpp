@@ -1,4 +1,5 @@
 #include "client.hpp"
+#include "color.hpp"
 #include "utils.hpp"
 #include <cstdlib>
 #include <cstring> // strlen
