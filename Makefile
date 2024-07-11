@@ -174,6 +174,10 @@ login-webserv:
 		docker exec -it $(WEBSERV_CONTAINER_NAME) /bin/bash; \
 	fi
 
+.PHONY	: is-running
+is-running:
+	@docker ps | grep $(WEBSERV_CONTAINER_NAME)
+
 #--------------------------------------------
 
 DEV_IMAGE_NAME := dev-image
