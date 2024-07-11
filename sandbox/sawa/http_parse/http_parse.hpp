@@ -6,18 +6,18 @@
 
 namespace http {
 
-struct StatusLine {
+struct RequestLine {
 	std::string method;
 	std::string uri;
 	std::string version;
 };
 
-typedef std::map<std::string, std::string> HeaderField;
+typedef std::map<std::string, std::string> HeaderFields;
 
 struct HTTPRequest {
-	StatusLine  status_line;
-	HeaderField header_fields;
-	std::string message_body;
+	RequestLine  status_line;
+	HeaderFields header_fields;
+	std::string  message_body;
 };
 
 class HTTPParse {
@@ -27,7 +27,8 @@ class HTTPParse {
 	HTTPRequest Run(const std::string &buf);
 
   private:
-	StatusLine SetStatusLine(const std::vector<std::string> &request_line);
+	RequestLine  SetRequestLine(const std::vector<std::string> &request_line);
+	HeaderFields SetHeaderFields(const std::vector<std::string> &header_fields_info);
 };
 
 } // namespace http

@@ -16,18 +16,18 @@ std::string CreateDefaultPath(const std::string &path) {
 	return location + path + "/index.html";
 }
 
-void PrintLines(const std::vector<std::string> &lines) {
-	typedef std::vector<std::string>::const_iterator It;
-	size_t                                           i = 0;
-	for (It it = lines.begin(); it != lines.end(); ++it) {
-		// if (*it == "") {
-		// 	std::cout << "stop!" << std::endl;
-		// 	break;
-		// }
-		std::cout << i << ":" << *it << std::endl;
-		i++;
-	}
-}
+// void PrintLines(const std::vector<std::string> &lines) {
+// 	typedef std::vector<std::string>::const_iterator It;
+// 	size_t                                           i = 0;
+// 	for (It it = lines.begin(); it != lines.end(); ++it) {
+// 		// if (*it == "") {
+// 		// 	std::cout << "stop!" << std::endl;
+// 		// 	break;
+// 		// }
+// 		std::cout << i << ":" << *it << std::endl;
+// 		i++;
+// 	}
+// }
 
 } // namespace
 
@@ -35,20 +35,35 @@ HTTPParse::HTTPParse() {}
 
 HTTPParse::~HTTPParse() {}
 
-StatusLine HTTPParse::SetStatusLine(const std::vector<std::string> &request_line) {
-	StatusLine status_line;
-	status_line.method  = request_line[0];
-	status_line.uri     = CreateDefaultPath(request_line[1]);
-	status_line.version = request_line[2];
-	return status_line;
+RequestLine HTTPParse::SetRequestLine(const std::vector<std::string> &request_line_info) {
+	// 各値が正常な値かどうか確認してから作成する（エラーの場合はenumに設定？）
+	RequestLine request_line;
+	request_line.method  = request_line_info[0];
+	request_line.uri     = CreateDefaultPath(request_line_info[1]);
+	request_line.version = request_line_info[2];
+	return request_line;
+}
+
+HeaderFields HTTPParse::SetHeaderFields(const std::vector<std::string> &header_fields_info) {
+	// 各値が正常な値かどうか確認してから作成する（エラーの場合はenumに設定？）
+	HeaderFields                                     header_fields;
+	typedef std::vector<std::string>::const_iterator It;
+	for (It it = header_fields_info.begin() + 1; it != header_fields_info.end(); ++it) {
+		if (*it == "")
+			break;
+		std::vector<std::string> tmp = utils::SplitStr(*it, ": ");
+		header_fields[tmp[0]]        = tmp[1];
+	}
+	return header_fields;
 }
 
 // todo: tmp request_
 HTTPRequest HTTPParse::Run(const std::string &read_buf) {
-	HTTPRequest                    request;
-	const std::vector<std::string> lines = utils::SplitStr(read_buf, CRLF);
-	PrintLines(lines);
-	request.status_line = SetStatusLine(utils::SplitStr(lines[0], SP));
+	HTTPRequest              request;
+	std::vector<std::string> lines = utils::SplitStr(read_buf, CRLF);
+	request.status_line            = SetRequestLine(utils::SplitStr(lines[0], SP));
+	request.header_fields          = SetHeaderFields(lines);
+	// PrintLines(lines);
 	return request;
 }
 
