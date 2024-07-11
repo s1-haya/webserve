@@ -38,6 +38,7 @@ Server::Server(const _config::Config::ConfigData &config) {
 	SockInfoVec sock_infos = ConvertConfigToSockInfoVec(server_configs);
 	Init(sock_infos);
 }
+
 Server::~Server() {}
 
 void Server::Run() {
