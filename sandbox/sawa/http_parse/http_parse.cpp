@@ -6,7 +6,7 @@
 namespace http {
 namespace {
 
-bool isUSASCII(const std::string &str) {
+bool IsUSASCII(const std::string &str) {
 	typedef std::string::const_iterator It;
 	for (It it = str.begin(); it != str.end(); it++) {
 		if (static_cast<unsigned char>(*it) > 127) {
@@ -16,7 +16,7 @@ bool isUSASCII(const std::string &str) {
 	return true;
 }
 
-bool isUpper(const std::string &str) {
+bool IsUpper(const std::string &str) {
 	typedef std::string::const_iterator It;
 	for (It it = str.begin(); it != str.end(); it++) {
 		if (!std::isupper(static_cast<unsigned char>(*it))) {
@@ -58,9 +58,10 @@ HTTPParse::~HTTPParse() {}
 // メソッドを拡張する視点で作成する
 std::string HTTPParse::CheckMethod(const std::string &method) {
 	// US-ASCIIかまたは大文字かどうか -> 400
-	if (isUSASCII(method) == false || isUpper(method) == false)
+	if (IsUSASCII(method) == false || IsUpper(method) == false)
 		return "400";
 	// GET, POST, DELETEかどうか ->　501
+	// メソッドはstaticで持たせた方がいいのかな？
 	std::vector<std::string> basic_methods;
 	basic_methods.push_back("GET");
 	basic_methods.push_back("POST");
@@ -76,12 +77,26 @@ std::string HTTPParse::CheckMethod(const std::string &method) {
 	return (method);
 }
 
+std::string HTTPParse::CheckUri(const std::string &uri) {
+	// US-ASCIIかまたは大文字かどうか -> 400
+	if ("HTTP/1.1" == version)
+		return ("400");
+	return (version);
+}
+
+std::string HTTPParse::CheckVersion(const std::string &version) {
+	// US-ASCIIかまたは大文字かどうか -> 400
+	if ("HTTP/1.1" == version)
+		return ("400");
+	return (version);
+}
+
 RequestLine HTTPParse::SetRequestLine(const std::vector<std::string> &request_line_info) {
 	// 各値が正常な値かどうか確認してから作成する（エラーの場合はenumに設定？）
 	RequestLine request_line(
 		CheckMethod(request_line_info[0]),
-		CreateDefaultPath(request_line_info[1]),
-		request_line_info[2]
+		CreateDefaultPath(CheckUri(request_line_info[1])),
+		CheckVersion(request_line_info[2])
 	);
 	return request_line;
 }

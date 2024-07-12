@@ -35,6 +35,8 @@ class HTTPParse {
 	std::string  SetMessageBody(const std::vector<std::string> &message_body_info);
 
 	std::string CheckMethod(const std::string &method);
+	std::string CheckUri(const std::string &uri);
+	std::string CheckVersion(const std::string &version);
 };
 
 } // namespace http
