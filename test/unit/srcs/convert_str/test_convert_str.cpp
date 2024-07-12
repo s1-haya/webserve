@@ -70,6 +70,7 @@ int RunTest() {
 		TestCase("a", 0, FAIL),
 		TestCase("8080a", 0, FAIL),
 		TestCase("a8080", 0, FAIL),
+		TestCase("    8080", 8080, FAIL),
 		TestCase("8080    ", 0, FAIL),
 		TestCase("-8080", 0, FAIL),
 		TestCase("4294967296", 0, FAIL), // UINT_MAX + 1
@@ -77,7 +78,6 @@ int RunTest() {
 		// 成功を確認するtestcase
 		TestCase("0", 0, SUCCESS),
 		TestCase("8080", 8080, SUCCESS),
-		TestCase("    8080", 8080, SUCCESS),
 		TestCase("4294967295", 4294967295, SUCCESS), // UINT_MAX
 	};
 

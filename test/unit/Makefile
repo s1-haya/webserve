@@ -14,7 +14,8 @@ WS_UTILS_DIR	:=	../../srcs/utils
 SRCS			+=	$(WS_UTILS_DIR)/color.cpp \
                 	$(WS_UTILS_DIR)/split.cpp
 # for convert_str
-SRCS			+=	$(WS_UTILS_DIR)/convert_str.cpp
+SRCS			+=	$(WS_UTILS_DIR)/convert_str.cpp \
+					$(WS_UTILS_DIR)/isdigit.cpp
 
 # 2. add unit test file
 # for split
