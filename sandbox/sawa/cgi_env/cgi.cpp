@@ -7,14 +7,14 @@
 
 namespace cgi {
 
-Cgi::Cgi() {}
+Cgi::Cgi() : argv_(NULL), env_(NULL), exit_status_(0) {}
 
 // CGIリクエストの構造体の場合、Freeは削除する。んでデストラクターでfree
 Cgi::~Cgi() {}
 
 // CGIリクエストの情報を持つ構造体を引数に渡す。返り値enumを返す
 int Cgi::Run(const cgi::CgiRequest &request) {
-	Set(request);
+	SetCgiMember(request);
 	Execve();
 	Free();
 	return (this->exit_status_);
@@ -79,7 +79,7 @@ void Cgi::ExecveCgiScript() {
 	// perror("execve"); // execveが失敗した場合のエラーメッセージ出力
 }
 
-void Cgi::Set(cgi::CgiRequest request) {
+void Cgi::SetCgiMember(cgi::CgiRequest request) {
 	this->method_       = request.meta_variables["REQUEST_METHOD"];
 	this->cgi_script_   = request.meta_variables["SCRIPT_NAME"];
 	this->body_message_ = request.body_message;

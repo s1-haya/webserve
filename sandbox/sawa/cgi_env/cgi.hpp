@@ -18,7 +18,7 @@ class Cgi {
   private:
 	Cgi(const Cgi &cgi);
 	Cgi   &operator=(const Cgi &cgi);
-	void   Set(cgi::CgiRequest request);
+	void   SetCgiMember(cgi::CgiRequest request);
 	char *const* SetCgiEnv(const MetaMap &meta_variables);
 	char *const* SetCgiArgv();
 	void   Execve();
