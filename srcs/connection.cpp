@@ -26,8 +26,6 @@ void InitHints(Connection::AddrInfo *hints) {
 
 // result: dynamic allocated by getaddrinfo()
 Connection::AddrInfo *Connection::GetAddrInfoList(const SockInfo &server_sock_info) {
-	// todo: use host in getaddrinfo()?
-	// const std::string &host  = server_sock_info.GetName();
 	const std::string &port  = utils::ConvertUintToStr(server_sock_info.GetPort());
 	AddrInfo           hints = {};
 	InitHints(&hints);
