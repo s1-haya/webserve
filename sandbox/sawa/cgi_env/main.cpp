@@ -14,12 +14,12 @@ void run_cgi(const char *scirpt_name);
 // 						 "REMOTE_HOST" | "REMOTE_IDENT" | "REMOTE_USER" | "REQUEST_METHOD" |
 // 						 "SCRIPT_NAME" | "SERVER_NAME" | "SERVER_PORT" | "SERVER_PROTOCOL" |
 // 						 "SERVER_SOFTWARE"
-std::map<std::string, std::string> create_request_meta_variables();
+std::map<std::string, std::string> CreateRequestMetaVariables();
 
 // メタ変数から環境変数を作成する関数
-const char **create_cgi_env(const std::map<std::string, std::string> &request_meta_variables);
+char **create_cgi_env(const std::map<std::string, std::string> &request_meta_variables);
 
-void free_cgi_env(const char **cgi_env) {
+void free_cgi_env(char *const* cgi_env) {
 	for (size_t i = 0; cgi_env[i] != NULL; ++i) {
 		delete[] cgi_env[i];
 	}
@@ -61,7 +61,7 @@ int main(void) {
 		"SERVER_PROTOCOL",
 		"SERVER_SOFTWARE"
 	};
-	std::map<std::string, std::string> request_meta_variables = create_request_meta_variables();
+	std::map<std::string, std::string> request_meta_variables = CreateRequestMetaVariables();
 	const size_t                       expected_size = sizeof(expected) / sizeof(expected[0]);
 
 	// メタ変数の値があるかどうか確認するテスト（expectedはRFC3875のメタ変数の値をコピペした）
@@ -76,7 +76,7 @@ int main(void) {
 	}
 
 	// 環境変数を出力する（=が付与されてるか、valueが紐づいてるかどうか、動的にメモリが確保できてるか）
-	const char **cgi_env = create_cgi_env(request_meta_variables);
+	char *const* cgi_env = create_cgi_env(request_meta_variables);
 	for (size_t i = 0; cgi_env[i] != NULL; i++) {
 		std::cout << cgi_env[i] << std::endl;
 	}
@@ -93,10 +93,10 @@ int main(void) {
 	// test_run_cgi("../../../test/apache/cgi/not_executable.pl");
 	// test_run_cgi("../../../test/apache/cgi/not_file.pl");
 
-	// cgi::CGIRequest request;
-	// request.meta_variables = create_request_meta_variables();
+	// cgi::CgiRequest request;
+	// request.meta_variables = CreateRequestMetaVariables();
 	// request.body_message   = "name=ChatGPT&message=Hello";
-	cgi::CGI    cgi;
+	cgi::Cgi    cgi;
 	std::string http_request = "tmp";
 	// std::string http_request = "POST /cgi-bin/print_stdin.pl HTTP/1.1\r\n"
 	// 							"Host: localhost:8080\r\n"
@@ -105,8 +105,8 @@ int main(void) {
 	// 							"Content-Length: 26\r\n"
 	// 							"\r\n"
 	// 							"name=ChatGPT&message=Hello";
-	cgi::CGIParse   parser;
-	cgi::CGIRequest request = parser.parse(http_request);
+	cgi::CgiParse   parser;
+	cgi::CgiRequest request = parser.Parse(http_request);
 	cgi.Run(request);
 	return 0;
 }

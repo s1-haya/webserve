@@ -7,20 +7,20 @@
 
 namespace cgi {
 
-CGI::CGI() {}
+Cgi::Cgi() {}
 
 // CGIリクエストの構造体の場合、Freeは削除する。んでデストラクターでfree
-CGI::~CGI() {}
+Cgi::~Cgi() {}
 
 // CGIリクエストの情報を持つ構造体を引数に渡す。返り値enumを返す
-int CGI::Run(const cgi::CGIRequest &request) {
+int Cgi::Run(const cgi::CgiRequest &request) {
 	Set(request);
 	Execve();
 	Free();
 	return (this->exit_status_);
 }
 
-void CGI::Execve() {
+void Cgi::Execve() {
 	int cgi_request[2];
 	int cgi_response[2];
 
@@ -39,33 +39,34 @@ void CGI::Execve() {
 	} else if (p == 0) {
 		// 親と子でプロセス空間が違うため、親プロセス自体の標準出力に影響はない。
 		if (method_ == "POST") {
-			close(cgi_request[W]);
-			// close(STDIN_FILENO);
-			dup2(cgi_request[R], STDIN_FILENO);
-			close(cgi_request[R]);
+			close(cgi_request[WRITE]);
+			dup2(cgi_request[READ], STDIN_FILENO);
+			close(cgi_request[READ]);
 		}
-		close(cgi_response[R]);
-		dup2(cgi_response[W], STDOUT_FILENO);
-		close(cgi_response[W]);
+		close(cgi_response[READ]);
+		dup2(cgi_response[WRITE], STDOUT_FILENO);
+		close(cgi_response[WRITE]);
 		ExecveCgiScript();
 	} else {
 		if (method_ == "POST") {
-			// Send POST data to child process
-			close(cgi_request[R]);
-			write(cgi_request[W], body_message_.c_str(), body_message_.length());
-			close(cgi_request[W]);
+			close(cgi_request[READ]);
+			write(cgi_request[WRITE], body_message_.c_str(), body_message_.length());
+			close(cgi_request[WRITE]);
 		}
-		close(cgi_response[W]);
+		close(cgi_response[WRITE]);
 		wait(NULL);
 		char buf;
-		while (read(cgi_response[R], &buf, 1) > 0) {
+		while (read(cgi_response[READ], &buf, 1) > 0) {
 			write(STDOUT_FILENO, &buf, 1);
 		}
-		close(cgi_response[R]);
+		close(cgi_response[READ]);
 	}
 }
 
-void CGI::Free() {
+void Cgi::Free() {
+	for (size_t i = 0; this->argv_[i] != NULL; ++i) {
+		delete[] this->argv_[i];
+	}
 	delete[] this->argv_;
 	for (size_t i = 0; this->env_[i] != NULL; ++i) {
 		delete[] this->env_[i];
@@ -73,12 +74,12 @@ void CGI::Free() {
 	delete[] this->env_;
 }
 
-void CGI::ExecveCgiScript() {
+void Cgi::ExecveCgiScript() {
 	this->exit_status_ = execve(cgi_script_.c_str(), argv_, env_);
 	// perror("execve"); // execveが失敗した場合のエラーメッセージ出力
 }
 
-void CGI::Set(cgi::CGIRequest request) {
+void Cgi::Set(cgi::CgiRequest request) {
 	this->method_       = request.meta_variables["REQUEST_METHOD"];
 	this->cgi_script_   = request.meta_variables["SCRIPT_NAME"];
 	this->body_message_ = request.body_message;
@@ -86,27 +87,29 @@ void CGI::Set(cgi::CGIRequest request) {
 	this->env_          = SetCgiEnv(request.meta_variables);
 }
 
-char **CGI::SetCgiArgv() {
-	// CGIスクリプトに引数を渡す場合の引数リストの初期化
+char *const* Cgi::SetCgiArgv() {
 	char **argv = new char *[2];
-	argv[0]     = const_cast<char *>(cgi_script_.c_str());
+	// todo error(new(std::nothrow))
+	char             *dest    = new char[cgi_script_.size() + 1];
+	// todo error(new(std::nothrow))
+	std::strcpy(dest, cgi_script_.c_str());
+	argv[0]     = dest;
 	argv[1]     = NULL;
 	return argv;
 }
 
-char **CGI::SetCgiEnv(const MetaMap &meta_variables) {
+char *const* Cgi::SetCgiEnv(const MetaMap &meta_variables) {
 	char                          **cgi_env = new char *[meta_variables.size() + 1];
-	typedef MetaMap::const_iterator It;
 	size_t                          i = 0;
+	typedef MetaMap::const_iterator It;
 	for (It it = meta_variables.begin(); it != meta_variables.end(); it++) {
 		const std::string element = it->first + "=" + it->second;
 		char             *dest    = new char[element.size() + 1];
-		// error
+		// todo error(new(std::nothrow))
 		if (dest == NULL)
 			return (NULL);
 		std::strcpy(dest, element.c_str());
 		cgi_env[i] = dest;
-		std::strcpy(const_cast<char *>(cgi_env[i]), element.c_str());
 		i++;
 	}
 	cgi_env[i] = NULL;

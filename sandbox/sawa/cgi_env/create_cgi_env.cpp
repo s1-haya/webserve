@@ -2,20 +2,20 @@
 #include <iostream>
 #include <map>
 
-std::map<std::string, std::string> create_request_meta_variables();
+std::map<std::string, std::string> CreateRequestMetaVariables();
 
-const char **create_cgi_env(const std::map<std::string, std::string> &request_meta_variables) {
-	const char **cgi_env = new const char *[request_meta_variables.size() + 1];
-	size_t       i       = 0;
-	for (std::map<std::string, std::string>::const_iterator ite = request_meta_variables.begin();
-		 ite != request_meta_variables.end();
-		 ite++) {
-		const std::string element = ite->first + "=" + ite->second;
-		cgi_env[i]                = new char[element.size() + 1];
-		// error
-		if (cgi_env[i] == NULL)
+char **create_cgi_env(const std::map<std::string, std::string> &meta_variables) {
+	char **cgi_env = new char *[meta_variables.size() + 1];
+	size_t i = 0;
+	typedef std::map<std::string, std::string>::const_iterator It;
+	for (It it = meta_variables.begin(); it != meta_variables.end(); it++) {
+		const std::string element = it->first + "=" + it->second;
+		char             *dest    = new char[element.size() + 1];
+		// todo error(new(std::nothrow))
+		if (dest == NULL)
 			return (NULL);
-		std::strcpy(const_cast<char *>(cgi_env[i]), element.c_str());
+		std::strcpy(dest, element.c_str());
+		cgi_env[i] = dest;
 		i++;
 	}
 	cgi_env[i] = NULL;

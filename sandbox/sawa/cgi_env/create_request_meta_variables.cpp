@@ -1,7 +1,7 @@
 #include <iostream>
 #include <map>
 
-std::map<std::string, std::string> create_request_meta_variables() {
+std::map<std::string, std::string> CreateRequestMetaVariables() {
 	std::map<std::string, std::string> request_meta_variables;
 	request_meta_variables["AUTH_TYPE"];
 	request_meta_variables["CONTENT_LENGTH"] = "26";
@@ -24,7 +24,7 @@ std::map<std::string, std::string> create_request_meta_variables() {
 }
 
 // int main(void) {
-// 	std::map<std::string, std::string> request_meta_variables = create_request_meta_variables();
+// 	std::map<std::string, std::string> request_meta_variables = CreateRequestMetaVariables();
 // 	std::cout << request_meta_variables["HELLO"] << std::endl;
 // 	std::cout << request_meta_variables["SERVER_NAME"] << std::endl;
 // 	return (0);

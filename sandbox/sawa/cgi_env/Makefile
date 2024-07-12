@@ -4,6 +4,7 @@ TARGET_DIR	:=	../../../srcs/utils
 
 SRCS		:=	main.cpp \
 				create_cgi_env.cpp \
+				create_cgi_argv.cpp \
 				create_request_meta_variables.cpp \
 				execve_cgi_script.cpp \
 				run_cgi.cpp \
