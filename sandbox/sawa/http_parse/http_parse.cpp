@@ -27,14 +27,14 @@ bool IsUpper(const std::string &str) {
 }
 
 // todo: create path (/, /aaa, /aaa/)
-std::string CreateDefaultPath(const std::string &path) {
-	static const std::string location = "html";
+// std::string CreateDefaultPath(const std::string &path) {
+// 	static const std::string location = "html";
 
-	if (path.size() == 1) {
-		return location + "/index.html";
-	}
-	return location + path + "/index.html";
-}
+// 	if (path.size() == 1) {
+// 		return location + "/index.html";
+// 	}
+// 	return location + path + "/index.html";
+// }
 
 // void PrintLines(const std::vector<std::string> &lines) {
 // 	typedef std::vector<std::string>::const_iterator It;
@@ -67,7 +67,7 @@ std::string HTTPParse::CheckMethod(const std::string &method) {
 	basic_methods.push_back("POST");
 	basic_methods.push_back("DELETE");
 	if (std::find(basic_methods.begin(), basic_methods.end(), method) == basic_methods.end()) {
-		return "501 Not Implemented";
+		return "501";
 	}
 	// 設定ファイルでメソッドが許可されてるかどうか -> 405
 	// どの仮想サーバーのどのリソースがメソッド許可されてるかどうか？がリソースパースしていない段階ではわからないからこの関数で判定しないかも
@@ -77,16 +77,16 @@ std::string HTTPParse::CheckMethod(const std::string &method) {
 	return (method);
 }
 
-std::string HTTPParse::CheckUri(const std::string &uri) {
-	// US-ASCIIかまたは大文字かどうか -> 400
-	if ("HTTP/1.1" == version)
-		return ("400");
-	return (version);
+std::string HTTPParse::CheckRequestTarget(const std::string &reqest_target) {
+	// /が先頭になかったら場合 -> 400
+	if (reqest_target.empty() || reqest_target[0] != '/')
+		return "400";
+	return reqest_target;
 }
 
 std::string HTTPParse::CheckVersion(const std::string &version) {
-	// US-ASCIIかまたは大文字かどうか -> 400
-	if ("HTTP/1.1" == version)
+	// HTTP/1.1かどうか -> 400
+	if ("HTTP/1.1" != version)
 		return ("400");
 	return (version);
 }
@@ -95,7 +95,7 @@ RequestLine HTTPParse::SetRequestLine(const std::vector<std::string> &request_li
 	// 各値が正常な値かどうか確認してから作成する（エラーの場合はenumに設定？）
 	RequestLine request_line(
 		CheckMethod(request_line_info[0]),
-		CreateDefaultPath(CheckUri(request_line_info[1])),
+		CheckRequestTarget(request_line_info[1]),
 		CheckVersion(request_line_info[2])
 	);
 	return request_line;

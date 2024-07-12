@@ -8,11 +8,13 @@ namespace http {
 
 struct RequestLine {
 	std::string method;
-	std::string uri;
+	std::string request_target;
 	std::string version;
-	RequestLine() : method(""), uri(""), version("") {}
-	RequestLine(const std::string &method, const std::string &uri, const std::string &version)
-		: method(method), uri(uri), version(version) {}
+	RequestLine() : method(""), request_target(""), version("") {}
+	RequestLine(
+		const std::string &method, const std::string &request_target, const std::string &version
+	)
+		: method(method), request_target(request_target), version(version) {}
 };
 
 typedef std::map<std::string, std::string> HeaderFields;
@@ -35,7 +37,7 @@ class HTTPParse {
 	std::string  SetMessageBody(const std::vector<std::string> &message_body_info);
 
 	std::string CheckMethod(const std::string &method);
-	std::string CheckUri(const std::string &uri);
+	std::string CheckRequestTarget(const std::string &request_target);
 	std::string CheckVersion(const std::string &version);
 };
 
