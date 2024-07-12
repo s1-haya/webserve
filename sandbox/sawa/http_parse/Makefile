@@ -49,3 +49,7 @@ fclean: clean
 
 .PHONY	: re
 re: fclean all
+
+.PHONY	: run
+run: re
+	./$(NAME)
