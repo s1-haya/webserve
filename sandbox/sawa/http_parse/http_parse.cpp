@@ -2,6 +2,7 @@
 #include "http_message.hpp"
 #include "utils.hpp"
 #include <vector>
+#include <algorithm> // std::find
 
 namespace http {
 namespace {
@@ -51,17 +52,16 @@ bool IsUpper(const std::string &str) {
 
 } // namespace
 
-HTTPParse::HTTPParse() {}
+HttpParse::HttpParse() {}
 
-HTTPParse::~HTTPParse() {}
+HttpParse::~HttpParse() {}
 
-// メソッドを拡張する視点で作成する
-std::string HTTPParse::CheckMethod(const std::string &method) {
+std::string HttpParse::CheckMethod(const std::string &method) {
 	// US-ASCIIかまたは大文字かどうか -> 400
 	if (IsUSASCII(method) == false || IsUpper(method) == false)
 		return "400";
 	// GET, POST, DELETEかどうか ->　501
-	// メソッドはstaticで持たせた方がいいのかな？
+	// ? メソッドはstaticで持たせた方がいいのかな？
 	std::vector<std::string> basic_methods;
 	basic_methods.push_back("GET");
 	basic_methods.push_back("POST");
@@ -70,29 +70,29 @@ std::string HTTPParse::CheckMethod(const std::string &method) {
 		return "501";
 	}
 	// 設定ファイルでメソッドが許可されてるかどうか -> 405
-	// どの仮想サーバーのどのリソースがメソッド許可されてるかどうか？がリソースパースしていない段階ではわからないからこの関数で判定しないかも
+	// todo: どの仮想サーバーのどのリソースがメソッド許可されてるかどうか？がリソースパースしていない段階ではわからないからこの関数で判定しないかも
 	// if (allowed_methods.find(method) == allowed_methods.end()) {
 	// 	return "405";
 	// }
 	return (method);
 }
 
-std::string HTTPParse::CheckRequestTarget(const std::string &reqest_target) {
+std::string HttpParse::CheckRequestTarget(const std::string &reqest_target) {
 	// /が先頭になかったら場合 -> 400
 	if (reqest_target.empty() || reqest_target[0] != '/')
 		return "400";
 	return reqest_target;
 }
 
-std::string HTTPParse::CheckVersion(const std::string &version) {
+std::string HttpParse::CheckVersion(const std::string &version) {
 	// HTTP/1.1かどうか -> 400
 	if ("HTTP/1.1" != version)
 		return ("400");
 	return (version);
 }
 
-RequestLine HTTPParse::SetRequestLine(const std::vector<std::string> &request_line_info) {
-	// 各値が正常な値かどうか確認してから作成する（エラーの場合はenumに設定？）
+RequestLine HttpParse::SetRequestLine(const std::vector<std::string> &request_line_info) {
+	// todo: 各値が正常な値かどうか確認してから作成する（エラーの場合はenumに設定？）
 	RequestLine request_line(
 		CheckMethod(request_line_info[0]),
 		CheckRequestTarget(request_line_info[1]),
@@ -101,8 +101,8 @@ RequestLine HTTPParse::SetRequestLine(const std::vector<std::string> &request_li
 	return request_line;
 }
 
-HeaderFields HTTPParse::SetHeaderFields(const std::vector<std::string> &header_fields_info) {
-	// 各値が正常な値かどうか確認してから作成する（エラーの場合はenumに設定？）
+HeaderFields HttpParse::SetHeaderFields(const std::vector<std::string> &header_fields_info) {
+	// todo: 各値が正常な値かどうか確認してから作成する（エラーの場合はenumに設定？）
 	HeaderFields                                     header_fields;
 	typedef std::vector<std::string>::const_iterator It;
 	for (It it = header_fields_info.begin() + 1; it != header_fields_info.end(); ++it) {
@@ -112,21 +112,20 @@ HeaderFields HTTPParse::SetHeaderFields(const std::vector<std::string> &header_f
 	return header_fields;
 }
 
-// 　懸念点：MessageBodyにCRLFが含まれていた場合 std::vectorはLineごとに持ってる
-std::string HTTPParse::SetMessageBody(const std::vector<std::string> &message_body_info) {
+std::string HttpParse::SetMessageBody(const std::vector<std::string> &message_body_info) {
 	std::vector<std::string>::const_iterator it           = message_body_info.begin();
 	std::string                              message_body = *it;
 	return message_body;
 }
 
 // todo: tmp request_
-HTTPRequest HTTPParse::Run(const std::string &read_buf) {
-	HTTPRequest              request;
+HttpRequest HttpParse::Run(const std::string &read_buf) {
+	HttpRequest              request;
 	std::vector<std::string> a = utils::SplitStr(read_buf, CRLF + CRLF);
 	std::vector<std::string> b = utils::SplitStr(a[0], CRLF);
 	request.request_line       = SetRequestLine(utils::SplitStr(b[0], SP));
 	request.header_fields      = SetHeaderFields(b);
-	// 調査: bodymessageの取得方法（ヘッダーによって仕様が変わる）
+	// todo: bodymessageの取得方法（ヘッダーによって仕様が変わる）
 	if ("POST" == request.request_line.method)
 		request.message_body = SetMessageBody(utils::SplitStr(a[1], ""));
 	// PrintLines(b);

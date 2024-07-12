@@ -3,6 +3,7 @@
 
 #include <map>
 #include <string>
+#include <vector>
 
 namespace http {
 
@@ -19,26 +20,26 @@ struct RequestLine {
 
 typedef std::map<std::string, std::string> HeaderFields;
 
-struct HTTPRequest {
+struct HttpRequest {
 	RequestLine  request_line;
 	HeaderFields header_fields;
 	std::string  message_body;
 };
 
-class HTTPParse {
+class HttpParse {
   public:
-	HTTPParse();
-	~HTTPParse();
-	HTTPRequest Run(const std::string &buf);
+	HttpParse();
+	~HttpParse();
+	static HttpRequest Run(const std::string &buf);
 
   private:
-	RequestLine  SetRequestLine(const std::vector<std::string> &request_line);
-	HeaderFields SetHeaderFields(const std::vector<std::string> &header_fields_info);
-	std::string  SetMessageBody(const std::vector<std::string> &message_body_info);
+	static RequestLine  SetRequestLine(const std::vector<std::string> &request_line);
+	static HeaderFields SetHeaderFields(const std::vector<std::string> &header_fields_info);
+	static std::string  SetMessageBody(const std::vector<std::string> &message_body_info);
 
-	std::string CheckMethod(const std::string &method);
-	std::string CheckRequestTarget(const std::string &request_target);
-	std::string CheckVersion(const std::string &version);
+	static std::string CheckMethod(const std::string &method);
+	static std::string CheckRequestTarget(const std::string &request_target);
+	static std::string CheckVersion(const std::string &version);
 };
 
 } // namespace http
