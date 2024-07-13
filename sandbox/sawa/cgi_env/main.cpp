@@ -19,7 +19,7 @@ std::map<std::string, std::string> CreateRequestMetaVariables();
 // メタ変数から環境変数を作成する関数
 char **create_cgi_env(const std::map<std::string, std::string> &request_meta_variables);
 
-void free_cgi_env(char *const* cgi_env) {
+void free_cgi_env(char *const *cgi_env) {
 	for (size_t i = 0; cgi_env[i] != NULL; ++i) {
 		delete[] cgi_env[i];
 	}
@@ -76,7 +76,7 @@ int main(void) {
 	}
 
 	// 環境変数を出力する（=が付与されてるか、valueが紐づいてるかどうか、動的にメモリが確保できてるか）
-	char *const* cgi_env = create_cgi_env(request_meta_variables);
+	char *const *cgi_env = create_cgi_env(request_meta_variables);
 	for (size_t i = 0; cgi_env[i] != NULL; i++) {
 		std::cout << cgi_env[i] << std::endl;
 	}
@@ -105,8 +105,7 @@ int main(void) {
 	// 							"Content-Length: 26\r\n"
 	// 							"\r\n"
 	// 							"name=ChatGPT&message=Hello";
-	cgi::CgiParse   parser;
-	cgi::CgiRequest request = parser.Parse(http_request);
+	cgi::CgiRequest request = cgi::CgiParse::Parse(http_request);
 	cgi.Run(request);
 	return 0;
 }
