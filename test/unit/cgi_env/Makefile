@@ -3,7 +3,8 @@ NAME		:=	a.out
 TARGET_DIR	:=	../../../srcs/utils
 
 SRCS		:=	main.cpp \
-				$(TARGET_DIR)/split.cpp \
+				create_cgi_env.cpp \
+				create_request_meta_variables.cpp \
 				$(TARGET_DIR)/color.cpp
 
 OBJ_DIR		:=	objs
@@ -22,7 +23,7 @@ MKDIR		:=	mkdir -p
 all		: $(NAME)
 
 $(NAME): $(OBJS)
-	$(CXX) $(CXXFLAGS) -o $@ $^
+	$(CXX) -o $@ $^
 
 $(OBJ_DIR)/%.o: %.cpp
 	@$(MKDIR) $(dir $@)
