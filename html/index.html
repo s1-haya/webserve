@@ -8,13 +8,13 @@
     <h1>Hello from webserv! (tmp)</h1>
 
     <h2>GET</h2>
-    <div><a href="/sub">link to /sub</a></div>
-    <div><a href="/non-existent-path">link to non-existent-path (404)</a></div>
+    <div><a href="sub/">link to sub/</a></div>
+    <div><a href="non-existent-path/">link to non-existent-path/ (404)</a></div>
     <br />
 
     <h2>POST</h2>
-    <div>post to /post?</div>
-    <form action="/post" method="POST">
+    <div>post to post/?</div>
+    <form action="post/" method="POST">
       <label for="text-input">Enter text</label>
       <input type="text" name="user_text" />
       <button type="submit">Submit</button>
@@ -22,16 +22,16 @@
     <br />
 
     <h2>DELETE</h2>
-    <div><a href="/delete">link to /delete?</a></div>
+    <div><a href="delete/">link to delete/?</a></div>
     <br />
 
     <h2>GET(CGI)</h2>
-    <div><a href="/cgi/print_env.pl">link to /cgi/print_env.pl</a></div>
+    <div><a href="cgi/print_env.pl">link to cgi/print_env.pl</a></div>
     <br />
 
     <h2>POST(CGI)</h2>
     <div>post to cgi/print_stdin.pl?</div>
-    <form action="/cgi/print_stdin.pl" method="POST">
+    <form action="cgi/print_stdin.pl" method="POST">
       <label for="text-input">Enter text</label>
       <input type="text" name="user_text" />
       <button type="submit">Submit</button>
