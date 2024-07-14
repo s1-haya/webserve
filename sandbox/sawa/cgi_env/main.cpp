@@ -1,3 +1,5 @@
+#include "cgi.hpp"
+#include "cgi_parse.hpp"
 #include "color.hpp"
 #include <iostream>
 #include <map>
@@ -12,12 +14,12 @@ void run_cgi(const char *scirpt_name);
 // 						 "REMOTE_HOST" | "REMOTE_IDENT" | "REMOTE_USER" | "REQUEST_METHOD" |
 // 						 "SCRIPT_NAME" | "SERVER_NAME" | "SERVER_PORT" | "SERVER_PROTOCOL" |
 // 						 "SERVER_SOFTWARE"
-std::map<std::string, std::string> create_request_meta_variables();
+std::map<std::string, std::string> CreateRequestMetaVariables();
 
 // メタ変数から環境変数を作成する関数
-const char **create_cgi_env(const std::map<std::string, std::string> &request_meta_variables);
+char **create_cgi_env(const std::map<std::string, std::string> &request_meta_variables);
 
-void free_cgi_env(const char **cgi_env) {
+void free_cgi_env(char *const *cgi_env) {
 	for (size_t i = 0; cgi_env[i] != NULL; ++i) {
 		delete[] cgi_env[i];
 	}
@@ -32,11 +34,10 @@ void test_run_cgi(const char *script_name) {
 		std::cout << utils::color::GREEN << "[OK] " << utils::color::RESET << std::endl;
 		std::cout << "The file " << script_name << " is executable." << std::endl;
 		run_cgi(script_name);
-	}
-	else {
+	} else {
 		std::cerr << utils::color::RED << "[NG] " << utils::color::RESET << std::endl;
-		std::cerr << "The file "
-				  << script_name << " is not executable or does not exist." << std::endl;
+		std::cerr << "The file " << script_name << " is not executable or does not exist."
+				  << std::endl;
 	}
 }
 
@@ -60,7 +61,7 @@ int main(void) {
 		"SERVER_PROTOCOL",
 		"SERVER_SOFTWARE"
 	};
-	std::map<std::string, std::string> request_meta_variables = create_request_meta_variables();
+	std::map<std::string, std::string> request_meta_variables = CreateRequestMetaVariables();
 	const size_t                       expected_size = sizeof(expected) / sizeof(expected[0]);
 
 	// メタ変数の値があるかどうか確認するテスト（expectedはRFC3875のメタ変数の値をコピペした）
@@ -75,7 +76,7 @@ int main(void) {
 	}
 
 	// 環境変数を出力する（=が付与されてるか、valueが紐づいてるかどうか、動的にメモリが確保できてるか）
-	const char **cgi_env = create_cgi_env(request_meta_variables);
+	char *const *cgi_env = create_cgi_env(request_meta_variables);
 	for (size_t i = 0; cgi_env[i] != NULL; i++) {
 		std::cout << cgi_env[i] << std::endl;
 	}
@@ -85,10 +86,26 @@ int main(void) {
 	// - 親プロセスをkillせずにCGIスクリプトが実行できているかどうか
 	// - CGIスクリプトが標準出力されてるか？（first.plが標準出力してればOK）
 	// - script_nameは実行権限があるかどうか、存在しているかどうか
-	test_run_cgi("../../../test/apache/cgi/print_stdout.pl");
-	test_run_cgi("../../../test/apache/cgi/print_stdin.pl");
-	test_run_cgi("../../../test/apache/cgi/print_env.pl");
-	test_run_cgi("../../../test/apache/cgi/not_executable.pl");
-	test_run_cgi("../../../test/apache/cgi/not_file.pl");
+
+	// test_run_cgi("../../../test/apache/cgi/print_stdout.pl");
+	// test_run_cgi("../../../test/apache/cgi/print_stdin.pl");
+	// test_run_cgi("../../../test/apache/cgi/print_env.pl");
+	// test_run_cgi("../../../test/apache/cgi/not_executable.pl");
+	// test_run_cgi("../../../test/apache/cgi/not_file.pl");
+
+	// cgi::CgiRequest request;
+	// request.meta_variables = CreateRequestMetaVariables();
+	// request.body_message   = "name=ChatGPT&message=Hello";
+	cgi::Cgi    cgi;
+	std::string http_request = "tmp";
+	// std::string http_request = "POST /cgi-bin/print_stdin.pl HTTP/1.1\r\n"
+	// 							"Host: localhost:8080\r\n"
+	// 							"Server: Apache/2.4.59 (Unix)\r\n"
+	// 							"Content-Type: application/x-www-form-urlencoded\r\n"
+	// 							"Content-Length: 26\r\n"
+	// 							"\r\n"
+	// 							"name=ChatGPT&message=Hello";
+	cgi::CgiRequest request = cgi::CgiParse::Parse(http_request);
+	cgi.Run(request);
 	return 0;
 }
