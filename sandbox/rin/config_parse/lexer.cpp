@@ -3,10 +3,9 @@
 #include <algorithm>
 #include <iostream>
 
-namespace lexer {
-
-Lexer::Lexer(const std::string &buffer, std::list<node::Node> &tokens)
-	: tokens_(tokens), buffer_(buffer) {
+Lexer::Lexer(const std::string &buffer, std::list<Node> &tokens_)
+	: tokens_(tokens_), buffer_(buffer) {
+	std::string new_str;
 	InitDefinition();
 	LexBuffer();
 }
@@ -31,13 +30,13 @@ void Lexer::LexBuffer() {
 		}
 		switch (*it) {
 		case SEMICOLON_CHR:
-			AddToken(SEMICOLON_CHR, node::DELIM);
+			AddToken(SEMICOLON_CHR, DELIM);
 			break;
 		case L_BRACKET_CHR:
-			AddToken(L_BRACKET_CHR, node::L_BRACKET);
+			AddToken(L_BRACKET_CHR, L_BRACKET);
 			break;
 		case R_BRACKET_CHR:
-			AddToken(R_BRACKET_CHR, node::R_BRACKET);
+			AddToken(R_BRACKET_CHR, R_BRACKET);
 			break;
 		case SHARP_CHR:
 			SkipComment(it);
@@ -50,15 +49,15 @@ void Lexer::LexBuffer() {
 }
 
 // For char
-void Lexer::AddToken(char symbol, node::TokenType token_type) {
-	const std::string symbol_str(1, symbol);
-	const node::Node  token = {symbol_str, token_type};
+void Lexer::AddToken(const char symbol, int token_type) {
+	std::string symbol_str(1, symbol);
+	Node        token(symbol_str, token_type);
 	tokens_.push_back(token);
 }
 
 // For string
-void Lexer::AddToken(const std::string &symbol, node::TokenType token_type) {
-	const node::Node token = {symbol, token_type};
+void Lexer::AddToken(const std::string &symbol, int token_type) {
+	Node token(symbol, token_type);
 	tokens_.push_back(token);
 }
 
@@ -69,7 +68,7 @@ void Lexer::AddWordToken(std::string::const_iterator &it) {
 		++it;
 	}
 	AddToken(new_str, SearchWordTokenType(new_str)); // 予約語の検索
-	--it;                                            // loopでWordの次の文字から処理
+	it -= 1;                                         // loopでWordの次の文字から処理
 }
 
 void Lexer::SkipComment(std::string::const_iterator &it) {
@@ -77,12 +76,10 @@ void Lexer::SkipComment(std::string::const_iterator &it) {
 		++it;
 }
 
-node::TokenType Lexer::SearchWordTokenType(std::string &word) {
+Lexer::TokenType Lexer::SearchWordTokenType(std::string &word) {
 	if (std::find(context_.begin(), context_.end(), word) != context_.end())
-		return node::CONTEXT;
+		return CONTEXT;
 	else if (std::find(directive_.begin(), directive_.end(), word) != directive_.end())
-		return node::DIRECTIVE;
-	return node::WORD;
+		return DIRECTIVE;
+	return WORD;
 }
-
-} // namespace lexer

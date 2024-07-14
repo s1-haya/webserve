@@ -1,0 +1,6 @@
+server_name: localhost   port: 80 
+location: /   root: /data/   index: index.html
+location: /www/   root: /data/www   index: index.html
+server_name: test_serv   port: 8080 8000 
+location: /   root: /data/www/test   index: index.html
+location: /www/   root: /data/www   index: index.html
