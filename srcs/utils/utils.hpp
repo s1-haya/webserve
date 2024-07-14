@@ -32,6 +32,9 @@ std::string ToString(T value) {
 	return oss.str();
 }
 
+// string
+bool                     ConvertStrToUint(const std::string &str, unsigned int &num);
+std::string              ConvertUintToStr(unsigned int num);
 std::vector<std::string> SplitStr(const std::string &src, const std::string &substring);
 
 bool IsSpace(char c);
