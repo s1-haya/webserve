@@ -52,11 +52,11 @@ re: fclean all
 
 #--------------------------------------------
 .PHONY	: run
-run: all
+run: re
 	@./$(NAME)
 
 .PHONY	: val
-val: all
+val: re
 	@valgrind ./$(NAME)
 
 #--------------------------------------------
