@@ -7,7 +7,7 @@
 namespace utils {
 
 bool ConvertStrToUint(const std::string &str, unsigned int &num) {
-	if (str.empty()) {
+	if (str.empty() || !IsDigit(str[0])) {
 		return false;
 	}
 

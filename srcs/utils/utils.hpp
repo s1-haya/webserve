@@ -37,6 +37,7 @@ bool                     ConvertStrToUint(const std::string &str, unsigned int &
 std::string              ConvertUintToStr(unsigned int num);
 std::vector<std::string> SplitStr(const std::string &src, const std::string &substring);
 
+bool IsDigit(char c);
 bool IsSpace(char c);
 
 } // namespace utils

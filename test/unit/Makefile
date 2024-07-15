@@ -10,19 +10,28 @@ SRCS	:=	$(SRC_DIR)/main.cpp
 
 # 1. add webserv file
 WS_UTILS_DIR	:=	../../srcs/utils
+# for split
 SRCS			+=	$(WS_UTILS_DIR)/color.cpp \
                 	$(WS_UTILS_DIR)/split.cpp
+# for convert_str
+SRCS			+=	$(WS_UTILS_DIR)/convert_str.cpp \
+					$(WS_UTILS_DIR)/isdigit.cpp
 
 # 2. add unit test file
 # for split
 SPLIT_DIR	:=	$(SRC_DIR)/split
 SRCS		+=	$(SPLIT_DIR)/test_split.cpp
+# for convert_str
+CONVERT_STR_DIR	:=	$(SRC_DIR)/convert_str
+SRCS		+=	$(CONVERT_STR_DIR)/test_convert_str.cpp
+
 # for ~
 
 # 3. add new dir
 SRC_DIRS	:=	$(SRC_DIR) \
 				$(WS_UTILS_DIR) \
-				$(SPLIT_DIR)
+				$(SPLIT_DIR) \
+				$(CONVERT_STR_DIR)
 
 #--------------------------------------------
 OBJ_DIR	:=	objs

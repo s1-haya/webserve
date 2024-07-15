@@ -27,16 +27,18 @@ struct TestCase {
 };
 
 // SplitStr()を実行してexpectedと比較
-int Run(const std::string &src, const std::string &substring, const Strs &expected) {
-	static unsigned int test_case = 0;
-	test_case++;
-
+int Run(
+	std::size_t        test_case_num,
+	const std::string &src,
+	const std::string &substring,
+	const Strs        &expected
+) {
 	if (utils::SplitStr(src, substring) == expected) {
-		std::cout << utils::color::GREEN << test_case << ".[OK] " << utils::color::RESET
+		std::cout << utils::color::GREEN << test_case_num << ".[OK] " << utils::color::RESET
 				  << std::endl;
 		return EXIT_SUCCESS;
 	}
-	std::cerr << utils::color::RED << test_case << ".[NG] " << utils::color::RESET << std::endl;
+	std::cerr << utils::color::RED << test_case_num << ".[NG] " << utils::color::RESET << std::endl;
 	std::cerr << utils::color::RED << "SplitStr() failed" << utils::color::RESET << std::endl;
 	std::cerr << "src: [" << src << "]" << std::endl;
 	return EXIT_FAILURE;
@@ -47,7 +49,7 @@ int RunTestCases(const TestCase test_cases[], std::size_t num_test_cases) {
 
 	for (std::size_t i = 0; i < num_test_cases; i++) {
 		const TestCase test_case = test_cases[i];
-		ret_code |= Run(test_case.input, test_case.substring, test_case.expected);
+		ret_code |= Run(i + 1, test_case.input, test_case.substring, test_case.expected);
 	}
 	return ret_code;
 }
