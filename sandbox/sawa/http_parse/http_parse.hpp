@@ -1,6 +1,7 @@
 #ifndef HTTP_PARSE_HPP_
 #define HTTP_PARSE_HPP_
 
+#include "result.hpp"
 #include <map>
 #include <string>
 #include <vector>
@@ -28,11 +29,12 @@ struct HttpRequest {
 
 class HttpParse {
   public:
-	HttpParse();
-	~HttpParse();
-	static HttpRequest Run(const std::string &buf);
+	static Result Run(const std::string &buf);
+	static void   Free(const HttpRequest *request);
 
   private:
+	HttpParse();
+	~HttpParse();
 	static RequestLine  SetRequestLine(const std::vector<std::string> &request_line);
 	static HeaderFields SetHeaderFields(const std::vector<std::string> &header_fields_info);
 	static std::string  SetMessageBody(const std::vector<std::string> &message_body_info);

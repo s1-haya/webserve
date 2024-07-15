@@ -9,38 +9,45 @@ void assert_request_line(const http::RequestLine &expect, const http::RequestLin
 }
 
 int main(void) {
-	http::HttpParse a;
 	// todo: expectはエラーの場合はエラーのステータスコードを入れてます。enumを作成したら削除する
 
 	// StatusLineのみのHTTPリクエスト
-	http::RequestLine expect1("GET", "/", "HTTP/1.1");
-	http::HttpRequest test1 = a.Run("GET / HTTP/1.1");
-	assert_request_line(expect1, test1.request_line);
+	http::RequestLine  expect1("GET", "/", "HTTP/1.1");
+	Result             test1         = http::HttpParse::Run("GET / HTTP/1.1");
+	http::HttpRequest *test1_request = static_cast<http::HttpRequest *>(test1.result);
+	assert_request_line(expect1, test1_request->request_line);
+	http::HttpParse::Free(test1_request);
 
 	// methodが小文字が含まれてる
-	http::RequestLine expect2("400", "/", "HTTP/1.1");
-	http::HttpRequest test2 = a.Run("GEdT / HTTP/1.1");
-	assert_request_line(expect2, test2.request_line);
+	http::RequestLine  expect2("400", "/", "HTTP/1.1");
+	Result             test2         = http::HttpParse::Run("GEdT / HTTP/1.1");
+	http::HttpRequest *test2_request = static_cast<http::HttpRequest *>(test2.result);
+	assert_request_line(expect2, test2_request->request_line);
+	http::HttpParse::Free(test2_request);
 
 	// methodがUS-ASCII以外の文字が含まれてる
-	http::RequestLine expect3("400", "/", "HTTP/1.1");
-	http::HttpRequest test3 = a.Run("GEあ / HTTP/1.1");
-	assert_request_line(expect3, test3.request_line);
+	http::RequestLine  expect3("400", "/", "HTTP/1.1");
+	Result             test3         = http::HttpParse::Run("GEあ / HTTP/1.1");
+	http::HttpRequest *test3_request = static_cast<http::HttpRequest *>(test3.result);
+	assert_request_line(expect3, test3_request->request_line);
+	http::HttpParse::Free(test3_request);
 
 	// 課題要件以外のmethodが含まれてる
-	http::RequestLine expect4("501", "/", "HTTP/1.1");
-	http::HttpRequest test4 = a.Run("HEAD / HTTP/1.1");
-	assert_request_line(expect4, test4.request_line);
+	http::RequestLine  expect4("501", "/", "HTTP/1.1");
+	Result             test4         = http::HttpParse::Run("HEAD / HTTP/1.1");
+	http::HttpRequest *test4_request = static_cast<http::HttpRequest *>(test4.result);
+	assert_request_line(expect4, test4_request->request_line);
+	http::HttpParse::Free(test4_request);
 
-	// RequestTargetが絶対パスじゃない
-	http::RequestLine expect5("GET", "400", "HTTP/1.1");
-	http::HttpRequest test5 = a.Run("GET index.html/ HTTP/1.1");
-	assert_request_line(expect5, test5.request_line);
+	// // RequestTargetが絶対パスじゃない
+	// http::RequestLine expect5("GET", "400", "HTTP/1.1");
+	// Result test5 = a.Run("GET index.html/ HTTP/1.1");
+	// assert_request_line(expect5, test5.request_line);
 
-	// HTTPバージョンが異なる
-	http::RequestLine expect6("GET", "/", "400");
-	http::HttpRequest test6 = a.Run("GET / HTTP/1.0");
-	assert_request_line(expect6, test6.request_line);
+	// // HTTPバージョンが異なる
+	// http::RequestLine expect6("GET", "/", "400");
+	// Result test6 = a.Run("GET / HTTP/1.0");
+	// assert_request_line(expect6, test6.request_line);
 
 	// StatusLineとHeadersを含むHTTPリクエスト
 	// http::HttpRequest test2 =

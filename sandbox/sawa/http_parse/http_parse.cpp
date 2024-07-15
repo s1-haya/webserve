@@ -1,8 +1,8 @@
 #include "http_parse.hpp"
 #include "http_message.hpp"
 #include "utils.hpp"
-#include <vector>
 #include <algorithm> // std::find
+#include <vector>
 
 namespace http {
 namespace {
@@ -70,7 +70,8 @@ std::string HttpParse::CheckMethod(const std::string &method) {
 		return "501";
 	}
 	// 設定ファイルでメソッドが許可されてるかどうか -> 405
-	// todo: どの仮想サーバーのどのリソースがメソッド許可されてるかどうか？がリソースパースしていない段階ではわからないからこの関数で判定しないかも
+	// todo:
+	// どの仮想サーバーのどのリソースがメソッド許可されてるかどうか？がリソースパースしていない段階ではわからないからこの関数で判定しないかも
 	// if (allowed_methods.find(method) == allowed_methods.end()) {
 	// 	return "405";
 	// }
@@ -118,18 +119,25 @@ std::string HttpParse::SetMessageBody(const std::vector<std::string> &message_bo
 	return message_body;
 }
 
+void HttpParse::Free(const HttpRequest *resuest) {
+	delete resuest;
+}
+
 // todo: tmp request_
-HttpRequest HttpParse::Run(const std::string &read_buf) {
-	HttpRequest              request;
+Result HttpParse::Run(const std::string &read_buf) {
+	Result       output;
+	HttpRequest *request       = new HttpRequest();
+	output.status_code         = OK;
 	std::vector<std::string> a = utils::SplitStr(read_buf, CRLF + CRLF);
 	std::vector<std::string> b = utils::SplitStr(a[0], CRLF);
-	request.request_line       = SetRequestLine(utils::SplitStr(b[0], SP));
-	request.header_fields      = SetHeaderFields(b);
+	request->request_line      = SetRequestLine(utils::SplitStr(b[0], SP));
+	request->header_fields     = SetHeaderFields(b);
 	// todo: bodymessageの取得方法（ヘッダーによって仕様が変わる）
-	if ("POST" == request.request_line.method)
-		request.message_body = SetMessageBody(utils::SplitStr(a[1], ""));
+	// if ("POST" == request->request_line.method)
+	// 	request->message_body = SetMessageBody(utils::SplitStr(a[1], ""));
 	// PrintLines(b);
-	return request;
+	output.result = static_cast<void *>(request);
+	return output;
 }
 
 // request_line && header
