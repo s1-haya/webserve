@@ -17,19 +17,26 @@ int main(void) {
 	assert_request_line(expect1, test1.request.request_line);
 
 	// methodが小文字が含まれてる
-	http::RequestLine       expect2("400", "/", "HTTP/1.1");
+	http::RequestLine       expect2("", "/", "HTTP/1.1");
 	http::HttpRequestResult test2 = http::HttpParse::Run("GEdT / HTTP/1.1");
-	assert_request_line(expect2, test2.request.request_line);
+	assert(http::BAD_REQUEST == test2.status_code);
+	if (http::OK == test2.status_code)
+		assert_request_line(expect2, test2.request.request_line);
+	// assert(http::OK == test2.status_code);
 
 	// methodがUS-ASCII以外の文字が含まれてる
-	http::RequestLine       expect3("400", "/", "HTTP/1.1");
+	http::RequestLine       expect3("", "/", "HTTP/1.1");
 	http::HttpRequestResult test3 = http::HttpParse::Run("GEあ / HTTP/1.1");
-	assert_request_line(expect3, test3.request.request_line);
+	assert(http::BAD_REQUEST == test3.status_code);
+	if (http::OK == test3.status_code)
+		assert_request_line(expect3, test3.request.request_line);
 
 	// 課題要件以外のmethodが含まれてる
-	http::RequestLine       expect4("501", "/", "HTTP/1.1");
+	http::RequestLine       expect4("", "/", "HTTP/1.1");
 	http::HttpRequestResult test4 = http::HttpParse::Run("HEAD / HTTP/1.1");
-	assert_request_line(expect4, test4.request.request_line);
+	assert(http::NOT_IMPLEMENTED == test4.status_code);
+	if (http::OK == test4.status_code)
+		assert_request_line(expect4, test4.request.request_line);
 
 	// // RequestTargetが絶対パスじゃない
 	// http::RequestLine expect5("GET", "400", "HTTP/1.1");
