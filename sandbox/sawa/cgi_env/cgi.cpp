@@ -17,7 +17,7 @@ int Cgi::Run(const cgi::CgiRequest &request) {
 	SetCgiMember(request);
 	Execve();
 	Free();
-	return (this->exit_status_);
+	return this->exit_status_;
 }
 
 void Cgi::Execve() {
@@ -87,27 +87,27 @@ void Cgi::SetCgiMember(cgi::CgiRequest request) {
 	this->env_          = SetCgiEnv(request.meta_variables);
 }
 
-char *const* Cgi::SetCgiArgv() {
+char *const *Cgi::SetCgiArgv() {
 	char **argv = new char *[2];
 	// todo error(new(std::nothrow))
-	char             *dest    = new char[cgi_script_.size() + 1];
+	char *dest = new char[cgi_script_.size() + 1];
 	// todo error(new(std::nothrow))
 	std::strcpy(dest, cgi_script_.c_str());
-	argv[0]     = dest;
-	argv[1]     = NULL;
+	argv[0] = dest;
+	argv[1] = NULL;
 	return argv;
 }
 
-char *const* Cgi::SetCgiEnv(const MetaMap &meta_variables) {
+char *const *Cgi::SetCgiEnv(const MetaMap &meta_variables) {
 	char                          **cgi_env = new char *[meta_variables.size() + 1];
-	size_t                          i = 0;
+	size_t                          i       = 0;
 	typedef MetaMap::const_iterator It;
 	for (It it = meta_variables.begin(); it != meta_variables.end(); it++) {
 		const std::string element = it->first + "=" + it->second;
 		char             *dest    = new char[element.size() + 1];
 		// todo error(new(std::nothrow))
 		if (dest == NULL)
-			return (NULL);
+			return NULL;
 		std::strcpy(dest, element.c_str());
 		cgi_env[i] = dest;
 		i++;
