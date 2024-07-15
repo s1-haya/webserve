@@ -23,14 +23,13 @@ struct HttpRequest {
 
 class HttpParse {
   public:
-	HttpParse();
-	~HttpParse();
 	static HttpRequest Run(const std::string &buf);
 
   private:
+	HttpParse();
+	~HttpParse();
 	static RequestLine  SetRequestLine(const std::vector<std::string> &request_line);
 	static HeaderFields SetHeaderFields(const std::vector<std::string> &header_fields_info);
-	static std::string  SetMessageBody(const std::vector<std::string> &message_body_info);
 };
 
 } // namespace http
