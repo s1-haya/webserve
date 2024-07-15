@@ -5,6 +5,7 @@
 #include <vector>
 
 namespace http {
+
 namespace {
 
 bool IsUSASCII(const std::string &str) {
@@ -44,26 +45,26 @@ bool IsUpper(const std::string &str) {
 
 // todo: tmp request_
 HttpRequestResult HttpParse::Run(const std::string &read_buf) {
-	HttpRequestResult        result;
+	HttpRequestResult result;
 	// a: [request_line header_fields, messagebody]
 	// b: [request_line, header_fields]
-	std::vector<std::string> a = utils::SplitStr(read_buf, CRLF + CRLF);
-	std::vector<std::string> b = utils::SplitStr(a[0], CRLF);
-	result.request.request_line       = SetRequestLine(utils::SplitStr(b[0], SP), &result.status_code);
-	result.request.header_fields      = SetHeaderFields(b);
+	std::vector<std::string> a   = utils::SplitStr(read_buf, CRLF + CRLF);
+	std::vector<std::string> b   = utils::SplitStr(a[0], CRLF);
+	result.request.request_line  = SetRequestLine(utils::SplitStr(b[0], SP), &result.status_code);
+	result.request.header_fields = SetHeaderFields(b);
 	// PrintLines(b);
 	return result;
 }
 
-RequestLine HttpParse::SetRequestLine(const std::vector<std::string> &request_line_info, StatusCode* status_code) {
-	// todo: 各値が正常な値かどうか確認してから作成する（エラーの場合はenumに設定？）
+RequestLine HttpParse::SetRequestLine(
+	const std::vector<std::string> &request_line_info, StatusCode *status_code
+) {
 	RequestLine request_line;
 	try {
-		request_line.method = CheckMethod(request_line_info[0]);
+		request_line.method         = CheckMethod(request_line_info[0]);
 		request_line.request_target = CheckRequestTarget(request_line_info[1]);
-		request_line.version = CheckVersion(request_line_info[2]);
-	}
-	catch (const HttpParseException& e) {
+		request_line.version        = CheckVersion(request_line_info[2]);
+	} catch (const HttpParseException &e) {
 		*status_code = e.GetStatusCode();
 	}
 	return request_line;
@@ -93,32 +94,27 @@ std::string HttpParse::CheckMethod(const std::string &method) {
 	if (std::find(basic_methods.begin(), basic_methods.end(), method) == basic_methods.end()) {
 		throw HttpParseException(NOT_IMPLEMENTED);
 	}
-	// 設定ファイルでメソッドが許可されてるかどうか -> 405
-	// todo:
-	// どの仮想サーバーのどのリソースがメソッド許可されてるかどうか？がリソースパースしていない段階ではわからないからこの関数で判定しないかも
-	// if (allowed_methods.find(method) == allowed_methods.end()) {
-	// 	return "405";
-	// }
 	return method;
 }
 
 std::string HttpParse::CheckRequestTarget(const std::string &reqest_target) {
 	// /が先頭になかったら場合 -> 400
 	if (reqest_target.empty() || reqest_target[0] != '/')
-		return "400";
+		throw HttpParseException(BAD_REQUEST);
 	return reqest_target;
 }
 
 std::string HttpParse::CheckVersion(const std::string &version) {
 	// HTTP/1.1かどうか -> 400
 	if ("HTTP/1.1" != version)
-		return ("400");
+		throw HttpParseException(BAD_REQUEST);
 	return version;
 }
 
-HttpParse::HttpParseException::HttpParseException(const StatusCode& status_code) : status_code_(status_code) {}
+HttpParse::HttpParseException::HttpParseException(const StatusCode &status_code)
+	: status_code_(status_code) {}
 
-const StatusCode& HttpParse::HttpParseException::GetStatusCode() const {
+const StatusCode &HttpParse::HttpParseException::GetStatusCode() const {
 	return status_code_;
 }
 
