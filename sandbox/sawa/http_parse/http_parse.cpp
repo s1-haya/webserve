@@ -119,25 +119,20 @@ std::string HttpParse::SetMessageBody(const std::vector<std::string> &message_bo
 	return message_body;
 }
 
-void HttpParse::Free(const HttpRequest *resuest) {
-	delete resuest;
-}
-
 // todo: tmp request_
-Result HttpParse::Run(const std::string &read_buf) {
-	Result       output;
-	HttpRequest *request       = new HttpRequest();
-	output.status_code         = OK;
+HttpRequestResult HttpParse::Run(const std::string &read_buf) {
+	HttpRequestResult        result;
+	HttpRequest              request;
 	std::vector<std::string> a = utils::SplitStr(read_buf, CRLF + CRLF);
 	std::vector<std::string> b = utils::SplitStr(a[0], CRLF);
-	request->request_line      = SetRequestLine(utils::SplitStr(b[0], SP));
-	request->header_fields     = SetHeaderFields(b);
+	request.request_line       = SetRequestLine(utils::SplitStr(b[0], SP));
+	request.header_fields      = SetHeaderFields(b);
 	// todo: bodymessageの取得方法（ヘッダーによって仕様が変わる）
-	// if ("POST" == request->request_line.method)
-	// 	request->message_body = SetMessageBody(utils::SplitStr(a[1], ""));
+	// if ("POST" == request.request_line.method)
+	// 	request.message_body = SetMessageBody(utils::SplitStr(a[1], ""));
 	// PrintLines(b);
-	output.result = static_cast<void *>(request);
-	return output;
+	result.request = request;
+	return result;
 }
 
 // request_line && header

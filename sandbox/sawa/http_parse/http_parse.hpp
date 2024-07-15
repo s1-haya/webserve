@@ -27,10 +27,20 @@ struct HttpRequest {
 	std::string  message_body;
 };
 
+enum StatusCode {
+	OK,
+	NOT_FOUND
+};
+
+struct HttpRequestResult {
+	StatusCode  status_code;
+	HttpRequest request;
+	HttpRequestResult() : status_code(OK) {}
+};
+
 class HttpParse {
   public:
-	static Result Run(const std::string &buf);
-	static void   Free(const HttpRequest *request);
+	static HttpRequestResult Run(const std::string &buf);
 
   private:
 	HttpParse();
