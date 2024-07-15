@@ -51,7 +51,7 @@ int main(void) {
 	// assert("keep-alive" == test2.header_fields["Connection"]);
 
 	// // StatusLineとHeader、Bodyを含むHTTPリクエスト
-	// http::HttpRequest test3 = a.Run("POST /index.html HTTP/1.1\r\nHost: "
+	// http::HttpRequest test3 = http::HttpParse::Run("POST /index.html HTTP/1.1\r\nHost: "
 	// 								"www.example.com\r\nConnection: keep-alive\r\n\r\nbodymessage");
 	// assert("POST" == test3.request_line.method);
 	// assert("/index.html" == test3.request_line.request_target);

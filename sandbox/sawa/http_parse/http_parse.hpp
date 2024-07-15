@@ -1,7 +1,6 @@
 #ifndef HTTP_PARSE_HPP_
 #define HTTP_PARSE_HPP_
 
-#include "result.hpp"
 #include <map>
 #include <string>
 #include <vector>
@@ -47,7 +46,6 @@ class HttpParse {
 	~HttpParse();
 	static RequestLine  SetRequestLine(const std::vector<std::string> &request_line);
 	static HeaderFields SetHeaderFields(const std::vector<std::string> &header_fields_info);
-	static std::string  SetMessageBody(const std::vector<std::string> &message_body_info);
 
 	static std::string CheckMethod(const std::string &method);
 	static std::string CheckRequestTarget(const std::string &request_target);
