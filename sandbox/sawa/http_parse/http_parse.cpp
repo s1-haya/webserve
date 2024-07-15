@@ -28,6 +28,25 @@ bool IsUpper(const std::string &str) {
 	return true;
 }
 
+static std::vector<std::string> CreateBasicMethods() {
+	std::vector<std::string> basic_methods;
+	basic_methods.push_back("GET");
+	basic_methods.push_back("POST");
+	basic_methods.push_back("DELETE");
+	return basic_methods;
+}
+
+static std::vector<std::string> CreateHeaderFields() {
+	std::vector<std::string> header_fields;
+	header_fields.push_back("Host");
+	header_fields.push_back("User-Agent");
+	header_fields.push_back("Accept");
+	header_fields.push_back("Content-Type");
+	header_fields.push_back("Content-Length");
+	header_fields.push_back("Connection");
+	return header_fields;
+}
+
 // void PrintLines(const std::vector<std::string> &lines) {
 // 	typedef std::vector<std::string>::const_iterator It;
 // 	size_t                                           i = 0;
@@ -48,10 +67,11 @@ HttpRequestResult HttpParse::Run(const std::string &read_buf) {
 	HttpRequestResult result;
 	// a: [request_line header_fields, messagebody]
 	// b: [request_line, header_fields]
-	std::vector<std::string> a   = utils::SplitStr(read_buf, CRLF + CRLF);
-	std::vector<std::string> b   = utils::SplitStr(a[0], CRLF);
-	result.request.request_line  = SetRequestLine(utils::SplitStr(b[0], SP), &result.status_code);
-	result.request.header_fields = SetHeaderFields(b);
+	std::vector<std::string> a  = utils::SplitStr(read_buf, CRLF + CRLF);
+	std::vector<std::string> b  = utils::SplitStr(a[0], CRLF);
+	result.request.request_line = SetRequestLine(utils::SplitStr(b[0], SP), &result.status_code);
+	if (result.status_code == OK)
+		result.request.header_fields = SetHeaderFields(b, &result.status_code);
 	// PrintLines(b);
 	return result;
 }
@@ -70,27 +90,29 @@ RequestLine HttpParse::SetRequestLine(
 	return request_line;
 }
 
-HeaderFields HttpParse::SetHeaderFields(const std::vector<std::string> &header_fields_info) {
+HeaderFields HttpParse::SetHeaderFields(
+	const std::vector<std::string> &header_fields_info, StatusCode *status_code
+) {
 	// todo: 各値が正常な値かどうか確認してから作成する（エラーの場合はenumに設定？）
 	HeaderFields                                     header_fields;
 	typedef std::vector<std::string>::const_iterator It;
-	for (It it = header_fields_info.begin() + 1; it != header_fields_info.end(); ++it) {
-		std::vector<std::string> header_key_value = utils::SplitStr(*it, ": ");
-		header_fields[header_key_value[0]]        = header_key_value[1];
+	try {
+		for (It it = header_fields_info.begin() + 1; it != header_fields_info.end(); ++it) {
+			std::vector<std::string> header_key_value                 = utils::SplitStr(*it, ": ");
+			header_fields[CheckHeaderFieldValue(header_key_value[0])] = header_key_value[1];
+		}
+	} catch (const HttpParseException &e) {
+		*status_code = e.GetStatusCode();
 	}
 	return header_fields;
 }
 
 std::string HttpParse::CheckMethod(const std::string &method) {
 	// US-ASCIIかまたは大文字かどうか -> 400
-	if (IsUSASCII(method) == false || IsUpper(method) == false) {
+	if (IsUSASCII(method) == false || IsUpper(method) == false)
 		throw HttpParseException(BAD_REQUEST);
-	}
 	// GET, POST, DELETEかどうか ->　501
-	std::vector<std::string> basic_methods;
-	basic_methods.push_back("GET");
-	basic_methods.push_back("POST");
-	basic_methods.push_back("DELETE");
+	std::vector<std::string> basic_methods = CreateBasicMethods();
 	if (std::find(basic_methods.begin(), basic_methods.end(), method) == basic_methods.end()) {
 		throw HttpParseException(NOT_IMPLEMENTED);
 	}
@@ -111,10 +133,19 @@ std::string HttpParse::CheckVersion(const std::string &version) {
 	return version;
 }
 
-HttpParse::HttpParseException::HttpParseException(const StatusCode &status_code)
+std::string HttpParse::CheckHeaderFieldValue(const std::string &header_field_value) {
+	// C++98 では初期化リストがサポートされていないため
+	static const std::vector<std::string> header_fields = CreateHeaderFields();
+	if (std::find(header_fields.begin(), header_fields.end(), header_field_value) ==
+		header_fields.end())
+		throw HttpParseException(BAD_REQUEST);
+	return header_field_value;
+}
+
+HttpParse::HttpParseException::HttpParseException(StatusCode status_code)
 	: status_code_(status_code) {}
 
-const StatusCode &HttpParse::HttpParseException::GetStatusCode() const {
+StatusCode HttpParse::HttpParseException::GetStatusCode() const {
 	return status_code_;
 }
 
