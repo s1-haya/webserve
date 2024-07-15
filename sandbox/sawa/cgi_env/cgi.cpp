@@ -64,14 +64,18 @@ void Cgi::Execve() {
 }
 
 void Cgi::Free() {
-	for (size_t i = 0; this->argv_[i] != NULL; ++i) {
-		delete[] this->argv_[i];
+	if (this->argv_ != NULL) {
+		for (size_t i = 0; this->argv_[i] != NULL; ++i) {
+			delete[] this->argv_[i];
+		}
+		delete[] this->argv_;
 	}
-	delete[] this->argv_;
-	for (size_t i = 0; this->env_[i] != NULL; ++i) {
-		delete[] this->env_[i];
+	if (this->env_ != NULL) {
+		for (size_t i = 0; this->env_[i] != NULL; ++i) {
+			delete[] this->env_[i];
+		}
+		delete[] this->env_;
 	}
-	delete[] this->env_;
 }
 
 void Cgi::ExecveCgiScript() {
