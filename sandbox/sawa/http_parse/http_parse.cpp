@@ -27,16 +27,6 @@ bool IsUpper(const std::string &str) {
 	return true;
 }
 
-// todo: create path (/, /aaa, /aaa/)
-// std::string CreateDefaultPath(const std::string &path) {
-// 	static const std::string location = "html";
-
-// 	if (path.size() == 1) {
-// 		return location + "/index.html";
-// 	}
-// 	return location + path + "/index.html";
-// }
-
 // void PrintLines(const std::vector<std::string> &lines) {
 // 	typedef std::vector<std::string>::const_iterator It;
 // 	size_t                                           i = 0;
@@ -61,7 +51,6 @@ std::string HttpParse::CheckMethod(const std::string &method) {
 	if (IsUSASCII(method) == false || IsUpper(method) == false)
 		return "400";
 	// GET, POST, DELETEかどうか ->　501
-	// ? メソッドはstaticで持たせた方がいいのかな？
 	std::vector<std::string> basic_methods;
 	basic_methods.push_back("GET");
 	basic_methods.push_back("POST");
@@ -112,27 +101,20 @@ HeaderFields HttpParse::SetHeaderFields(const std::vector<std::string> &header_f
 	return header_fields;
 }
 
-std::string HttpParse::SetMessageBody(const std::vector<std::string> &message_body_info) {
-	std::vector<std::string>::const_iterator it           = message_body_info.begin();
-	std::string                              message_body = *it;
-	return message_body;
-}
-
 // todo: tmp request_
 HttpRequest HttpParse::Run(const std::string &read_buf) {
 	HttpRequest              request;
+	// a: [request_line header_fields, messagebody]
+	// b: [request_line, header_fields]
 	std::vector<std::string> a = utils::SplitStr(read_buf, CRLF + CRLF);
 	std::vector<std::string> b = utils::SplitStr(a[0], CRLF);
 	request.request_line       = SetRequestLine(utils::SplitStr(b[0], SP));
 	request.header_fields      = SetHeaderFields(b);
-	// todo: bodymessageの取得方法（ヘッダーによって仕様が変わる）
-	if ("POST" == request.request_line.method)
-		request.message_body = SetMessageBody(utils::SplitStr(a[1], ""));
 	// PrintLines(b);
 	return request;
 }
 
-// request_line && header
+// status_line && header
 // messagebody
 
 } // namespace http
