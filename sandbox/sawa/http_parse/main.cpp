@@ -31,7 +31,7 @@ int main(void) {
 	http::HttpRequestResult test4 = http::HttpParse::Run("HEAD / HTTP/1.1");
 	assert(http::NOT_IMPLEMENTED == test4.status_code);
 
-	// header_fieldsが設定されてる場合
+	// header_fields: 成功例
 	http::RequestLine       expect5("GET", "/", "HTTP/1.1");
 	http::HttpRequestResult test5 = http::HttpParse::Run(
 		"GET / HTTP/1.1\r\nHost: www.example.com\r\nConnection: keep-alive\r\n\r\n"
@@ -40,12 +40,21 @@ int main(void) {
 	assert_request_line(expect5, test5.request.request_line);
 	assert("www.example.com" == test5.request.header_fields["Host"]);
 
-	// header_fieldsの書式が間違ってる場合
-	http::RequestLine       expect6("", "/", "HTTP/1.1");
+	// header_fields: セミコロン以降に複数OWS(SpaceとHorizontal Tab)が設定されてる場合
+	http::RequestLine       expect6("GET", "/", "HTTP/1.1");
 	http::HttpRequestResult test6 = http::HttpParse::Run(
+		"GET / HTTP/1.1\r\nHost:    \twww.example.com\r\nConnection: keep-alive\r\n\r\n"
+	);
+	assert(http::OK == test6.status_code);
+	assert_request_line(expect6, test6.request.request_line);
+	assert("www.example.com" == test6.request.header_fields["Host"]);
+
+	// header_fields: 存在しないfield_nameの場合
+	http::RequestLine       expect7("", "/", "HTTP/1.1");
+	http::HttpRequestResult test7 = http::HttpParse::Run(
 		"GET / HTTP/1.1\r\nHosdt: www.example.com\r\nConnection: keep-alive\r\n\r\n"
 	);
-	assert(http::BAD_REQUEST == test6.status_code);
+	assert(http::BAD_REQUEST == test7.status_code);
 
 	// // RequestTargetが絶対パスじゃない
 	// http::RequestLine expect6("GET", "400", "HTTP/1.1");
