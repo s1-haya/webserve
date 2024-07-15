@@ -28,7 +28,9 @@ struct HttpRequest {
 
 enum StatusCode {
 	OK,
-	NOT_FOUND
+	BAD_REQUEST,
+	NOT_FOUND,
+	NOT_IMPLEMENTED
 };
 
 struct HttpRequestResult {
@@ -44,12 +46,19 @@ class HttpParse {
   private:
 	HttpParse();
 	~HttpParse();
-	static RequestLine  SetRequestLine(const std::vector<std::string> &request_line);
+	static RequestLine  SetRequestLine(const std::vector<std::string> &request_line, StatusCode* status_code);
 	static HeaderFields SetHeaderFields(const std::vector<std::string> &header_fields_info);
 
 	static std::string CheckMethod(const std::string &method);
 	static std::string CheckRequestTarget(const std::string &request_target);
 	static std::string CheckVersion(const std::string &version);
+	class HttpParseException {
+		public:
+			explicit HttpParseException(const StatusCode& status_code);
+			const StatusCode& GetStatusCode() const;
+		private:
+			const StatusCode& status_code_;
+	};
 };
 
 } // namespace http
