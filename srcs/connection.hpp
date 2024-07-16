@@ -8,6 +8,7 @@
 namespace server {
 
 class SockInfo;
+class ClientInfo;
 
 class Connection {
   public:
@@ -16,9 +17,9 @@ class Connection {
 	Connection();
 	~Connection();
 	// function
-	int        Connect(SockInfo &server_sock_info);
-	static int Accept(int server_fd);
-	bool       IsListenServerFd(int sock_fd) const;
+	int               Connect(SockInfo &server_sock_info);
+	static ClientInfo Accept(int server_fd);
+	bool              IsListenServerFd(int sock_fd) const;
 
   private:
 	// prohibit copy

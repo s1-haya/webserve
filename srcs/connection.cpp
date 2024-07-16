@@ -91,7 +91,8 @@ int Connection::Connect(SockInfo &server_sock_info) {
 	return server_fd;
 }
 
-int Connection::Accept(int server_fd) {
+// todo: return ClientInfo *?
+ClientInfo Connection::Accept(int server_fd) {
 	struct sockaddr_storage client_sock_addr;
 	socklen_t               addrlen = sizeof(client_sock_addr);
 	const int client_fd = accept(server_fd, (struct sockaddr *)&client_sock_addr, &addrlen);
@@ -106,7 +107,7 @@ int Connection::Accept(int server_fd) {
 	// if (client_fd == SYSTEM_ERROR) {
 	// 	throw std::runtime_error("accept failed");
 	// }
-	return client_fd;
+	return client_info;
 }
 
 bool Connection::IsListenServerFd(int sock_fd) const {

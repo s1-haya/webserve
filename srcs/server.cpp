@@ -1,4 +1,5 @@
 #include "server.hpp"
+#include "client_info.hpp"
 #include "event.hpp"
 #include "http.hpp"
 #include "sock_info.hpp"
@@ -74,7 +75,9 @@ void Server::HandleEvent(const event::Event &event) {
 
 void Server::HandleNewConnection(int server_fd) {
 	// A new socket that has established a connection with the peer socket.
-	const int client_fd = Connection::Accept(server_fd);
+	// todo: return accept error like Result
+	const ClientInfo new_client_info = Connection::Accept(server_fd);
+	const int        client_fd       = new_client_info.GetFd();
 	if (client_fd == SYSTEM_ERROR) {
 		throw std::runtime_error("accept failed");
 	}
