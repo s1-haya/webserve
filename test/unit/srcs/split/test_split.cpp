@@ -1,3 +1,4 @@
+#include "color.hpp"
 #include "utils.hpp"
 #include <cstdlib>
 #include <iostream>

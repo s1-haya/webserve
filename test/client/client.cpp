@@ -1,4 +1,5 @@
 #include "client.hpp"
+#include "color.hpp"
 #include "utils.hpp"
 #include <arpa/inet.h> // inet_pton,htons
 #include <iostream>
