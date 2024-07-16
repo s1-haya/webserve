@@ -60,4 +60,12 @@ void ClientInfo::SetSockInfo(const struct sockaddr_storage &sock_addr) {
 	port_   = ConvertPortToHostByteOrder(sock_addr);
 }
 
+std::string ClientInfo::GetIp() const {
+	return ip_str_;
+}
+
+unsigned int ClientInfo::GetPort() const {
+	return port_;
+}
+
 } // namespace server

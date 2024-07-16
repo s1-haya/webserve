@@ -10,6 +10,9 @@ class ClientInfo {
   public:
 	ClientInfo(int fd, const struct sockaddr_storage &sock_addr);
 	~ClientInfo();
+	// getter
+	std::string  GetIp() const;
+	unsigned int GetPort() const;
 
   private:
 	ClientInfo();
