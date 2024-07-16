@@ -4,14 +4,10 @@
 #include <netinet/in.h> // struct sock_addr,INET6_ADDRSTRLEN,ntohs
 #include <stdexcept>
 
-// todo: tmp
-#include <iostream>
-
 namespace server {
 
 ClientInfo::ClientInfo(int fd, const struct sockaddr_storage &sock_addr) : fd_(fd), port_(0) {
 	SetSockInfo(sock_addr);
-	std::cout << "client (" << fd << ") " << "ip: " << ip_str_ << ", port: " << port_ << std::endl;
 }
 
 ClientInfo::~ClientInfo() {
