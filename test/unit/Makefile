@@ -17,6 +17,15 @@ SRCS			+=	$(WS_UTILS_DIR)/color.cpp \
 SRCS			+=	$(WS_UTILS_DIR)/convert_str.cpp \
 					$(WS_UTILS_DIR)/isdigit.cpp
 
+# for http_parse
+WS_HTTP_DIR := ../../srcs/http/
+
+WS_HTTP_PARSE_DIR := ../../srcs/http/request/parse
+
+SRCS			+=	$(WS_HTTP_DIR)/http_message.cpp \
+					$(WS_HTTP_PARSE_DIR)/http_parse.cpp
+
+
 # 2. add unit test file
 # for split
 SPLIT_DIR	:=	$(SRC_DIR)/split
@@ -24,14 +33,20 @@ SRCS		+=	$(SPLIT_DIR)/test_split.cpp
 # for convert_str
 CONVERT_STR_DIR	:=	$(SRC_DIR)/convert_str
 SRCS		+=	$(CONVERT_STR_DIR)/test_convert_str.cpp
+# for http_parse
+HTTP_PARSE_DIR	:=	$(SRC_DIR)/http_parse
+SRCS		+=	$(HTTP_PARSE_DIR)/test_http_parse.cpp
 
 # for ~
 
 # 3. add new dir
 SRC_DIRS	:=	$(SRC_DIR) \
 				$(WS_UTILS_DIR) \
+				$(WS_HTTP_DIR) \
+				$(WS_HTTP_PARSE_DIR) \
 				$(SPLIT_DIR) \
-				$(CONVERT_STR_DIR)
+				$(CONVERT_STR_DIR) \
+				$(HTTP_PARSE_DIR)
 
 #--------------------------------------------
 OBJ_DIR	:=	objs
