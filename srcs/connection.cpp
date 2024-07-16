@@ -93,7 +93,7 @@ int Connection::Connect(SockInfo &server_sock_info) {
 int Connection::Accept(int server_fd) {
 	struct sockaddr sock_addr;
 	socklen_t       addrlen   = sizeof(sock_addr);
-	const socklen_t client_fd = accept(server_fd, (struct sockaddr *)&sock_addr, &addrlen);
+	const int       client_fd = accept(server_fd, (struct sockaddr *)&sock_addr, &addrlen);
 	// retrieve the client's IP address, port, etc.
 
 	// todo: need?
