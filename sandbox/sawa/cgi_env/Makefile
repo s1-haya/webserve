@@ -4,7 +4,13 @@ TARGET_DIR	:=	../../../srcs/utils
 
 SRCS		:=	main.cpp \
 				create_cgi_env.cpp \
+				create_cgi_argv.cpp \
 				create_request_meta_variables.cpp \
+				execve_cgi_script.cpp \
+				run_cgi.cpp \
+				is_executable.cpp \
+				cgi.cpp \
+				cgi_parse.cpp \
 				$(TARGET_DIR)/color.cpp
 
 OBJ_DIR		:=	objs
@@ -46,11 +52,11 @@ re: fclean all
 
 #--------------------------------------------
 .PHONY	: run
-run: all
+run: re
 	@./$(NAME)
 
 .PHONY	: val
-val: all
+val: re
 	@valgrind ./$(NAME)
 
 #--------------------------------------------
