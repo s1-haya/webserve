@@ -8,16 +8,16 @@ namespace server {
 
 class ClientInfo {
   public:
+	// default constructor: necessary for map's insert/[]
+	ClientInfo();
 	ClientInfo(int fd, const struct sockaddr_storage &sock_addr);
 	~ClientInfo();
+	ClientInfo(const ClientInfo &other);
+	ClientInfo &operator=(const ClientInfo &other);
 	// getter
 	const std::string &GetIp() const;
 
   private:
-	ClientInfo();
-	// prohibit copy
-	ClientInfo(const ClientInfo &other);
-	ClientInfo &operator=(const ClientInfo &other);
 	// function
 	void SetSockInfo(const struct sockaddr_storage &sock_addr);
 	// variables

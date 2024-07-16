@@ -5,6 +5,8 @@
 
 namespace server {
 
+ClientInfo::ClientInfo() {}
+
 ClientInfo::ClientInfo(int fd, const struct sockaddr_storage &sock_addr) : fd_(fd) {
 	SetSockInfo(sock_addr);
 }
@@ -14,6 +16,18 @@ ClientInfo::~ClientInfo() {
 	// if (fd_ != SYSTEM_ERROR) {
 	// 	close(fd_);
 	// }
+}
+
+ClientInfo::ClientInfo(const ClientInfo &other) {
+	*this = other;
+}
+
+ClientInfo &ClientInfo::operator=(const ClientInfo &other) {
+	if (this != &other) {
+		fd_ = other.fd_;
+		ip_ = other.ip_;
+	}
+	return *this;
 }
 
 void ClientInfo::SetSockInfo(const struct sockaddr_storage &sock_addr) {
