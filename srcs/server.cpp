@@ -82,10 +82,8 @@ void Server::HandleNewConnection(int server_fd) {
 		throw std::runtime_error("accept failed");
 	}
 
-	SockInfo new_sock_info;
-	new_sock_info.SetPeerSockFd(client_fd);
 	// add to context
-	context_.AddSockInfo(client_fd, new_sock_info);
+	context_.AddClientInfo(client_fd, new_client_info);
 	event_monitor_.Add(client_fd, event::EVENT_READ);
 	utils::Debug("server", "add new client", client_fd);
 }
@@ -142,7 +140,7 @@ void Server::SendResponse(int client_fd) {
 
 	// disconnect
 	buffers_.Delete(client_fd);
-	context_.DeleteSockInfo(client_fd);
+	context_.DeleteClientInfo(client_fd);
 	event_monitor_.Delete(client_fd);
 	close(client_fd);
 	utils::Debug("server", "disconnected client", client_fd);

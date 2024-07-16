@@ -19,14 +19,11 @@ class SockInfo {
 	unsigned int GetPort() const;
 	// setter
 	void SetSockFd(int fd);
-	void SetPeerSockFd(int fd);
 
   private:
 	int          fd_;
 	std::string  name_;
 	unsigned int port_;
-	// peer socket info(client)
-	int peer_fd_;
 };
 
 } // namespace server
