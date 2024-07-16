@@ -11,6 +11,7 @@ struct RequestLine {
 	std::string method;
 	std::string request_target;
 	std::string version;
+	// Fot test(main.cpp)
 	RequestLine() : method(""), request_target(""), version("") {}
 	RequestLine(
 		const std::string &method, const std::string &request_target, const std::string &version
@@ -26,19 +27,41 @@ struct HttpRequest {
 	std::string  message_body;
 };
 
+enum StatusCode {
+	OK,
+	BAD_REQUEST,
+	NOT_FOUND,
+	NOT_IMPLEMENTED
+};
+
+struct HttpRequestResult {
+	StatusCode  status_code;
+	HttpRequest request;
+	HttpRequestResult() : status_code(OK) {}
+};
+
 class HttpParse {
   public:
-	static HttpRequest Run(const std::string &buf);
+	static HttpRequestResult Run(const std::string &buf);
 
   private:
 	HttpParse();
 	~HttpParse();
-	static RequestLine  SetRequestLine(const std::vector<std::string> &request_line);
+	static RequestLine
+	SetRequestLine(const std::vector<std::string> &request_line, StatusCode *status_code);
 	static HeaderFields SetHeaderFields(const std::vector<std::string> &header_fields_info);
 
 	static std::string CheckMethod(const std::string &method);
 	static std::string CheckRequestTarget(const std::string &request_target);
 	static std::string CheckVersion(const std::string &version);
+	class HttpParseException {
+	  public:
+		explicit HttpParseException(const StatusCode &status_code);
+		const StatusCode &GetStatusCode() const;
+
+	  private:
+		const StatusCode &status_code_;
+	};
 };
 
 } // namespace http

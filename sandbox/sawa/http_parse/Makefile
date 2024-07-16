@@ -53,3 +53,7 @@ re: fclean all
 .PHONY	: run
 run: re
 	./$(NAME)
+
+.PHONY	: val
+val: re
+	valgrind ./a.out

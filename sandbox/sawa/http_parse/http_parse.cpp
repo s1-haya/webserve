@@ -1,10 +1,11 @@
 #include "http_parse.hpp"
 #include "http_message.hpp"
 #include "utils.hpp"
-#include <vector>
 #include <algorithm> // std::find
+#include <vector>
 
 namespace http {
+
 namespace {
 
 bool IsUSASCII(const std::string &str) {
@@ -42,51 +43,30 @@ bool IsUpper(const std::string &str) {
 
 } // namespace
 
-HttpParse::HttpParse() {}
+// todo: tmp request_
+HttpRequestResult HttpParse::Run(const std::string &read_buf) {
+	HttpRequestResult result;
+	// a: [request_line header_fields, messagebody]
+	// b: [request_line, header_fields]
+	std::vector<std::string> a   = utils::SplitStr(read_buf, CRLF + CRLF);
+	std::vector<std::string> b   = utils::SplitStr(a[0], CRLF);
+	result.request.request_line  = SetRequestLine(utils::SplitStr(b[0], SP), &result.status_code);
+	result.request.header_fields = SetHeaderFields(b);
+	// PrintLines(b);
+	return result;
+}
 
-HttpParse::~HttpParse() {}
-
-std::string HttpParse::CheckMethod(const std::string &method) {
-	// US-ASCIIかまたは大文字かどうか -> 400
-	if (IsUSASCII(method) == false || IsUpper(method) == false)
-		return "400";
-	// GET, POST, DELETEかどうか ->　501
-	std::vector<std::string> basic_methods;
-	basic_methods.push_back("GET");
-	basic_methods.push_back("POST");
-	basic_methods.push_back("DELETE");
-	if (std::find(basic_methods.begin(), basic_methods.end(), method) == basic_methods.end()) {
-		return "501";
+RequestLine HttpParse::SetRequestLine(
+	const std::vector<std::string> &request_line_info, StatusCode *status_code
+) {
+	RequestLine request_line;
+	try {
+		request_line.method         = CheckMethod(request_line_info[0]);
+		request_line.request_target = CheckRequestTarget(request_line_info[1]);
+		request_line.version        = CheckVersion(request_line_info[2]);
+	} catch (const HttpParseException &e) {
+		*status_code = e.GetStatusCode();
 	}
-	// 設定ファイルでメソッドが許可されてるかどうか -> 405
-	// todo: どの仮想サーバーのどのリソースがメソッド許可されてるかどうか？がリソースパースしていない段階ではわからないからこの関数で判定しないかも
-	// if (allowed_methods.find(method) == allowed_methods.end()) {
-	// 	return "405";
-	// }
-	return (method);
-}
-
-std::string HttpParse::CheckRequestTarget(const std::string &reqest_target) {
-	// /が先頭になかったら場合 -> 400
-	if (reqest_target.empty() || reqest_target[0] != '/')
-		return "400";
-	return reqest_target;
-}
-
-std::string HttpParse::CheckVersion(const std::string &version) {
-	// HTTP/1.1かどうか -> 400
-	if ("HTTP/1.1" != version)
-		return ("400");
-	return (version);
-}
-
-RequestLine HttpParse::SetRequestLine(const std::vector<std::string> &request_line_info) {
-	// todo: 各値が正常な値かどうか確認してから作成する（エラーの場合はenumに設定？）
-	RequestLine request_line(
-		CheckMethod(request_line_info[0]),
-		CheckRequestTarget(request_line_info[1]),
-		CheckVersion(request_line_info[2])
-	);
 	return request_line;
 }
 
@@ -101,17 +81,41 @@ HeaderFields HttpParse::SetHeaderFields(const std::vector<std::string> &header_f
 	return header_fields;
 }
 
-// todo: tmp request_
-HttpRequest HttpParse::Run(const std::string &read_buf) {
-	HttpRequest              request;
-	// a: [request_line header_fields, messagebody]
-	// b: [request_line, header_fields]
-	std::vector<std::string> a = utils::SplitStr(read_buf, CRLF + CRLF);
-	std::vector<std::string> b = utils::SplitStr(a[0], CRLF);
-	request.request_line       = SetRequestLine(utils::SplitStr(b[0], SP));
-	request.header_fields      = SetHeaderFields(b);
-	// PrintLines(b);
-	return request;
+std::string HttpParse::CheckMethod(const std::string &method) {
+	// US-ASCIIかまたは大文字かどうか -> 400
+	if (IsUSASCII(method) == false || IsUpper(method) == false) {
+		throw HttpParseException(BAD_REQUEST);
+	}
+	// GET, POST, DELETEかどうか ->　501
+	std::vector<std::string> basic_methods;
+	basic_methods.push_back("GET");
+	basic_methods.push_back("POST");
+	basic_methods.push_back("DELETE");
+	if (std::find(basic_methods.begin(), basic_methods.end(), method) == basic_methods.end()) {
+		throw HttpParseException(NOT_IMPLEMENTED);
+	}
+	return method;
+}
+
+std::string HttpParse::CheckRequestTarget(const std::string &reqest_target) {
+	// /が先頭になかったら場合 -> 400
+	if (reqest_target.empty() || reqest_target[0] != '/')
+		throw HttpParseException(BAD_REQUEST);
+	return reqest_target;
+}
+
+std::string HttpParse::CheckVersion(const std::string &version) {
+	// HTTP/1.1かどうか -> 400
+	if ("HTTP/1.1" != version)
+		throw HttpParseException(BAD_REQUEST);
+	return version;
+}
+
+HttpParse::HttpParseException::HttpParseException(const StatusCode &status_code)
+	: status_code_(status_code) {}
+
+const StatusCode &HttpParse::HttpParseException::GetStatusCode() const {
+	return status_code_;
 }
 
 // status_line && header
