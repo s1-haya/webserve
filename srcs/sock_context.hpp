@@ -16,8 +16,11 @@ class SockContext {
 	SockContext();
 	~SockContext();
 	// functions
+	// todo: overload?
 	void AddSockInfo(int fd, const SockInfo &sock_info);
 	void DeleteSockInfo(int fd);
+	void AddClientInfo(int fd, const ClientInfo &client_info);
+	void DeleteClientInfo(int fd);
 	// getter
 	SockInfo &GetSockInfo(int fd);
 

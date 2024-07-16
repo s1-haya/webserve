@@ -1,4 +1,5 @@
 #include "sock_context.hpp"
+#include "client_info.hpp"
 #include "sock_info.hpp"
 #include <stdexcept> // logic_error
 #include <unistd.h>  // close
@@ -26,6 +27,17 @@ void SockContext::AddSockInfo(int fd, const SockInfo &sock_info) {
 
 void SockContext::DeleteSockInfo(int fd) {
 	context_.erase(fd);
+}
+
+void SockContext::AddClientInfo(int fd, const ClientInfo &client_info) {
+	if (client_context_.count(fd) > 0) {
+		throw std::logic_error("ClientInfo already exists");
+	}
+	client_context_[fd] = client_info;
+}
+
+void SockContext::DeleteClientInfo(int fd) {
+	client_context_.erase(fd);
 }
 
 // In C++98, the map's "at" method is unavailable, not using const qualifiers.
