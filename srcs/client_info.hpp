@@ -16,6 +16,8 @@ class ClientInfo {
 	// prohibit copy
 	ClientInfo(const ClientInfo &other);
 	ClientInfo &operator=(const ClientInfo &other);
+	// function
+	void SetSockInfo(const struct sockaddr_storage &sock_addr);
 	// variables
 	int          fd_;
 	std::string  ip_str_;
