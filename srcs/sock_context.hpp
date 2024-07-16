@@ -6,11 +6,13 @@
 namespace server {
 
 class SockInfo;
+class ClientInfo;
 
 // Store socket informations for each fd
 class SockContext {
   public:
-	typedef std::map<int, SockInfo> SockInfoMap;
+	typedef std::map<int, SockInfo>   SockInfoMap;
+	typedef std::map<int, ClientInfo> ClientInfoMap;
 	SockContext();
 	~SockContext();
 	// functions
@@ -26,7 +28,8 @@ class SockContext {
 	// const
 	static const int SYSTEM_ERROR = -1;
 	// variables
-	SockInfoMap context_;
+	SockInfoMap   context_;
+	ClientInfoMap client_context_;
 };
 
 } // namespace server
