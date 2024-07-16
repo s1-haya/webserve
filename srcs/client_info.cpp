@@ -49,6 +49,10 @@ void ClientInfo::SetSockInfo(const struct sockaddr_storage &sock_addr) {
 	ip_ = ip;
 }
 
+int ClientInfo::GetFd() const {
+	return fd_;
+}
+
 const std::string &ClientInfo::GetIp() const {
 	return ip_;
 }

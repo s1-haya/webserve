@@ -15,6 +15,7 @@ class ClientInfo {
 	ClientInfo(const ClientInfo &other);
 	ClientInfo &operator=(const ClientInfo &other);
 	// getter
+	int                GetFd() const;
 	const std::string &GetIp() const;
 
   private:
