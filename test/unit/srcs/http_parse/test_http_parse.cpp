@@ -2,6 +2,8 @@
 #include "http_parse.hpp"
 #include <cstdlib> //EXIT_SUCCESS, EXIT_FAILURE
 #include <iostream>
+#include <ostream>
+#include <sstream> //stringstream
 
 namespace test_http_parse {
 
@@ -17,38 +19,45 @@ struct TestCase {
 	const http::HttpRequestResult expected;
 };
 
-// 　仮 関数名
-int assert_request_line(
-	std::size_t test_case_num, const http::RequestLine &res, const http::RequestLine &expect
+bool IsSameRequestLine(
+	std::size_t test_case_num, const http::RequestLine &res, const http::RequestLine &expected
 ) {
-	if (expect.method == res.method && expect.request_target == res.request_target &&
-		expect.version == res.version) {
-		std::cout << utils::color::GREEN << test_case_num << ".[OK] " << utils::color::RESET
-				  << std::endl;
-		return EXIT_SUCCESS;
+	bool result = true;
+	std::stringstream error_log;
+	if (expected.method != res.method) {
+		error_log << "Expected method: " << expected.method << ", Actual method: " << res.method << "\n";
+		result = false;
 	}
-	std::cerr << utils::color::RED << test_case_num << ".[NG] " << utils::color::RESET << std::endl;
-	std::cerr << utils::color::RED << "HttpParseClass failed: request_line" << utils::color::RESET
-			  << std::endl;
-	// 仮: coderabbit
-	std::cerr << "Expected method: " << expect.method << ", Actual method: " << res.method << std::endl;
-	std::cerr << "Expected request_target: " << expect.request_target << ", Actual request_target: " << res.request_target << std::endl;
-	std::cerr << "Expected version: " << expect.version << ", Actual version: " << res.version << std::endl;
-	return EXIT_FAILURE;
+	if (expected.request_target != res.request_target) {
+		error_log << "Expected request_target: " << expected.request_target
+				  << ", Actual request_target: " << res.request_target << "\n";
+		result = false;
+	}
+	if (expected.version != res.version) {
+		error_log << "Expected version: " << expected.version << ", Actual version: " << res.version
+				  << "\n";
+		result = false;
+	}
+	if (result == false) {
+		std::cerr << utils::color::RED << test_case_num << ".[NG] " << utils::color::RESET << std::endl;
+		std::cerr << utils::color::RED << "HttpParseClass failed: request_line" << utils::color::RESET
+				<< std::endl;
+		std::cerr << error_log.str();
+	}
+	return result;
 }
 
-// SplitStr()を実行してexpectedと比較
+// HTTPリクエストの書式
+// - 期待したステータスコードかどうかテスト
+// 	- ステータスコードがOKの場合はHTTPリクエストの中身もテスト（今回はステータスラインのみ）
 int Run(
 	std::size_t test_case_num, const std::string &src, const http::HttpRequestResult &expected
 ) {
 	const http::HttpRequestResult &result = http::HttpParse::Run(src);
 	if (result.status_code == expected.status_code) {
-		if (result.status_code == http::OK) {
-			// 　仮: OKだった場合はHTTPリクエスト情報をテストしたい
-			return (assert_request_line(
-				test_case_num, result.request.request_line, expected.request.request_line
-			));
-		}
+		// 　仮: ステータスコードがOKだった場合はHTTPリクエスト情報をテストしたい
+		if (result.status_code == http::OK && !(IsSameRequestLine(test_case_num, result.request.request_line, expected.request.request_line)))
+			return EXIT_FAILURE;
 		std::cout << utils::color::GREEN << test_case_num << ".[OK] " << utils::color::RESET
 				  << std::endl;
 		return EXIT_SUCCESS;
@@ -77,16 +86,13 @@ int RunTestCases(const TestCase test_cases[], std::size_t num_test_cases) {
 int RunTest() {
 	int ret_code = 0;
 
-	// HTTPリクエストの書式
-	// - 期待したステータスコードかどうかテスト
-	// 	- OKの場合はHTTPリクエストの中身もテスト（今回はステータスラインのみ）
 	static http::HttpRequestResult expected_1;
 	static const http::RequestLine expected_request_1("GET", "/", "HTTP/1.1");
-	// 要相談：エラーの場合のクエストラインの出力仕方
-	// static const http::RequestLine             expected_request_1("GEl", "/", "HTTP/1.1");
+	// NGの場合
+	// static const http::RequestLine             expected_request_1("GET", "/d", "HTTP/1.1d");
 	expected_1.request.request_line = expected_request_1;
 	expected_1.status_code          = http::OK;
-	// 要相談：失敗した時にenumの数値が出る（のちにステータスコードのenumからステータスコードの文字列を作成するので一旦保留）
+	// NGの場合
 	// expected_1.status_code = http::BAD_REQUEST;
 
 	// methodが小文字が含まれてる
