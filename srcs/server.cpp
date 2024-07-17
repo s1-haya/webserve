@@ -2,7 +2,7 @@
 #include "client_info.hpp"
 #include "event.hpp"
 #include "http.hpp"
-#include "sock_info.hpp"
+#include "server_info.hpp"
 #include "utils.hpp"
 #include <errno.h>
 #include <sys/socket.h> // socket

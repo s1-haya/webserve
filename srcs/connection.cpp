@@ -1,7 +1,7 @@
 #include "connection.hpp"
 #include "client_info.hpp"
 #include "server.hpp"
-#include "sock_info.hpp"
+#include "server_info.hpp"
 #include "utils.hpp"    // ConvertUintToStr
 #include <netdb.h>      // getaddrinfo,freeaddrinfo
 #include <netinet/in.h> // struct sockaddr

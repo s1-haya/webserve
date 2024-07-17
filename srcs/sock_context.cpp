@@ -1,6 +1,6 @@
 #include "sock_context.hpp"
 #include "client_info.hpp"
-#include "sock_info.hpp"
+#include "server_info.hpp"
 #include <stdexcept> // logic_error
 #include <unistd.h>  // close
 
