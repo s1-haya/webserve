@@ -9,8 +9,8 @@ namespace server {
 SockContext::SockContext() {}
 
 SockContext::~SockContext() {
-	typedef std::map<int, SockInfo>::iterator Itr;
-	for (Itr it = context_.begin(); it != context_.end(); ++it) {
+	typedef std::map<int, ServerInfo>::iterator Itr;
+	for (Itr it = server_context_.begin(); it != server_context_.end(); ++it) {
 		const int fd = it->first;
 		if (fd != SYSTEM_ERROR) {
 			close(fd);
@@ -18,15 +18,15 @@ SockContext::~SockContext() {
 	}
 }
 
-void SockContext::AddSockInfo(int fd, const SockInfo &sock_info) {
-	if (context_.count(fd) > 0) {
-		throw std::logic_error("SockInfo already exists");
+void SockContext::AddServerInfo(int fd, const ServerInfo &server_info) {
+	if (server_context_.count(fd) > 0) {
+		throw std::logic_error("ServerInfo already exists");
 	}
-	context_[fd] = sock_info;
+	server_context_[fd] = server_info;
 }
 
-void SockContext::DeleteSockInfo(int fd) {
-	context_.erase(fd);
+void SockContext::DeleteServerInfo(int fd) {
+	server_context_.erase(fd);
 }
 
 void SockContext::AddClientInfo(int fd, const ClientInfo &client_info) {
@@ -41,12 +41,12 @@ void SockContext::DeleteClientInfo(int fd) {
 }
 
 // In C++98, the map's "at" method is unavailable, not using const qualifiers.
-SockInfo &SockContext::GetSockInfo(int fd) {
-	SockInfo &sock_info = context_[fd];
-	if (context_.count(fd) == 0) {
-		throw std::logic_error("SockInfo doesn't exist");
+ServerInfo &SockContext::GetServerInfo(int fd) {
+	ServerInfo &server_info = server_context_[fd];
+	if (server_context_.count(fd) == 0) {
+		throw std::logic_error("ServerInfo doesn't exist");
 	}
-	return sock_info;
+	return server_info;
 }
 
 } // namespace server

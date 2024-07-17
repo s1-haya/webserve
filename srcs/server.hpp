@@ -14,7 +14,7 @@ namespace server {
 class Server {
   public:
 	typedef std::pair<std::string, std::string> TempConfig; // todo: tmp
-	typedef std::vector<SockInfo>               SockInfoVec;
+	typedef std::vector<ServerInfo>             ServerInfoVec;
 	explicit Server(const _config::Config::ConfigData &config);
 	~Server();
 	void Run();
@@ -24,7 +24,7 @@ class Server {
 	// prohibit copy
 	Server(const Server &other);
 	Server &operator=(const Server &other);
-	void    Init(const SockInfoVec &sock_infos);
+	void    Init(const ServerInfoVec &server_infos);
 	void    HandleEvent(const event::Event &event);
 	void    HandleNewConnection(int server_fd);
 	void    HandleExistingConnection(const event::Event &event);

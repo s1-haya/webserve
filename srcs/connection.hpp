@@ -7,7 +7,7 @@
 
 namespace server {
 
-class SockInfo;
+class ServerInfo;
 class ClientInfo;
 
 class Connection {
@@ -17,7 +17,7 @@ class Connection {
 	Connection();
 	~Connection();
 	// function
-	int               Connect(SockInfo &server_sock_info);
+	int               Connect(ServerInfo &server_info);
 	static ClientInfo Accept(int server_fd);
 	bool              IsListenServerFd(int sock_fd) const;
 
@@ -26,7 +26,7 @@ class Connection {
 	Connection(const Connection &other);
 	Connection &operator=(const Connection &other);
 	// functions
-	AddrInfo *GetAddrInfoList(const SockInfo &server_sock_info);
+	AddrInfo *GetAddrInfoList(const ServerInfo &server_info);
 	int       TryBind(AddrInfo *addrinfo) const;
 	// const
 	static const int SYSTEM_ERROR = -1;

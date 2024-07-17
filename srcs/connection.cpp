@@ -26,8 +26,8 @@ void InitHints(Connection::AddrInfo *hints) {
 } // namespace
 
 // result: dynamic allocated by getaddrinfo()
-Connection::AddrInfo *Connection::GetAddrInfoList(const SockInfo &server_sock_info) {
-	const std::string &port  = utils::ConvertUintToStr(server_sock_info.GetPort());
+Connection::AddrInfo *Connection::GetAddrInfoList(const ServerInfo &server_info) {
+	const std::string &port  = utils::ConvertUintToStr(server_info.GetPort());
 	AddrInfo           hints = {};
 	InitHints(&hints);
 
@@ -72,8 +72,8 @@ int Connection::TryBind(AddrInfo *addrinfo) const {
 	return SYSTEM_ERROR;
 }
 
-int Connection::Connect(SockInfo &server_sock_info) {
-	AddrInfo *addrinfo_list = GetAddrInfoList(server_sock_info);
+int Connection::Connect(ServerInfo &server_info) {
+	AddrInfo *addrinfo_list = GetAddrInfoList(server_info);
 	const int server_fd     = TryBind(addrinfo_list);
 	freeaddrinfo(addrinfo_list);
 	if (server_fd == SYSTEM_ERROR) {
