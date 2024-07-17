@@ -49,18 +49,21 @@ class HttpParse {
 	~HttpParse();
 	static RequestLine
 	SetRequestLine(const std::vector<std::string> &request_line, StatusCode *status_code);
-	static HeaderFields SetHeaderFields(const std::vector<std::string> &header_fields_info);
+	static HeaderFields
+	SetHeaderFields(const std::vector<std::string> &header_fields_info, StatusCode *status_code);
 
 	static std::string CheckMethod(const std::string &method);
 	static std::string CheckRequestTarget(const std::string &request_target);
 	static std::string CheckVersion(const std::string &version);
+
+	static std::string CheckHeaderFieldValue(const std::string &header_field_value);
 	class HttpParseException {
 	  public:
-		explicit HttpParseException(const StatusCode &status_code);
-		const StatusCode &GetStatusCode() const;
+		explicit HttpParseException(StatusCode status_code);
+		StatusCode GetStatusCode() const;
 
 	  private:
-		const StatusCode &status_code_;
+		StatusCode status_code_;
 	};
 };
 
