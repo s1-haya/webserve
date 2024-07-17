@@ -30,7 +30,10 @@ int assert_request_line(
 	std::cerr << utils::color::RED << test_case_num << ".[NG] " << utils::color::RESET << std::endl;
 	std::cerr << utils::color::RED << "HttpParseClass failed: request_line" << utils::color::RESET
 			  << std::endl;
-	// リクエストラインでどの値が期待した値と違ったかを出力したいけど、どう書けばいいかはまた考える。
+	// 仮: coderabbit
+	std::cerr << "Expected method: " << expect.method << ", Actual method: " << res.method << std::endl;
+	std::cerr << "Expected request_target: " << expect.request_target << ", Actual request_target: " << res.request_target << std::endl;
+	std::cerr << "Expected version: " << expect.version << ", Actual version: " << res.version << std::endl;
 	return EXIT_FAILURE;
 }
 
@@ -79,7 +82,7 @@ int RunTest() {
 	// 	- OKの場合はHTTPリクエストの中身もテスト（今回はステータスラインのみ）
 	static http::HttpRequestResult expected_1;
 	static const http::RequestLine expected_request_1("GET", "/", "HTTP/1.1");
-	// 要相談：クエストラインでどの値が期待した値と違ったかを出力したいけど、どう書くかまた考える
+	// 要相談：エラーの場合のクエストラインの出力仕方
 	// static const http::RequestLine             expected_request_1("GEl", "/", "HTTP/1.1");
 	expected_1.request.request_line = expected_request_1;
 	expected_1.status_code          = http::OK;
