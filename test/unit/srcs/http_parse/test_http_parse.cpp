@@ -1,8 +1,7 @@
 #include "color.hpp"
 #include "http_parse.hpp"
-#include <cstdlib>
+#include <cstdlib> //EXIT_SUCCESS, EXIT_FAILURE
 #include <iostream>
-#include <string>
 
 namespace test_http_parse {
 
@@ -11,7 +10,6 @@ namespace {
 #define ARRAY_SIZE(array) (sizeof(array) / sizeof(array[0]))
 
 // expected
-// templateのパラメータパックがc++11以降なので使っていない
 struct TestCase {
 	TestCase(const std::string &tmp_input, const http::HttpRequestResult &tmp_expected)
 		: input(tmp_input), expected(tmp_expected) {}
@@ -76,7 +74,7 @@ int RunTestCases(const TestCase test_cases[], std::size_t num_test_cases) {
 int RunTest() {
 	int ret_code = 0;
 
-	// HTTPリクエスト
+	// HTTPリクエストの書式
 	// - 期待したステータスコードかどうかテスト
 	// 	- OKの場合はHTTPリクエストの中身もテスト（今回はステータスラインのみ）
 	static http::HttpRequestResult expected_1;
@@ -96,7 +94,7 @@ int RunTest() {
 	static http::HttpRequestResult expected_3;
 	expected_3.status_code = http::BAD_REQUEST;
 
-	// 課題要件以外のmethodが含まれてる
+	// 課題要件以外のmethod(大文字のみ)が含まれてる
 	static http::HttpRequestResult expected_4;
 	expected_4.status_code = http::NOT_IMPLEMENTED;
 
