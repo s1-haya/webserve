@@ -19,32 +19,24 @@ ClientInfo::~ClientInfo() {
 void ClientInfo::SetSockInfo(const struct sockaddr_storage &sock_addr) {
 	// getnameinfo
 	char      ip[INET6_ADDRSTRLEN];
-	char      port[NI_MAXSERV];
 	const int status = getnameinfo(
 		(struct sockaddr *)&sock_addr,
 		sizeof(sock_addr),
 		ip,
 		sizeof(ip),
-		port,
-		sizeof(port),
+		NULL,
+		0,
 		NI_NUMERICHOST | NI_NUMERICSERV
 	);
 	if (status != 0) {
 		// todo: tmp
 		throw std::runtime_error("getnameinfo failed: " + std::string(gai_strerror(status)));
 	}
-
-	// set IP,port
-	ip_   = ip;
-	port_ = port;
+	ip_ = ip;
 }
 
 const std::string &ClientInfo::GetIp() const {
 	return ip_;
-}
-
-const std::string &ClientInfo::GetPort() const {
-	return port_;
 }
 
 } // namespace server

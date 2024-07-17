@@ -12,7 +12,6 @@ class ClientInfo {
 	~ClientInfo();
 	// getter
 	const std::string &GetIp() const;
-	const std::string &GetPort() const;
 
   private:
 	ClientInfo();
@@ -24,7 +23,6 @@ class ClientInfo {
 	// variables
 	int         fd_;
 	std::string ip_;
-	std::string port_;
 };
 
 } // namespace server

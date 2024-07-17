@@ -99,10 +99,7 @@ int Connection::Accept(int server_fd) {
 	// create new client struct
 	ClientInfo client_info(client_fd, client_sock_addr);
 	utils::Debug(
-		"server",
-		"new ClientInfo created. IP: " + client_info.GetIp() + ", PORT: " + client_info.GetPort() +
-			", fd",
-		client_fd
+		"server", "new ClientInfo created. IP: " + client_info.GetIp() + ", fd", client_fd
 	);
 
 	// todo: need?
