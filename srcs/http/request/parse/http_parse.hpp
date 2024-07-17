@@ -11,7 +11,7 @@ struct RequestLine {
 	std::string method;
 	std::string request_target;
 	std::string version;
-	// For test(main.cpp)
+	// For test
 	RequestLine() : method(""), request_target(""), version("") {}
 	RequestLine(
 		const std::string &method, const std::string &request_target, const std::string &version
@@ -39,7 +39,7 @@ struct HttpRequestResult {
 	HttpRequest request;
 	HttpRequestResult() : status_code(OK) {}
 	// For test
-	HttpRequestResult(const HttpRequest &request) : status_code(OK), request(request) {}
+	explicit HttpRequestResult(const HttpRequest &request) : status_code(OK), request(request) {}
 };
 
 class HttpParse {

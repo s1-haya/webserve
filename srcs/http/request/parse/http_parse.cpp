@@ -10,7 +10,7 @@ namespace {
 
 bool IsUSASCII(const std::string &str) {
 	typedef std::string::const_iterator It;
-	for (It it = str.begin(); it != str.end(); it++) {
+	for (It it = str.begin(); it != str.end(); ++it) {
 		if (static_cast<unsigned char>(*it) > 127)
 			return false;
 	}
@@ -19,7 +19,7 @@ bool IsUSASCII(const std::string &str) {
 
 bool IsUpper(const std::string &str) {
 	typedef std::string::const_iterator It;
-	for (It it = str.begin(); it != str.end(); it++) {
+	for (It it = str.begin(); it != str.end(); ++it) {
 		if (!std::isupper(static_cast<unsigned char>(*it)))
 			return false;
 	}
@@ -45,7 +45,6 @@ HttpRequestResult HttpParse::Run(const std::string &read_buf) {
 	std::vector<std::string> b   = utils::SplitStr(a[0], CRLF);
 	result.request.request_line  = SetRequestLine(utils::SplitStr(b[0], SP), &result.status_code);
 	result.request.header_fields = SetHeaderFields(b);
-	// PrintLines(b);
 	return result;
 }
 
@@ -94,7 +93,7 @@ std::string HttpParse::CheckRequestTarget(const std::string &reqest_target) {
 
 std::string HttpParse::CheckVersion(const std::string &version) {
 	// HTTP/1.1かどうか -> 400
-	if ("HTTP/1.1" != version)
+	if (version != "HTTP/1.1")
 		throw HttpParseException(BAD_REQUEST);
 	return version;
 }
