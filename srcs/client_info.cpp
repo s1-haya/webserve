@@ -18,13 +18,13 @@ ClientInfo::~ClientInfo() {
 
 void ClientInfo::SetSockInfo(const struct sockaddr_storage &sock_addr) {
 	// getnameinfo
-	char      ip_str[INET6_ADDRSTRLEN];
+	char      ip[INET6_ADDRSTRLEN];
 	char      port[NI_MAXSERV];
 	const int status = getnameinfo(
 		(struct sockaddr *)&sock_addr,
 		sizeof(sock_addr),
-		ip_str,
-		sizeof(ip_str),
+		ip,
+		sizeof(ip),
 		port,
 		sizeof(port),
 		NI_NUMERICHOST | NI_NUMERICSERV
@@ -35,12 +35,12 @@ void ClientInfo::SetSockInfo(const struct sockaddr_storage &sock_addr) {
 	}
 
 	// set IP,port
-	ip_str_ = ip_str;
-	port_   = port;
+	ip_   = ip;
+	port_ = port;
 }
 
 std::string ClientInfo::GetIp() const {
-	return ip_str_;
+	return ip_;
 }
 
 std::string ClientInfo::GetPort() const {
