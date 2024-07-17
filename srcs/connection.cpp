@@ -100,8 +100,8 @@ int Connection::Accept(int server_fd) {
 	ClientInfo client_info(client_fd, client_sock_addr);
 	utils::Debug(
 		"server",
-		"new ClientInfo created. IP: " + client_info.GetIp() +
-			", PORT: " + utils::ConvertUintToStr(client_info.GetPort()) + ", fd",
+		"new ClientInfo created. IP: " + client_info.GetIp() + ", PORT: " + client_info.GetPort() +
+			", fd",
 		client_fd
 	);
 

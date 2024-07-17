@@ -11,8 +11,8 @@ class ClientInfo {
 	ClientInfo(int fd, const struct sockaddr_storage &sock_addr);
 	~ClientInfo();
 	// getter
-	std::string  GetIp() const;
-	unsigned int GetPort() const;
+	std::string GetIp() const;
+	std::string GetPort() const;
 
   private:
 	ClientInfo();
@@ -22,9 +22,9 @@ class ClientInfo {
 	// function
 	void SetSockInfo(const struct sockaddr_storage &sock_addr);
 	// variables
-	int          fd_;
-	std::string  ip_str_;
-	unsigned int port_;
+	int         fd_;
+	std::string ip_str_;
+	std::string port_;
 };
 
 } // namespace server

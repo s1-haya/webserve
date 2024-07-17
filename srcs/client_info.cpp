@@ -1,12 +1,11 @@
 #include "client_info.hpp"
-#include <arpa/inet.h>  // ntohs
 #include <netdb.h>      // getnameinfo
 #include <netinet/in.h> // struct sock_addr,INET6_ADDRSTRLEN,ntohs
 #include <stdexcept>
 
 namespace server {
 
-ClientInfo::ClientInfo(int fd, const struct sockaddr_storage &sock_addr) : fd_(fd), port_(0) {
+ClientInfo::ClientInfo(int fd, const struct sockaddr_storage &sock_addr) : fd_(fd) {
 	SetSockInfo(sock_addr);
 }
 
@@ -17,34 +16,18 @@ ClientInfo::~ClientInfo() {
 	// }
 }
 
-namespace {
-
-unsigned int ConvertPortToHostByteOrder(const struct sockaddr_storage &sock_addr) {
-	// for IPv4
-	if (sock_addr.ss_family == AF_INET) {
-		return ntohs(((struct sockaddr_in *)&sock_addr)->sin_port);
-	}
-	// for IPv6
-	if (sock_addr.ss_family == AF_INET6) {
-		return ntohs(((struct sockaddr_in6 *)&sock_addr)->sin6_port);
-	}
-	// todo: tmp(unreachable?)
-	return -1;
-}
-
-} // namespace
-
 void ClientInfo::SetSockInfo(const struct sockaddr_storage &sock_addr) {
 	// getnameinfo
 	char      ip_str[INET6_ADDRSTRLEN];
+	char      port[NI_MAXSERV];
 	const int status = getnameinfo(
 		(struct sockaddr *)&sock_addr,
 		sizeof(sock_addr),
 		ip_str,
 		sizeof(ip_str),
-		NULL,
-		0,
-		NI_NUMERICHOST
+		port,
+		sizeof(port),
+		NI_NUMERICHOST | NI_NUMERICSERV
 	);
 	if (status != 0) {
 		// todo: tmp
@@ -53,14 +36,14 @@ void ClientInfo::SetSockInfo(const struct sockaddr_storage &sock_addr) {
 
 	// set IP,port
 	ip_str_ = ip_str;
-	port_   = ConvertPortToHostByteOrder(sock_addr);
+	port_   = port;
 }
 
 std::string ClientInfo::GetIp() const {
 	return ip_str_;
 }
 
-unsigned int ClientInfo::GetPort() const {
+std::string ClientInfo::GetPort() const {
 	return port_;
 }
 
