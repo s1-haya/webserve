@@ -20,26 +20,44 @@ int main(void) {
 	http::RequestLine       expect2("", "/", "HTTP/1.1");
 	http::HttpRequestResult test2 = http::HttpParse::Run("GEdT / HTTP/1.1");
 	assert(http::BAD_REQUEST == test2.status_code);
-	if (http::OK == test2.status_code)
-		assert_request_line(expect2, test2.request.request_line);
-	// assert(http::OK == test2.status_code);
 
 	// methodがUS-ASCII以外の文字が含まれてる
 	http::RequestLine       expect3("", "/", "HTTP/1.1");
 	http::HttpRequestResult test3 = http::HttpParse::Run("GEあ / HTTP/1.1");
 	assert(http::BAD_REQUEST == test3.status_code);
-	if (http::OK == test3.status_code)
-		assert_request_line(expect3, test3.request.request_line);
 
 	// 課題要件以外のmethodが含まれてる
 	http::RequestLine       expect4("", "/", "HTTP/1.1");
 	http::HttpRequestResult test4 = http::HttpParse::Run("HEAD / HTTP/1.1");
 	assert(http::NOT_IMPLEMENTED == test4.status_code);
-	if (http::OK == test4.status_code)
-		assert_request_line(expect4, test4.request.request_line);
+
+	// header_fields: 成功例
+	http::RequestLine       expect5("GET", "/", "HTTP/1.1");
+	http::HttpRequestResult test5 = http::HttpParse::Run(
+		"GET / HTTP/1.1\r\nHost: www.example.com\r\nConnection: keep-alive\r\n\r\n"
+	);
+	assert(http::OK == test5.status_code);
+	assert_request_line(expect5, test5.request.request_line);
+	assert("www.example.com" == test5.request.header_fields["Host"]);
+
+	// header_fields: セミコロン以降に複数OWS(SpaceとHorizontal Tab)が設定されてる場合
+	http::RequestLine       expect6("GET", "/", "HTTP/1.1");
+	http::HttpRequestResult test6 = http::HttpParse::Run(
+		"GET / HTTP/1.1\r\nHost:    \twww.example.com\r\nConnection: keep-alive\r\n\r\n"
+	);
+	assert(http::OK == test6.status_code);
+	assert_request_line(expect6, test6.request.request_line);
+	assert("www.example.com" == test6.request.header_fields["Host"]);
+
+	// header_fields: 存在しないfield_nameの場合
+	http::RequestLine       expect7("", "/", "HTTP/1.1");
+	http::HttpRequestResult test7 = http::HttpParse::Run(
+		"GET / HTTP/1.1\r\nHosdt: www.example.com\r\nConnection: keep-alive\r\n\r\n"
+	);
+	assert(http::BAD_REQUEST == test7.status_code);
 
 	// // RequestTargetが絶対パスじゃない
-	// http::RequestLine expect5("GET", "400", "HTTP/1.1");
+	// http::RequestLine expect6("GET", "400", "HTTP/1.1");
 	// http::HttpRequestResult test5 = a.Run("GET index.html/ HTTP/1.1");
 	// assert_request_line(expect5, test5.request_line);
 
