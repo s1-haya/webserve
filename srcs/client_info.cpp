@@ -39,11 +39,11 @@ void ClientInfo::SetSockInfo(const struct sockaddr_storage &sock_addr) {
 	port_ = port;
 }
 
-std::string ClientInfo::GetIp() const {
+const std::string &ClientInfo::GetIp() const {
 	return ip_;
 }
 
-std::string ClientInfo::GetPort() const {
+const std::string &ClientInfo::GetPort() const {
 	return port_;
 }
 

@@ -11,8 +11,8 @@ class ClientInfo {
 	ClientInfo(int fd, const struct sockaddr_storage &sock_addr);
 	~ClientInfo();
 	// getter
-	std::string GetIp() const;
-	std::string GetPort() const;
+	const std::string &GetIp() const;
+	const std::string &GetPort() const;
 
   private:
 	ClientInfo();
