@@ -38,10 +38,33 @@ int main() {
 
 	// HTTP GETリクエストの作成
 	std::string request_body = "key1=value1&key2=value2";
-	std::string http_request = "GET / HTTP/1.1\r\nHost: " + std::string(server_ip) +
-							   "\r\nConnection: close\r\nContent-Type: "
-							   "application/x-www-form-urlencoded\r\nContent-Length: " +
+	std::string http_request = "GET / HTTP/1.1\r\n"
+							   "Host: a\r\n"
+							   "Host: " +
+							   std::string(server_ip) +
+							   "\r\n"
+							   "Connection: close\r\n"
+							   "Content-Type: application/x-www-form-urlencoded\r\n"
+							   "Content-Length: " +
 							   std::to_string(request_body.length()) + "\r\n\r\n" + request_body;
+	// Hostを複数設定した場合　HTTP/1.1 400 Bad Request
+	// std::string http_request = "GET / HTTP/1.1\r\n"
+	// 						   "Host: a\r\n"
+	// 						   "Host: " + std::string(server_ip) + "\r\n"
+	// 						   "Connection: close\r\n"
+	// 						   "Content-Type: application/x-www-form-urlencoded\r\n"
+	// 						   "Content-Length: " +
+	// 						   std::to_string(request_body.length()) + "\r\n\r\n" + request_body;
+
+	// Connectionが複数設定した場合は最後に設定した値が適用: HTTP/1.1 200 OK
+	// std::string http_request = "GET / HTTP/1.1\r\n"
+	// 						   "Host: a\r\n"
+	// 						   "Connection: keep-alive\r\n"
+	// 						   "Connection: keep-alive\r\n"
+	// 						   "Connection: close\r\n"
+	// 						   "Content-Type: application/x-www-form-urlencoded\r\n"
+	// 						   "Content-Length: " +
+	// 						   std::to_string(request_body.length()) + "\r\n\r\n" + request_body;
 
 	// リクエストの送信
 	send(sockfd, http_request.c_str(), http_request.size(), 0);
