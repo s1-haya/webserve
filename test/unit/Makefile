@@ -23,7 +23,9 @@ TEST_DIRS	:=	$(TEST_CONVERT_STR_DIR) \
 run:
 	@status=0; \
 	for dir in $(TEST_DIRS); do \
-		echo -e "\n\033[30mRunning unit tests in $$dir...\033[0m"; \
+		echo "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"; \
+		echo "┃ $$dir"; \
+		echo "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"; \
 		(MAKEFLAGS="-s" make -C $$dir run); \
 		dir_status=$$?; \
 		status=$$((status | dir_status)); \
