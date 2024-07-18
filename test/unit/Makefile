@@ -6,10 +6,10 @@ TEST_CONVERT_STR_DIR	:=	convert_str
 run-convert-str:
 	@make -C $(TEST_CONVERT_STR_DIR) run
 
-TEST_SPLIT_DIR	:=	split
-.PHONY	: run-split
-run-split:
-	@make -C $(TEST_SPLIT_DIR) run
+TEST_SPLIT_STR_DIR	:=	split_str
+.PHONY	: run-split-str
+run-split-str:
+	@make -C $(TEST_SPLIT_STR_DIR) run
 
 #--------------------------------------------
 # run all unit test
@@ -17,7 +17,7 @@ run-split:
 # Add target test directories.
 # Each directory should have a Makefile with a 'run' target.
 TEST_DIRS	:=	$(TEST_CONVERT_STR_DIR) \
-				$(TEST_SPLIT_DIR)
+				$(TEST_SPLIT_STR_DIR)
 
 .PHONY	: run
 run:
