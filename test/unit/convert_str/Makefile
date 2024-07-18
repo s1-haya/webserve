@@ -1,20 +1,21 @@
 NAME			:=	a.out
 
 # 1. Set each directory name
-TEST_DIR		:=	split
+TEST_DIR		:=	convert_str
 
 LOG_DIR			:=	log
 LOG_FILE_NAME	:=	$(TEST_DIR).log
 LOG_FILE_PATH	:=	$(LOG_DIR)/$(LOG_FILE_NAME)
 
 # 2. Add target webserv files
-WS_SRCS_DIR		:=	../../../../srcs
+WS_SRCS_DIR		:=	../../../srcs
 WS_UTILS_DIR	:=	$(WS_SRCS_DIR)/utils
 SRCS			+=	$(WS_UTILS_DIR)/color.cpp \
-					$(WS_UTILS_DIR)/split.cpp
+					$(WS_UTILS_DIR)/convert_str.cpp \
+					$(WS_UTILS_DIR)/isdigit.cpp
 
 # 3. Add unit test files
-SRCS	+=	test_split.cpp
+SRCS	+=	test_convert_str.cpp
 
 # 4. Add directory for INCLUDE
 INCLUDE_DIR	:=	$(WS_UTILS_DIR)

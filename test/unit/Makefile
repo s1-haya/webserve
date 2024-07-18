@@ -1,12 +1,12 @@
 #--------------------------------------------
 # run each unit test
 #--------------------------------------------
-TEST_CONVERT_STR_DIR	:=	srcs/convert_str
+TEST_CONVERT_STR_DIR	:=	convert_str
 .PHONY	: run-convert-str
 run-convert-str:
 	@make -C $(TEST_CONVERT_STR_DIR) run
 
-TEST_SPLIT_DIR	:=	srcs/split
+TEST_SPLIT_DIR	:=	split
 .PHONY	: run-split
 run-split:
 	@make -C $(TEST_SPLIT_DIR) run
