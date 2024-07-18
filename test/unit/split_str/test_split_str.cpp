@@ -11,12 +11,6 @@ namespace {
 // 比較する型
 typedef std::vector<std::string> Strs;
 
-void PrintTestTitle(const std::string &title) {
-	std::cout << "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
-	std::cout << "┃ " << title << std::endl;
-	std::cout << "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
-}
-
 // expected
 // templateのパラメータパックがc++11以降なので使っていない
 struct TestCase {
@@ -63,8 +57,6 @@ int RunTestCases(const TestCase test_cases[], std::size_t num_test_cases) {
 } // namespace
 
 int main() {
-	PrintTestTitle("SplitStr()");
-
 	int ret_code = 0;
 
 	// ---------------------------------------------------------------------

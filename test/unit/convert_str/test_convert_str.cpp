@@ -17,12 +17,6 @@ enum Result {
 	FAIL
 };
 
-void PrintTestTitle(const std::string &title) {
-	std::cout << "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
-	std::cout << "┃ " << title << std::endl;
-	std::cout << "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
-}
-
 struct TestCase {
 	TestCase(const std::string &tmp_src, Expect tmp_expected, Result tmp_result)
 		: src(tmp_src), expected(tmp_expected), result(tmp_result) {}
@@ -62,8 +56,6 @@ int RunTestCases(const TestCase test_cases[], std::size_t num_test_cases) {
 } // namespace
 
 int main() {
-	PrintTestTitle("ConvertStr()");
-
 	int ret_code = 0;
 
 	static const TestCase test_cases_for_space[] = {
