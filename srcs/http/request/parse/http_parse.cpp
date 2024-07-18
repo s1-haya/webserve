@@ -8,7 +8,7 @@ namespace http {
 
 namespace {
 
-bool IsUSASCII(const std::string &str) {
+bool IsUsaAscii(const std::string &str) {
 	typedef std::string::const_iterator It;
 	for (It it = str.begin(); it != str.end(); ++it) {
 		if (static_cast<unsigned char>(*it) > 127)
@@ -41,10 +41,11 @@ HttpRequestResult HttpParse::Run(const std::string &read_buf) {
 	HttpRequestResult result;
 	// a: [request_line header_fields, messagebody]
 	// b: [request_line, header_fields]
-	std::vector<std::string> a   = utils::SplitStr(read_buf, CRLF + CRLF);
-	std::vector<std::string> b   = utils::SplitStr(a[0], CRLF);
-	result.request.request_line  = SetRequestLine(utils::SplitStr(b[0], SP), &result.status_code);
-	result.request.header_fields = SetHeaderFields(b);
+	std::vector<std::string> a  = utils::SplitStr(read_buf, CRLF + CRLF);
+	std::vector<std::string> b  = utils::SplitStr(a[0], CRLF);
+	result.request.request_line = SetRequestLine(utils::SplitStr(b[0], SP), &result.status_code);
+	const std::vector<std::string> header_fields_info(b.begin() + 1, b.end());
+	result.request.header_fields = SetHeaderFields(header_fields_info);
 	return result;
 }
 
@@ -66,7 +67,7 @@ HeaderFields HttpParse::SetHeaderFields(const std::vector<std::string> &header_f
 	// todo: 各値が正常な値かどうか確認してから作成する（エラーの場合はenumに設定？）
 	HeaderFields                                     header_fields;
 	typedef std::vector<std::string>::const_iterator It;
-	for (It it = header_fields_info.begin() + 1; it != header_fields_info.end(); ++it) {
+	for (It it = header_fields_info.begin(); it != header_fields_info.end(); ++it) {
 		std::vector<std::string> header_key_value = utils::SplitStr(*it, ": ");
 		header_fields[header_key_value[0]]        = header_key_value[1];
 	}
@@ -75,7 +76,7 @@ HeaderFields HttpParse::SetHeaderFields(const std::vector<std::string> &header_f
 
 std::string HttpParse::CheckMethod(const std::string &method) {
 	// US-ASCIIかまたは大文字かどうか -> 400
-	if (IsUSASCII(method) == false || IsUpper(method) == false)
+	if (IsUsaAscii(method) == false || IsUpper(method) == false)
 		throw HttpParseException(BAD_REQUEST);
 	// GET, POST, DELETEかどうか ->　501
 	static const std::vector<std::string> basic_methods = CreateBasicMethods();
