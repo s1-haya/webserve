@@ -7,6 +7,7 @@
 namespace {
 
 #define ARRAY_SIZE(array) (sizeof(array) / sizeof(array[0]))
+#define UNUSED            0
 
 // 比較する型
 typedef unsigned int Expect;
@@ -65,20 +66,17 @@ int main() {
 
 	int ret_code = 0;
 
-	// ---------------------------------------------------------------------
-	//
-	// ---------------------------------------------------------------------
 	static const TestCase test_cases_for_space[] = {
 		// 失敗が返ることを確認するtestcase
-		TestCase("", 0, FAIL),
-		TestCase("   ", 0, FAIL),
-		TestCase("a", 0, FAIL),
-		TestCase("8080a", 0, FAIL),
-		TestCase("a8080", 0, FAIL),
-		TestCase("    8080", 8080, FAIL),
-		TestCase("8080    ", 0, FAIL),
-		TestCase("-8080", 0, FAIL),
-		TestCase("4294967296", 0, FAIL), // UINT_MAX + 1
+		TestCase("", UNUSED, FAIL),
+		TestCase("   ", UNUSED, FAIL),
+		TestCase("a", UNUSED, FAIL),
+		TestCase("8080a", UNUSED, FAIL),
+		TestCase("a8080", UNUSED, FAIL),
+		TestCase("    8080", UNUSED, FAIL),
+		TestCase("8080    ", UNUSED, FAIL),
+		TestCase("-8080", UNUSED, FAIL),
+		TestCase("4294967296", UNUSED, FAIL), // UINT_MAX + 1
 
 		// 成功を確認するtestcase
 		TestCase("0", 0, SUCCESS),
