@@ -43,6 +43,17 @@ static std::vector<std::string> CreateBasicMethods() {
 	return basic_methods;
 }
 
+static std::vector<std::string> CreateHeaderFields() {
+	std::vector<std::string> header_fields;
+	header_fields.push_back("Host");
+	header_fields.push_back("User-Agent");
+	header_fields.push_back("Accept");
+	header_fields.push_back("Content-Type");
+	header_fields.push_back("Content-Length");
+	header_fields.push_back("Connection");
+	return header_fields;
+}
+
 } // namespace
 
 // todo: tmp request_
@@ -106,6 +117,15 @@ std::string HttpParse::CheckVersion(const std::string &version) {
 	if (version != "HTTP/1.1")
 		throw HttpParseException(BAD_REQUEST);
 	return version;
+}
+
+std::string HttpParse::CheckHeaderFieldValue(const std::string &header_field_value) {
+	// C++98 では初期化リストがサポートされていないため
+	static const std::vector<std::string> header_fields = CreateHeaderFields();
+	if (std::find(header_fields.begin(), header_fields.end(), header_field_value) ==
+		header_fields.end())
+		throw HttpParseException(BAD_REQUEST);
+	return header_field_value;
 }
 
 HttpParse::HttpParseException::HttpParseException(StatusCode status_code)
