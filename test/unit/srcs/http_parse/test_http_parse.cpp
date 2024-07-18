@@ -107,14 +107,14 @@ int RunTest() {
 	static http::HttpRequestResult expected_4;
 	expected_4.status_code = http::NOT_IMPLEMENTED;
 
-	static const TestCase test_cases_for_space[] = {
+	static const TestCase test_cases_for_request_line[] = {
 		TestCase("GET / HTTP/1.1", expected_1),
 		TestCase("GEt / HTTP/1.1", expected_2),
 		TestCase("あGE / HTTP/1.1", expected_3),
 		TestCase("HEAD / HTTP/1.1", expected_4),
 	};
 
-	ret_code |= RunTestCases(test_cases_for_space, ARRAY_SIZE(test_cases_for_space));
+	ret_code |= RunTestCases(test_cases_for_request_line, ARRAY_SIZE(test_cases_for_request_line));
 	return ret_code;
 }
 
