@@ -13,6 +13,7 @@ class SockContext {
   public:
 	typedef std::map<int, ServerInfo> ServerInfoMap;
 	typedef std::map<int, ClientInfo> ClientInfoMap;
+	typedef std::map<int, ServerInfo> ClientsHostServerMap; // todo: naming
 	SockContext();
 	~SockContext();
 	// functions
@@ -30,8 +31,9 @@ class SockContext {
 	// const
 	static const int SYSTEM_ERROR = -1;
 	// variables
-	ServerInfoMap server_context_;
-	ClientInfoMap client_context_;
+	ServerInfoMap        server_context_;
+	ClientInfoMap        client_context_;
+	ClientsHostServerMap host_servers_;
 };
 
 } // namespace server
