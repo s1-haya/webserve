@@ -65,7 +65,7 @@ HttpRequestResult HttpParse::Run(const std::string &read_buf) {
 	std::vector<std::string> b  = utils::SplitStr(a[0], CRLF);
 	result.request.request_line = SetRequestLine(utils::SplitStr(b[0], SP), &result.status_code);
 	const std::vector<std::string> header_fields_info(b.begin() + 1, b.end());
-	result.request.header_fields = SetHeaderFields(header_fields_info);
+	result.request.header_fields = SetHeaderFields(header_fields_info, &result.status_code);
 	return result;
 }
 
@@ -83,14 +83,22 @@ RequestLine HttpParse::SetRequestLine(
 	return request_line;
 }
 
-HeaderFields HttpParse::SetHeaderFields(const std::vector<std::string> &header_fields_info) {
+HeaderFields HttpParse::SetHeaderFields(const std::vector<std::string> &header_fields_info, StatusCode *status_code) {
 	// todo: 各値が正常な値かどうか確認してから作成する（エラーの場合はenumに設定？）
 	HeaderFields                                     header_fields;
-	typedef std::vector<std::string>::const_iterator It;
-	for (It it = header_fields_info.begin(); it != header_fields_info.end(); ++it) {
-		std::vector<std::string> header_key_value = utils::SplitStr(*it, ":");
-		TrimLeadingOptionalWhitespace(header_key_value[1]);
-		header_fields[header_key_value[0]] = header_key_value[1];
+	try {
+		typedef std::vector<std::string>::const_iterator It;
+		for (It it = header_fields_info.begin(); it != header_fields_info.end(); ++it) {
+			std::vector<std::string> header_key_value = utils::SplitStr(*it, ":");
+			TrimLeadingOptionalWhitespace(header_key_value[1]);
+			CheckHeaderFieldValue(header_key_value[0]);
+			// 既にヘッダフィールドの値が設定されてる場合
+			if (header_fields[header_key_value[0]].size())
+				throw HttpParseException(BAD_REQUEST);
+			header_fields[header_key_value[0]] = header_key_value[1];
+		}
+	} catch (const HttpParseException &e) {
+		*status_code = e.GetStatusCode();
 	}
 	return header_fields;
 }
@@ -120,13 +128,12 @@ std::string HttpParse::CheckVersion(const std::string &version) {
 	return version;
 }
 
-std::string HttpParse::CheckHeaderFieldValue(const std::string &header_field_value) {
+void HttpParse::CheckHeaderFieldValue(const std::string &header_field_value) {
 	// C++98 では初期化リストがサポートされていないため
 	static const std::vector<std::string> header_fields = CreateHeaderFields();
 	if (std::find(header_fields.begin(), header_fields.end(), header_field_value) ==
 		header_fields.end())
 		throw HttpParseException(BAD_REQUEST);
-	return header_field_value;
 }
 
 HttpParse::HttpParseException::HttpParseException(StatusCode status_code)
