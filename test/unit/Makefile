@@ -1,9 +1,23 @@
 #--------------------------------------------
+# run each unit test
+#--------------------------------------------
+TEST_CONVERT_STR_DIR	:=	srcs/convert_str
+.PHONY	: run-convert-str
+run-convert-str:
+	@make -C $(TEST_CONVERT_STR_DIR) run
+
+TEST_SPLIT_DIR	:=	srcs/split
+.PHONY	: run-split
+run-split:
+	@make -C $(TEST_SPLIT_DIR) run
+
+#--------------------------------------------
 # run all unit test
 #--------------------------------------------
 # Add target test directories.
 # Each directory should have a Makefile with a 'run' target.
-TEST_DIRS	:=	srcs/convert_str srcs/split
+TEST_DIRS	:=	$(TEST_CONVERT_STR_DIR) \
+				$(TEST_SPLIT_DIR)
 
 .PHONY	: run
 run:
