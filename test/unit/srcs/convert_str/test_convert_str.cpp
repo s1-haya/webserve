@@ -1,9 +1,9 @@
+#include "color.hpp"
 #include "utils.hpp"
 #include <cstdlib>
 #include <iostream>
 #include <string>
 
-namespace test_convert_str {
 namespace {
 
 #define ARRAY_SIZE(array) (sizeof(array) / sizeof(array[0]))
@@ -15,6 +15,12 @@ enum Result {
 	SUCCESS,
 	FAIL
 };
+
+void PrintTestTitle(const std::string &title) {
+	std::cout << "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
+	std::cout << "┃ " << title << std::endl;
+	std::cout << "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
+}
 
 struct TestCase {
 	TestCase(const std::string &tmp_src, Expect tmp_expected, Result tmp_result)
@@ -54,7 +60,9 @@ int RunTestCases(const TestCase test_cases[], std::size_t num_test_cases) {
 
 } // namespace
 
-int RunTest() {
+int main() {
+	PrintTestTitle("ConvertStr()");
+
 	int ret_code = 0;
 
 	// ---------------------------------------------------------------------
@@ -82,5 +90,3 @@ int RunTest() {
 
 	return ret_code;
 }
-
-} // namespace test_convert_str
