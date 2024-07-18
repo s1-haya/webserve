@@ -19,7 +19,7 @@ class SockContext {
 	// functions
 	// todo: overload?
 	void AddServerInfo(int fd, const ServerInfo &server_info);
-	void AddClientInfo(int fd, const ClientInfo &client_info);
+	void AddClientInfo(int fd, const ClientInfo &client_info, int server_fd);
 	void DeleteClientInfo(int fd);
 	// getter
 	const ServerInfo &GetServerInfo(int fd) const;
