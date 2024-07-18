@@ -26,6 +26,15 @@ bool IsUpper(const std::string &str) {
 	return true;
 }
 
+// OWS (optional whitespace): SP(Space), HTAB(Horizontal Tab)
+void TrimLeadingOptionalWhitespace(std::string &str) {
+	size_t i = 0;
+	while (i < str.size() && (std::isspace(str[i]) || str[i] == '\t')) {
+		++i;
+	}
+	str.erase(0, i);
+}
+
 static std::vector<std::string> CreateBasicMethods() {
 	std::vector<std::string> basic_methods;
 	basic_methods.push_back("GET");
@@ -67,8 +76,9 @@ HeaderFields HttpParse::SetHeaderFields(const std::vector<std::string> &header_f
 	HeaderFields                                     header_fields;
 	typedef std::vector<std::string>::const_iterator It;
 	for (It it = header_fields_info.begin() + 1; it != header_fields_info.end(); ++it) {
-		std::vector<std::string> header_key_value = utils::SplitStr(*it, ": ");
-		header_fields[header_key_value[0]]        = header_key_value[1];
+		std::vector<std::string> header_key_value = utils::SplitStr(*it, ":");
+		TrimLeadingOptionalWhitespace(header_key_value[1]);
+		header_fields[header_key_value[0]] = header_key_value[1];
 	}
 	return header_fields;
 }
