@@ -4,13 +4,18 @@
 #include <iostream>
 #include <string>
 
-namespace test_split {
 namespace {
 
 #define ARRAY_SIZE(array) (sizeof(array) / sizeof(array[0]))
 
 // 比較する型
 typedef std::vector<std::string> Strs;
+
+void PrintTestTitle(const std::string &title) {
+	std::cout << "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
+	std::cout << "┃ " << title << std::endl;
+	std::cout << "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
+}
 
 // expected
 // templateのパラメータパックがc++11以降なので使っていない
@@ -57,7 +62,9 @@ int RunTestCases(const TestCase test_cases[], std::size_t num_test_cases) {
 
 } // namespace
 
-int RunTest() {
+int main() {
+	PrintTestTitle("SplitStr()");
+
 	int ret_code = 0;
 
 	// ---------------------------------------------------------------------
@@ -152,5 +159,3 @@ int RunTest() {
 
 	return ret_code;
 }
-
-} // namespace test_split
