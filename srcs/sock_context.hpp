@@ -24,6 +24,7 @@ class SockContext {
 	// getter
 	const ServerInfo &GetServerInfo(int fd) const;
 	const ClientInfo &GetClientInfo(int fd) const;
+	const ServerInfo &GetConnectedServerInfo(int client_fd) const;
 
   private:
 	// prohibit copy

@@ -65,4 +65,12 @@ const ClientInfo &SockContext::GetClientInfo(int fd) const {
 	}
 }
 
+const ServerInfo &SockContext::GetConnectedServerInfo(int client_fd) const {
+	try {
+		return host_servers_.at(client_fd);
+	} catch (const std::exception &e) {
+		throw std::logic_error("associated ServerInfo doesn't exist");
+	}
+}
+
 } // namespace server
