@@ -23,6 +23,7 @@ class SockContext {
 	void DeleteClientInfo(int fd);
 	// getter
 	const ServerInfo &GetServerInfo(int fd) const;
+	const ClientInfo &GetClientInfo(int fd) const;
 
   private:
 	// prohibit copy

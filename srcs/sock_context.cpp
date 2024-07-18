@@ -57,4 +57,12 @@ const ServerInfo &SockContext::GetServerInfo(int fd) const {
 	}
 }
 
+const ClientInfo &SockContext::GetClientInfo(int fd) const {
+	try {
+		return client_context_.at(fd);
+	} catch (const std::exception &e) {
+		throw std::logic_error("ClientInfo doesn't exist");
+	}
+}
+
 } // namespace server
