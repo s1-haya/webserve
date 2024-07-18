@@ -41,12 +41,35 @@ bool IsSameRequestLine(
 	}
 	if (result == false) {
 		std::cerr << utils::color::RED << test_case_num << ".[NG] " << utils::color::RESET
-				<< std::endl;
+				  << std::endl;
 		std::cerr << utils::color::RED << "HttpParseClass failed: request_line"
 				  << utils::color::RESET << std::endl;
 		std::cerr << error_log.str();
 	}
 	return result;
+}
+
+bool IsSameHeaderFields(
+	std::size_t test_case_num, const http::HeaderFields &res, const http::HeaderFields &expected
+) {
+	(void)test_case_num;
+	(void)res;
+	(void)expected;
+	return true;
+}
+
+bool IsSameHttpRequest(
+	std::size_t test_case_num, const http::HttpRequest &res, const http::HttpRequest &expected
+) {
+	if (!(IsSameRequestLine(
+			test_case_num, res.request_line, expected.request_line
+		)))
+		return false;
+	if (!(IsSameHeaderFields(
+			test_case_num, res.header_fields, expected.header_fields
+		)))
+		return false;
+	return true;
 }
 
 // HTTPリクエストの書式
@@ -55,10 +78,13 @@ bool IsSameRequestLine(
 int Run(
 	std::size_t test_case_num, const std::string &src, const http::HttpRequestResult &expected
 ) {
-	const http::HttpRequestResult &result = http::HttpParse::Run(src);
+	const http::HttpRequestResult result = http::HttpParse::Run(src);
 	if (result.status_code == expected.status_code) {
 		// 　仮: ステータスコードがOKだった場合はHTTPリクエスト情報をテストしたい
-		if (result.status_code == http::OK && !(IsSameRequestLine(test_case_num, result.request.request_line, expected.request.request_line)))
+		if (result.status_code == http::OK &&
+			!(IsSameHttpRequest(
+				test_case_num, result.request, expected.request
+			)))
 			return EXIT_FAILURE;
 		std::cout << utils::color::GREEN << test_case_num << ".[OK] " << utils::color::RESET
 				  << std::endl;
