@@ -87,7 +87,7 @@ HeaderFields HttpParse::SetHeaderFields(const std::vector<std::string> &header_f
 	// todo: 各値が正常な値かどうか確認してから作成する（エラーの場合はenumに設定？）
 	HeaderFields                                     header_fields;
 	typedef std::vector<std::string>::const_iterator It;
-	for (It it = header_fields_info.begin() + 1; it != header_fields_info.end(); ++it) {
+	for (It it = header_fields_info.begin(); it != header_fields_info.end(); ++it) {
 		std::vector<std::string> header_key_value = utils::SplitStr(*it, ":");
 		TrimLeadingOptionalWhitespace(header_key_value[1]);
 		header_fields[header_key_value[0]] = header_key_value[1];

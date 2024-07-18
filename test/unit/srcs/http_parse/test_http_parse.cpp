@@ -22,10 +22,11 @@ struct TestCase {
 bool IsSameRequestLine(
 	std::size_t test_case_num, const http::RequestLine &res, const http::RequestLine &expected
 ) {
-	bool result = true;
+	bool              result = true;
 	std::stringstream error_log;
 	if (expected.method != res.method) {
-		error_log << "Expected method: " << expected.method << ", Actual method: " << res.method << "\n";
+		error_log << "Expected method: " << expected.method << ", Actual method: " << res.method
+				  << "\n";
 		result = false;
 	}
 	if (expected.request_target != res.request_target) {
@@ -39,9 +40,10 @@ bool IsSameRequestLine(
 		result = false;
 	}
 	if (result == false) {
-		std::cerr << utils::color::RED << test_case_num << ".[NG] " << utils::color::RESET << std::endl;
-		std::cerr << utils::color::RED << "HttpParseClass failed: request_line" << utils::color::RESET
+		std::cerr << utils::color::RED << test_case_num << ".[NG] " << utils::color::RESET
 				<< std::endl;
+		std::cerr << utils::color::RED << "HttpParseClass failed: request_line"
+				  << utils::color::RESET << std::endl;
 		std::cerr << error_log.str();
 	}
 	return result;
