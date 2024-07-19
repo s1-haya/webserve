@@ -8,17 +8,21 @@ namespace http {
 
 namespace {
 
-bool IsUsAscii(const std::string &str) {
+bool IsUsAscii(int c) {
+	return static_cast<unsigned char>(c) > 127;
+}
+
+bool IsStringUsAscii(const std::string &str) {
 	typedef std::string::const_iterator It;
 	for (It it = str.begin(); it != str.end(); ++it) {
-		if (static_cast<unsigned char>(*it) > 127) {
+		if (IsUsAscii(*it)) {
 			return false;
 		}
 	}
 	return true;
 }
 
-bool IsUpper(const std::string &str) {
+bool IsStringUpper(const std::string &str) {
 	typedef std::string::const_iterator It;
 	for (It it = str.begin(); it != str.end(); ++it) {
 		if (!std::isupper(static_cast<unsigned char>(*it))) {
@@ -77,8 +81,8 @@ void HttpParse::CheckValidRequestLine(const std::vector<std::string>& request_li
 
 void HttpParse::CheckValidMethod(const std::string &method) {
 	// US-ASCIIかまたは大文字かどうか -> 400
-	if (IsUsAscii(method) == false || IsUpper(method) == false) {
-		throw HttpParseException(BAD_REQUEST);
+	if (IsStringUsAscii(method) == false || IsStringUpper(method) == false) {
+		throw HttpParseException("Error Method: BAD_REQUEST", BAD_REQUEST);
 	}
 	// GET, POST, DELETEかどうか ->　501
 	static const std::string basic_methods[] = {"GET", "DELETE", "POST"};
