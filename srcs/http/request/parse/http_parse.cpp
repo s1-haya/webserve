@@ -41,17 +41,6 @@ void TrimLeadingOptionalWhitespace(std::string &str) {
 	str.erase(0, i);
 }
 
-static std::vector<std::string> CreateHeaderFields() {
-	std::vector<std::string> header_fields;
-	header_fields.push_back("Host");
-	header_fields.push_back("User-Agent");
-	header_fields.push_back("Accept");
-	header_fields.push_back("Content-Type");
-	header_fields.push_back("Content-Length");
-	header_fields.push_back("Connection");
-	return header_fields;
-}
-
 } // namespace
 
 // todo: tmp request_
@@ -137,9 +126,10 @@ void HttpParse::CheckValidVersion(const std::string &version) {
 
 void HttpParse::CheckHeaderFieldValue(const std::string &header_field_value) {
 	// C++98 では初期化リストがサポートされていないため
-	static const std::vector<std::string> header_fields = CreateHeaderFields();
-	if (std::find(header_fields.begin(), header_fields.end(), header_field_value) ==
-		header_fields.end())
+	static const std::string header_fields[] = {"Host", "User-Agent", "Accept", "Content-Type", "Content-Length", "Connection"};
+	static const std::size_t header_fields_size = sizeof(header_fields) / sizeof(header_fields[0]);
+	if (std::find(header_fields, header_fields + header_fields_size, header_field_value) ==
+		header_fields + header_fields_size)
 		throw HttpParseException("Error: the value does not exist in format of header fields", BAD_REQUEST);
 }
 
