@@ -135,7 +135,7 @@ std::string Server::CreateHttpResponse(int client_fd) const {
 	// todo: tmp
 	const bool is_cgi = true;
 	if (is_cgi) {
-		ClientInfo client_info = context_.GetClientInfo(client_fd);
+		const ClientInfo &client_info = context_.GetClientInfo(client_fd);
 		const ServerInfo &server_info = context_.GetConnectedServerInfo(client_fd);
 		utils::Debug(
 			"server",
