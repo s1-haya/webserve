@@ -22,7 +22,6 @@ class SockContext {
 	void AddClientInfo(int fd, const ClientInfo &client_info, int server_fd);
 	void DeleteClientInfo(int fd);
 	// getter
-	const ServerInfo *GetServerInfo(int fd) const;
 	const ClientInfo &GetClientInfo(int fd) const;
 	const ServerInfo &GetConnectedServerInfo(int client_fd) const;
 
@@ -30,6 +29,8 @@ class SockContext {
 	// prohibit copy
 	SockContext(const SockContext &other);
 	SockContext &operator=(const SockContext &other);
+	// function
+	const ServerInfo *GetServerInfo(int fd) const;
 	// const
 	static const int SYSTEM_ERROR = -1;
 	// variables

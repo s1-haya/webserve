@@ -49,14 +49,6 @@ void SockContext::DeleteClientInfo(int fd) {
 	host_servers_.erase(fd);
 }
 
-const ServerInfo *SockContext::GetServerInfo(int fd) const {
-	try {
-		return &server_context_.at(fd);
-	} catch (const std::exception &e) {
-		throw std::logic_error("ServerInfo doesn't exist");
-	}
-}
-
 const ClientInfo &SockContext::GetClientInfo(int fd) const {
 	try {
 		return client_context_.at(fd);
@@ -70,6 +62,14 @@ const ServerInfo &SockContext::GetConnectedServerInfo(int client_fd) const {
 		return *host_servers_.at(client_fd);
 	} catch (const std::exception &e) {
 		throw std::logic_error("associated ServerInfo doesn't exist");
+	}
+}
+
+const ServerInfo *SockContext::GetServerInfo(int fd) const {
+	try {
+		return &server_context_.at(fd);
+	} catch (const std::exception &e) {
+		throw std::logic_error("ServerInfo doesn't exist");
 	}
 }
 
