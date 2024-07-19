@@ -4,6 +4,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <stdexcept> //runtime_error
 
 namespace http {
 
@@ -57,9 +58,9 @@ class HttpParse {
 	static void CheckValidRequestTarget(const std::string &request_target);
 	static void CheckValidVersion(const std::string &version);
 
-	class HttpParseException {
+	class HttpParseException : public std::runtime_error {
 	  public:
-		explicit HttpParseException(StatusCode status_code);
+		explicit HttpParseException(const std::string& error_message, StatusCode status_code);
 		StatusCode GetStatusCode() const;
 
 	  private:

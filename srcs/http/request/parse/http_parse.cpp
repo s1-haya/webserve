@@ -88,26 +88,26 @@ void HttpParse::CheckValidMethod(const std::string &method) {
 	static const std::string basic_methods[] = {"GET", "DELETE", "POST"};
 	static const std::size_t methods_size = sizeof(basic_methods) / sizeof(basic_methods[0]);
 	if (std::find(basic_methods, basic_methods + methods_size, method) == basic_methods + methods_size) {
-		throw HttpParseException(NOT_IMPLEMENTED);
+		throw HttpParseException("Error Method: NOT_IMPLEMENTED", NOT_IMPLEMENTED);
 	}
 }
 
 void HttpParse::CheckValidRequestTarget(const std::string &reqest_target) {
 	// /が先頭になかったら場合 -> 400
 	if (reqest_target.empty() || reqest_target[0] != '/') {
-		throw HttpParseException(BAD_REQUEST);
+		throw HttpParseException("Error RequestTarget: BAD_REQUEST", BAD_REQUEST);
 	}
 }
 
 void HttpParse::CheckValidVersion(const std::string &version) {
 	// HTTP/1.1かどうか -> 400
 	if (version != "HTTP/1.1") {
-		throw HttpParseException(BAD_REQUEST);
+		throw HttpParseException("Error Version: BAD_REQUEST", BAD_REQUEST);
 	}
 }
 
-HttpParse::HttpParseException::HttpParseException(StatusCode status_code)
-	: status_code_(status_code) {}
+HttpParse::HttpParseException::HttpParseException(const std::string& error_message,StatusCode status_code)
+	: runtime_error(error_message), status_code_(status_code) {}
 
 StatusCode HttpParse::HttpParseException::GetStatusCode() const {
 	return status_code_;
