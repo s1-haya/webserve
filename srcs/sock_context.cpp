@@ -25,10 +25,6 @@ void SockContext::AddServerInfo(int fd, const ServerInfo &server_info) {
 	server_context_[fd] = server_info;
 }
 
-void SockContext::DeleteServerInfo(int fd) {
-	server_context_.erase(fd);
-}
-
 void SockContext::AddClientInfo(int fd, const ClientInfo &client_info) {
 	if (client_context_.count(fd) > 0) {
 		throw std::logic_error("ClientInfo already exists");
@@ -38,15 +34,6 @@ void SockContext::AddClientInfo(int fd, const ClientInfo &client_info) {
 
 void SockContext::DeleteClientInfo(int fd) {
 	client_context_.erase(fd);
-}
-
-// In C++98, the map's "at" method is unavailable, not using const qualifiers.
-ServerInfo &SockContext::GetServerInfo(int fd) {
-	ServerInfo &server_info = server_context_[fd];
-	if (server_context_.count(fd) == 0) {
-		throw std::logic_error("ServerInfo doesn't exist");
-	}
-	return server_info;
 }
 
 } // namespace server

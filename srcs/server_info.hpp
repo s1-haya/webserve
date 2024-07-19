@@ -15,7 +15,6 @@ class ServerInfo {
 	ServerInfo &operator=(const ServerInfo &other);
 	// getter
 	int          GetFd() const;
-	std::string  GetName() const;
 	unsigned int GetPort() const;
 	// setter
 	void SetSockFd(int fd);

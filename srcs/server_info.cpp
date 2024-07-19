@@ -26,10 +26,6 @@ int ServerInfo::GetFd() const {
 	return fd_;
 }
 
-std::string ServerInfo::GetName() const {
-	return name_;
-}
-
 unsigned int ServerInfo::GetPort() const {
 	return port_;
 }
