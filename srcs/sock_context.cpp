@@ -38,4 +38,12 @@ void SockContext::DeleteClientInfo(int fd) {
 	client_context_.erase(fd);
 }
 
+const ServerInfo &SockContext::GetServerInfo(int fd) const {
+	try {
+		return server_context_.at(fd);
+	} catch (const std::exception &e) {
+		throw std::logic_error("ServerInfo doesn't exist");
+	}
+}
+
 } // namespace server
