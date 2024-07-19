@@ -12,12 +12,6 @@ struct RequestLine {
 	std::string method;
 	std::string request_target;
 	std::string version;
-	// For test
-	RequestLine() : method(""), request_target(""), version("") {}
-	RequestLine(
-		const std::string &method, const std::string &request_target, const std::string &version
-	)
-		: method(method), request_target(request_target), version(version) {}
 };
 
 typedef std::map<std::string, std::string> HeaderFields;
@@ -39,8 +33,6 @@ struct HttpRequestResult {
 	StatusCode  status_code;
 	HttpRequest request;
 	HttpRequestResult() : status_code(OK) {}
-	// For test
-	explicit HttpRequestResult(const HttpRequest &request) : status_code(OK), request(request) {}
 };
 
 class HttpParse {
