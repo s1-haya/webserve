@@ -23,13 +23,14 @@ class Server {
 	Server();
 	// prohibit copy
 	Server(const Server &other);
-	Server &operator=(const Server &other);
-	void    Init(const ServerInfoVec &server_infos);
-	void    HandleEvent(const event::Event &event);
-	void    HandleNewConnection(int server_fd);
-	void    HandleExistingConnection(const event::Event &event);
-	void    ReadRequest(const event::Event &event);
-	void    SendResponse(int client_fd);
+	Server     &operator=(const Server &other);
+	void        Init(const ServerInfoVec &server_infos);
+	void        HandleEvent(const event::Event &event);
+	void        HandleNewConnection(int server_fd);
+	void        HandleExistingConnection(const event::Event &event);
+	void        ReadRequest(const event::Event &event);
+	std::string CreateHttpResponse(int client_fd) const;
+	void        SendResponse(int client_fd);
 	// const
 	static const int SYSTEM_ERROR = -1;
 	// connection
