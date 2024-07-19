@@ -35,7 +35,7 @@ MKDIR		:=	mkdir -p
 all: $(NAME)
 
 $(NAME): $(OBJS)
-	$(CXX) $(CXXFLAGS) -o $@ $^
+	$(CXX) -o $@ $^
 
 $(OBJ_DIR)/%.o: %.cpp
 	@$(MKDIR) $(dir $@)
