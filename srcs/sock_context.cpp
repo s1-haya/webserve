@@ -19,17 +19,19 @@ SockContext::~SockContext() {
 }
 
 void SockContext::AddServerInfo(int fd, const ServerInfo &server_info) {
-	if (server_context_.count(fd) > 0) {
+	typedef std::pair<ServerInfoMap::const_iterator, bool> InsertResult;
+	InsertResult result = server_context_.insert(std::make_pair(fd, server_info));
+	if (result.second == false) {
 		throw std::logic_error("ServerInfo already exists");
 	}
-	server_context_[fd] = server_info;
 }
 
 void SockContext::AddClientInfo(int fd, const ClientInfo &client_info) {
-	if (client_context_.count(fd) > 0) {
+	typedef std::pair<ClientInfoMap::const_iterator, bool> InsertResult;
+	InsertResult result = client_context_.insert(std::make_pair(fd, client_info));
+	if (result.second == false) {
 		throw std::logic_error("ClientInfo already exists");
 	}
-	client_context_[fd] = client_info;
 }
 
 void SockContext::DeleteClientInfo(int fd) {
