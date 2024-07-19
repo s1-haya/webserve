@@ -18,13 +18,13 @@ SRCS			+=	$(WS_UTILS_DIR)/color.cpp \
 SRCS	+=	test_convert_str.cpp
 
 # 4. Add directory for INCLUDE
-INCLUDE_DIR	:=	$(WS_UTILS_DIR)
+SRCS_DIR	:=	$(WS_UTILS_DIR)
 
 #--------------------------------------------
 OBJ_DIR		:=	objs
-OBJS		:=	$(SRCS:%.cpp=$(OBJ_DIR)/%.o)
+OBJS		:=	$(patsubst %.cpp, $(OBJ_DIR)/%.o, $(notdir $(SRCS)))
 
-INCLUDES	:=	$(addprefix -I, $(INCLUDE_DIR))
+INCLUDES	:=	$(addprefix -I, $(SRCS_DIR))
 
 CXX			:=	c++
 CXXFLAGS	:=	-std=c++98 -Wall -Wextra -Werror -MMD -MP -pedantic
@@ -38,6 +38,7 @@ all: $(NAME)
 $(NAME): $(OBJS)
 	$(CXX) -o $@ $^
 
+vpath %.cpp $(SRCS_DIR)
 $(OBJ_DIR)/%.o: %.cpp
 	@$(MKDIR) $(dir $@)
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
