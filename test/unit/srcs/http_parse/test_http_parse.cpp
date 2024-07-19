@@ -61,13 +61,9 @@ bool IsSameHeaderFields(
 bool IsSameHttpRequest(
 	std::size_t test_case_num, const http::HttpRequest &res, const http::HttpRequest &expected
 ) {
-	if (!(IsSameRequestLine(
-			test_case_num, res.request_line, expected.request_line
-		)))
+	if (!(IsSameRequestLine(test_case_num, res.request_line, expected.request_line)))
 		return false;
-	if (!(IsSameHeaderFields(
-			test_case_num, res.header_fields, expected.header_fields
-		)))
+	if (!(IsSameHeaderFields(test_case_num, res.header_fields, expected.header_fields)))
 		return false;
 	return true;
 }
@@ -82,9 +78,7 @@ int Run(
 	if (result.status_code == expected.status_code) {
 		// 　仮: ステータスコードがOKだった場合はHTTPリクエスト情報をテストしたい
 		if (result.status_code == http::OK &&
-			!(IsSameHttpRequest(
-				test_case_num, result.request, expected.request
-			)))
+			!(IsSameHttpRequest(test_case_num, result.request, expected.request)))
 			return EXIT_FAILURE;
 		std::cout << utils::color::GREEN << test_case_num << ".[OK] " << utils::color::RESET
 				  << std::endl;
@@ -115,7 +109,7 @@ int RunTest() {
 	int ret_code = 0;
 
 	std::cout << "Request Line Test" << std::endl;
-	http::HttpRequestResult expected_1;
+	http::HttpRequestResult        expected_1;
 	static const http::RequestLine expected_request_1 = {"GET", "/", "HTTP/1.1"};
 	// NGの場合
 	// static const http::RequestLine             expected_request_1("GET", "/d", "HTTP/1.1d");
@@ -146,16 +140,16 @@ int RunTest() {
 	ret_code |= RunTestCases(test_cases_for_request_line, ARRAY_SIZE(test_cases_for_request_line));
 
 	std::cout << "Header Fields Test" << std::endl;
-	http::HttpRequestResult expected_5;
+	http::HttpRequestResult        expected_5;
 	static const http::RequestLine expected_request_5 = {"GET", "/", "HTTP/1.1"};
-	expected_5.request.request_line = expected_request_5;
-	expected_5.status_code = http::OK;
+	expected_5.request.request_line                   = expected_request_5;
+	expected_5.status_code                            = http::OK;
 
 	// セミコロン以降に複数OWS(SpaceとHorizontal Tab)が設定の場合
-	http::HttpRequestResult expected_6;
+	http::HttpRequestResult        expected_6;
 	static const http::RequestLine expected_request_6 = {"GET", "/", "HTTP/1.1"};
-	expected_6.request.request_line = expected_request_6;
-	expected_6.status_code = http::OK;
+	expected_6.request.request_line                   = expected_request_6;
+	expected_6.status_code                            = http::OK;
 
 	// 存在しないfield_nameの場合
 	http::HttpRequestResult expected_7;
@@ -163,15 +157,27 @@ int RunTest() {
 
 	// 複数のヘッダーフィールドの書式が設定の場合
 	http::HttpRequestResult expected_8;
-	expected_8.status_code = http::BAD_REQUEST;
+	expected_8.status_code                               = http::BAD_REQUEST;
 	static const TestCase test_cases_for_header_fields[] = {
-		TestCase("GET / HTTP/1.1\r\nHost: www.example.com\r\nConnection: keep-alive\r\n\r\n", expected_5),
-		TestCase("GET / HTTP/1.1\r\nHost:    \twww.example.com\r\nConnection: keep-alive\r\n\r\n", expected_6),
-		TestCase("GET / HTTP/1.1\r\nGold: www.example.com\r\nConnection: keep-alive\r\n\r\n", expected_7),
-		TestCase("GET / HTTP/1.1\r\nHost: www.example.com\r\nHost: www.example.com\r\nConnection: keep-alive\r\n\r\n", expected_8)
+		TestCase(
+			"GET / HTTP/1.1\r\nHost: www.example.com\r\nConnection: keep-alive\r\n\r\n", expected_5
+		),
+		TestCase(
+			"GET / HTTP/1.1\r\nHost:    \twww.example.com\r\nConnection: keep-alive\r\n\r\n",
+			expected_6
+		),
+		TestCase(
+			"GET / HTTP/1.1\r\nGold: www.example.com\r\nConnection: keep-alive\r\n\r\n", expected_7
+		),
+		TestCase(
+			"GET / HTTP/1.1\r\nHost: www.example.com\r\nHost: www.example.com\r\nConnection: "
+			"keep-alive\r\n\r\n",
+			expected_8
+		)
 	};
 
-	ret_code |= RunTestCases(test_cases_for_header_fields, ARRAY_SIZE(test_cases_for_header_fields));
+	ret_code |=
+		RunTestCases(test_cases_for_header_fields, ARRAY_SIZE(test_cases_for_header_fields));
 	return ret_code;
 }
 
