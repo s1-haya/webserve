@@ -18,9 +18,9 @@ SockContext::~SockContext() {
 	}
 }
 
-void SockContext::AddServerInfo(int fd, const ServerInfo &server_info) {
+void SockContext::AddServerInfo(int server_fd, const ServerInfo &server_info) {
 	typedef std::pair<ServerInfoMap::const_iterator, bool> InsertResult;
-	InsertResult result = server_context_.insert(std::make_pair(fd, server_info));
+	InsertResult result = server_context_.insert(std::make_pair(server_fd, server_info));
 	if (result.second == false) {
 		throw std::logic_error("ServerInfo already exists");
 	}
@@ -44,14 +44,14 @@ void SockContext::AddClientInfo(int client_fd, const ClientInfo &client_info, in
 	}
 }
 
-void SockContext::DeleteClientInfo(int fd) {
-	client_context_.erase(fd);
-	host_servers_.erase(fd);
+void SockContext::DeleteClientInfo(int client_fd) {
+	client_context_.erase(client_fd);
+	host_servers_.erase(client_fd);
 }
 
-const ClientInfo &SockContext::GetClientInfo(int fd) const {
+const ClientInfo &SockContext::GetClientInfo(int client_fd) const {
 	try {
-		return client_context_.at(fd);
+		return client_context_.at(client_fd);
 	} catch (const std::exception &e) {
 		throw std::logic_error("ClientInfo doesn't exist");
 	}
@@ -65,9 +65,9 @@ const ServerInfo &SockContext::GetConnectedServerInfo(int client_fd) const {
 	}
 }
 
-const ServerInfo *SockContext::GetServerInfo(int fd) const {
+const ServerInfo *SockContext::GetServerInfo(int server_fd) const {
 	try {
-		return &server_context_.at(fd);
+		return &server_context_.at(server_fd);
 	} catch (const std::exception &e) {
 		throw std::logic_error("ServerInfo doesn't exist");
 	}
