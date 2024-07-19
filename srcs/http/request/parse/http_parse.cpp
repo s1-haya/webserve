@@ -8,11 +8,12 @@ namespace http {
 
 namespace {
 
-bool IsUsaAscii(const std::string &str) {
+bool IsUsAscii(const std::string &str) {
 	typedef std::string::const_iterator It;
 	for (It it = str.begin(); it != str.end(); ++it) {
-		if (static_cast<unsigned char>(*it) > 127)
+		if (static_cast<unsigned char>(*it) > 127) {
 			return false;
+		}
 	}
 	return true;
 }
@@ -20,8 +21,9 @@ bool IsUsaAscii(const std::string &str) {
 bool IsUpper(const std::string &str) {
 	typedef std::string::const_iterator It;
 	for (It it = str.begin(); it != str.end(); ++it) {
-		if (!std::isupper(static_cast<unsigned char>(*it)))
+		if (!std::isupper(static_cast<unsigned char>(*it))) {
 			return false;
+	}
 	}
 	return true;
 }
@@ -68,27 +70,31 @@ HeaderFields HttpParse::SetHeaderFields(const std::vector<std::string> &header_f
 
 std::string HttpParse::CheckMethod(const std::string &method) {
 	// US-ASCIIかまたは大文字かどうか -> 400
-	if (IsUsaAscii(method) == false || IsUpper(method) == false)
+	if (IsUsAscii(method) == false || IsUpper(method) == false) {
 		throw HttpParseException(BAD_REQUEST);
+	}
 	// GET, POST, DELETEかどうか ->　501
 	static const std::string basic_methods[] = {"GET", "DELETE", "POST"};
 	static const std::size_t methods_size = sizeof(basic_methods) / sizeof(basic_methods[0]);
-	if (std::find(basic_methods, basic_methods + methods_size, method) == basic_methods + methods_size)
+	if (std::find(basic_methods, basic_methods + methods_size, method) == basic_methods + methods_size) {
 		throw HttpParseException(NOT_IMPLEMENTED);
+	}
 	return method;
 }
 
 std::string HttpParse::CheckRequestTarget(const std::string &reqest_target) {
 	// /が先頭になかったら場合 -> 400
-	if (reqest_target.empty() || reqest_target[0] != '/')
+	if (reqest_target.empty() || reqest_target[0] != '/') {
 		throw HttpParseException(BAD_REQUEST);
+	}
 	return reqest_target;
 }
 
 std::string HttpParse::CheckVersion(const std::string &version) {
 	// HTTP/1.1かどうか -> 400
-	if (version != "HTTP/1.1")
+	if (version != "HTTP/1.1") {
 		throw HttpParseException(BAD_REQUEST);
+	}
 	return version;
 }
 
