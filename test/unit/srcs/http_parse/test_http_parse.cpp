@@ -22,10 +22,11 @@ struct TestCase {
 bool IsSameRequestLine(
 	std::size_t test_case_num, const http::RequestLine &res, const http::RequestLine &expected
 ) {
-	bool result = true;
+	bool              result = true;
 	std::stringstream error_log;
 	if (expected.method != res.method) {
-		error_log << "Expected method: " << expected.method << ", Actual method: " << res.method << "\n";
+		error_log << "Expected method: " << expected.method << ", Actual method: " << res.method
+				  << "\n";
 		result = false;
 	}
 	if (expected.request_target != res.request_target) {
@@ -39,9 +40,10 @@ bool IsSameRequestLine(
 		result = false;
 	}
 	if (result == false) {
-		std::cerr << utils::color::RED << test_case_num << ".[NG] " << utils::color::RESET << std::endl;
-		std::cerr << utils::color::RED << "HttpParseClass failed: request_line" << utils::color::RESET
-				<< std::endl;
+		std::cerr << utils::color::RED << test_case_num << ".[NG] " << utils::color::RESET
+				  << std::endl;
+		std::cerr << utils::color::RED << "HttpParseClass failed: request_line"
+				  << utils::color::RESET << std::endl;
 		std::cerr << error_log.str();
 	}
 	return result;
@@ -56,7 +58,10 @@ int Run(
 	const http::HttpRequestResult &result = http::HttpParse::Run(src);
 	if (result.status_code == expected.status_code) {
 		// 　仮: ステータスコードがOKだった場合はHTTPリクエスト情報をテストしたい
-		if (result.status_code == http::OK && !(IsSameRequestLine(test_case_num, result.request.request_line, expected.request.request_line)))
+		if (result.status_code == http::OK &&
+			!(IsSameRequestLine(
+				test_case_num, result.request.request_line, expected.request.request_line
+			)))
 			return EXIT_FAILURE;
 		std::cout << utils::color::GREEN << test_case_num << ".[OK] " << utils::color::RESET
 				  << std::endl;
@@ -86,7 +91,7 @@ int RunTestCases(const TestCase test_cases[], std::size_t num_test_cases) {
 int RunTest() {
 	int ret_code = 0;
 
-	http::HttpRequestResult expected_1;
+	http::HttpRequestResult        expected_1;
 	static const http::RequestLine expected_request_1 = {"GET", "/", "HTTP/1.1"};
 	// NGの場合
 	// static const http::RequestLine             expected_request_1("GET", "/d", "HTTP/1.1d");

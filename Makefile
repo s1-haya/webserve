@@ -79,6 +79,8 @@ format-srcs:
 format-test:
 	@black test
 	@isort test
+	@find test -name "*.cpp" -exec clang-format -i {} +
+	@find test -name "*.hpp" -exec clang-format -i {} +
 
 .PHONY	: test
 test:
