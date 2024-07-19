@@ -8,20 +8,26 @@ namespace http {
 
 namespace {
 
-bool IsUsaAscii(const std::string &str) {
+bool IsUsAscii(int c) {
+	return static_cast<unsigned char>(c) > 127;
+}
+
+bool IsStringUsAscii(const std::string &str) {
 	typedef std::string::const_iterator It;
 	for (It it = str.begin(); it != str.end(); ++it) {
-		if (static_cast<unsigned char>(*it) > 127)
+		if (IsUsAscii(*it)) {
 			return false;
+		}
 	}
 	return true;
 }
 
-bool IsUpper(const std::string &str) {
+bool IsStringUpper(const std::string &str) {
 	typedef std::string::const_iterator It;
 	for (It it = str.begin(); it != str.end(); ++it) {
-		if (!std::isupper(static_cast<unsigned char>(*it)))
+		if (!std::isupper(static_cast<unsigned char>(*it))) {
 			return false;
+		}
 	}
 	return true;
 }
@@ -33,14 +39,6 @@ void TrimLeadingOptionalWhitespace(std::string &str) {
 		++i;
 	}
 	str.erase(0, i);
-}
-
-static std::vector<std::string> CreateBasicMethods() {
-	std::vector<std::string> basic_methods;
-	basic_methods.push_back("GET");
-	basic_methods.push_back("POST");
-	basic_methods.push_back("DELETE");
-	return basic_methods;
 }
 
 static std::vector<std::string> CreateHeaderFields() {
@@ -74,9 +72,10 @@ RequestLine HttpParse::SetRequestLine(
 ) {
 	RequestLine request_line;
 	try {
-		request_line.method         = CheckMethod(request_line_info[0]);
-		request_line.request_target = CheckRequestTarget(request_line_info[1]);
-		request_line.version        = CheckVersion(request_line_info[2]);
+		CheckValidRequestLine(request_line_info);
+		request_line.method         = request_line_info[0];
+		request_line.request_target = request_line_info[1];
+		request_line.version        = request_line_info[2];
 	} catch (const HttpParseException &e) {
 		*status_code = e.GetStatusCode();
 	}
@@ -94,7 +93,7 @@ HeaderFields HttpParse::SetHeaderFields(const std::vector<std::string> &header_f
 			CheckHeaderFieldValue(header_key_value[0]);
 			// 既にヘッダフィールドの値が設定されてる場合
 			if (header_fields[header_key_value[0]].size())
-				throw HttpParseException(BAD_REQUEST);
+				throw HttpParseException("Error: The value already exists in header fields", BAD_REQUEST);
 			header_fields[header_key_value[0]] = header_key_value[1];
 		}
 	} catch (const HttpParseException &e) {
@@ -103,29 +102,37 @@ HeaderFields HttpParse::SetHeaderFields(const std::vector<std::string> &header_f
 	return header_fields;
 }
 
-std::string HttpParse::CheckMethod(const std::string &method) {
+void HttpParse::CheckValidRequestLine(const std::vector<std::string>& request_line_info) {
+	CheckValidMethod(request_line_info[0]);
+	CheckValidRequestTarget(request_line_info[1]);
+	CheckValidVersion(request_line_info[2]);
+}
+
+void HttpParse::CheckValidMethod(const std::string &method) {
 	// US-ASCIIかまたは大文字かどうか -> 400
-	if (IsUsaAscii(method) == false || IsUpper(method) == false)
-		throw HttpParseException(BAD_REQUEST);
+	if (IsStringUsAscii(method) == false || IsStringUpper(method) == false) {
+		throw HttpParseException("Error Method", BAD_REQUEST);
+	}
 	// GET, POST, DELETEかどうか ->　501
-	static const std::vector<std::string> basic_methods = CreateBasicMethods();
-	if (std::find(basic_methods.begin(), basic_methods.end(), method) == basic_methods.end())
-		throw HttpParseException(NOT_IMPLEMENTED);
-	return method;
+	static const std::string basic_methods[] = {"GET", "DELETE", "POST"};
+	static const std::size_t methods_size = sizeof(basic_methods) / sizeof(basic_methods[0]);
+	if (std::find(basic_methods, basic_methods + methods_size, method) == basic_methods + methods_size) {
+		throw HttpParseException("Error Method", NOT_IMPLEMENTED);
+	}
 }
 
-std::string HttpParse::CheckRequestTarget(const std::string &reqest_target) {
+void HttpParse::CheckValidRequestTarget(const std::string &reqest_target) {
 	// /が先頭になかったら場合 -> 400
-	if (reqest_target.empty() || reqest_target[0] != '/')
-		throw HttpParseException(BAD_REQUEST);
-	return reqest_target;
+	if (reqest_target.empty() || reqest_target[0] != '/') {
+		throw HttpParseException("Error RequestTarget", BAD_REQUEST);
+	}
 }
 
-std::string HttpParse::CheckVersion(const std::string &version) {
+void HttpParse::CheckValidVersion(const std::string &version) {
 	// HTTP/1.1かどうか -> 400
-	if (version != "HTTP/1.1")
-		throw HttpParseException(BAD_REQUEST);
-	return version;
+	if (version != "HTTP/1.1") {
+		throw HttpParseException("Error Version", BAD_REQUEST);
+	}
 }
 
 void HttpParse::CheckHeaderFieldValue(const std::string &header_field_value) {
@@ -133,11 +140,11 @@ void HttpParse::CheckHeaderFieldValue(const std::string &header_field_value) {
 	static const std::vector<std::string> header_fields = CreateHeaderFields();
 	if (std::find(header_fields.begin(), header_fields.end(), header_field_value) ==
 		header_fields.end())
-		throw HttpParseException(BAD_REQUEST);
+		throw HttpParseException("Error: the value does not exist in format of header fields", BAD_REQUEST);
 }
 
-HttpParse::HttpParseException::HttpParseException(StatusCode status_code)
-	: status_code_(status_code) {}
+HttpParse::HttpParseException::HttpParseException(const std::string& error_message,StatusCode status_code)
+	: runtime_error(error_message), status_code_(status_code) {}
 
 StatusCode HttpParse::HttpParseException::GetStatusCode() const {
 	return status_code_;

@@ -114,8 +114,8 @@ int RunTestCases(const TestCase test_cases[], std::size_t num_test_cases) {
 int RunTest() {
 	int ret_code = 0;
 
-	static http::HttpRequestResult expected_1;
-	static const http::RequestLine expected_request_1("GET", "/", "HTTP/1.1");
+	http::HttpRequestResult expected_1;
+	static const http::RequestLine expected_request_1 = {"GET", "/", "HTTP/1.1"};
 	// NGの場合
 	// static const http::RequestLine             expected_request_1("GET", "/d", "HTTP/1.1d");
 	expected_1.request.request_line = expected_request_1;
@@ -124,15 +124,15 @@ int RunTest() {
 	// expected_1.status_code = http::BAD_REQUEST;
 
 	// methodが小文字が含まれてる
-	static http::HttpRequestResult expected_2;
+	http::HttpRequestResult expected_2;
 	expected_2.status_code = http::BAD_REQUEST;
 
 	// methodがUS-ASCII以外の文字が含まれてる
-	static http::HttpRequestResult expected_3;
+	http::HttpRequestResult expected_3;
 	expected_3.status_code = http::BAD_REQUEST;
 
 	// 課題要件以外のmethod(大文字のみ)が含まれてる
-	static http::HttpRequestResult expected_4;
+	http::HttpRequestResult expected_4;
 	expected_4.status_code = http::NOT_IMPLEMENTED;
 
 	static const TestCase test_cases_for_request_line[] = {

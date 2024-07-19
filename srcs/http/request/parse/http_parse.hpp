@@ -4,6 +4,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <stdexcept> //runtime_error
 
 namespace http {
 
@@ -11,12 +12,6 @@ struct RequestLine {
 	std::string method;
 	std::string request_target;
 	std::string version;
-	// For test
-	RequestLine() : method(""), request_target(""), version("") {}
-	RequestLine(
-		const std::string &method, const std::string &request_target, const std::string &version
-	)
-		: method(method), request_target(request_target), version(version) {}
 };
 
 typedef std::map<std::string, std::string> HeaderFields;
@@ -38,8 +33,6 @@ struct HttpRequestResult {
 	StatusCode  status_code;
 	HttpRequest request;
 	HttpRequestResult() : status_code(OK) {}
-	// For test
-	explicit HttpRequestResult(const HttpRequest &request) : status_code(OK), request(request) {}
 };
 
 class HttpParse {
@@ -54,18 +47,16 @@ class HttpParse {
 	static HeaderFields SetHeaderFields(
 		const std::vector<std::string> &header_fields_info, StatusCode *status_code
 	);
+    static void CheckValidRequestLine(const std::vector<std::string> &request_line_info);
+	static void CheckValidMethod(const std::string &method);
+	static void CheckValidRequestTarget(const std::string &request_target);
+	static void CheckValidVersion(const std::string &version);
 
-	//parse request line
-	static std::string CheckMethod(const std::string &method);
-	static std::string CheckRequestTarget(const std::string &request_target);
-	static std::string CheckVersion(const std::string &version);
-
-	//parse header fields
 	static void CheckHeaderFieldValue(const std::string &header_field_value);
 
-	class HttpParseException {
+	class HttpParseException : public std::runtime_error {
 	  public:
-		explicit HttpParseException(StatusCode status_code);
+		explicit HttpParseException(const std::string& error_message, StatusCode status_code);
 		StatusCode GetStatusCode() const;
 
 	  private:
