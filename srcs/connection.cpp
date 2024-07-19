@@ -1,4 +1,5 @@
 #include "connection.hpp"
+#include "client_info.hpp"
 #include "server.hpp"
 #include "sock_info.hpp"
 #include "utils.hpp"    // ConvertUintToStr
@@ -91,10 +92,15 @@ int Connection::Connect(SockInfo &server_sock_info) {
 }
 
 int Connection::Accept(int server_fd) {
-	struct sockaddr sock_addr;
-	socklen_t       addrlen   = sizeof(sock_addr);
-	const socklen_t client_fd = accept(server_fd, (struct sockaddr *)&sock_addr, &addrlen);
-	// retrieve the client's IP address, port, etc.
+	struct sockaddr_storage client_sock_addr;
+	socklen_t               addrlen = sizeof(client_sock_addr);
+	const int client_fd = accept(server_fd, (struct sockaddr *)&client_sock_addr, &addrlen);
+
+	// create new client struct
+	ClientInfo client_info(client_fd, client_sock_addr);
+	utils::Debug(
+		"server", "new ClientInfo created. IP: " + client_info.GetIp() + ", fd", client_fd
+	);
 
 	// todo: need?
 	// if (client_fd == SYSTEM_ERROR) {
