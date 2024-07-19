@@ -52,10 +52,10 @@ class HttpParse {
 	static RequestLine
 	SetRequestLine(const std::vector<std::string> &request_line, StatusCode *status_code);
 	static HeaderFields SetHeaderFields(const std::vector<std::string> &header_fields_info);
-
-	static std::string CheckMethod(const std::string &method);
-	static std::string CheckRequestTarget(const std::string &request_target);
-	static std::string CheckVersion(const std::string &version);
+    static void CheckValidRequestLine(const std::vector<std::string> &request_line_info);
+	static void CheckValidMethod(const std::string &method);
+	static void CheckValidRequestTarget(const std::string &request_target);
+	static void CheckValidVersion(const std::string &version);
 
 	class HttpParseException {
 	  public:

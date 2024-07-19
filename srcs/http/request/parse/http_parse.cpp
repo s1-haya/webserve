@@ -23,7 +23,7 @@ bool IsUpper(const std::string &str) {
 	for (It it = str.begin(); it != str.end(); ++it) {
 		if (!std::isupper(static_cast<unsigned char>(*it))) {
 			return false;
-	}
+		}
 	}
 	return true;
 }
@@ -48,9 +48,10 @@ RequestLine HttpParse::SetRequestLine(
 ) {
 	RequestLine request_line;
 	try {
-		request_line.method         = CheckMethod(request_line_info[0]);
-		request_line.request_target = CheckRequestTarget(request_line_info[1]);
-		request_line.version        = CheckVersion(request_line_info[2]);
+		CheckValidRequestLine(request_line_info);
+		request_line.method         = request_line_info[0];
+		request_line.request_target = request_line_info[1];
+		request_line.version        = request_line_info[2];
 	} catch (const HttpParseException &e) {
 		*status_code = e.GetStatusCode();
 	}
@@ -68,7 +69,13 @@ HeaderFields HttpParse::SetHeaderFields(const std::vector<std::string> &header_f
 	return header_fields;
 }
 
-std::string HttpParse::CheckMethod(const std::string &method) {
+void HttpParse::CheckValidRequestLine(const std::vector<std::string>& request_line_info) {
+	CheckValidMethod(request_line_info[0]);
+	CheckValidRequestTarget(request_line_info[1]);
+	CheckValidVersion(request_line_info[2]);
+}
+
+void HttpParse::CheckValidMethod(const std::string &method) {
 	// US-ASCIIかまたは大文字かどうか -> 400
 	if (IsUsAscii(method) == false || IsUpper(method) == false) {
 		throw HttpParseException(BAD_REQUEST);
@@ -79,23 +86,20 @@ std::string HttpParse::CheckMethod(const std::string &method) {
 	if (std::find(basic_methods, basic_methods + methods_size, method) == basic_methods + methods_size) {
 		throw HttpParseException(NOT_IMPLEMENTED);
 	}
-	return method;
 }
 
-std::string HttpParse::CheckRequestTarget(const std::string &reqest_target) {
+void HttpParse::CheckValidRequestTarget(const std::string &reqest_target) {
 	// /が先頭になかったら場合 -> 400
 	if (reqest_target.empty() || reqest_target[0] != '/') {
 		throw HttpParseException(BAD_REQUEST);
 	}
-	return reqest_target;
 }
 
-std::string HttpParse::CheckVersion(const std::string &version) {
+void HttpParse::CheckValidVersion(const std::string &version) {
 	// HTTP/1.1かどうか -> 400
 	if (version != "HTTP/1.1") {
 		throw HttpParseException(BAD_REQUEST);
 	}
-	return version;
 }
 
 HttpParse::HttpParseException::HttpParseException(StatusCode status_code)
