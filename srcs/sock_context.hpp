@@ -5,19 +5,21 @@
 
 namespace server {
 
-class SockInfo;
+class ServerInfo;
+class ClientInfo;
 
 // Store socket informations for each fd
 class SockContext {
   public:
-	typedef std::map<int, SockInfo> SockInfoMap;
+	typedef std::map<int, ServerInfo> ServerInfoMap;
+	typedef std::map<int, ClientInfo> ClientInfoMap;
 	SockContext();
 	~SockContext();
 	// functions
-	void AddSockInfo(int fd, const SockInfo &sock_info);
-	void DeleteSockInfo(int fd);
-	// getter
-	SockInfo &GetSockInfo(int fd);
+	// todo: overload?
+	void AddServerInfo(int fd, const ServerInfo &server_info);
+	void AddClientInfo(int fd, const ClientInfo &client_info);
+	void DeleteClientInfo(int fd);
 
   private:
 	// prohibit copy
@@ -26,7 +28,8 @@ class SockContext {
 	// const
 	static const int SYSTEM_ERROR = -1;
 	// variables
-	SockInfoMap context_;
+	ServerInfoMap server_context_;
+	ClientInfoMap client_context_;
 };
 
 } // namespace server
