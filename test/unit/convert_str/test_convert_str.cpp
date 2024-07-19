@@ -17,6 +17,12 @@ enum Result {
 	FAIL
 };
 
+int GetTestCaseNum() {
+	static unsigned int test_case_num = 0;
+	++test_case_num;
+	return test_case_num;
+}
+
 struct TestCase {
 	TestCase(const std::string &tmp_src, Expect tmp_expected, Result tmp_result)
 		: src(tmp_src), expected(tmp_expected), result(tmp_result) {}
@@ -26,15 +32,16 @@ struct TestCase {
 };
 
 // ConvertStrToUint()を実行してexpectedと比較
-int Run(std::size_t test_case_num, const std::string &src, Expect expected, Result result) {
+int Run(const std::string &src, Expect expected, Result result) {
 	Expect num;
 	bool   is_success = utils::ConvertStrToUint(src, num);
 	if ((is_success && result == SUCCESS && num == expected) || (!is_success && result == FAIL)) {
-		std::cout << utils::color::GREEN << test_case_num << ".[OK] " << utils::color::RESET
+		std::cout << utils::color::GREEN << GetTestCaseNum() << ".[OK] " << utils::color::RESET
 				  << std::endl;
 		return EXIT_SUCCESS;
 	}
-	std::cerr << utils::color::RED << test_case_num << ".[NG] " << utils::color::RESET << std::endl;
+	std::cerr << utils::color::RED << GetTestCaseNum() << ".[NG] " << utils::color::RESET
+			  << std::endl;
 	std::cerr << utils::color::RED << "ConvertStrToUint() failed" << utils::color::RESET
 			  << std::endl;
 	std::cerr << "src     : [" << src << "]" << std::endl;
@@ -48,7 +55,7 @@ int RunTestCases(const TestCase test_cases[], std::size_t num_test_cases) {
 
 	for (std::size_t i = 0; i < num_test_cases; i++) {
 		const TestCase test_case = test_cases[i];
-		ret_code |= Run(i + 1, test_case.src, test_case.expected, test_case.result);
+		ret_code |= Run(test_case.src, test_case.expected, test_case.result);
 	}
 	return ret_code;
 }
