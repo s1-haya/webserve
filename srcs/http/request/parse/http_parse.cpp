@@ -26,14 +26,6 @@ bool IsUpper(const std::string &str) {
 	return true;
 }
 
-static std::vector<std::string> CreateBasicMethods() {
-	std::vector<std::string> basic_methods;
-	basic_methods.push_back("GET");
-	basic_methods.push_back("POST");
-	basic_methods.push_back("DELETE");
-	return basic_methods;
-}
-
 } // namespace
 
 // todo: tmp request_
@@ -79,8 +71,9 @@ std::string HttpParse::CheckMethod(const std::string &method) {
 	if (IsUsaAscii(method) == false || IsUpper(method) == false)
 		throw HttpParseException(BAD_REQUEST);
 	// GET, POST, DELETEかどうか ->　501
-	static const std::vector<std::string> basic_methods = CreateBasicMethods();
-	if (std::find(basic_methods.begin(), basic_methods.end(), method) == basic_methods.end())
+	static const std::string basic_methods[] = {"GET", "DELETE", "POST"};
+	static const std::size_t methods_size = sizeof(basic_methods) / sizeof(basic_methods[0]);
+	if (std::find(basic_methods, basic_methods + methods_size, method) == basic_methods + methods_size)
 		throw HttpParseException(NOT_IMPLEMENTED);
 	return method;
 }
