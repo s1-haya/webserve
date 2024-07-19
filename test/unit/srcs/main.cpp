@@ -1,4 +1,5 @@
 #include "test_convert_str.hpp"
+#include "test_http_parse.hpp"
 #include "test_split.hpp"
 #include <iostream>
 #include <string>
@@ -23,6 +24,7 @@ int main() {
 	// add unit test
 	ret_code |= Run("utils/SplitStr()", &test_split::RunTest);
 	ret_code |= Run("utils/ConvertStrToUint()", &test_convert_str::RunTest);
+	ret_code |= Run("srcs/http/request/parse/HttpParseClass", &test_http_parse::RunTest);
 
 	return ret_code;
 }
