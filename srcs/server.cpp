@@ -1,7 +1,8 @@
 #include "server.hpp"
+#include "client_info.hpp"
 #include "event.hpp"
 #include "http.hpp"
-#include "sock_info.hpp"
+#include "server_info.hpp"
 #include "utils.hpp"
 #include <errno.h>
 #include <sys/socket.h> // socket
@@ -10,8 +11,8 @@
 namespace server {
 namespace {
 
-Server::SockInfoVec ConvertConfigToSockInfoVec(std::vector<Server::TempConfig> server_configs) {
-	Server::SockInfoVec sock_infos;
+Server::ServerInfoVec ConvertConfigToSockInfoVec(std::vector<Server::TempConfig> server_configs) {
+	Server::ServerInfoVec server_infos;
 
 	typedef std::vector<Server::TempConfig>::const_iterator Itr;
 	for (Itr it = server_configs.begin(); it != server_configs.end(); ++it) {
@@ -23,10 +24,10 @@ Server::SockInfoVec ConvertConfigToSockInfoVec(std::vector<Server::TempConfig> s
 		}
 
 		// todo: validate server_name, port, etc?
-		SockInfo server_sock_info(server_name, port);
-		sock_infos.push_back(server_sock_info);
+		ServerInfo server_info(server_name, port);
+		server_infos.push_back(server_info);
 	}
-	return sock_infos;
+	return server_infos;
 }
 
 } // namespace
@@ -41,8 +42,8 @@ Server::Server(const _config::Config::ConfigData &config) {
 	server_configs.push_back(std::make_pair("localhost", "12345"));
 	// server_configs.push_back(std::make_pair("::1", "8080"));
 
-	SockInfoVec sock_infos = ConvertConfigToSockInfoVec(server_configs);
-	Init(sock_infos);
+	ServerInfoVec server_infos = ConvertConfigToSockInfoVec(server_configs);
+	Init(server_infos);
 }
 
 Server::~Server() {}
@@ -74,15 +75,15 @@ void Server::HandleEvent(const event::Event &event) {
 
 void Server::HandleNewConnection(int server_fd) {
 	// A new socket that has established a connection with the peer socket.
-	const int client_fd = Connection::Accept(server_fd);
+	// todo: return accept error like Result
+	const ClientInfo new_client_info = Connection::Accept(server_fd);
+	const int        client_fd       = new_client_info.GetFd();
 	if (client_fd == SYSTEM_ERROR) {
 		throw std::runtime_error("accept failed");
 	}
 
-	SockInfo new_sock_info;
-	new_sock_info.SetPeerSockFd(client_fd);
 	// add to context
-	context_.AddSockInfo(client_fd, new_sock_info);
+	context_.AddClientInfo(client_fd, new_client_info);
 	event_monitor_.Add(client_fd, event::EVENT_READ);
 	utils::Debug("server", "add new client", client_fd);
 }
@@ -139,23 +140,23 @@ void Server::SendResponse(int client_fd) {
 
 	// disconnect
 	buffers_.Delete(client_fd);
-	context_.DeleteSockInfo(client_fd);
+	context_.DeleteClientInfo(client_fd);
 	event_monitor_.Delete(client_fd);
 	close(client_fd);
 	utils::Debug("server", "disconnected client", client_fd);
 	utils::Debug("------------------------------------------");
 }
 
-void Server::Init(const SockInfoVec &sock_infos) {
-	typedef SockInfoVec::const_iterator Itr;
-	for (Itr it = sock_infos.begin(); it != sock_infos.end(); ++it) {
-		SockInfo server_sock_info = *it;
+void Server::Init(const ServerInfoVec &server_infos) {
+	typedef ServerInfoVec::const_iterator Itr;
+	for (Itr it = server_infos.begin(); it != server_infos.end(); ++it) {
+		ServerInfo server_info = *it;
 		// connect & listen
-		const int server_fd = connection_.Connect(server_sock_info);
-		server_sock_info.SetSockFd(server_fd);
+		const int server_fd = connection_.Connect(server_info);
+		server_info.SetSockFd(server_fd);
 
 		// add to context
-		context_.AddSockInfo(server_fd, server_sock_info);
+		context_.AddServerInfo(server_fd, server_info);
 		event_monitor_.Add(server_fd, event::EVENT_READ);
 		utils::Debug("server", "init server & listen", server_fd);
 	}
