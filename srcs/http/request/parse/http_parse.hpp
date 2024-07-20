@@ -51,7 +51,7 @@ class HttpParse {
 	static void CheckValidRequestTarget(const std::string &request_target);
 	static void CheckValidVersion(const std::string &version);
 
-	static void CheckHeaderFieldValue(const std::string &header_field_value);
+	static void CheckValidHeaderFieldValue(const std::string &header_field_value);
 
 	class HttpParseException : public std::runtime_error {
 	  public:
