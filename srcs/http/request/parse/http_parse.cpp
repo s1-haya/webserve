@@ -100,27 +100,27 @@ void HttpParse::CheckValidRequestLine(const std::vector<std::string>& request_li
 void HttpParse::CheckValidMethod(const std::string &method) {
 	// US-ASCIIかまたは大文字かどうか -> 400
 	if (IsStringUsAscii(method) == false || IsStringUpper(method) == false) {
-		throw HttpParseException("Error Method", BAD_REQUEST);
+		throw HttpParseException("Error: This method contains lowercase or non-USASCII characters.", BAD_REQUEST);
 	}
 	// GET, POST, DELETEかどうか ->　501
 	static const std::string basic_methods[] = {"GET", "DELETE", "POST"};
 	static const std::size_t methods_size = sizeof(basic_methods) / sizeof(basic_methods[0]);
 	if (std::find(basic_methods, basic_methods + methods_size, method) == basic_methods + methods_size) {
-		throw HttpParseException("Error Method", NOT_IMPLEMENTED);
+		throw HttpParseException("Error: This method doesn't exist in webserv.", NOT_IMPLEMENTED);
 	}
 }
 
 void HttpParse::CheckValidRequestTarget(const std::string &reqest_target) {
 	// /が先頭になかったら場合 -> 400
 	if (reqest_target.empty() || reqest_target[0] != '/') {
-		throw HttpParseException("Error RequestTarget", BAD_REQUEST);
+		throw HttpParseException("Error: the request target is missing the '/' character at the beginning", BAD_REQUEST);
 	}
 }
 
 void HttpParse::CheckValidVersion(const std::string &version) {
 	// HTTP/1.1かどうか -> 400
 	if (version != "HTTP/1.1") {
-		throw HttpParseException("Error Version", BAD_REQUEST);
+		throw HttpParseException("Error: The version is not supported by webserv", BAD_REQUEST);
 	}
 }
 
