@@ -71,9 +71,11 @@ RequestLine HttpParse::SetRequestLine(
 	return request_line;
 }
 
-HeaderFields HttpParse::SetHeaderFields(const std::vector<std::string> &header_fields_info, StatusCode *status_code) {
+HeaderFields HttpParse::SetHeaderFields(
+	const std::vector<std::string> &header_fields_info, StatusCode *status_code
+) {
 	// todo: 各値が正常な値かどうか確認してから作成する（エラーの場合はenumに設定？）
-	HeaderFields                                     header_fields;
+	HeaderFields header_fields;
 	try {
 		typedef std::vector<std::string>::const_iterator It;
 		for (It it = header_fields_info.begin(); it != header_fields_info.end(); ++it) {
@@ -81,8 +83,11 @@ HeaderFields HttpParse::SetHeaderFields(const std::vector<std::string> &header_f
 			TrimLeadingOptionalWhitespace(header_key_value[1]);
 			CheckHeaderFieldValue(header_key_value[0]);
 			// 既にヘッダフィールドの値が設定されてる場合
-			if (header_fields[header_key_value[0]].size())
-				throw HttpParseException("Error: The value already exists in header fields", BAD_REQUEST);
+			if (header_fields[header_key_value[0]].size()) {
+				throw HttpParseException(
+					"Error: The value already exists in header fields", BAD_REQUEST
+				);
+			}
 			header_fields[header_key_value[0]] = header_key_value[1];
 		}
 	} catch (const HttpParseException &e) {
@@ -91,7 +96,7 @@ HeaderFields HttpParse::SetHeaderFields(const std::vector<std::string> &header_f
 	return header_fields;
 }
 
-void HttpParse::CheckValidRequestLine(const std::vector<std::string>& request_line_info) {
+void HttpParse::CheckValidRequestLine(const std::vector<std::string> &request_line_info) {
 	CheckValidMethod(request_line_info[0]);
 	CheckValidRequestTarget(request_line_info[1]);
 	CheckValidVersion(request_line_info[2]);
@@ -100,12 +105,15 @@ void HttpParse::CheckValidRequestLine(const std::vector<std::string>& request_li
 void HttpParse::CheckValidMethod(const std::string &method) {
 	// US-ASCIIかまたは大文字かどうか -> 400
 	if (IsStringUsAscii(method) == false || IsStringUpper(method) == false) {
-		throw HttpParseException("Error: This method contains lowercase or non-USASCII characters.", BAD_REQUEST);
+		throw HttpParseException(
+			"Error: This method contains lowercase or non-USASCII characters.", BAD_REQUEST
+		);
 	}
 	// GET, POST, DELETEかどうか ->　501
 	static const std::string basic_methods[] = {"GET", "DELETE", "POST"};
-	static const std::size_t methods_size = sizeof(basic_methods) / sizeof(basic_methods[0]);
-	if (std::find(basic_methods, basic_methods + methods_size, method) == basic_methods + methods_size) {
+	static const std::size_t methods_size    = sizeof(basic_methods) / sizeof(basic_methods[0]);
+	if (std::find(basic_methods, basic_methods + methods_size, method) ==
+		basic_methods + methods_size) {
 		throw HttpParseException("Error: This method doesn't exist in webserv.", NOT_IMPLEMENTED);
 	}
 }
@@ -113,7 +121,9 @@ void HttpParse::CheckValidMethod(const std::string &method) {
 void HttpParse::CheckValidRequestTarget(const std::string &reqest_target) {
 	// /が先頭になかったら場合 -> 400
 	if (reqest_target.empty() || reqest_target[0] != '/') {
-		throw HttpParseException("Error: the request target is missing the '/' character at the beginning", BAD_REQUEST);
+		throw HttpParseException(
+			"Error: the request target is missing the '/' character at the beginning", BAD_REQUEST
+		);
 	}
 }
 
@@ -138,11 +148,16 @@ void HttpParse::CheckHeaderFieldValue(const std::string &header_field_value) {
 	};
 	static const std::size_t header_fields_size = sizeof(header_fields) / sizeof(header_fields[0]);
 	if (std::find(header_fields, header_fields + header_fields_size, header_field_value) ==
-		header_fields + header_fields_size)
-		throw HttpParseException("Error: the value does not exist in format of header fields", BAD_REQUEST);
+		header_fields + header_fields_size) {
+		throw HttpParseException(
+			"Error: the value does not exist in format of header fields", BAD_REQUEST
+		);
+	}
 }
 
-HttpParse::HttpParseException::HttpParseException(const std::string& error_message,StatusCode status_code)
+HttpParse::HttpParseException::HttpParseException(
+	const std::string &error_message, StatusCode status_code
+)
 	: runtime_error(error_message), status_code_(status_code) {}
 
 StatusCode HttpParse::HttpParseException::GetStatusCode() const {
