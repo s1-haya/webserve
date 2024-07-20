@@ -12,6 +12,10 @@ bool IsUsAscii(int c) {
 	return static_cast<unsigned char>(c) > 127;
 }
 
+bool IsOptionalWhitespace(char c) {
+	return (c == ' ' || c == '\t');
+}
+
 bool IsStringUsAscii(const std::string &str) {
 	typedef std::string::const_iterator It;
 	for (It it = str.begin(); it != str.end(); ++it) {
@@ -34,11 +38,14 @@ bool IsStringUpper(const std::string &str) {
 
 // OWS (optional whitespace): SP(Space), HTAB(Horizontal Tab)
 void TrimLeadingOptionalWhitespace(std::string &str) {
-	size_t i = 0;
-	while (i < str.size() && (std::isspace(str[i]) || str[i] == '\t')) {
-		++i;
+	typedef std::string::iterator It;
+	for (It it = str.begin(); it != str.end(); ++it) {
+		if (!IsOptionalWhitespace(*it)) {
+			str.erase(str.begin(), it);
+			return;
+		}
 	}
-	str.erase(0, i);
+	str.erase(str.end());
 }
 
 } // namespace
