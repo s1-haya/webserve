@@ -126,7 +126,16 @@ void HttpParse::CheckValidVersion(const std::string &version) {
 
 void HttpParse::CheckHeaderFieldValue(const std::string &header_field_value) {
 	// C++98 では初期化リストがサポートされていないため
-	static const std::string header_fields[] = {"Host", "User-Agent", "Accept", "Content-Type", "Content-Length", "Connection"};
+	static const std::string header_fields[] = {
+		"Host",
+		"User-Agent",
+		"Accept",
+		"Accept-Encoding",
+		"Content-Type",
+		"Content-Length",
+		"Connection",
+		"Authorization"
+	};
 	static const std::size_t header_fields_size = sizeof(header_fields) / sizeof(header_fields[0]);
 	if (std::find(header_fields, header_fields + header_fields_size, header_field_value) ==
 		header_fields + header_fields_size)
