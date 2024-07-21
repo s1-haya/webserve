@@ -12,10 +12,6 @@ bool IsUsAscii(int c) {
 	return static_cast<unsigned char>(c) > 127;
 }
 
-bool IsOptionalWhitespace(char c) {
-	return (c == ' ' || c == '\t');
-}
-
 bool IsStringUsAscii(const std::string &str) {
 	typedef std::string::const_iterator It;
 	for (It it = str.begin(); it != str.end(); ++it) {
@@ -36,16 +32,13 @@ bool IsStringUpper(const std::string &str) {
 	return true;
 }
 
-// OWS (optional whitespace): SP(Space), HTAB(Horizontal Tab)
-void TrimLeadingOptionalWhitespace(std::string &str) {
-	typedef std::string::iterator It;
-	for (It it = str.begin(); it != str.end(); ++it) {
-		if (!IsOptionalWhitespace(*it)) {
-			str.erase(str.begin(), it);
-			return;
-		}
+std::string StrTrimLeadingOptionalWhitespace(const std::string &str) {
+	std::string::size_type   pos                 = str.find_first_not_of(OPTIONAL_WHITESPACE);
+	if (pos != std::string::npos) {
+		return str.substr(pos);
+	} else {
+		return "";
 	}
-	str.erase(str.end());
 }
 
 } // namespace
@@ -80,16 +73,17 @@ HeaderFields HttpParse::SetHeaderFields(const std::vector<std::string> &header_f
 	HeaderFields                                     header_fields;
 	typedef std::vector<std::string>::const_iterator It;
 	for (It it = header_fields_info.begin(); it != header_fields_info.end(); ++it) {
-		std::vector<std::string> header_key_value = utils::SplitStr(*it, ":");
-		TrimLeadingOptionalWhitespace(header_key_value[1]);
-		CheckValidHeaderFieldValue(header_key_value[0]);
+		std::vector<std::string> header_field_name_and_value = utils::SplitStr(*it, ":");
+		CheckValidHeaderFieldName(header_field_name_and_value[0]);
 		// 既にヘッダフィールドの値が設定されてる場合
-		if (header_fields[header_key_value[0]].size()) {
+		if (header_fields[header_field_name_and_value[0]].size()) {
 			throw HttpParseException(
 				"Error: The value already exists in header fields", BAD_REQUEST
 			);
 		}
-		header_fields[header_key_value[0]] = header_key_value[1];
+		const std::string& header_field_value = StrTrimLeadingOptionalWhitespace(header_field_name_and_value[1]);
+		// to do: #189  ヘッダフィールドをパースする関数（value）-> CheckValidHeaderFieldValue
+		header_fields[header_field_name_and_value[0]] = header_field_value;
 	}
 	return header_fields;
 }
@@ -132,7 +126,7 @@ void HttpParse::CheckValidVersion(const std::string &version) {
 	}
 }
 
-void HttpParse::CheckValidHeaderFieldValue(const std::string &header_field_value) {
+void HttpParse::CheckValidHeaderFieldName(const std::string &header_field_value) {
 	// C++98 では初期化リストがサポートされていないため
 	static const std::string header_fields[] = {
 		"Host",

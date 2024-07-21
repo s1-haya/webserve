@@ -6,6 +6,8 @@
 namespace http {
 
 extern const std::string SP;
+extern const std::string HTAB;
+extern const std::string OPTIONAL_WHITESPACE;
 extern const std::string CRLF;
 extern const std::string HTTP_VERSION;
 extern const std::string CONNECTION;
