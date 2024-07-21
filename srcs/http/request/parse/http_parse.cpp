@@ -102,10 +102,8 @@ void HttpParse::CheckValidMethod(const std::string &method) {
 		);
 	}
 	// GET, POST, DELETEかどうか ->　501
-	static const std::string basic_methods[] = {"GET", "DELETE", "POST"};
-	static const std::size_t methods_size    = sizeof(basic_methods) / sizeof(basic_methods[0]);
-	if (std::find(basic_methods, basic_methods + methods_size, method) ==
-		basic_methods + methods_size) {
+	if (std::find(BASIC_METHODS, BASIC_METHODS + BASIC_METHODS_SIZE, method) ==
+		BASIC_METHODS + BASIC_METHODS_SIZE) {
 		throw HttpParseException("Error: This method doesn't exist in webserv.", NOT_IMPLEMENTED);
 	}
 }
@@ -128,19 +126,9 @@ void HttpParse::CheckValidVersion(const std::string &version) {
 
 void HttpParse::CheckValidHeaderFieldName(const std::string &header_field_value) {
 	// C++98 では初期化リストがサポートされていないため
-	static const std::string header_fields[] = {
-		"Host",
-		"User-Agent",
-		"Accept",
-		"Accept-Encoding",
-		"Content-Type",
-		"Content-Length",
-		"Connection",
-		"Authorization"
-	};
-	static const std::size_t header_fields_size = sizeof(header_fields) / sizeof(header_fields[0]);
-	if (std::find(header_fields, header_fields + header_fields_size, header_field_value) ==
-		header_fields + header_fields_size) {
+	if (std::find(
+			BASIC_HEADER_FIELDS, BASIC_HEADER_FIELDS + BASIC_HEADER_FIELDS_SIZE, header_field_value
+		) == BASIC_HEADER_FIELDS + BASIC_HEADER_FIELDS_SIZE) {
 		throw HttpParseException(
 			"Error: the value does not exist in format of header fields", BAD_REQUEST
 		);
