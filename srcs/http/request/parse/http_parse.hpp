@@ -42,16 +42,14 @@ class HttpParse {
   private:
 	HttpParse();
 	~HttpParse();
-	static RequestLine
-	SetRequestLine(const std::vector<std::string> &request_line);
-	static HeaderFields
-	SetHeaderFields(const std::vector<std::string> &header_fields_info);
-	static void CheckValidRequestLine(const std::vector<std::string> &request_line_info);
-	static void CheckValidMethod(const std::string &method);
-	static void CheckValidRequestTarget(const std::string &request_target);
-	static void CheckValidVersion(const std::string &version);
+	static RequestLine  SetRequestLine(const std::vector<std::string> &request_line);
+	static HeaderFields SetHeaderFields(const std::vector<std::string> &header_fields_info);
+	static void         CheckValidRequestLine(const std::vector<std::string> &request_line_info);
+	static void         CheckValidMethod(const std::string &method);
+	static void         CheckValidRequestTarget(const std::string &request_target);
+	static void         CheckValidVersion(const std::string &version);
 
-	static void CheckValidHeaderFieldValue(const std::string &header_field_value);
+	static void CheckValidHeaderFieldName(const std::string &header_field_value);
 
 	class HttpParseException : public std::runtime_error {
 	  public:

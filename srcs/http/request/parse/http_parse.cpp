@@ -46,7 +46,7 @@ std::string StrTrimLeadingOptionalWhitespace(const std::string &str) {
 // todo: tmp request_
 HttpRequestResult HttpParse::Run(const std::string &read_buf) {
 	HttpRequestResult result;
-	// a: [request_line header_fields, messagebody]
+	// a: [request_line ＋ header_fields, messagebody]
 	// b: [request_line, header_fields]
 	std::vector<std::string> a = utils::SplitStr(read_buf, CRLF + CRLF);
 	std::vector<std::string> b = utils::SplitStr(a[0], CRLF);
@@ -61,8 +61,8 @@ HttpRequestResult HttpParse::Run(const std::string &read_buf) {
 }
 
 RequestLine HttpParse::SetRequestLine(const std::vector<std::string> &request_line_info) {
-	RequestLine request_line;
 	CheckValidRequestLine(request_line_info);
+	RequestLine request_line;
 	request_line.method         = request_line_info[0];
 	request_line.request_target = request_line_info[1];
 	request_line.version        = request_line_info[2];
@@ -112,7 +112,7 @@ void HttpParse::CheckValidMethod(const std::string &method) {
 
 void HttpParse::CheckValidRequestTarget(const std::string &reqest_target) {
 	// /が先頭になかったら場合 -> 400
-	if (reqest_target.empty() || reqest_target[0] != '/') {
+	if (reqest_target[0] != '/') {
 		throw HttpParseException(
 			"Error: the request target is missing the '/' character at the beginning", BAD_REQUEST
 		);
