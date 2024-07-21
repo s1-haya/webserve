@@ -74,6 +74,11 @@ HeaderFields HttpParse::SetHeaderFields(const std::vector<std::string> &header_f
 	typedef std::vector<std::string>::const_iterator It;
 	for (It it = header_fields_info.begin(); it != header_fields_info.end(); ++it) {
 		std::vector<std::string> header_field_name_and_value = utils::SplitStr(*it, ":");
+		if (header_field_name_and_value.size() != 2) {
+			throw HttpParseException(
+				"Error: Missing colon or multiple colons found in header filed", BAD_REQUEST
+			);
+		} 
 		// header_field_valueを初期化してるためheader_field_nameも初期化した
 		const std::string &header_field_name = header_field_name_and_value[0];
 		CheckValidHeaderFieldName(header_field_name);

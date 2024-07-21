@@ -186,24 +186,45 @@ int RunTest() {
 	http::HttpRequestResult expected_header_fileds_test_5;
 	expected_header_fileds_test_5.status_code = http::BAD_REQUEST;
 
+	// セミコロンがない場合
+	http::HttpRequestResult expected_header_fileds_test_6;
+	expected_header_fileds_test_6.status_code = http::BAD_REQUEST;
+
+	// セミコロンが複数ある場合
+	http::HttpRequestResult expected_header_fileds_test_7;
+	expected_header_fileds_test_7.status_code = http::BAD_REQUEST;
+
 	static const TestCase test_cases_for_header_fields[] = {
 		TestCase(
-			"GET / HTTP/1.1\r\nHost: www.example.com\r\nConnection: keep-alive\r\n\r\n", expected_header_fields_test_1
+			"GET / HTTP/1.1\r\nHost: www.example.com\r\nConnection: keep-alive\r\n\r\n",
+			expected_header_fields_test_1
 		),
 		TestCase(
 			"GET / HTTP/1.1\r\nHost:    \twww.example.com\r\nConnection: keep-alive\r\n\r\n",
 			expected_header_fields_test_2
 		),
 		TestCase(
-			"GET / HTTP/1.1\r\nHost:www.example.com\r\nConnection: keep-alive\r\n\r\n", expected_header_fields_test_3
+			"GET / HTTP/1.1\r\nHost:www.example.com\r\nConnection: keep-alive\r\n\r\n",
+			expected_header_fields_test_3
 		),
 		TestCase(
-			"GET / HTTP/1.1\r\nGold: www.example.com\r\nConnection: keep-alive\r\n\r\n", expected_header_fileds_test_4
+			"GET / HTTP/1.1\r\nGold: www.example.com\r\nConnection: keep-alive\r\n\r\n",
+			expected_header_fileds_test_4
 		),
 		TestCase(
 			"GET / HTTP/1.1\r\nHost: www.example.com\r\nHost: www.example.com\r\nConnection: "
 			"keep-alive\r\n\r\n",
 			expected_header_fileds_test_5
+		),
+		TestCase(
+			"GET / HTTP/1.1\r\nHost\r\nConnection: "
+			"keep-alive\r\n\r\n",
+			expected_header_fileds_test_6
+		),
+		TestCase(
+			"GET / HTTP/1.1\r\nHost:kkk:kk\r\nConnection: "
+			"keep-alive\r\n\r\n",
+			expected_header_fileds_test_7
 		)
 	};
 
