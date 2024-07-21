@@ -74,16 +74,21 @@ HeaderFields HttpParse::SetHeaderFields(const std::vector<std::string> &header_f
 	typedef std::vector<std::string>::const_iterator It;
 	for (It it = header_fields_info.begin(); it != header_fields_info.end(); ++it) {
 		std::vector<std::string> header_field_name_and_value = utils::SplitStr(*it, ":");
-		CheckValidHeaderFieldName(header_field_name_and_value[0]);
-		// 既にヘッダフィールドの値が設定されてる場合
-		if (header_fields[header_field_name_and_value[0]].size()) {
+		// header_field_valueを初期化してるためheader_field_nameも初期化した
+		const std::string &header_field_name = header_field_name_and_value[0];
+		CheckValidHeaderFieldName(header_field_name);
+		const std::string &header_field_value =
+			StrTrimLeadingOptionalWhitespace(header_field_name_and_value[1]);
+		typedef std::pair<HeaderFields::const_iterator, bool> Result;
+		Result result = header_fields.insert(std::make_pair(header_field_name, header_field_value));
+		if (result.second == false) {
 			throw HttpParseException(
 				"Error: The value already exists in header fields", BAD_REQUEST
 			);
 		}
 		const std::string& header_field_value = StrTrimLeadingOptionalWhitespace(header_field_name_and_value[1]);
 		// to do: #189  ヘッダフィールドをパースする関数（value）-> CheckValidHeaderFieldValue
-		header_fields[header_field_name_and_value[0]] = header_field_value;
+		header_fields[header_field_name] = header_field_value;
 	}
 	return header_fields;
 }
