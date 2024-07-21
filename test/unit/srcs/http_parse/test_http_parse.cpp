@@ -158,25 +158,25 @@ int RunTest() {
 	ret_code |= RunTestCases(test_cases_for_request_line, ARRAY_SIZE(test_cases_for_request_line));
 
 	std::cout << "Header Fields Test" << std::endl;
-	http::HttpRequestResult        expected_header_fields_test_1;
-	expected_header_fields_test_1.request.request_line                   = expected_request_line_1;
-	expected_header_fields_test_1.status_code                            = http::OK;
-	expected_header_fields_test_1.request.header_fields["Host"]          = "www.example.com";
-	expected_header_fields_test_1.request.header_fields["Connection"]    = "keep-alive";
+	http::HttpRequestResult expected_header_fields_test_1;
+	expected_header_fields_test_1.request.request_line                = expected_request_line_1;
+	expected_header_fields_test_1.status_code                         = http::OK;
+	expected_header_fields_test_1.request.header_fields["Host"]       = "www.example.com";
+	expected_header_fields_test_1.request.header_fields["Connection"] = "keep-alive";
 
 	// セミコロン以降に複数OWS(SpaceとHorizontal Tab)が設定の場合
-	http::HttpRequestResult        expected_header_fields_test_2;
-	expected_header_fields_test_2.request.request_line                   = expected_request_line_1;
-	expected_header_fields_test_2.status_code                            = http::OK;
-	expected_header_fields_test_2.request.header_fields["Host"]          = "www.example.com";
-	expected_header_fields_test_2.request.header_fields["Connection"]    = "keep-alive";
+	http::HttpRequestResult expected_header_fields_test_2;
+	expected_header_fields_test_2.request.request_line                = expected_request_line_1;
+	expected_header_fields_test_2.status_code                         = http::OK;
+	expected_header_fields_test_2.request.header_fields["Host"]       = "www.example.com";
+	expected_header_fields_test_2.request.header_fields["Connection"] = "keep-alive";
 
 	// セミコロンの後にnameがある設定の場合
-	http::HttpRequestResult        expected_header_fields_test_3;
-	expected_header_fields_test_3.request.request_line                   = expected_request_line_1;
-	expected_header_fields_test_3.status_code                            = http::OK;
-	expected_header_fields_test_3.request.header_fields["Host"]          = "www.example.com";
-	expected_header_fields_test_3.request.header_fields["Connection"]    = "keep-alive";
+	http::HttpRequestResult expected_header_fields_test_3;
+	expected_header_fields_test_3.request.request_line                = expected_request_line_1;
+	expected_header_fields_test_3.status_code                         = http::OK;
+	expected_header_fields_test_3.request.header_fields["Host"]       = "www.example.com";
+	expected_header_fields_test_3.request.header_fields["Connection"] = "keep-alive";
 
 	// 存在しないfield_nameの場合
 	http::HttpRequestResult expected_header_fileds_test_4;

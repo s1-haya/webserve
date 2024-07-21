@@ -33,7 +33,7 @@ bool IsStringUpper(const std::string &str) {
 }
 
 std::string StrTrimLeadingOptionalWhitespace(const std::string &str) {
-	std::string::size_type   pos                 = str.find_first_not_of(OPTIONAL_WHITESPACE);
+	std::string::size_type pos = str.find_first_not_of(OPTIONAL_WHITESPACE);
 	if (pos != std::string::npos) {
 		return str.substr(pos);
 	} else {
@@ -78,7 +78,7 @@ HeaderFields HttpParse::SetHeaderFields(const std::vector<std::string> &header_f
 			throw HttpParseException(
 				"Error: Missing colon or multiple colons found in header filed", BAD_REQUEST
 			);
-		} 
+		}
 		// header_field_valueを初期化してるためheader_field_nameも初期化した
 		const std::string &header_field_name = header_field_name_and_value[0];
 		CheckValidHeaderFieldName(header_field_name);
@@ -91,7 +91,6 @@ HeaderFields HttpParse::SetHeaderFields(const std::vector<std::string> &header_f
 				"Error: The value already exists in header fields", BAD_REQUEST
 			);
 		}
-		const std::string& header_field_value = StrTrimLeadingOptionalWhitespace(header_field_name_and_value[1]);
 		// to do: #189  ヘッダフィールドをパースする関数（value）-> CheckValidHeaderFieldValue
 		header_fields[header_field_name] = header_field_value;
 	}
@@ -129,7 +128,7 @@ void HttpParse::CheckValidRequestTarget(const std::string &reqest_target) {
 
 void HttpParse::CheckValidVersion(const std::string &version) {
 	// HTTP/1.1かどうか -> 400
-	if (version != "HTTP/1.1") {
+	if (version != HTTP_VERSION) {
 		throw HttpParseException("Error: The version is not supported by webserv", BAD_REQUEST);
 	}
 }
