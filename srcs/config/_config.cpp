@@ -11,4 +11,4 @@ Config::ConfigData Config::ParseConfig(const std::string &path_config) {
 	return tmp_config;
 }
 
-} // namespace config
+} // namespace _config

@@ -18,9 +18,9 @@ SRCS			+=	$(WS_UTILS_DIR)/convert_str.cpp \
 					$(WS_UTILS_DIR)/isdigit.cpp
 
 # for http_parse
-WS_HTTP_DIR := ../../srcs/http/
+WS_HTTP_DIR := ../../srcs/http
 
-WS_HTTP_PARSE_DIR := ../../srcs/http/request/parse
+WS_HTTP_PARSE_DIR := $(WS_HTTP_DIR)/request/parse
 
 SRCS			+=	$(WS_HTTP_DIR)/http_message.cpp \
 					$(WS_HTTP_PARSE_DIR)/http_parse.cpp
