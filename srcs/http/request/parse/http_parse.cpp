@@ -84,6 +84,7 @@ HeaderFields HttpParse::SetHeaderFields(const std::vector<std::string> &header_f
 		CheckValidHeaderFieldName(header_field_name);
 		const std::string &header_field_value =
 			StrTrimLeadingOptionalWhitespace(header_field_name_and_value[1]);
+		// to do: #189  ヘッダフィールドをパースする関数（value）-> CheckValidHeaderFieldValue
 		typedef std::pair<HeaderFields::const_iterator, bool> Result;
 		Result result = header_fields.insert(std::make_pair(header_field_name, header_field_value));
 		if (result.second == false) {
@@ -91,8 +92,6 @@ HeaderFields HttpParse::SetHeaderFields(const std::vector<std::string> &header_f
 				"Error: The value already exists in header fields", BAD_REQUEST
 			);
 		}
-		// to do: #189  ヘッダフィールドをパースする関数（value）-> CheckValidHeaderFieldValue
-		header_fields[header_field_name] = header_field_value;
 	}
 	return header_fields;
 }
@@ -119,7 +118,7 @@ void HttpParse::CheckValidMethod(const std::string &method) {
 
 void HttpParse::CheckValidRequestTarget(const std::string &reqest_target) {
 	// /が先頭になかったら場合 -> 400
-	if (reqest_target[0] != '/') {
+	if (reqest_target.empty() || reqest_target[0] != '/') {
 		throw HttpParseException(
 			"Error: the request target is missing the '/' character at the beginning", BAD_REQUEST
 		);
@@ -134,7 +133,6 @@ void HttpParse::CheckValidVersion(const std::string &version) {
 }
 
 void HttpParse::CheckValidHeaderFieldName(const std::string &header_field_value) {
-	// C++98 では初期化リストがサポートされていないため
 	if (std::find(
 			BASIC_HEADER_FIELDS, BASIC_HEADER_FIELDS + BASIC_HEADER_FIELDS_SIZE, header_field_value
 		) == BASIC_HEADER_FIELDS + BASIC_HEADER_FIELDS_SIZE) {
