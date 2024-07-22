@@ -16,6 +16,6 @@ class Config {
 	~Config();
 };
 
-} // namespace config
+} // namespace _config
 
 #endif /* CONFIG_HPP_ */
