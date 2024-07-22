@@ -2,6 +2,7 @@ a.out
 __pycache__
 .pytest_cache
 venv
+*.log
 
 !nginx/**
 !apache/**

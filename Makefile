@@ -25,7 +25,7 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
 
 $(NAME): $(OBJS)
-	$(CXX) $(CXXFLAGS) -o $@ $^
+	$(CXX) -o $@ $^
 
 .PHONY	: clean
 clean:

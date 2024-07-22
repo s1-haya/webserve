@@ -4,13 +4,18 @@
 #include <iostream>
 #include <string>
 
-namespace test_split {
 namespace {
 
 #define ARRAY_SIZE(array) (sizeof(array) / sizeof(array[0]))
 
 // 比較する型
 typedef std::vector<std::string> Strs;
+
+int GetTestCaseNum() {
+	static unsigned int test_case_num = 0;
+	++test_case_num;
+	return test_case_num;
+}
 
 // expected
 // templateのパラメータパックがc++11以降なので使っていない
@@ -28,18 +33,14 @@ struct TestCase {
 };
 
 // SplitStr()を実行してexpectedと比較
-int Run(
-	std::size_t        test_case_num,
-	const std::string &src,
-	const std::string &substring,
-	const Strs        &expected
-) {
+int Run(const std::string &src, const std::string &substring, const Strs &expected) {
 	if (utils::SplitStr(src, substring) == expected) {
-		std::cout << utils::color::GREEN << test_case_num << ".[OK] " << utils::color::RESET
+		std::cout << utils::color::GREEN << GetTestCaseNum() << ".[OK] " << utils::color::RESET
 				  << std::endl;
 		return EXIT_SUCCESS;
 	}
-	std::cerr << utils::color::RED << test_case_num << ".[NG] " << utils::color::RESET << std::endl;
+	std::cerr << utils::color::RED << GetTestCaseNum() << ".[NG] " << utils::color::RESET
+			  << std::endl;
 	std::cerr << utils::color::RED << "SplitStr() failed" << utils::color::RESET << std::endl;
 	std::cerr << "src: [" << src << "]" << std::endl;
 	return EXIT_FAILURE;
@@ -50,14 +51,14 @@ int RunTestCases(const TestCase test_cases[], std::size_t num_test_cases) {
 
 	for (std::size_t i = 0; i < num_test_cases; i++) {
 		const TestCase test_case = test_cases[i];
-		ret_code |= Run(i + 1, test_case.input, test_case.substring, test_case.expected);
+		ret_code |= Run(test_case.input, test_case.substring, test_case.expected);
 	}
 	return ret_code;
 }
 
 } // namespace
 
-int RunTest() {
+int main() {
 	int ret_code = 0;
 
 	// ---------------------------------------------------------------------
@@ -152,5 +153,3 @@ int RunTest() {
 
 	return ret_code;
 }
-
-} // namespace test_split
