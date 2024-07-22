@@ -57,6 +57,34 @@ int TestIsSameClientInfo(
 	return EXIT_FAILURE;
 }
 
+bool IsSameServerInfo(const server::ServerInfo &a, const server::ServerInfo &b) {
+	return a.GetFd() == b.GetFd() && a.GetName() == b.GetName() && a.GetPort() == b.GetPort();
+}
+
+// ServerInfo同士のメンバが全て等しいことを期待するテスト
+int TestIsSameHostServerInfo(
+	const server::SockContext                    &context,
+	const server::SockContext::HostServerInfoMap &expected_host_server_info,
+	int                                           client_fd
+) {
+	// テスト対象のgetter
+	const server::ServerInfo &a = context.GetConnectedServerInfo(client_fd);
+	const server::ServerInfo &b = *expected_host_server_info.at(client_fd);
+
+	if (IsSameServerInfo(a, b)) {
+		PrintOk();
+		return EXIT_SUCCESS;
+	}
+	PrintNg();
+	std::cerr << "server_fd  : result   [" << a.GetFd() << "]" << std::endl;
+	std::cerr << "             expected [" << b.GetFd() << "]" << std::endl;
+	std::cerr << "server_name: result   [" << a.GetName() << "]" << std::endl;
+	std::cerr << "             expected [" << b.GetName() << "]" << std::endl;
+	std::cerr << "port       : result   [" << a.GetPort() << "]" << std::endl;
+	std::cerr << "             expected [" << b.GetPort() << "]" << std::endl;
+	return EXIT_FAILURE;
+}
+
 // test_funcを実行したらthrowされることを期待するテスト
 template <typename TestFunc>
 int TestThrow(
@@ -147,6 +175,7 @@ int RunTestSockContext() {
 	expected_host_server_info[client_fd1] = &server_info1;
 	// contextのメンバと自作のexpectedが同じか確認
 	ret_code |= TestIsSameClientInfo(context, expected_client_info, client_fd1);
+	ret_code |= TestIsSameHostServerInfo(context, expected_host_server_info, client_fd1);
 
 	// contextにClientInfo2とServerInfoMapに登録されていないserver_fdを追加してみる (todo: 保留)
 	// ret_code |= TestThrow(&server::SockContext::AddClientInfo, client_fd2, client_info2, 100);
@@ -161,6 +190,7 @@ int RunTestSockContext() {
 	expected_host_server_info[client_fd2] = &server_info2;
 	// contextのメンバと自作のexpectedが同じか確認
 	ret_code |= TestIsSameClientInfo(context, expected_client_info, client_fd2);
+	ret_code |= TestIsSameHostServerInfo(context, expected_host_server_info, client_fd2);
 
 	return ret_code;
 }
