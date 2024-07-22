@@ -30,6 +30,32 @@ void PrintError(const std::string &message) {
 }
 
 // -----------------------------------------------------------------------------
+bool IsSameClientInfo(const server::ClientInfo &a, const server::ClientInfo &b) {
+	return a.GetFd() == b.GetFd() && a.GetIp() == b.GetIp();
+}
+
+// ClientInfo同士のメンバが全て等しいことを期待するテスト
+// (todo: 呼び出し側でClientInfoのメンバがセットできてないので今必ずtrueが返る)
+int TestIsSameClientInfo(
+	const server::SockContext                &context,
+	const server::SockContext::ClientInfoMap &expected_client_info,
+	int                                       client_fd
+) {
+	// テスト対象のgetter
+	const server::ClientInfo &a = context.GetClientInfo(client_fd);
+	const server::ClientInfo &b = expected_client_info.at(client_fd);
+
+	if (IsSameClientInfo(a, b)) {
+		PrintOk();
+		return EXIT_SUCCESS;
+	}
+	PrintNg();
+	std::cerr << "client_fd : result   [" << a.GetFd() << "]" << std::endl;
+	std::cerr << "            expected [" << b.GetFd() << "]" << std::endl;
+	std::cerr << "client_IP : result   [" << a.GetIp() << "]" << std::endl;
+	std::cerr << "            expected [" << b.GetIp() << "]" << std::endl;
+	return EXIT_FAILURE;
+}
 
 // test_funcを実行したらthrowされることを期待するテスト
 template <typename TestFunc>
@@ -110,6 +136,31 @@ int RunTestSockContext() {
 
 	// contextに既に追加済みのServerInfo2を再度追加してみる(期待: throw)
 	ret_code |= TestThrow(&server::SockContext::AddServerInfo, context, server_fd2, server_info2);
+
+	// contextにClientInfo1とそれに紐づくserver_fd1を追加
+	// - ServerInfoMap     = {{4, ServerInfo1}, {5, ServerInfo2}}
+	// - ClientInfoMap     = {{6, ClientInfo1}}
+	// - HostServerInfoMap = {{6, ServerInfo1*}}
+	const int client_fd1 = 6;
+	context.AddClientInfo(client_fd1, client_info1, server_fd1);
+	expected_client_info[client_fd1]      = client_info1;
+	expected_host_server_info[client_fd1] = &server_info1;
+	// contextのメンバと自作のexpectedが同じか確認
+	ret_code |= TestIsSameClientInfo(context, expected_client_info, client_fd1);
+
+	// contextにClientInfo2とServerInfoMapに登録されていないserver_fdを追加してみる (todo: 保留)
+	// ret_code |= TestThrow(&server::SockContext::AddClientInfo, client_fd2, client_info2, 100);
+
+	// contextにClientInfo2とそれに紐づくserver_fd2を追加
+	// - ServerInfoMap     = {{4, ServerInfo1}, {5, ServerInfo2}}
+	// - ClientInfoMap     = {{6, ClientInfo1}, {7, ClientInfo2}}
+	// - HostServerInfoMap = {{6, ServerInfo1*}, {7, ServerInfo2*}}
+	const int client_fd2 = 7;
+	context.AddClientInfo(client_fd2, client_info2, server_fd2);
+	expected_client_info[client_fd2]      = client_info2;
+	expected_host_server_info[client_fd2] = &server_info2;
+	// contextのメンバと自作のexpectedが同じか確認
+	ret_code |= TestIsSameClientInfo(context, expected_client_info, client_fd2);
 
 	return ret_code;
 }
