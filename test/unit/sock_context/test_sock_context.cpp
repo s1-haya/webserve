@@ -105,6 +105,21 @@ int TestThrow(
 	}
 }
 
+// test_funcを実行したらthrowされることを期待するテスト
+template <typename TestFunc>
+int TestThrow(TestFunc test_func, const server::SockContext &context, int client_fd) {
+	try {
+		(context.*test_func)(client_fd);
+		PrintNg();
+		PrintError("throw failed");
+		return EXIT_FAILURE;
+	} catch (const std::exception &e) {
+		PrintOk();
+		std::cerr << utils::color::GRAY << e.what() << utils::color::RESET << std::endl;
+		return EXIT_SUCCESS;
+	}
+}
+
 // -----------------------------------------------------------------------------
 /*
 
@@ -191,6 +206,21 @@ int RunTestSockContext() {
 	// contextのメンバと自作のexpectedが同じか確認
 	ret_code |= TestIsSameClientInfo(context, expected_client_info, client_fd2);
 	ret_code |= TestIsSameHostServerInfo(context, expected_host_server_info, client_fd2);
+
+	// contextからClientInfo1(とそれに紐づくServerInfo1*を削除
+	// (ServerInfoMapからはServerInfo1は消えない。listen待機中一覧なので)
+	// - ServerInfoMap     = {{4, ServerInfo1}, {5, ServerInfo2}}
+	// - ClientInfoMap     = {{7, ClientInfo2}}
+	// - HostServerInfoMap = {{7, ServerInfo2*}}
+	context.DeleteClientInfo(client_fd1);
+	expected_client_info.erase(client_fd1);
+	expected_host_server_info.erase(client_fd1);
+	// 削除後にgetterを使用し,期待通りthrowされるか確認 (todo: getterがthrowするなら必要なテスト)
+	ret_code |= TestThrow(&server::SockContext::GetClientInfo, context, client_fd1);
+	ret_code |= TestThrow(&server::SockContext::GetConnectedServerInfo, context, client_fd1);
+
+	// 2度同じClientInfo1を削除してみる(期待: 何も起きない)
+	context.DeleteClientInfo(client_fd1);
 
 	return ret_code;
 }
