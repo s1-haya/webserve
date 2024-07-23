@@ -17,9 +17,13 @@ struct TestCase {
 	const http::HttpRequestResult expected;
 };
 
-bool IsSameRequestLine(
-	std::size_t test_case_num, const http::RequestLine &res, const http::RequestLine &expected
-) {
+
+int GetTestCaseNum() {
+	static unsigned int test_case_num = 0;
+	++test_case_num;
+	return test_case_num;
+}
+
 	bool              result = true;
 	std::stringstream error_log;
 	if (expected.method != res.method) {
@@ -38,7 +42,7 @@ bool IsSameRequestLine(
 		result = false;
 	}
 	if (result == false) {
-		std::cerr << utils::color::RED << test_case_num << ".[NG] " << utils::color::RESET
+		std::cerr << utils::color::RED << GetTestCaseNum() << ".[NG] " << utils::color::RESET
 				  << std::endl;
 		std::cerr << utils::color::RED << "HttpParseClass failed: request_line"
 				  << utils::color::RESET << std::endl;
@@ -47,8 +51,7 @@ bool IsSameRequestLine(
 	return result;
 }
 
-bool IsSameHeaderFields(
-	std::size_t test_case_num, const http::HeaderFields &res, http::HeaderFields expected
+bool IsSameHeaderFields(const http::HeaderFields &res, http::HeaderFields expected
 ) {
 	bool              result = true;
 	std::stringstream error_log;
@@ -65,7 +68,7 @@ bool IsSameHeaderFields(
 		result = false;
 	}
 	if (result == false) {
-		std::cerr << utils::color::RED << test_case_num << ".[NG] " << utils::color::RESET
+		std::cerr << utils::color::RED << GetTestCaseNum() << ".[NG] " << utils::color::RESET
 				  << std::endl;
 		std::cerr << utils::color::RED << "HttpParseClass failed: header fields"
 				  << utils::color::RESET << std::endl;
@@ -74,12 +77,11 @@ bool IsSameHeaderFields(
 	return result;
 }
 
-bool IsSameHttpRequest(
-	std::size_t test_case_num, const http::HttpRequest &res, const http::HttpRequest &expected
+bool IsSameHttpRequest(const http::HttpRequest &res, const http::HttpRequest &expected
 ) {
-	if (!(IsSameRequestLine(test_case_num, res.request_line, expected.request_line)))
+	if (!(IsSameRequestLine(res.request_line, expected.request_line)))
 		return false;
-	if (!(IsSameHeaderFields(test_case_num, res.header_fields, expected.header_fields)))
+	if (!(IsSameHeaderFields(res.header_fields, expected.header_fields)))
 		return false;
 	return true;
 }
@@ -87,25 +89,20 @@ bool IsSameHttpRequest(
 // HTTPリクエストの書式
 // - 期待したステータスコードかどうかテスト
 // 	- ステータスコードがOKの場合はHTTPリクエストの中身もテスト（今回はステータスラインのみ）
-int Run(
-	std::size_t test_case_num, const std::string &src, const http::HttpRequestResult &expected
+int Run(const std::string &src, const http::HttpRequestResult &expected
 ) {
 	const http::HttpRequestResult result = http::HttpParse::Run(src);
 	if (result.status_code == expected.status_code) {
 		// 　仮: ステータスコードがOKだった場合はHTTPリクエスト情報をテストしたい
 		if (result.status_code == http::OK &&
-			!(IsSameHttpRequest(test_case_num, result.request, expected.request)))
+				!IsSameHttpRequest(result.request, expected.request)) {
 			return EXIT_FAILURE;
-		std::cout << utils::color::GREEN << test_case_num << ".[OK] " << utils::color::RESET
+		std::cout << utils::color::GREEN << GetTestCaseNum() << ".[OK] " << utils::color::RESET
 				  << std::endl;
 		return EXIT_SUCCESS;
 	}
-	std::cerr << utils::color::RED << test_case_num << ".[NG] " << utils::color::RESET << std::endl;
-	std::cerr << utils::color::RED << "HttpParseClass failed: status_code" << utils::color::RESET
-			  << std::endl;
-	std::cerr << "src     : [" << src << "]" << std::endl;
-	std::cerr << "result  : [" << result.status_code << "]" << std::endl;
-	std::cerr << "expected: [" << expected.status_code << "]" << std::endl;
+	std::cerr << utils::color::RED << GetTestCaseNum() << ".[NG] " << utils::color::RESET << std::endl;
+	std::cerr << status_code_result.error_log << std::endl;
 	return EXIT_FAILURE;
 }
 
@@ -114,7 +111,7 @@ int RunTestCases(const TestCase test_cases[], std::size_t num_test_cases) {
 
 	for (std::size_t i = 0; i < num_test_cases; i++) {
 		const TestCase test_case = test_cases[i];
-		ret_code |= Run(i + 1, test_case.input, test_case.expected);
+		ret_code |= Run(test_case.input, test_case.expected);
 	}
 	return ret_code;
 }
