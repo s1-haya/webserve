@@ -5,8 +5,6 @@
 #include <ostream>
 #include <sstream> //stringstream
 
-namespace test_http_parse {
-
 namespace {
 
 #define ARRAY_SIZE(array) (sizeof(array) / sizeof(array[0]))
@@ -123,7 +121,7 @@ int RunTestCases(const TestCase test_cases[], std::size_t num_test_cases) {
 
 } // namespace
 
-int RunTest() {
+int main(void) {
 	int ret_code = 0;
 
 	std::cout << "Request Line Test" << std::endl;
@@ -232,5 +230,3 @@ int RunTest() {
 		RunTestCases(test_cases_for_header_fields, ARRAY_SIZE(test_cases_for_header_fields));
 	return ret_code;
 }
-
-} // namespace test_http_parse

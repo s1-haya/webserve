@@ -1,7 +1,8 @@
 # Add target test directories.
 # Each directory should have a Makefile with a 'run' target.
 TEST_DIRS	:=	convert_str \
-				split_str
+				split_str \
+				http_parse
 
 .PHONY	: run
 run:
