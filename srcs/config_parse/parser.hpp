@@ -5,6 +5,7 @@
 #include "node.hpp"
 #include <list>
 
+namespace config {
 namespace parser {
 
 typedef std::list<node::Node>::iterator NodeItr;
@@ -28,5 +29,6 @@ class Parser {
 };
 
 } // namespace parser
+} // namespace config
 
 #endif

@@ -2,6 +2,7 @@
 #define NODE_HPP_
 #include <string>
 
+namespace config {
 namespace node {
 
 struct Node {
@@ -19,5 +20,6 @@ enum TokenType {
 };
 
 } // namespace node
+} // namespace config
 
 #endif

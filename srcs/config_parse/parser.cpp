@@ -2,6 +2,7 @@
 #include <cstdlib> // atoi
 #include <stdexcept>
 
+namespace config {
 namespace parser {
 namespace {
 
@@ -120,3 +121,4 @@ std::list<context::ServerCon> Parser::GetServers() const {
 }
 
 } // namespace parser
+} // namespace config

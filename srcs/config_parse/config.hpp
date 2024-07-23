@@ -8,6 +8,8 @@
 
 #define ConfigInstance Config::GetInstance()
 
+namespace config {
+
 class Config {
   private:
 	Config(const std::string &file_path);
@@ -25,5 +27,7 @@ class Config {
 	static void                   Destroy();
 	std::list<context::ServerCon> servers_;
 };
+
+} // namespace config
 
 #endif

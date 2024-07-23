@@ -4,6 +4,8 @@
 #include <iostream>
 #include <sstream>
 
+namespace config {
+
 const Config *Config::s_cInstance = NULL;
 
 Config::Config(const std::string &file_path) : config_file_(file_path.c_str()) {
@@ -43,3 +45,5 @@ void Config::Destroy() {
 	delete s_cInstance;
 	s_cInstance = NULL;
 }
+
+} // namespace config

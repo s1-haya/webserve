@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <iostream>
 
+namespace config {
 namespace lexer {
 
 Lexer::Lexer(const std::string &buffer, std::list<node::Node> &tokens)
@@ -86,3 +87,4 @@ node::TokenType Lexer::SearchWordTokenType(std::string &word) {
 }
 
 } // namespace lexer
+} // namespace config
