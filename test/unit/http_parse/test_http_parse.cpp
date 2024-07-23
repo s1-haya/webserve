@@ -17,6 +17,13 @@ struct TestCase {
 	const http::HttpRequestResult expected;
 };
 
+struct  Result
+{
+	Result() : result(true) {}
+	bool result;
+	std::string error_log;
+};
+
 
 int GetTestCaseNum() {
 	static unsigned int test_case_num = 0;
@@ -24,6 +31,7 @@ int GetTestCaseNum() {
 	return test_case_num;
 }
 
+bool IsSameRequestLine(const http::RequestLine &res, const http::RequestLine &expected) {
 	bool              result = true;
 	std::stringstream error_log;
 	if (expected.method != res.method) {
@@ -86,19 +94,38 @@ bool IsSameHttpRequest(const http::HttpRequest &res, const http::HttpRequest &ex
 	return true;
 }
 
+Result IsSameStatusCode(http::StatusCode status_code, http::StatusCode expected, const std::string& src) {
+	Result status_code_result;
+	if (status_code != expected) {
+		std::stringstream error_log;
+		error_log << utils::color::RED << "HttpParseClass failed: status_code" << utils::color::RESET
+				<< std::endl;
+		error_log << "src     : [" << src << "]" << std::endl;
+		error_log << "result  : [" << status_code << "]" << std::endl;
+		error_log << "expected: [" << expected << "]" << std::endl;
+		status_code_result.result = false;
+		status_code_result.error_log = error_log.str();
+	}
+	return (status_code_result);
+}
+
+// int HandleResult()
+
 // HTTPリクエストの書式
 // - 期待したステータスコードかどうかテスト
 // 	- ステータスコードがOKの場合はHTTPリクエストの中身もテスト（今回はステータスラインのみ）
 int Run(const std::string &src, const http::HttpRequestResult &expected
 ) {
-	const http::HttpRequestResult result = http::HttpParse::Run(src);
-	if (result.status_code == expected.status_code) {
+	const http::HttpRequestResult http_request_result = http::HttpParse::Run(src);
+	Result status_code_result = IsSameStatusCode(http_request_result.status_code, expected.status_code, src);
+	if (status_code_result.result) {
 		// 　仮: ステータスコードがOKだった場合はHTTPリクエスト情報をテストしたい
-		if (result.status_code == http::OK &&
-				!IsSameHttpRequest(result.request, expected.request)) {
+		if (http_request_result.status_code == http::OK &&
+				!IsSameHttpRequest(http_request_result.request, expected.request)) {
 			return EXIT_FAILURE;
+		}
 		std::cout << utils::color::GREEN << GetTestCaseNum() << ".[OK] " << utils::color::RESET
-				  << std::endl;
+				<< std::endl;
 		return EXIT_SUCCESS;
 	}
 	std::cerr << utils::color::RED << GetTestCaseNum() << ".[NG] " << utils::color::RESET << std::endl;
