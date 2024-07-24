@@ -36,7 +36,7 @@ void SockContext::AddClientInfo(int client_fd, const ClientInfo &client_info, in
 	}
 
 	// add the connected host server_info associated with client_fd to host_servers
-	typedef std::pair<ClientsHostServerMap::const_iterator, bool> ResultInsertToHost;
+	typedef std::pair<HostServerInfoMap::const_iterator, bool> ResultInsertToHost;
 	ResultInsertToHost                                            result_host =
 		host_servers_.insert(std::make_pair(client_fd, GetServerInfo(server_fd)));
 	if (result_host.second == false) {
