@@ -5,7 +5,7 @@
 
 namespace server {
 
-ClientInfo::ClientInfo() {}
+ClientInfo::ClientInfo() : fd_(0) {}
 
 ClientInfo::ClientInfo(int fd, const struct sockaddr_storage &sock_addr) : fd_(fd) {
 	SetSockInfo(sock_addr);
