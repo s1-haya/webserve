@@ -28,18 +28,18 @@ void SockContext::AddServerInfo(int server_fd, const ServerInfo &server_info) {
 
 void SockContext::AddClientInfo(int client_fd, const ClientInfo &client_info, int server_fd) {
 	// add client_info to client_context
-	typedef std::pair<ClientInfoMap::const_iterator, bool> ResultInsertToContext;
-	ResultInsertToContext                                  result_context =
+	typedef std::pair<ClientInfoMap::const_iterator, bool> ResultInsertToClientContext;
+	ResultInsertToClientContext                            result_client_context =
 		client_context_.insert(std::make_pair(client_fd, client_info));
-	if (result_context.second == false) {
+	if (result_client_context.second == false) {
 		throw std::logic_error("ClientInfo already exists");
 	}
 
 	// add the connected host server_info associated with client_fd to host_servers
-	typedef std::pair<HostServerInfoMap::const_iterator, bool> ResultInsertToHost;
-	ResultInsertToHost                                            result_host =
+	typedef std::pair<HostServerInfoMap::const_iterator, bool> ResultInsertToHostServers;
+	ResultInsertToHostServers                                  result_host_servers =
 		host_servers_.insert(std::make_pair(client_fd, GetServerInfo(server_fd)));
-	if (result_host.second == false) {
+	if (result_host_servers.second == false) {
 		throw std::logic_error("ClientInfo already exists");
 	}
 }
