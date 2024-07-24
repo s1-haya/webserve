@@ -17,8 +17,9 @@ class VirtualServerStorage {
 	~VirtualServerStorage();
 	VirtualServerStorage(const VirtualServerStorage &other);
 	VirtualServerStorage &operator=(const VirtualServerStorage &other);
-	// function
+	// functions
 	void AddVirtualServer(const VirtualServer &virtual_server);
+	void AddMapping(int server_fd, const VirtualServer *virtual_server);
 
   private:
 	// 全VirtualServerを保持
