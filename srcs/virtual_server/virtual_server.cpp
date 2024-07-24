@@ -23,4 +23,12 @@ VirtualServer &VirtualServer::operator=(const VirtualServer &other) {
 	return *this;
 }
 
+const std::string &VirtualServer::GetServerName() const {
+	return server_name_;
+}
+
+const std::string &VirtualServer::GetLocation() const {
+	return location_;
+}
+
 } // namespace server

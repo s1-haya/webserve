@@ -15,6 +15,9 @@ class VirtualServer {
 	~VirtualServer();
 	VirtualServer(const VirtualServer &other);
 	VirtualServer &operator=(const VirtualServer &other);
+	// getter
+	const std::string &GetServerName() const;
+	const std::string &GetLocation() const;
 
   private:
 	// todo: add member(& operator=)
