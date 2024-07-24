@@ -8,6 +8,8 @@ namespace server {
 // virtual serverとして必要な情報を保持・取得する
 class VirtualServer {
   public:
+	// default constructor: necessary for map's insert/[]
+	VirtualServer();
 	// todo: configもらう？
 	VirtualServer(const std::string &server_name, const std::string &location);
 	~VirtualServer();

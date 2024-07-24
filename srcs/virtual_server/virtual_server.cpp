@@ -2,6 +2,8 @@
 
 namespace server {
 
+VirtualServer::VirtualServer() {}
+
 VirtualServer::VirtualServer(const std::string &server_name, const std::string &location)
 	: server_name_(server_name), location_(location) {
 	// todo: error handling?
