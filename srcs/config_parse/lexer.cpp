@@ -75,7 +75,7 @@ void Lexer::AddToken(const std::string &symbol, node::TokenType token_type) {
 
 void Lexer::AddWordToken(std::string::const_iterator &it) {
 	std::string new_str = "";
-	while (!utils::IsSpace(*it) && *it != SEMICOLON_CHR) {
+	while (it != buffer_.end() && !utils::IsSpace(*it) && *it != SEMICOLON_CHR) {
 		new_str += *it;
 		++it;
 	}
@@ -85,7 +85,7 @@ void Lexer::AddWordToken(std::string::const_iterator &it) {
 
 void Lexer::AddContextDirectiveWordToken(std::string::const_iterator &it) {
 	std::string new_str = "";
-	while (!utils::IsSpace(*it) && *it != SEMICOLON_CHR) {
+	while (it != buffer_.end() && !utils::IsSpace(*it) && *it != SEMICOLON_CHR) {
 		new_str += *it;
 		++it;
 	}
@@ -94,7 +94,7 @@ void Lexer::AddContextDirectiveWordToken(std::string::const_iterator &it) {
 }
 
 void Lexer::SkipComment(std::string::const_iterator &it) {
-	while (*it != '\n')
+	while (it != buffer_.end() && *it != '\n')
 		++it;
 }
 
