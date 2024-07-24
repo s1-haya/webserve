@@ -107,7 +107,7 @@ Result RunGetConnectedServerInfo(
 	return result;
 }
 
-// test_funcを実行したらthrowされることを期待するテスト
+// test_funcを実行したらthrowされることを期待するテスト(todo: テスト共通化？)
 template <typename TestFunc>
 int TestThrow(
 	TestFunc                  test_func,
@@ -120,14 +120,14 @@ int TestThrow(
 		PrintNg();
 		PrintError("throw failed");
 		return EXIT_FAILURE;
-	} catch (const std::exception &e) {
+	} catch (const std::exception &e) { // todo: 独自のexceptionだけcatchしてokが良いかも
 		PrintOk();
 		std::cerr << utils::color::GRAY << e.what() << utils::color::RESET << std::endl;
 		return EXIT_SUCCESS;
 	}
 }
 
-// test_funcを実行したらthrowされることを期待するテスト
+// test_funcを実行したらthrowされることを期待するテスト(todo: テスト共通化？)
 template <typename TestFunc>
 int TestThrow(TestFunc test_func, const server::SockContext &context, int client_fd) {
 	try {
@@ -135,7 +135,7 @@ int TestThrow(TestFunc test_func, const server::SockContext &context, int client
 		PrintNg();
 		PrintError("throw failed");
 		return EXIT_FAILURE;
-	} catch (const std::exception &e) {
+	} catch (const std::exception &e) { // todo: 独自のexceptionだけcatchしてokが良いかも
 		PrintOk();
 		std::cerr << utils::color::GRAY << e.what() << utils::color::RESET << std::endl;
 		return EXIT_SUCCESS;
