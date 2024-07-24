@@ -49,9 +49,11 @@ void PrintServersLocation(std::list<context::ServerCon> *servers) { /*デバッ�
 }
 
 } // namespace
+} // namespace config
 
 // c++ main.cpp ../../../srcs/config_parse/parser.cpp ../../../srcs/config_parse/lexer.cpp
 // ../../../srcs/utils/isspace.cpp
+using namespace config;
 
 int main() {
 	std::ifstream     conf("config_samp.conf");
@@ -59,8 +61,8 @@ int main() {
 	ss << conf.rdbuf();
 	std::string buffer = ss.str();
 	try {
-		std::list<node::Node> *tokens_ = new std::list<node::Node>;
-		lexer::Lexer           lex(buffer, *tokens_);
+		std::list<config::node::Node> *tokens_ = new std::list<node::Node>;
+		lexer::Lexer                   lex(buffer, *tokens_);
 		// PrintTokens(tokens_);
 		parser::Parser                par(*tokens_);
 		std::list<context::ServerCon> servers = par.GetServers();
@@ -72,5 +74,3 @@ int main() {
 		return EXIT_FAILURE;
 	}
 }
-
-} // namespace config
