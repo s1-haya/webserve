@@ -28,10 +28,10 @@ void Lexer::InitDefinition() {
 void Lexer::LexBuffer() {
 	bool is_next_to_word = false;
 
-	for (std::string::const_iterator it = buffer_.begin(); it != buffer_.end(); ++it) {
-		while (utils::IsSpace(*it)) {
-			++it;
-		}
+	for (std::string::const_iterator it = buffer_.begin(); it != buffer_.end() && *it != '\0';
+		 ++it) {
+		if (utils::IsSpace(*it))
+			continue;
 		switch (*it) {
 		case SEMICOLON_CHR:
 			AddToken(SEMICOLON_CHR, node::DELIM);
