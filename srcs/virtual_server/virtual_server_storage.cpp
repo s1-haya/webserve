@@ -18,4 +18,8 @@ VirtualServerStorage &VirtualServerStorage::operator=(const VirtualServerStorage
 	return *this;
 }
 
+void VirtualServerStorage::AddVirtualServer(const VirtualServer &virtual_server) {
+	virtual_servers_.push_back(virtual_server);
+}
+
 } // namespace server

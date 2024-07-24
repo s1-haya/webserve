@@ -15,6 +15,8 @@ class VirtualServerStorage {
 	~VirtualServerStorage();
 	VirtualServerStorage(const VirtualServerStorage &other);
 	VirtualServerStorage &operator=(const VirtualServerStorage &other);
+	// function
+	void AddVirtualServer(const VirtualServer &virtual_server);
 
   private:
 	// 全VirtualServerを保持
