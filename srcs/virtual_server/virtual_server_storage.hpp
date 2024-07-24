@@ -20,6 +20,8 @@ class VirtualServerStorage {
 	// functions
 	void AddVirtualServer(const VirtualServer &virtual_server);
 	void AddMapping(int server_fd, const VirtualServer *virtual_server);
+	// getter
+	const VirtualServer &GetVirtualServer(int server_fd) const;
 
   private:
 	// 全VirtualServerを保持

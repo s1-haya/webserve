@@ -38,4 +38,12 @@ void VirtualServerStorage::AddMapping(int server_fd, const VirtualServer *virtua
 	}
 }
 
+const VirtualServer &VirtualServerStorage::GetVirtualServer(int server_fd) const {
+	try {
+		return *mapping_fd_to_virtual_servers_.at(server_fd);
+	} catch (const std::exception &e) {
+		throw std::logic_error("VirtualServer doesn't exists");
+	}
+}
+
 } // namespace server
