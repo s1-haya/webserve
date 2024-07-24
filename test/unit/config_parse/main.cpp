@@ -5,7 +5,8 @@
 #include <iostream>
 #include <sstream>
 
-namespace config {
+using namespace config;
+
 namespace {
 
 void PrintServers(std::list<context::ServerCon> *servers_) { /*デバッグ用*/
@@ -49,11 +50,9 @@ void PrintServersLocation(std::list<context::ServerCon> *servers) { /*デバッ�
 }
 
 } // namespace
-} // namespace config
 
 // c++ main.cpp ../../../srcs/config_parse/parser.cpp ../../../srcs/config_parse/lexer.cpp
 // ../../../srcs/utils/isspace.cpp
-using namespace config;
 
 int main() {
 	std::ifstream     conf("config_samp.conf");
