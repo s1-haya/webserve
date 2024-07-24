@@ -5,9 +5,15 @@
 #include "utils.hpp"
 #include <cstdlib>
 #include <iostream>
+#include <sstream> // ostringstream
 #include <string>
 
 namespace {
+
+struct Result {
+	bool        is_ok;
+	std::string error_log;
+};
 
 int GetTestCaseNum() {
 	static unsigned int test_case_num = 0;
@@ -29,6 +35,16 @@ void PrintError(const std::string &message) {
 	std::cerr << utils::color::RED << message << utils::color::RESET << std::endl;
 }
 
+int Test(Result result) {
+	if (result.is_ok) {
+		PrintOk();
+		return EXIT_SUCCESS;
+	}
+	PrintNg();
+	PrintError(result.error_log);
+	return EXIT_FAILURE;
+}
+
 // -----------------------------------------------------------------------------
 bool IsSameClientInfo(const server::ClientInfo &a, const server::ClientInfo &b) {
 	return a.GetFd() == b.GetFd() && a.GetIp() == b.GetIp();
@@ -36,7 +52,7 @@ bool IsSameClientInfo(const server::ClientInfo &a, const server::ClientInfo &b) 
 
 // ClientInfo同士のメンバが全て等しいことを期待するテスト
 // (todo: 呼び出し側でClientInfoのメンバがセットできてないので今必ずtrueが返る)
-int TestIsSameClientInfo(
+Result RunGetClientInfo(
 	const server::SockContext                &context,
 	const server::SockContext::ClientInfoMap &expected_client_info,
 	int                                       client_fd
@@ -45,16 +61,19 @@ int TestIsSameClientInfo(
 	const server::ClientInfo &a = context.GetClientInfo(client_fd);
 	const server::ClientInfo &b = expected_client_info.at(client_fd);
 
+	Result result;
 	if (IsSameClientInfo(a, b)) {
-		PrintOk();
-		return EXIT_SUCCESS;
+		result.is_ok = true;
+	} else {
+		result.is_ok = false;
+		std::ostringstream oss;
+		oss << "client_fd : result   [" << a.GetFd() << "]" << std::endl;
+		oss << "            expected [" << b.GetFd() << "]" << std::endl;
+		oss << "client_IP : result   [" << a.GetIp() << "]" << std::endl;
+		oss << "            expected [" << b.GetIp() << "]" << std::endl;
+		result.error_log = oss.str();
 	}
-	PrintNg();
-	std::cerr << "client_fd : result   [" << a.GetFd() << "]" << std::endl;
-	std::cerr << "            expected [" << b.GetFd() << "]" << std::endl;
-	std::cerr << "client_IP : result   [" << a.GetIp() << "]" << std::endl;
-	std::cerr << "            expected [" << b.GetIp() << "]" << std::endl;
-	return EXIT_FAILURE;
+	return result;
 }
 
 bool IsSameServerInfo(const server::ServerInfo &a, const server::ServerInfo &b) {
@@ -62,7 +81,7 @@ bool IsSameServerInfo(const server::ServerInfo &a, const server::ServerInfo &b) 
 }
 
 // ServerInfo同士のメンバが全て等しいことを期待するテスト
-int TestIsSameHostServerInfo(
+Result RunGetConnectedServerInfo(
 	const server::SockContext                    &context,
 	const server::SockContext::HostServerInfoMap &expected_host_server_info,
 	int                                           client_fd
@@ -71,18 +90,21 @@ int TestIsSameHostServerInfo(
 	const server::ServerInfo &a = context.GetConnectedServerInfo(client_fd);
 	const server::ServerInfo &b = *expected_host_server_info.at(client_fd);
 
+	Result result;
 	if (IsSameServerInfo(a, b)) {
-		PrintOk();
-		return EXIT_SUCCESS;
+		result.is_ok = true;
+	} else {
+		result.is_ok = false;
+		std::ostringstream oss;
+		oss << "server_fd  : result   [" << a.GetFd() << "]" << std::endl;
+		oss << "             expected [" << b.GetFd() << "]" << std::endl;
+		oss << "server_name: result   [" << a.GetName() << "]" << std::endl;
+		oss << "             expected [" << b.GetName() << "]" << std::endl;
+		oss << "port       : result   [" << a.GetPort() << "]" << std::endl;
+		oss << "             expected [" << b.GetPort() << "]" << std::endl;
+		result.error_log = oss.str();
 	}
-	PrintNg();
-	std::cerr << "server_fd  : result   [" << a.GetFd() << "]" << std::endl;
-	std::cerr << "             expected [" << b.GetFd() << "]" << std::endl;
-	std::cerr << "server_name: result   [" << a.GetName() << "]" << std::endl;
-	std::cerr << "             expected [" << b.GetName() << "]" << std::endl;
-	std::cerr << "port       : result   [" << a.GetPort() << "]" << std::endl;
-	std::cerr << "             expected [" << b.GetPort() << "]" << std::endl;
-	return EXIT_FAILURE;
+	return result;
 }
 
 // test_funcを実行したらthrowされることを期待するテスト
@@ -189,8 +211,8 @@ int RunTestSockContext() {
 	expected_client_info[client_fd1]      = client_info1;
 	expected_host_server_info[client_fd1] = &server_info1;
 	// contextのメンバと自作のexpectedが同じか確認
-	ret_code |= TestIsSameClientInfo(context, expected_client_info, client_fd1);
-	ret_code |= TestIsSameHostServerInfo(context, expected_host_server_info, client_fd1);
+	ret_code |= Test(RunGetClientInfo(context, expected_client_info, client_fd1));
+	ret_code |= Test(RunGetConnectedServerInfo(context, expected_host_server_info, client_fd1));
 
 	// contextにClientInfo2とServerInfoMapに登録されていないserver_fdを追加してみる (todo: 保留)
 	// ret_code |= TestThrow(&server::SockContext::AddClientInfo, client_fd2, client_info2, 100);
@@ -204,8 +226,8 @@ int RunTestSockContext() {
 	expected_client_info[client_fd2]      = client_info2;
 	expected_host_server_info[client_fd2] = &server_info2;
 	// contextのメンバと自作のexpectedが同じか確認
-	ret_code |= TestIsSameClientInfo(context, expected_client_info, client_fd2);
-	ret_code |= TestIsSameHostServerInfo(context, expected_host_server_info, client_fd2);
+	ret_code |= Test(RunGetClientInfo(context, expected_client_info, client_fd2));
+	ret_code |= Test(RunGetConnectedServerInfo(context, expected_host_server_info, client_fd2));
 
 	// contextからClientInfo1(とそれに紐づくServerInfo1*を削除
 	// (ServerInfoMapからはServerInfo1は消えない。listen待機中一覧なので)
