@@ -18,8 +18,8 @@ struct TestCase {
 };
 
 struct Result {
-	Result() : result(true) {}
-	bool        result;
+	Result() : is_success(true) {}
+	bool        is_success;
 	std::string error_log;
 };
 
@@ -33,38 +33,38 @@ Result IsSameRequestLine(const http::RequestLine &res, const http::RequestLine &
 	Result            request_line_result;
 	std::stringstream error_log;
 	if (expected.method != res.method) {
-		error_log << "Expected method: " << expected.method << ", Actual method: " << res.method
+		error_log << "Expected method: " << expected.method << ", Result method: " << res.method
 				  << "\n";
 		request_line_result.result = false;
 	}
 	if (expected.request_target != res.request_target) {
 		error_log << "Expected request_target: " << expected.request_target
-				  << ", Actual request_target: " << res.request_target << "\n";
+				  << ", Result request_target: " << res.request_target << "\n";
 		request_line_result.result = false;
 	}
 	if (expected.version != res.version) {
-		error_log << "Expected version: " << expected.version << ", Actual version: " << res.version
+		error_log << "Expected version: " << expected.version << ", Result version: " << res.version
 				  << "\n";
 		request_line_result.result = false;
 	}
+	request_line_result.error_log = error_log.str();
 	return request_line_result;
 }
 
 Result IsSameHeaderFields(const http::HeaderFields &res, http::HeaderFields expected) {
 	Result            header_fields_result;
 	std::stringstream error_log;
-	// 仮
-	// expectedがconstじゃない理由は期待値にヘッダフィールドがなければパスして欲しいため
 	if (expected["Host"].size() && expected.at("Host") != res.at("Host")) {
-		error_log << "Expected Host: " << expected.at("Host") << ", Actual Host: " << res.at("Host")
+		error_log << "Expected Host: " << expected.at("Host") << ", Result Host: " << res.at("Host")
 				  << "\n";
 		header_fields_result.result = false;
 	}
 	if (expected["Connection"].size() && expected.at("Connection") != res.at("Connection")) {
 		error_log << "Expected Host: " << expected.at("Connection")
-				  << ", Actual Connection: " << res.at("Connection") << "\n";
+				  << ", Result Connection: " << res.at("Connection") << "\n";
 		header_fields_result.result = false;
 	}
+	header_fields_result.error_log = error_log.str();
 	return header_fields_result;
 }
 
@@ -84,8 +84,8 @@ IsSameStatusCode(http::StatusCode status_code, http::StatusCode expected, const 
 	Result status_code_result;
 	if (status_code != expected) {
 		std::stringstream error_log;
-		error_log << "src     : [" << src << "]" << std::endl;
-		error_log << "Expected Status code: " << status_code << ", Actual Status code: " << expected
+		error_log << "src     : [\n" << src << "]" << std::endl;
+		error_log << "Expected Status code: " << status_code << ", Result Status code: " << expected
 				  << "\n";
 		status_code_result.result    = false;
 		status_code_result.error_log = error_log.str();
@@ -94,7 +94,7 @@ IsSameStatusCode(http::StatusCode status_code, http::StatusCode expected, const 
 }
 
 int HandleResult(const Result &result) {
-	if (result.result) {
+	if (result.is_success) {
 		std::cout << utils::color::GREEN << GetTestCaseNum() << ".[OK] " << utils::color::RESET
 				  << std::endl;
 		return EXIT_SUCCESS;
