@@ -24,25 +24,25 @@ struct SaveData {
 	// HTTP各書式のパースしたかどうか
 	IsHttpRequestFormat save_is_request_format;
 	// HttpRequestResult
-	HttpRequestResult save_request_result; 
+	HttpRequestResult save_request_result;
 	// 現在HTTP各書式のパース前の読み込んだ情報
 	const std::string& current_buf;
 };
 
 class HttpDb {
-	public:
-		// Create
+  public:
+	// Create
 	static void CreateSaveData(int client_fd);
 	// Check
 	static bool IsSaveData(int client_fd);
 	// Get
 	static const SaveData &GetSaveData(int client_fd);
-		// Update
-		// Delete
-	private:
+	// Update
+	// Delete
+  private:
 	HttpDb();
 	~HttpDb();
-	  // client_fd -> 前回保存した情報にアクセスするためのデータ構造
+	// client_fd -> 前回保存した情報にアクセスするためのデータ構造
 	static std::map<int, SaveData> save_data_;
 };
 
