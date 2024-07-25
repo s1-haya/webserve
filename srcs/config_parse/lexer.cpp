@@ -4,6 +4,15 @@
 #include <iostream>
 
 namespace lexer {
+namespace {
+
+bool IsSpace(char c) { // 必要か
+	if (c == ' ' || c == '\t' || c == '\r' || c == '\n')
+		return true;
+	return false;
+}
+
+} // namespace
 
 Lexer::Lexer(const std::string &buffer, std::list<node::Node> &tokens)
 	: tokens_(tokens), buffer_(buffer) {
@@ -28,7 +37,7 @@ void Lexer::LexBuffer() {
 	bool is_next_to_word = false;
 
 	for (std::string::const_iterator it = buffer_.begin(); it != buffer_.end(); ++it) {
-		while (utils::IsSpace(*it)) {
+		while (IsSpace(*it)) {
 			++it;
 		}
 		switch (*it) {
@@ -75,7 +84,7 @@ void Lexer::AddToken(const std::string &symbol, node::TokenType token_type) {
 
 void Lexer::AddWordToken(std::string::const_iterator &it) {
 	std::string new_str;
-	while (!utils::IsSpace(*it) && *it != SEMICOLON_CHR) {
+	while (!IsSpace(*it) && *it != SEMICOLON_CHR) {
 		new_str += *it;
 		++it;
 	}
@@ -85,7 +94,7 @@ void Lexer::AddWordToken(std::string::const_iterator &it) {
 
 void Lexer::AddContextDirectiveWordToken(std::string::const_iterator &it) {
 	std::string new_str = "";
-	while (!utils::IsSpace(*it) && *it != SEMICOLON_CHR) {
+	while (!IsSpace(*it) && *it != SEMICOLON_CHR) {
 		new_str += *it;
 		++it;
 	}
