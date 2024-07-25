@@ -33,17 +33,18 @@ Result IsSameRequestLine(const http::RequestLine &res, const http::RequestLine &
 	Result            request_line_result;
 	std::stringstream error_log;
 	if (expected.method != res.method) {
-		error_log << "Expected method: " << expected.method << ", Result method: " << res.method;
+		error_log << "Expected method: " << expected.method << ", Result method: " << res.method
+				  << "\n";
 		request_line_result.is_success = false;
 	}
 	if (expected.request_target != res.request_target) {
 		error_log << "Expected request_target: " << expected.request_target
-				  << ", Result request_target: " << res.request_target;
+				  << ", Result request_target: " << res.request_target << "\n";
 		request_line_result.is_success = false;
 	}
 	if (expected.version != res.version) {
-		error_log << "Expected version: " << expected.version
-				  << ", Result version: " << res.version;
+		error_log << "Expected version: " << expected.version << ", Result version: " << res.version
+				  << "\n";
 		request_line_result.is_success = false;
 	}
 	request_line_result.error_log = error_log.str();
@@ -54,13 +55,13 @@ Result IsSameHeaderFields(const http::HeaderFields &res, http::HeaderFields expe
 	Result            header_fields_result;
 	std::stringstream error_log;
 	if (expected["Host"].size() && expected.at("Host") != res.at("Host")) {
-		error_log << "Expected Host: " << expected.at("Host")
-				  << ", Result Host: " << res.at("Host");
+		error_log << "Expected Host: " << expected.at("Host") << ", Result Host: " << res.at("Host")
+				  << "\n";
 		header_fields_result.is_success = false;
 	}
 	if (expected["Connection"].size() && expected.at("Connection") != res.at("Connection")) {
 		error_log << "Expected Host: " << expected.at("Connection")
-				  << ", Result Connection: " << res.at("Connection");
+				  << ", Result Connection: " << res.at("Connection") << "\n";
 		header_fields_result.is_success = false;
 	}
 	header_fields_result.error_log = error_log.str();
@@ -82,8 +83,8 @@ Result IsSameStatusCode(http::StatusCode status_code, http::StatusCode expected)
 	Result status_code_result;
 	if (status_code != expected) {
 		std::stringstream error_log;
-		error_log << "Expected Status code: " << status_code
-				  << ", Result Status code: " << expected;
+		error_log << "Expected Status code: " << status_code << ", Result Status code: " << expected
+				  << "\n";
 		status_code_result.is_success = false;
 		status_code_result.error_log  = error_log.str();
 	}
@@ -101,9 +102,9 @@ int HandleResult(const Result &result, const std::string &src) {
 		std::cerr << utils::color::RED << "HttpParseClass failed:" << utils::color::RESET
 				  << std::endl;
 		// セミコロンまでがsrc
-		std::cerr << "src:\n" << src << ";" <<std::endl;
-		std::cerr << "- - - - - - - - "<< std::endl;
-		std::cerr << "Error:\n" << result.error_log << std::endl;
+		std::cerr << "src:\n[" << src << "]" << std::endl;
+		std::cerr << "- - - - - - - - " << std::endl;
+		std::cerr << "Error:\n" << result.error_log;
 		return EXIT_FAILURE;
 	}
 }
