@@ -1,7 +1,7 @@
 NAME			:=	a.out
 
 # 1. Set each directory name
-TEST_DIR		:=	http_db
+TEST_DIR		:=	http_storage
 
 LOG_DIR			:=	log
 LOG_FILE_NAME	:=	$(TEST_DIR).log
@@ -17,11 +17,11 @@ WS_HTTP_PARSE_DIR	:=	$(WS_HTTP_REQUEST_DIR)/parse
 SRCS				+=	$(WS_UTILS_DIR)/color.cpp \
 						$(WS_UTILS_DIR)/split_str.cpp \
 						$(WS_HTTP_DIR)/http_message.cpp \
-						$(WS_HTTP_REQUEST_DIR)/http_db.cpp \
+						$(WS_HTTP_REQUEST_DIR)/http_storage.cpp \
 						$(WS_HTTP_PARSE_DIR)/http_parse.cpp
 
 # 3. Add unit test files
-SRCS	+=	test_http_db.cpp
+SRCS	+=	test_http_storage.cpp
 
 # 4. Add directory for INCLUDE
 SRCS_DIR	:=	$(WS_UTILS_DIR) \

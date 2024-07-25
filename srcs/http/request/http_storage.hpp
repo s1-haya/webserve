@@ -26,10 +26,10 @@ struct SaveData {
 	// HttpRequestResult
 	HttpRequestResult save_request_result;
 	// 現在HTTP各書式のパース前の読み込んだ情報
-	const std::string& current_buf;
+	std::string current_buf;
 };
 
-class HttpDb {
+class HttpStorage {
   public:
 	// Create
 	static void CreateSaveData(int client_fd);
@@ -40,8 +40,8 @@ class HttpDb {
 	// Update
 	// Delete
   private:
-	HttpDb();
-	~HttpDb();
+	HttpStorage();
+	~HttpStorage();
 	// client_fd -> 前回保存した情報にアクセスするためのデータ構造
 	static std::map<int, SaveData> save_data_;
 };

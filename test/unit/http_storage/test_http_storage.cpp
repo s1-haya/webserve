@@ -1,4 +1,4 @@
-#include "http_db.hpp"
+#include "http_storage.hpp"
 #include "utils.hpp"
 #include <cstdlib>
 #include <iostream>
@@ -17,11 +17,11 @@
 
 int main(void) {
 	try {
-		if (http::HttpDb::IsSaveData(1))
-			http::SaveData save_data = http::HttpDb::GetSaveData(1);
+		if (http::HttpStorage::IsSaveData(1))
+			http::SaveData save_data = http::HttpStorage::GetSaveData(1);
 		else
-			http::HttpDb::CreateSaveData(1);
-		http::SaveData save_data = http::HttpDb::GetSaveData(1);
+			http::HttpStorage::CreateSaveData(1);
+		http::SaveData save_data = http::HttpStorage::GetSaveData(1);
 		std::cout << utils::color::GREEN << ".[OK]" << utils::color::RESET << std::endl;
 	} catch (const std::exception &e) {
 		std::cerr << utils::color::RED << ".[NG] " << utils::color::RESET << std::endl;
