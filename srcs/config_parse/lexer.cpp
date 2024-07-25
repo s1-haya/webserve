@@ -49,10 +49,11 @@ void Lexer::LexBuffer() {
 			is_next_to_word = false;
 			break;
 		default:
-			if (is_next_to_word)
+			if (is_next_to_word) {
 				AddWordToken(it);
-			else
+			} else {
 				AddContextDirectiveWordToken(it);
+			}
 			is_next_to_word = true;
 			break;
 		}
@@ -73,7 +74,7 @@ void Lexer::AddToken(const std::string &symbol, node::TokenType token_type) {
 }
 
 void Lexer::AddWordToken(std::string::const_iterator &it) {
-	std::string new_str = "";
+	std::string new_str;
 	while (!utils::IsSpace(*it) && *it != SEMICOLON_CHR) {
 		new_str += *it;
 		++it;
