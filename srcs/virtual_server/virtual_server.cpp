@@ -4,8 +4,8 @@ namespace server {
 
 VirtualServer::VirtualServer() {}
 
-VirtualServer::VirtualServer(const std::string &server_name, const std::string &location)
-	: server_name_(server_name), location_(location) {
+VirtualServer::VirtualServer(const std::string &server_name, const LocationList &locations)
+	: server_name_(server_name), locations_(locations) {
 	// todo: error handling?
 }
 
@@ -18,7 +18,7 @@ VirtualServer::VirtualServer(const VirtualServer &other) {
 VirtualServer &VirtualServer::operator=(const VirtualServer &other) {
 	if (this != &other) {
 		server_name_ = other.server_name_;
-		location_    = other.location_;
+		locations_   = other.locations_;
 	}
 	return *this;
 }
@@ -27,8 +27,8 @@ const std::string &VirtualServer::GetServerName() const {
 	return server_name_;
 }
 
-const std::string &VirtualServer::GetLocation() const {
-	return location_;
+const VirtualServer::LocationList &VirtualServer::GetLocations() const {
+	return locations_;
 }
 
 } // namespace server
