@@ -40,6 +40,8 @@ class HttpDb {
 		// Update
 		// Delete
 	private:
+	HttpDb();
+	~HttpDb();
 	  // client_fd -> 前回保存した情報にアクセスするためのデータ構造
 	static std::map<int, SaveData> save_data_;
 };
