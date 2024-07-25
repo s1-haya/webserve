@@ -6,6 +6,8 @@
 
 namespace {
 
+typedef server::VirtualServer::LocationList LocationList;
+
 struct Result {
 	bool        is_ok;
 	std::string error_log;
@@ -47,6 +49,20 @@ int Test(Result result) {
 }
 
 // -----------------------------------------------------------------------------
+// テストfail時のlocationsのdebug出力
+std::string PrintLocations(const LocationList &locations) {
+	std::ostringstream oss;
+
+	typedef LocationList::const_iterator It;
+	for (It it = locations.begin(); it != locations.end(); ++it) {
+		oss << *it;
+		if (++LocationList::const_iterator(it) != locations.end()) {
+			oss << std::endl;
+		}
+	}
+	return oss.str();
+}
+
 Result TestIsSameMembers(
 	const server::VirtualServer &a,
 	const std::string           &expected_server_name,
