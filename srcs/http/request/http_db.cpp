@@ -1,8 +1,16 @@
 #include "http_db.hpp"
 #include <iostream>
 
-http::HttpDb::HttpDb(int client_fd) {
-	SaveData init_save_data;
-	save_data_[client_fd] = init_save_data;
-	std::cout << "Default Construct HttpDb!" << std::endl;
+namespace http {
+
+std::map<int, SaveData> HttpDb::save_data_;
+
+// SaveDataを初期化する関数
+void HttpDb::CreateSaveData(int client_fd) {
+	if (IsSaveData(client_fd)) {
+		std::cerr << "SaveData already exists for client_fd " << client_fd << std::endl;
+	} else {
+		save_data_[client_fd] = SaveData();
+	}
 }
+} // namespace http

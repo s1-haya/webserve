@@ -7,9 +7,12 @@
 namespace http {
 
 // todo: 今後http_parse.hppに移動する
-struct  IsHttpRequestFormat
-{
-	IsHttpRequestFormat() : is_response(false), is_request_line(false), is_header_fileds(false), is_body_message(false) {};
+struct IsHttpRequestFormat {
+	IsHttpRequestFormat()
+		: is_response(false),
+		  is_request_line(false),
+		  is_header_fileds(false),
+		  is_body_message(false){};
 	// is_response: server側にレスポンスを作成できるかのbool値
 	bool is_response;
 	bool is_request_line;
@@ -17,27 +20,26 @@ struct  IsHttpRequestFormat
 	bool is_body_message;
 };
 
-struct SaveData
-{
+struct SaveData {
 	// HTTP各書式のパースしたかどうか
 	IsHttpRequestFormat save_is_request_format;
 	// HttpRequestResult
 	HttpRequestResult save_request_result; 
+	// 現在HTTP各書式のパース前の読み込んだ情報
+	const std::string& current_buf;
 };
-
 
 class HttpDb {
 	public:
 		// Create
-		explicit HttpDb(int client_fd);
-		// Read
+	static void CreateSaveData(int client_fd);
 		// Update
 		// Delete
 	private:
 	  // client_fd -> 前回保存した情報にアクセスするためのデータ構造
-	  std::map<int, SaveData> save_data_;
+	static std::map<int, SaveData> save_data_;
 };
 
-}
+} // namespace http
 
 #endif
