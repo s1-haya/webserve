@@ -35,6 +35,8 @@ class HttpDb {
 	static void CreateSaveData(int client_fd);
 	// Check
 	static bool IsSaveData(int client_fd);
+	// Get
+	static const SaveData &GetSaveData(int client_fd);
 		// Update
 		// Delete
 	private:

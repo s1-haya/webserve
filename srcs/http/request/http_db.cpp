@@ -18,4 +18,11 @@ void HttpDb::CreateSaveData(int client_fd) {
 bool HttpDb::IsSaveData(int client_fd) {
 	return save_data_.find(client_fd) != save_data_.end();
 }
+
+// 相談: GetSaveDataは内でtry, catchを使用するか。
+// それとも外側でIsSaveDataを使ってから使用するか
+const SaveData &HttpDb::GetSaveData(int client_fd) {
+	return save_data_.at(client_fd);
+}
+
 } // namespace http
