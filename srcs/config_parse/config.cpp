@@ -14,10 +14,9 @@ Config::Config(const std::string &file_path) : config_file_(file_path.c_str()) {
 	}
 	std::stringstream buffer;
 	buffer << config_file_.rdbuf();
-	tokens_ = new std::list<node::Node>;
 	try {
-		lexer::Lexer   lex(buffer.str(), *tokens_);
-		parser::Parser par(*tokens_);
+		lexer::Lexer   lex(buffer.str(), tokens_);
+		parser::Parser par(tokens_);
 		servers_ = par.GetServers();
 	} catch (const std::exception &e) {
 		std::cerr << e.what() << '\n';
@@ -28,8 +27,6 @@ Config::Config(const std::string &file_path) : config_file_(file_path.c_str()) {
 Config::~Config() {
 	if (config_file_)
 		config_file_.close();
-	if (tokens_)
-		delete tokens_;
 }
 
 const Config *Config::GetInstance() {
