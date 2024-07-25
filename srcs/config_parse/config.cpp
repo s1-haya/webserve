@@ -24,10 +24,7 @@ Config::Config(const std::string &file_path) : config_file_(file_path.c_str()) {
 	// try catchをどこでするか
 }
 
-Config::~Config() {
-	if (config_file_)
-		config_file_.close();
-}
+Config::~Config() {}
 
 const Config *Config::GetInstance() {
 	return s_cInstance;
