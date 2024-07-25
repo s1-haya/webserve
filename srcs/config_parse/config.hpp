@@ -12,6 +12,7 @@ namespace config {
 
 class Config {
   private:
+	Config();
 	Config(const std::string &file_path);
 	Config(const Config &);
 	Config                &operator=(const Config &);
