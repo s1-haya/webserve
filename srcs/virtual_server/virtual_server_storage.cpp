@@ -46,4 +46,10 @@ const VirtualServer &VirtualServerStorage::GetVirtualServer(int server_fd) const
 	}
 }
 
+// todo: tmp. need?
+const VirtualServerStorage::VirtualServerList &
+VirtualServerStorage::GetAllVirtualServerList() const {
+	return virtual_servers_;
+}
+
 } // namespace server
