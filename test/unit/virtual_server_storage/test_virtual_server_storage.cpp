@@ -152,6 +152,19 @@ int RunTestVirtualServerStorage() {
 	ret_code |= Test(RunGetVirtualServer(vs_storage, 5, vs1));
 	ret_code |= Test(RunGetVirtualServer(vs_storage, 6, vs2));
 
+	// virtual_server_storageのcopyのテスト
+	// copy constructor
+	server::VirtualServerStorage copy_vs_storage1(vs_storage);
+	ret_code |= Test(RunGetVirtualServer(copy_vs_storage1, 4, vs1));
+	ret_code |= Test(RunGetVirtualServer(copy_vs_storage1, 5, vs1));
+	ret_code |= Test(RunGetVirtualServer(copy_vs_storage1, 6, vs2));
+
+	// copy assignment operator=
+	server::VirtualServerStorage copy_vs_storage2 = vs_storage;
+	ret_code |= Test(RunGetVirtualServer(copy_vs_storage2, 4, vs1));
+	ret_code |= Test(RunGetVirtualServer(copy_vs_storage2, 5, vs1));
+	ret_code |= Test(RunGetVirtualServer(copy_vs_storage2, 6, vs2));
+
 	return ret_code;
 }
 
