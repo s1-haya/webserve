@@ -6,6 +6,7 @@
 #include "connection.hpp"
 #include "epoll.hpp"
 #include "sock_context.hpp"
+#include "virtual_server_storage.hpp"
 #include <list>
 #include <string>
 #include <vector>
@@ -31,7 +32,9 @@ class Server {
 	Server();
 	// prohibit copy
 	Server(const Server &other);
-	Server     &operator=(const Server &other);
+	Server &operator=(const Server &other);
+	// functions
+	void        AddVirtualServers(const TempAllConfig &all_configs); // todo: tmp
 	void        Init(const ServerInfoVec &server_infos);
 	void        HandleEvent(const event::Event &event);
 	void        HandleNewConnection(int server_fd);
@@ -41,6 +44,8 @@ class Server {
 	void        SendResponse(int client_fd);
 	// const
 	static const int SYSTEM_ERROR = -1;
+	// virtual servers storage
+	VirtualServerStorage virtual_servers_;
 	// connection
 	Connection connection_;
 	// context

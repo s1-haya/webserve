@@ -4,6 +4,7 @@
 #include "http.hpp"
 #include "server_info.hpp"
 #include "utils.hpp"
+#include "virtual_server.hpp"
 #include <errno.h>
 #include <sys/socket.h> // socket
 #include <unistd.h>     // close
@@ -34,7 +35,34 @@ std::list<TempConfig> CreateTempConfig() {
 	return all_configs;
 }
 
+VirtualServer::PortList ConvertPorts(const std::list<std::string> &ports_str) {
+	VirtualServer::PortList port_list;
+
+	typedef std::list<std::string>::const_iterator It;
+	for (It it = ports_str.begin(); it != ports_str.end(); ++it) {
+		unsigned int port;
+		if (!utils::ConvertStrToUint(*it, port)) {
+			// todo: original exception
+			throw std::logic_error("wrong port number");
+		}
+		port_list.push_back(port);
+	}
+	return port_list;
+}
+
 } // namespace
+
+void Server::AddVirtualServers(const Server::TempAllConfig &all_configs) {
+	typedef Server::TempAllConfig::const_iterator Itr;
+	for (Itr it = all_configs.begin(); it != all_configs.end(); ++it) {
+		const TempConfig &config = *it;
+
+		// todo: validate server_name, port, etc?
+		VirtualServer::PortList ports = ConvertPorts(config.ports);
+		VirtualServer           virtual_server(config.server_name, config.locations, ports);
+		virtual_servers_.AddVirtualServer(virtual_server);
+	}
+}
 
 // todo: set ConfigData -> private variables
 Server::Server(const _config::Config::ConfigData &config) {
@@ -42,7 +70,7 @@ Server::Server(const _config::Config::ConfigData &config) {
 
 	// todo: tmp
 	TempAllConfig all_configs = CreateTempConfig();
-	(void)all_configs;
+	AddVirtualServers(all_configs);
 
 	ServerInfoVec server_infos;
 	Init(server_infos);
