@@ -9,10 +9,40 @@
 #include <unistd.h>     // close
 
 namespace server {
+namespace {
+
+// todo: tmp
+std::list<TempConfig> CreateTempConfig() {
+	std::list<TempConfig> all_configs;
+
+	// virtual server 1
+	TempConfig config1;
+	config1.server_name = "localhost";
+	config1.locations.push_back("/www/");
+	config1.ports.push_back("8080");
+	config1.ports.push_back("12345");
+	all_configs.push_back(config1);
+
+	// virtual server 2
+	TempConfig config2;
+	config2.server_name = "test_serv";
+	config2.locations.push_back("/");
+	config2.locations.push_back("/static/");
+	config2.ports.push_back("9999");
+	all_configs.push_back(config2);
+
+	return all_configs;
+}
+
+} // namespace
 
 // todo: set ConfigData -> private variables
 Server::Server(const _config::Config::ConfigData &config) {
 	(void)config;
+
+	// todo: tmp
+	TempAllConfig all_configs = CreateTempConfig();
+	(void)all_configs;
 
 	ServerInfoVec server_infos;
 	Init(server_infos);

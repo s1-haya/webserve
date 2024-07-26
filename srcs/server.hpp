@@ -6,13 +6,22 @@
 #include "connection.hpp"
 #include "epoll.hpp"
 #include "sock_context.hpp"
+#include <list>
 #include <string>
 #include <vector>
 
 namespace server {
 
+// todo: tmp
+struct TempConfig {
+	std::string            server_name;
+	std::list<std::string> locations;
+	std::list<std::string> ports;
+};
+
 class Server {
   public:
+	typedef std::list<TempConfig>   TempAllConfig; // todo: tmp
 	typedef std::vector<ServerInfo> ServerInfoVec;
 	explicit Server(const _config::Config::ConfigData &config);
 	~Server();
