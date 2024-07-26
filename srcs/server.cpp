@@ -155,6 +155,24 @@ void Server::ReadRequest(const event::Event &event) {
 	}
 }
 
+namespace {
+
+// todo: tmp for debug
+std::string OutputLocations(const VirtualServer::LocationList &locations) {
+	std::ostringstream oss;
+
+	typedef VirtualServer::LocationList::const_iterator It;
+	for (It it = locations.begin(); it != locations.end(); ++it) {
+		oss << *it;
+		if (++It(it) != locations.end()) {
+			oss << ", ";
+		}
+	}
+	return oss.str();
+}
+
+} // namespace
+
 std::string Server::CreateHttpResponse(int client_fd) const {
 	const std::string &request_buf = buffers_.GetBuffer(client_fd);
 
@@ -163,13 +181,24 @@ std::string Server::CreateHttpResponse(int client_fd) const {
 	// todo: tmp
 	const bool is_cgi = true;
 	if (is_cgi) {
-		const ClientInfo &client_info = context_.GetClientInfo(client_fd);
-		const ServerInfo &server_info = context_.GetConnectedServerInfo(client_fd);
+		// use client_info -> get client_ip
+		const ClientInfo  &client_info = context_.GetClientInfo(client_fd);
+		const std::string &client_ip   = client_info.GetIp();
+
+		// use server_info -> get server_fd, server_port
+		const ServerInfo  &server_info = context_.GetConnectedServerInfo(client_fd);
+		const int          server_fd   = server_info.GetFd();
+		const std::string &server_port = utils::ConvertUintToStr(server_info.GetPort());
+
+		// use virtual_server -> get server_name, locations
+		const VirtualServer &virtual_server          = virtual_servers_.GetVirtualServer(server_fd);
+		const std::string   &server_name             = virtual_server.GetServerName();
+		const VirtualServer::LocationList &locations = virtual_server.GetLocations();
 		utils::Debug(
 			"server",
-			"ClientInfo - IP: " + client_info.GetIp() +
-				" / ServerInfo - port: " + utils::ConvertUintToStr(server_info.GetPort()) + ", fd",
-			server_info.GetFd()
+			"ClientInfo - IP: " + client_ip + " / ServerInfo - name: " + server_name +
+				", location: " + OutputLocations(locations) + ", port: " + server_port + ", fd",
+			server_fd
 		);
 		// todo: call cgi(client_info, server_info)?
 	}
