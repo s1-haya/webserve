@@ -34,6 +34,18 @@ int RunTestVirtualServerStorage() {
 	vs_storage.AddVirtualServer(vs1);
 	vs_storage.AddVirtualServer(vs2);
 
+	// - socket通信した結果のserver_fdとvirtual_serverは以下の想定
+	// fd | virtual_server  | port
+	// ----------------------------
+	//  4 |       vs1       | 8080
+	//  5 |       vs1       | 12345
+	//  6 |       vs2       | 9999
+
+	// server_fdとvirtual_serverの紐づけをvirtual_server_storageに追加
+	vs_storage.AddMapping(4, &vs1);
+	vs_storage.AddMapping(5, &vs1);
+	vs_storage.AddMapping(6, &vs2);
+
 	return ret_code;
 }
 
