@@ -2,7 +2,8 @@
 # Each directory should have a Makefile with a 'run' target.
 TEST_DIRS	:=	convert_str \
 				split_str \
-				virtual_server
+				virtual_server \
+				virtual_server_storage
 
 .PHONY	: run
 run:
