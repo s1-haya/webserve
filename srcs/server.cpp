@@ -71,7 +71,6 @@ Server::Server(const _config::Config::ConfigData &config) {
 	// todo: tmp
 	TempAllConfig all_configs = CreateTempConfig();
 	AddVirtualServers(all_configs);
-	Init();
 }
 
 Server::~Server() {}

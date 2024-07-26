@@ -24,6 +24,7 @@ class Server {
 	typedef std::list<TempConfig> TempAllConfig; // todo: tmp
 	explicit Server(const _config::Config::ConfigData &config);
 	~Server();
+	void Init();
 	void Run();
 
   private:
@@ -33,7 +34,6 @@ class Server {
 	Server &operator=(const Server &other);
 	// functions
 	void        AddVirtualServers(const TempAllConfig &all_configs); // todo: tmp
-	void        Init();
 	void        HandleEvent(const event::Event &event);
 	void        HandleNewConnection(int server_fd);
 	void        HandleExistingConnection(const event::Event &event);
