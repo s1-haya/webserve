@@ -9,40 +9,12 @@
 #include <unistd.h>     // close
 
 namespace server {
-namespace {
-
-Server::ServerInfoVec ConvertConfigToSockInfoVec(std::vector<Server::TempConfig> server_configs) {
-	Server::ServerInfoVec server_infos;
-
-	typedef std::vector<Server::TempConfig>::const_iterator Itr;
-	for (Itr it = server_configs.begin(); it != server_configs.end(); ++it) {
-		const std::string &server_name = it->first;
-		unsigned int       port;
-		if (!utils::ConvertStrToUint(it->second, port)) {
-			// todo: original exception
-			throw std::logic_error("wrong port number");
-		}
-
-		// todo: validate server_name, port, etc?
-		ServerInfo server_info(server_name, port);
-		server_infos.push_back(server_info);
-	}
-	return server_infos;
-}
-
-} // namespace
 
 // todo: set ConfigData -> private variables
 Server::Server(const _config::Config::ConfigData &config) {
 	(void)config;
 
-	// todo: tmp
-	std::vector<TempConfig> server_configs;
-	server_configs.push_back(std::make_pair("localhost", "8080"));
-	server_configs.push_back(std::make_pair("localhost", "12345"));
-	// server_configs.push_back(std::make_pair("::1", "8080"));
-
-	ServerInfoVec server_infos = ConvertConfigToSockInfoVec(server_configs);
+	ServerInfoVec server_infos;
 	Init(server_infos);
 }
 

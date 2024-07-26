@@ -13,8 +13,7 @@ namespace server {
 
 class Server {
   public:
-	typedef std::pair<std::string, std::string> TempConfig; // todo: tmp
-	typedef std::vector<ServerInfo>             ServerInfoVec;
+	typedef std::vector<ServerInfo> ServerInfoVec;
 	explicit Server(const _config::Config::ConfigData &config);
 	~Server();
 	void Run();
