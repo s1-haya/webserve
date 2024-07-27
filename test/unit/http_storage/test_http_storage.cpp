@@ -41,6 +41,8 @@ int main(void) {
 	http::ClientSaveData save_data = http::HttpStorage::GetClientSaveData(1);
 	// ClientSaveDataがすでに存在してる場合、ClientSaveDataを作成する
 	//  -> ClientSaveData already exists for client_fd 1
-	http::HttpStorage::CreateClientSaveData(1);
+	// ClientSaveDataを削除する -> OK
+	http::HttpStorage::DeleteClientSaveData(1);
+	ret_code |= HandleResult(!http::HttpStorage::IsClientSaveData(1));
 	return ret_code;
 }

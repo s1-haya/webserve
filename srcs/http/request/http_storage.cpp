@@ -28,4 +28,9 @@ const ClientSaveData &HttpStorage::GetClientSaveData(int client_fd) {
 	}
 }
 
+// クライアント情報を削除する関数
+void HttpStorage::DeleteClientSaveData(int client_fd) {
+	save_data_.erase(client_fd);
+}
+
 } // namespace http
