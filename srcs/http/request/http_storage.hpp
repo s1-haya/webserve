@@ -40,14 +40,16 @@ class HttpStorage {
 	// Update
 	static void UpdateClientSaveData(int client_fd, const ClientSaveData &client_data);
 	// Delete
-	static void                           DeleteClientSaveData(int client_fd);
-	typedef std::map<int, ClientSaveData> ClientSaveDataMap;
+	static void DeleteClientSaveData(int client_fd);
 
   private:
 	HttpStorage();
 	~HttpStorage();
+	HttpStorage(const HttpStorage &other);
+	HttpStorage &operator=(const HttpStorage &other);
 	// client_fd -> 前回保存した情報にアクセスするためのデータ構造
-	static ClientSaveDataMap save_data_;
+	typedef std::map<int, ClientSaveData> ClientSaveDataMap;
+	static ClientSaveDataMap              save_data_;
 };
 
 } // namespace http
