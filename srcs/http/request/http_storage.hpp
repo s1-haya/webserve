@@ -25,8 +25,8 @@ struct SaveData {
 	IsHttpRequestFormat save_is_request_format;
 	// HttpRequestResult
 	HttpRequestResult save_request_result;
-	// 現在HTTP各書式のパース前の読み込んだ情報
-	std::string current_buf;
+	// HTTP各書式をパースする前の読み込んだ情報
+	std::string save_current_buf;
 };
 
 class HttpStorage {
@@ -45,7 +45,6 @@ class HttpStorage {
 	~HttpStorage();
 	// client_fd -> 前回保存した情報にアクセスするためのデータ構造
 	static ClientSaveDataMap save_data_;
-	static std::map<int, SaveData> save_data_;
 };
 
 } // namespace http
