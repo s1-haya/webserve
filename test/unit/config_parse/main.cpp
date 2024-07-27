@@ -1,6 +1,7 @@
 /*-----------------Parser----------------*/
 #include "../../../srcs/config_parse/lexer.hpp"
 #include "../../../srcs/config_parse/parser.hpp"
+#include <cstdlib>
 #include <fstream>
 #include <iostream>
 #include <sstream>
