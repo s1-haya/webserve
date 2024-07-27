@@ -20,7 +20,7 @@ struct IsHttpRequestFormat {
 	bool is_body_message;
 };
 
-struct SaveData {
+struct ClientSaveData {
 	// HTTP各書式のパースしたかどうか
 	IsHttpRequestFormat save_is_request_format;
 	// HttpRequestResult
@@ -32,14 +32,15 @@ struct SaveData {
 class HttpStorage {
   public:
 	// Create
-	static void CreateSaveData(int client_fd);
+	static void CreateClientSaveData(int client_fd);
 	// Check
-	static bool IsSaveData(int client_fd);
+	static bool IsClientSaveData(int client_fd);
 	// Get
-	static const SaveData &GetSaveData(int client_fd);
+	static const ClientSaveData &GetClientSaveData(int client_fd);
 	// Update
 	// Delete
-	typedef std::map<int, SaveData> ClientSaveDataMap;
+	typedef std::map<int, ClientSaveData> ClientSaveDataMap;
+
   private:
 	HttpStorage();
 	~HttpStorage();
