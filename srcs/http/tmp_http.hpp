@@ -1,26 +1,25 @@
-#ifndef HTTP_HPP_
-#define HTTP_HPP_
+#ifndef TMP_HTTP_HPP_
+#define TMP_HTTP_HPP_
 
-#include "http_storage.hpp"
 #include "http_parse.hpp"
+#include "http_storage.hpp"
 
 namespace http {
 
-class Http {
+class TmpHttp {
 	public:
-		Http();
-		~Http();
-		void Run(int client_fd, const std::string& read_buf);
+	TmpHttp();
+	~TmpHttp();
 
 	private:
-		Http(const Http& other);
-		Http &operator=(const Http& other);
+		TmpHttp(const TmpHttp &other);
+		TmpHttp           &operator=(const TmpHttp &other);
 		static HttpStorage storage_;
 		// todo: parse class
 		static HttpParse parse_;
 		// todo: response class
 };
 
-}
+} // namespace http
 
 #endif
