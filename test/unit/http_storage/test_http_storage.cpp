@@ -26,9 +26,6 @@ int HandleResult(bool is_ok) {
 }
 
 int main(void) {
-	// libc++abi: terminating due to uncaught exception of
-	// type std::logic_error: ClientSaveData doesn't exists.
-	// [1] 33298 abort./ a.out
 	// ClientSaveDataが存在しない場合、ClientSaveDataを取得する -> Logic Error
 	// http::ClientSaveData no_save_data = http::HttpStorage::GetClientSaveData(1);
 
@@ -40,10 +37,10 @@ int main(void) {
 	http::HttpStorage::CreateClientSaveData(1);
 	ret_code |= HandleResult(http::HttpStorage::IsClientSaveData(1));
 	http::ClientSaveData save_data = http::HttpStorage::GetClientSaveData(1);
-	
+
 	// ClientSaveDataがすでに存在してる場合、ClientSaveDataを作成する -> Logic Error
 	//  -> ClientSaveData already exists for client_fd 1
-// http::HttpStorage::CreateClientSaveData(1);
+	// http::HttpStorage::CreateClientSaveData(1);
 
 	// ClientDataを更新する。
 	ret_code |= HandleResult(save_data.save_request_result.status_code == http::OK);
