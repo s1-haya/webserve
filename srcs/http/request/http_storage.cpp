@@ -39,7 +39,9 @@ void HttpStorage::UpdateClientSaveData(int client_fd, const ClientSaveData &clie
 
 // クライアント情報を削除する関数
 void HttpStorage::DeleteClientSaveData(int client_fd) {
-	save_data_.erase(client_fd);
+	if (save_data_.erase(client_fd) == 0) {
+		throw std::logic_error("This save data of client doesn't exists.");
+	}
 }
 
 } // namespace http
