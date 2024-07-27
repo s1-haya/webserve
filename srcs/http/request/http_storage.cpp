@@ -3,7 +3,7 @@
 
 namespace http {
 
-std::map<int, SaveData> HttpStorage::save_data_;
+HttpStorage::ClientSaveDataMap HttpStorage::save_data_;
 
 // SaveDataを初期化する関数
 void HttpStorage::CreateSaveData(int client_fd) {
