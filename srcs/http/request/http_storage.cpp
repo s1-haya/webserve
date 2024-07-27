@@ -19,10 +19,13 @@ bool HttpStorage::IsSaveData(int client_fd) {
 	return save_data_.find(client_fd) != save_data_.end();
 }
 
-// 相談: GetSaveDataは内でtry, catchを使用するか。
-// それとも外側でIsSaveDataを使ってから使用するか
+// SaveDataを取得する関数
 const SaveData &HttpStorage::GetSaveData(int client_fd) {
-	return save_data_.at(client_fd);
+	try {
+		return save_data_.at(client_fd);
+	} catch (const std::logic_error& e) {
+		throw std::logic_error("SaveData doesn't exists.");
+	}
 }
 
 } // namespace http

@@ -15,18 +15,32 @@
 // 	- trueの場合: 処理を終了し、serverクラスはSendResponceにする
 // 	- falseの場合: 3に戻る
 
-int main(void) {
-	try {
-		if (http::HttpStorage::IsSaveData(1))
-			http::SaveData save_data = http::HttpStorage::GetSaveData(1);
-		else
-			http::HttpStorage::CreateSaveData(1);
-		http::SaveData save_data = http::HttpStorage::GetSaveData(1);
-		std::cout << utils::color::GREEN << ".[OK]" << utils::color::RESET << std::endl;
-	} catch (const std::exception &e) {
-		std::cerr << utils::color::RED << ".[NG] " << utils::color::RESET << std::endl;
-		std::cerr << e.what() << std::endl;
-		return (EXIT_FAILURE);
+int HandleResult(bool is_ok) {
+	if (is_ok) {
+		std::cout << utils::color::GREEN << "[OK]" << utils::color::RESET << std::endl;
+		return EXIT_SUCCESS;
+	} else {
+		std::cerr << utils::color::RED << "[NG] " << utils::color::RESET << std::endl;
+		return EXIT_FAILURE;
 	}
-	return EXIT_SUCCESS;
+}
+
+int main(void) {
+	// libc++abi: terminating due to uncaught exception of 
+	// type std::logic_error: SaveData doesn't exists.
+	// [1] 33298 abort./ a.out
+	// SaveDataが存在しない場合、SaveDataを取得する -> Logic Error
+	// http::SaveData no_save_data = http::HttpStorage::GetSaveData(1);	
+
+	int ret_code = 0;
+	// SaveDataが存在しない場合 -> OK
+	ret_code |= HandleResult(!http::HttpStorage::IsSaveData(1));
+	// SaveDataが存在する場合 -> OK
+	http::HttpStorage::CreateSaveData(1);
+	ret_code |= HandleResult(http::HttpStorage::IsSaveData(1));
+	http::SaveData save_data = http::HttpStorage::GetSaveData(1);
+	// SaveDataがすでに存在してる場合、SaveDataを作成する
+	//  -> SaveData already exists for client_fd 1
+	http::HttpStorage::CreateSaveData(1);
+	return ret_code;
 }
