@@ -38,6 +38,7 @@ class HttpStorage {
 	// Get
 	static const ClientSaveData &GetClientSaveData(int client_fd);
 	// Update
+	static void UpdateClientSaveData(int client_fd, const ClientSaveData &client_data);
 	// Delete
 	static void                           DeleteClientSaveData(int client_fd);
 	typedef std::map<int, ClientSaveData> ClientSaveDataMap;

@@ -28,6 +28,15 @@ const ClientSaveData &HttpStorage::GetClientSaveData(int client_fd) {
 	}
 }
 
+// クライアント情報を更新する関数
+void HttpStorage::UpdateClientSaveData(int client_fd, const ClientSaveData &client_data) {
+	if (!IsClientSaveData(client_fd)) {
+		throw std::logic_error("ClientSaveData doesn't exists.");
+	} else {
+		save_data_[client_fd] = client_data;
+	}
+}
+
 // クライアント情報を削除する関数
 void HttpStorage::DeleteClientSaveData(int client_fd) {
 	save_data_.erase(client_fd);
