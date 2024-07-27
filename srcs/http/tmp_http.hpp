@@ -7,17 +7,19 @@
 namespace http {
 
 class TmpHttp {
-	public:
+  public:
 	TmpHttp();
 	~TmpHttp();
+	void        RunParseRequest(int client_fd, const std::string &read_buf);
+	std::string RunCreateResponse(int client_fd);
 
-	private:
-		TmpHttp(const TmpHttp &other);
-		TmpHttp           &operator=(const TmpHttp &other);
-		static HttpStorage storage_;
-		// todo: parse class
-		static HttpParse parse_;
-		// todo: response class
+  private:
+	TmpHttp(const TmpHttp &other);
+	TmpHttp           &operator=(const TmpHttp &other);
+	static HttpStorage storage_;
+	// todo: parse class
+	static HttpParse parse_;
+	// todo: response class
 };
 
 } // namespace http
