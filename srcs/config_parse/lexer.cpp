@@ -94,7 +94,7 @@ void Lexer::AddWordToken(std::string::const_iterator &it) {
 }
 
 void Lexer::AddContextDirectiveWordToken(std::string::const_iterator &it) {
-	std::string new_str = "";
+	std::string new_str;
 	while (!IsSpace(*it) && *it != SEMICOLON_CHR) {
 		new_str += *it;
 		++it;
