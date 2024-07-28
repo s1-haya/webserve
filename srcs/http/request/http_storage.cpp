@@ -31,10 +31,10 @@ const ClientSaveData &HttpStorage::GetClientSaveData(int client_fd) {
 
 // クライアント情報を更新する関数
 void HttpStorage::UpdateClientSaveData(int client_fd, const ClientSaveData &client_data) {
-	if (!IsClientSaveData(client_fd)) {
-		throw std::logic_error("ClientSaveData doesn't exists.");
-	} else {
+	if (IsClientSaveData(client_fd)) {
 		save_data_[client_fd] = client_data;
+	} else {
+		throw std::logic_error("ClientSaveData doesn't exists.");
 	}
 }
 
