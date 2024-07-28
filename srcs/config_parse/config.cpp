@@ -1,5 +1,10 @@
 #include "config.hpp"
+#include "lexer.hpp"
+#include "parser.hpp"
+#include <iostream>
 #include <sstream>
+
+namespace config {
 
 const Config *Config::s_cInstance = NULL;
 
@@ -9,13 +14,18 @@ Config::Config(const std::string &file_path) : config_file_(file_path.c_str()) {
 	}
 	std::stringstream buffer;
 	buffer << config_file_.rdbuf();
-	// std::cout << buffer.str() << std::endl;
+	try {
+		std::list<node::Node> tokens;
+		lexer::Lexer          lex(buffer.str(), tokens);
+		parser::Parser        par(tokens);
+		servers_ = par.GetServers();
+	} catch (const std::exception &e) {
+		std::cerr << e.what() << '\n';
+	}
+	// try catchをどこでするか
 }
 
-Config::~Config() {
-	if (config_file_)
-		config_file_.close();
-}
+Config::~Config() {}
 
 const Config *Config::GetInstance() {
 	return s_cInstance;
@@ -30,3 +40,5 @@ void Config::Destroy() {
 	delete s_cInstance;
 	s_cInstance = NULL;
 }
+
+} // namespace config

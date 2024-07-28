@@ -1,7 +1,7 @@
-/*-----------------Parser----------------*/
+/*-----------------Config----------------*/
+#include "../../../srcs/config_parse/config.hpp"
 #include "../../../srcs/config_parse/lexer.hpp"
 #include "../../../srcs/config_parse/parser.hpp"
-#include <cstdlib>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -30,7 +30,7 @@ void PrintLocation(context::LocationCon *location_) { /*デバッグ用*/
 			  << "index: " << location_->index << std::endl;
 }
 
-void PrintServersLocation(std::list<context::ServerCon> *servers) { /*デバッグ用*/
+void PrintServersLocation(const std::list<context::ServerCon> *servers) { /*デバッグ用*/
 	std::list<context::ServerCon> tmp = *servers;
 	while (!tmp.empty()) {
 		context::ServerCon server = tmp.front();
@@ -50,28 +50,19 @@ void PrintServersLocation(std::list<context::ServerCon> *servers) { /*デバッ�
 }
 
 } // namespace
+} // namespace config
 
-// c++ main.cpp ../../../srcs/config_parse/parser.cpp ../../../srcs/config_parse/lexer.cpp
-// ../../../srcs/utils/isspace.cpp
+// c++ main_config.cpp ../../../srcs/config_parse/parser.cpp ../../../srcs/config_parse/lexer.cpp
+// ../../../srcs/utils/isspace.cpp ../../../srcs/config_parse/config.cpp
 
 int main() {
-	std::ifstream     conf("config_samp.conf");
-	std::stringstream ss;
-	ss << conf.rdbuf();
-	std::string buffer = ss.str();
 	try {
-		std::list<node::Node> *tokens_ = new std::list<node::Node>;
-		lexer::Lexer           lex(buffer, *tokens_);
-		// PrintTokens(tokens_);
-		parser::Parser                par(*tokens_);
-		std::list<context::ServerCon> servers = par.GetServers();
-		PrintServersLocation(&servers);
-		delete tokens_;
-		return EXIT_SUCCESS;
+		std::string conf = "config_samp.conf";
+		config::ConfigInstance->Create(conf);
+		config::PrintServersLocation(&(config::ConfigInstance->servers_));
+		config::ConfigInstance->Destroy();
 	} catch (const std::exception &e) {
 		std::cerr << e.what() << '\n';
-		return EXIT_FAILURE;
+		config::ConfigInstance->Destroy();
 	}
 }
-
-} // namespace config
