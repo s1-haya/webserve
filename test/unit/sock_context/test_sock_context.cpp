@@ -140,6 +140,17 @@ int TestThrow(TestFunc test_func, const server::SockContext &context, int client
 }
 
 // -----------------------------------------------------------------------------
+// test用にcontextとexpectedに同じserver_fd,server_infoを追加する
+void AddServerInfoForTest(
+	server::SockContext                &context,
+	server::SockContext::ServerInfoMap &expected_server_info,
+	int                                 server_fd,
+	const server::ServerInfo           &server_info
+) {
+	context.AddServerInfo(server_fd, server_info);
+	expected_server_info[server_fd] = server_info;
+}
+
 /*
 
 以下のような接続状況を仮定しテストする
@@ -185,16 +196,14 @@ int RunTestSockContext() {
 	// - ClientInfoMap      = {}
 	// - HostServerInfopMap = {}
 	const int server_fd1 = 4;
-	context.AddServerInfo(server_fd1, server_info1);
-	expected_server_info[server_fd1] = server_info1;
+	AddServerInfoForTest(context, expected_server_info, server_fd1, server_info1);
 
 	// contextにServerInfo2を追加
 	// - ServerInfoMap      = {{4, ServerInfo1}, {5, ServerInfo2}}
 	// - ClientInfoMap      = {}
 	// - HostServerInfopMap = {}
 	const int server_fd2 = 5;
-	context.AddServerInfo(server_fd2, server_info2);
-	expected_server_info[server_fd2] = server_info2;
+	AddServerInfoForTest(context, expected_server_info, server_fd2, server_info2);
 
 	// contextに既に追加済みのServerInfo2を再度追加してみる(期待: throw)
 	ret_code |= TestThrow(&server::SockContext::AddServerInfo, context, server_fd2, server_info2);
