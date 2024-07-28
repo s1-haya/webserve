@@ -3,7 +3,9 @@
 
 namespace http {
 
-HttpStorage::ClientSaveDataMap HttpStorage::save_data_;
+HttpStorage::HttpStorage() {}
+
+HttpStorage::~HttpStorage() {}
 
 // ClientSaveDataを初期化する関数
 void HttpStorage::CreateClientSaveData(int client_fd) {
@@ -21,19 +23,18 @@ bool HttpStorage::IsClientSaveData(int client_fd) {
 
 // ClientSaveDataを取得する関数
 const ClientSaveData &HttpStorage::GetClientSaveData(int client_fd) {
-	try {
-		return save_data_.at(client_fd);
-	} catch (const std::logic_error &e) {
-		throw std::logic_error("ClientSaveData doesn't exists.");
+	if (!IsClientSaveData(client_fd)) {
+		CreateClientSaveData(client_fd);
 	}
+	return save_data_.at(client_fd);
 }
 
 // クライアント情報を更新する関数
 void HttpStorage::UpdateClientSaveData(int client_fd, const ClientSaveData &client_data) {
-	if (!IsClientSaveData(client_fd)) {
-		throw std::logic_error("ClientSaveData doesn't exists.");
-	} else {
+	if (IsClientSaveData(client_fd)) {
 		save_data_[client_fd] = client_data;
+	} else {
+		throw std::logic_error("ClientSaveData doesn't exists.");
 	}
 }
 
