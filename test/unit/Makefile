@@ -3,7 +3,8 @@
 TEST_DIRS	:=	convert_str \
 				http_parse \
 				split_str \
-				virtual_server
+				virtual_server \
+				virtual_server_storage
 
 .PHONY	: run
 run:
