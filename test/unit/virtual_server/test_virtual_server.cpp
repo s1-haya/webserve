@@ -64,7 +64,7 @@ std::string PrintLocations(const LocationList &locations) {
 }
 
 Result TestIsSameMembers(
-	const server::VirtualServer &a,
+	const server::VirtualServer &under_test_vs,
 	const std::string           &expected_server_name,
 	const LocationList          &expected_locations
 ) {
@@ -73,7 +73,7 @@ Result TestIsSameMembers(
 	std::ostringstream oss;
 
 	// VirtualServer.GetServerName()
-	const std::string &server_name = a.GetServerName();
+	const std::string &server_name = under_test_vs.GetServerName();
 	if (!IsSame(server_name, expected_server_name)) {
 		result.is_ok = false;
 		oss << "server_name" << std::endl;
@@ -82,7 +82,7 @@ Result TestIsSameMembers(
 	}
 
 	// VirtualServer.GetLocations()
-	const LocationList &locations = a.GetLocations();
+	const LocationList &locations = under_test_vs.GetLocations();
 	if (!IsSame(locations, expected_locations)) {
 		result.is_ok = false;
 		oss << "locations" << std::endl;
