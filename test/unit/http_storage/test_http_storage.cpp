@@ -15,8 +15,9 @@
 // 	- trueの場合: 処理を終了し、serverクラスはSendResponceにする
 // 	- falseの場合: 3に戻る
 
-int HandleResult(bool is_ok) {
-	if (is_ok) {
+template <typename T>
+int HandleResult(const T &result, const T &expected) {
+	if (result == expected) {
 		std::cout << utils::color::GREEN << "[OK]" << utils::color::RESET << std::endl;
 		return EXIT_SUCCESS;
 	} else {
@@ -26,21 +27,14 @@ int HandleResult(bool is_ok) {
 }
 
 int main(void) {
-	// libc++abi: terminating due to uncaught exception of
-	// type std::logic_error: ClientSaveData doesn't exists.
-	// [1] 33298 abort./ a.out
-	// ClientSaveDataが存在しない場合、ClientSaveDataを取得する -> Logic Error
-	// http::ClientSaveData no_save_data = http::HttpStorage::GetClientSaveData(1);
-
 	int ret_code = 0;
-	// ClientSaveDataが存在しない場合 -> OK
-	ret_code |= HandleResult(!http::HttpStorage::IsClientSaveData(1));
-	// ClientSaveDataが存在する場合 -> OK
-	http::HttpStorage::CreateClientSaveData(1);
-	ret_code |= HandleResult(http::HttpStorage::IsClientSaveData(1));
+
+	// ClientSaveDataを新規作成
+	http::ClientSaveData new_data = http::HttpStorage::GetClientSaveData(1);
+	ret_code |= HandleResult(new_data.save_request_result.status_code, http::OK);
+
+	// client_fdを登録したClientSaveData取得
 	http::ClientSaveData save_data = http::HttpStorage::GetClientSaveData(1);
-	// ClientSaveDataがすでに存在してる場合、ClientSaveDataを作成する
-	//  -> ClientSaveData already exists for client_fd 1
-	http::HttpStorage::CreateClientSaveData(1);
+	ret_code |= HandleResult(save_data.save_request_result.status_code, http::OK);
 	return ret_code;
 }
