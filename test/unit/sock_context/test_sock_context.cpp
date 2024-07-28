@@ -11,6 +11,7 @@
 namespace {
 
 struct Result {
+	Result() : is_ok(true) {}
 	bool        is_ok;
 	std::string error_log;
 };
@@ -62,9 +63,7 @@ Result RunGetClientInfo(
 	const server::ClientInfo &b = expected_client_info.at(client_fd);
 
 	Result result;
-	if (IsSameClientInfo(a, b)) {
-		result.is_ok = true;
-	} else {
+	if (!IsSameClientInfo(a, b)) {
 		result.is_ok = false;
 		std::ostringstream oss;
 		oss << "client_fd : result   [" << a.GetFd() << "]" << std::endl;
@@ -91,9 +90,7 @@ Result RunGetConnectedServerInfo(
 	const server::ServerInfo &b = *expected_host_server_info.at(client_fd);
 
 	Result result;
-	if (IsSameServerInfo(a, b)) {
-		result.is_ok = true;
-	} else {
+	if (!IsSameServerInfo(a, b)) {
 		result.is_ok = false;
 		std::ostringstream oss;
 		oss << "server_fd  : result   [" << a.GetFd() << "]" << std::endl;
