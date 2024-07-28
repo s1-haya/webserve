@@ -56,7 +56,7 @@ std::string PrintLocations(const LocationList &locations) {
 	typedef LocationList::const_iterator It;
 	for (It it = locations.begin(); it != locations.end(); ++it) {
 		oss << *it;
-		if (++LocationList::const_iterator(it) != locations.end()) {
+		if (++It(it) != locations.end()) {
 			oss << std::endl;
 		}
 	}
