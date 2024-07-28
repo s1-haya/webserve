@@ -11,8 +11,8 @@
 namespace {
 
 struct Result {
-	Result() : is_ok(true) {}
-	bool        is_ok;
+	Result() : is_success(true) {}
+	bool        is_success;
 	std::string error_log;
 };
 
@@ -37,7 +37,7 @@ void PrintError(const std::string &message) {
 }
 
 int Test(Result result) {
-	if (result.is_ok) {
+	if (result.is_success) {
 		PrintOk();
 		return EXIT_SUCCESS;
 	}
@@ -64,7 +64,7 @@ Result RunGetClientInfo(
 
 	Result result;
 	if (!IsSameClientInfo(a, b)) {
-		result.is_ok = false;
+		result.is_success = false;
 		std::ostringstream oss;
 		oss << "client_fd : result   [" << a.GetFd() << "]" << std::endl;
 		oss << "            expected [" << b.GetFd() << "]" << std::endl;
@@ -91,7 +91,7 @@ Result RunGetConnectedServerInfo(
 
 	Result result;
 	if (!IsSameServerInfo(a, b)) {
-		result.is_ok = false;
+		result.is_success = false;
 		std::ostringstream oss;
 		oss << "server_fd  : result   [" << a.GetFd() << "]" << std::endl;
 		oss << "             expected [" << b.GetFd() << "]" << std::endl;
