@@ -8,13 +8,10 @@ namespace http {
 
 // todo: 今後http_parse.hppに移動する
 struct IsHttpRequestFormat {
-	IsHttpRequestFormat()
-		: is_response(false),
+	IsHttpRequestFormat() :
 		  is_request_line(false),
 		  is_header_fields(false),
 		  is_body_message(false){};
-	// is_response: server側にレスポンスを作成できるかのbool値
-	bool is_response;
 	bool is_request_line;
 	bool is_header_fields;
 	bool is_body_message;
