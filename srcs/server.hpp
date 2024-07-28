@@ -9,7 +9,6 @@
 #include "virtual_server_storage.hpp"
 #include <list>
 #include <string>
-#include <vector>
 
 namespace server {
 
@@ -22,8 +21,7 @@ struct TempConfig {
 
 class Server {
   public:
-	typedef std::list<TempConfig>   TempAllConfig; // todo: tmp
-	typedef std::vector<ServerInfo> ServerInfoVec;
+	typedef std::list<TempConfig> TempAllConfig; // todo: tmp
 	explicit Server(const _config::Config::ConfigData &config);
 	~Server();
 	void Run();
@@ -35,7 +33,7 @@ class Server {
 	Server &operator=(const Server &other);
 	// functions
 	void        AddVirtualServers(const TempAllConfig &all_configs); // todo: tmp
-	void        Init(const ServerInfoVec &server_infos);
+	void        Init();
 	void        HandleEvent(const event::Event &event);
 	void        HandleNewConnection(int server_fd);
 	void        HandleExistingConnection(const event::Event &event);

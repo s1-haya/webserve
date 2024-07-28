@@ -71,9 +71,7 @@ Server::Server(const _config::Config::ConfigData &config) {
 	// todo: tmp
 	TempAllConfig all_configs = CreateTempConfig();
 	AddVirtualServers(all_configs);
-
-	ServerInfoVec server_infos;
-	Init(server_infos);
+	Init();
 }
 
 Server::~Server() {}
@@ -170,8 +168,7 @@ std::string Server::CreateHttpResponse(int client_fd) const {
 		utils::Debug(
 			"server",
 			"ClientInfo - IP: " + client_info.GetIp() +
-				" / ServerInfo - name: " + server_info.GetName() +
-				", port: " + utils::ConvertUintToStr(server_info.GetPort()) + ", fd",
+				" / ServerInfo - port: " + utils::ConvertUintToStr(server_info.GetPort()) + ", fd",
 			server_info.GetFd()
 		);
 		// todo: call cgi(client_info, server_info)?
@@ -194,18 +191,30 @@ void Server::SendResponse(int client_fd) {
 	utils::Debug("------------------------------------------");
 }
 
-void Server::Init(const ServerInfoVec &server_infos) {
-	typedef ServerInfoVec::const_iterator Itr;
-	for (Itr it = server_infos.begin(); it != server_infos.end(); ++it) {
-		ServerInfo server_info = *it;
-		// connect & listen
-		const int server_fd = connection_.Connect(server_info);
-		server_info.SetSockFd(server_fd);
+void Server::Init() {
+	const VirtualServerStorage::VirtualServerList &all_virtual_server_list =
+		virtual_servers_.GetAllVirtualServerList();
 
-		// add to context
-		context_.AddServerInfo(server_fd, server_info);
-		event_monitor_.Add(server_fd, event::EVENT_READ);
-		utils::Debug("server", "init server & listen", server_fd);
+	typedef VirtualServerStorage::VirtualServerList::const_iterator ItVirtualServer;
+	for (ItVirtualServer it = all_virtual_server_list.begin(); it != all_virtual_server_list.end();
+		 ++it) {
+		const VirtualServer           &virtual_server = *it;
+		const VirtualServer::PortList &ports          = virtual_server.GetPorts();
+
+		// 各virtual serverの全portをsocket通信
+		typedef VirtualServer::PortList::const_iterator ItPort;
+		for (ItPort it_port = ports.begin(); it_port != ports.end(); ++it_port) {
+			// create ServerInfo
+			ServerInfo server_info(*it_port);
+			const int  server_fd = connection_.Connect(server_info);
+			server_info.SetSockFd(server_fd);
+
+			// add to context
+			context_.AddServerInfo(server_fd, server_info);
+			virtual_servers_.AddMapping(server_fd, &virtual_server);
+			event_monitor_.Add(server_fd, event::EVENT_READ);
+			utils::Debug("server", "listen", server_fd);
+		}
 	}
 }
 
