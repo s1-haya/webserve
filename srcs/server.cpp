@@ -154,24 +154,6 @@ void Server::ReadRequest(const event::Event &event) {
 	}
 }
 
-namespace {
-
-// todo: tmp for debug
-std::string OutputLocations(const VirtualServer::LocationList &locations) {
-	std::ostringstream oss;
-
-	typedef VirtualServer::LocationList::const_iterator It;
-	for (It it = locations.begin(); it != locations.end(); ++it) {
-		oss << *it;
-		if (++It(it) != locations.end()) {
-			oss << ", ";
-		}
-	}
-	return oss.str();
-}
-
-} // namespace
-
 std::string Server::CreateHttpResponse(int client_fd) const {
 	const std::string &request_buf = buffers_.GetBuffer(client_fd);
 
@@ -196,7 +178,8 @@ std::string Server::CreateHttpResponse(int client_fd) const {
 		utils::Debug(
 			"server",
 			"ClientInfo - IP: " + client_ip + " / ServerInfo - name: " + server_name +
-				", location: " + OutputLocations(locations) + ", port: " + server_port + ", fd",
+				", location: " + utils::FormatListToStr(locations) + ", port: " + server_port +
+				", fd",
 			server_fd
 		);
 		// todo: call cgi(client_info, server_info)?
