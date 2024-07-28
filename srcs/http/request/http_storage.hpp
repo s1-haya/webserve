@@ -1,5 +1,5 @@
-#ifndef HTTP_DB_HPP_
-#define HTTP_DB_HPP_
+#ifndef HTTP_STORAGE_HPP_
+#define HTTP_STORAGE_HPP_
 
 #include "http_parse.hpp"
 #include <map>
@@ -9,14 +9,9 @@ namespace http {
 // todo: 今後http_parse.hppに移動する
 struct IsHttpRequestFormat {
 	IsHttpRequestFormat()
-		: is_response(false),
-		  is_request_line(false),
-		  is_header_fileds(false),
-		  is_body_message(false){};
-	// is_response: server側にレスポンスを作成できるかのbool値
-	bool is_response;
+		: is_request_line(false), is_header_fields(false), is_body_message(false){};
 	bool is_request_line;
-	bool is_header_fileds;
+	bool is_header_fields;
 	bool is_body_message;
 };
 
@@ -31,25 +26,25 @@ struct ClientSaveData {
 
 class HttpStorage {
   public:
-	// Create
-	static void CreateClientSaveData(int client_fd);
-	// Check
-	static bool IsClientSaveData(int client_fd);
-	// Get
-	static const ClientSaveData &GetClientSaveData(int client_fd);
-	// Update
-	static void UpdateClientSaveData(int client_fd, const ClientSaveData &client_data);
-	// Delete
-	static void DeleteClientSaveData(int client_fd);
-
-  private:
 	HttpStorage();
 	~HttpStorage();
+	// Get
+	const ClientSaveData &GetClientSaveData(int client_fd);
+	// Update
+	void UpdateClientSaveData(int client_fd, const ClientSaveData &client_data);
+	// Delete
+	void DeleteClientSaveData(int client_fd);
+
+  private:
 	HttpStorage(const HttpStorage &other);
 	HttpStorage &operator=(const HttpStorage &other);
 	// client_fd -> 前回保存した情報にアクセスするためのデータ構造
 	typedef std::map<int, ClientSaveData> ClientSaveDataMap;
-	static ClientSaveDataMap              save_data_;
+	ClientSaveDataMap                     save_data_;
+	// Create
+	void CreateClientSaveData(int client_fd);
+	// Check
+	bool IsClientSaveData(int client_fd);
 };
 
 } // namespace http
