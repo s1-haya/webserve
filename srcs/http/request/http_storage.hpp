@@ -8,10 +8,8 @@ namespace http {
 
 // todo: 今後http_parse.hppに移動する
 struct IsHttpRequestFormat {
-	IsHttpRequestFormat() :
-		  is_request_line(false),
-		  is_header_fields(false),
-		  is_body_message(false){};
+	IsHttpRequestFormat()
+		: is_request_line(false), is_header_fields(false), is_body_message(false){};
 	bool is_request_line;
 	bool is_header_fields;
 	bool is_body_message;
@@ -28,21 +26,23 @@ struct ClientSaveData {
 
 class HttpStorage {
   public:
+	HttpStorage();
+	~HttpStorage();
 	// Get
-	static const ClientSaveData &GetClientSaveData(int client_fd);
+	const ClientSaveData &GetClientSaveData(int client_fd);
 	// Update
 	// Delete
 
   private:
-	HttpStorage();
-	~HttpStorage();
+	HttpStorage(const HttpStorage &other);
+	HttpStorage                          &operator=(const HttpStorage &other);
 	typedef std::map<int, ClientSaveData> ClientSaveDataMap;
 	// client_fd -> 前回保存した情報にアクセスするためのデータ構造
-	static ClientSaveDataMap save_data_;
+	ClientSaveDataMap save_data_;
 	// Create
-	static void CreateClientSaveData(int client_fd);
+	void CreateClientSaveData(int client_fd);
 	// Check
-	static bool IsClientSaveData(int client_fd);
+	bool IsClientSaveData(int client_fd);
 };
 
 } // namespace http

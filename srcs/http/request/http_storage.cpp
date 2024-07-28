@@ -3,7 +3,9 @@
 
 namespace http {
 
-HttpStorage::ClientSaveDataMap HttpStorage::save_data_;
+HttpStorage::HttpStorage() {}
+
+HttpStorage::~HttpStorage() {}
 
 // ClientSaveDataを初期化する関数
 void HttpStorage::CreateClientSaveData(int client_fd) {
