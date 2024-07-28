@@ -12,6 +12,8 @@ class TmpHttp {
 	~TmpHttp();
 	void        ParseHttpRequestFormat(int client_fd, const std::string &read_buf);
 	std::string RunCreateResponse(int client_fd);
+bool        GetIsHttpRequestFormatComplete(int client_fd);
+	// todo: 408のtimeoutのレスポンス
 
   private:
 	TmpHttp(const TmpHttp &other);

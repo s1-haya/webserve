@@ -20,9 +20,12 @@ storage_.UpdateClientSaveData(client_fd, save_data);
 
 // todo: レスポンスを作成する
 std::string TmpHttp::RunCreateResponse(int client_fd) {
-	(void)client_fd;
-	std::string tmp = "OK";
-	return tmp;
+// todo: HTTPRequestの書式が完全かどうか(どのように取得するかは要検討)
+bool TmpHttp::GetIsHttpRequestFormatComplete(int client_fd) {
+	ClientSaveData save_data = storage_.GetClientSaveData(client_fd);
+	return save_data.save_is_request_format.is_request_line &&
+		   save_data.save_is_request_format.is_header_fields &&
+		   save_data.save_is_request_format.is_body_message;
 }
 
 } // namespace http
