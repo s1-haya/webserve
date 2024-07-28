@@ -83,7 +83,7 @@ void Server::HandleNewConnection(int server_fd) {
 	}
 
 	// add to context
-	context_.AddClientInfo(client_fd, new_client_info);
+	context_.AddClientInfo(client_fd, new_client_info, server_fd);
 	event_monitor_.Add(client_fd, event::EVENT_READ);
 	utils::Debug("server", "add new client", client_fd);
 }
@@ -99,11 +99,6 @@ void Server::HandleExistingConnection(const event::Event &event) {
 }
 
 namespace {
-
-std::string CreateHttpResponse(const std::string &read_buf) {
-	http::Http http(read_buf);
-	return http.CreateResponse();
-}
 
 // todo: find "Connection: close"?
 bool IsRequestReceivedComplete(const std::string &buffer) {
@@ -132,9 +127,31 @@ void Server::ReadRequest(const event::Event &event) {
 	}
 }
 
+std::string Server::CreateHttpResponse(int client_fd) const {
+	const std::string &request_buf = buffers_.GetBuffer(client_fd);
+
+	http::Http http(request_buf);
+	// todo: parse?
+	// todo: tmp
+	const bool is_cgi = true;
+	if (is_cgi) {
+		const ClientInfo &client_info = context_.GetClientInfo(client_fd);
+		const ServerInfo &server_info = context_.GetConnectedServerInfo(client_fd);
+		utils::Debug(
+			"server",
+			"ClientInfo - IP: " + client_info.GetIp() +
+				" / ServerInfo - name: " + server_info.GetName() +
+				", port: " + utils::ConvertUintToStr(server_info.GetPort()) + ", fd",
+			server_info.GetFd()
+		);
+		// todo: call cgi(client_info, server_info)?
+	}
+	return http.CreateResponse();
+}
+
 void Server::SendResponse(int client_fd) {
 	// todo: check if it's ready to start write/send
-	const std::string response = CreateHttpResponse(buffers_.GetBuffer(client_fd));
+	const std::string response = CreateHttpResponse(client_fd);
 	send(client_fd, response.c_str(), response.size(), 0);
 	utils::Debug("server", "send response to client", client_fd);
 
