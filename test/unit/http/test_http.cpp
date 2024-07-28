@@ -27,6 +27,8 @@ int main(void) {
 
 	http::TmpHttp test;
 	test.ParseHttpRequestFormat(1, "PARSE");
+	const std::string &expected1 = "OK";
+	ret_code |= HandleResult(test.CreateHttpResponse(1), expected1);
 	ret_code |= HandleResult(test.GetIsHttpRequestFormatComplete(1), false);
 	return ret_code;
 }

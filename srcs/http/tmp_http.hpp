@@ -11,17 +11,14 @@ class TmpHttp {
 	TmpHttp();
 	~TmpHttp();
 	void        ParseHttpRequestFormat(int client_fd, const std::string &read_buf);
-	std::string RunCreateResponse(int client_fd);
-bool        GetIsHttpRequestFormatComplete(int client_fd);
+	std::string CreateHttpResponse(int client_fd);
+	bool        GetIsHttpRequestFormatComplete(int client_fd);
 	// todo: 408のtimeoutのレスポンス
 
   private:
 	TmpHttp(const TmpHttp &other);
-	TmpHttp           &operator=(const TmpHttp &other);
-	static HttpStorage storage_;
-	// todo: parse class
-	static HttpParse parse_;
-	// todo: response class
+	TmpHttp    &operator=(const TmpHttp &other);
+	HttpStorage storage_;
 };
 
 } // namespace http
