@@ -21,11 +21,10 @@ bool HttpStorage::IsClientSaveData(int client_fd) {
 
 // ClientSaveDataを取得する関数
 const ClientSaveData &HttpStorage::GetClientSaveData(int client_fd) {
-	try {
-		return save_data_.at(client_fd);
-	} catch (const std::logic_error &e) {
-		throw std::logic_error("ClientSaveData doesn't exists.");
+	if (!IsClientSaveData(client_fd)) {
+		CreateClientSaveData(client_fd);
 	}
+	return save_data_.at(client_fd);
 }
 
 } // namespace http

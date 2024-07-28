@@ -31,21 +31,21 @@ struct ClientSaveData {
 
 class HttpStorage {
   public:
-	// Create
-	static void CreateClientSaveData(int client_fd);
-	// Check
-	static bool IsClientSaveData(int client_fd);
 	// Get
 	static const ClientSaveData &GetClientSaveData(int client_fd);
 	// Update
 	// Delete
-	typedef std::map<int, ClientSaveData> ClientSaveDataMap;
 
   private:
 	HttpStorage();
 	~HttpStorage();
+	typedef std::map<int, ClientSaveData> ClientSaveDataMap;
 	// client_fd -> 前回保存した情報にアクセスするためのデータ構造
 	static ClientSaveDataMap save_data_;
+	// Create
+	static void CreateClientSaveData(int client_fd);
+	// Check
+	static bool IsClientSaveData(int client_fd);
 };
 
 } // namespace http
