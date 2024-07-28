@@ -9,11 +9,13 @@ TmpHttp::~TmpHttp() {}
 
 // ServerクラスがClientSaveDataを取得してリクエストを読み込むかレスポンスを作成するかを判定する。(is_response)
 // todo: クライアントのリクエスト情報を読み込む
-void TmpHttp::RunParseRequest(int client_fd, const std::string &read_buf) {
-	(void)client_fd;
+void TmpHttp::ParseHttpRequestFormat(int client_fd, const std::string &read_buf) {
 	std::cout << read_buf << std::endl;
-	// todo: リクエストを読むときはparse_Runする。返り値はClientSaveData
-	// ClientSaveData save_data = parse_.Run(read_buf);
+	ClientSaveData save_data = storage_.GetClientSaveData(client_fd);
+	save_data.save_current_buf += read_buf;
+	// todo: HttpRequestParsedResult(HttpRequestResultとIsHttpRequestFormat)を受け取る。
+	// save_data.result = http::HttpParse::parse_.Run(&save_current_buf);
+storage_.UpdateClientSaveData(client_fd, save_data);
 }
 
 // todo: レスポンスを作成する

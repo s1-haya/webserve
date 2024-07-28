@@ -10,7 +10,7 @@ class TmpHttp {
   public:
 	TmpHttp();
 	~TmpHttp();
-	void        RunParseRequest(int client_fd, const std::string &read_buf);
+	void        ParseHttpRequestFormat(int client_fd, const std::string &read_buf);
 	std::string RunCreateResponse(int client_fd);
 
   private:
