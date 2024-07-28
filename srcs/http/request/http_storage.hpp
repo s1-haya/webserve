@@ -1,5 +1,5 @@
-#ifndef HTTP_DB_HPP_
-#define HTTP_DB_HPP_
+#ifndef HTTP_STORAGE_HPP_
+#define HTTP_STORAGE_HPP_
 
 #include "http_parse.hpp"
 #include <map>
@@ -11,12 +11,12 @@ struct IsHttpRequestFormat {
 	IsHttpRequestFormat()
 		: is_response(false),
 		  is_request_line(false),
-		  is_header_fileds(false),
+		  is_header_fields(false),
 		  is_body_message(false){};
 	// is_response: server側にレスポンスを作成できるかのbool値
 	bool is_response;
 	bool is_request_line;
-	bool is_header_fileds;
+	bool is_header_fields;
 	bool is_body_message;
 };
 
