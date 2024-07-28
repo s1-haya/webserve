@@ -41,6 +41,15 @@ int main(void) {
 	ret_code |= HandleResult(update_data.save_request_result.status_code, http::BAD_REQUEST);
 
 	// 更新するClientSaveDataが存在しない場合 -> Logic Error
-	// storage.UpdateClientSaveData(2, save_data);
+	// storage.UpdateClientSaveData(100, save_data);
+
+	// ClientSaveDataを削除 -> OK
+	storage.DeleteClientSaveData(1);
+	new_data = storage.GetClientSaveData(1);
+	// 更新したSaveData情報を削除されているかどうかを確認するため、BAD_REQUESTではなくOK
+	ret_code |= HandleResult(new_data.save_request_result.status_code, http::OK);
+
+	// 削除するClientSaveDataが存在しない場合 -> Logic Error
+	// storage.DeleteClientSaveData(100);
 	return ret_code;
 }
