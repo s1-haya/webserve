@@ -4,6 +4,15 @@
 #include <iostream>
 
 namespace lexer {
+namespace {
+
+bool IsSpace(char c) { // 必要か
+	if (c == ' ' || c == '\t' || c == '\r' || c == '\n')
+		return true;
+	return false;
+}
+
+} // namespace
 
 Lexer::Lexer(const std::string &buffer, std::list<node::Node> &tokens)
 	: tokens_(tokens), buffer_(buffer) {
@@ -25,25 +34,36 @@ void Lexer::InitDefinition() {
 }
 
 void Lexer::LexBuffer() {
+	bool is_next_to_word = false;
+
 	for (std::string::const_iterator it = buffer_.begin(); it != buffer_.end(); ++it) {
-		while (utils::IsSpace(*it)) {
+		while (IsSpace(*it)) {
 			++it;
 		}
 		switch (*it) {
 		case SEMICOLON_CHR:
 			AddToken(SEMICOLON_CHR, node::DELIM);
+			is_next_to_word = false;
 			break;
 		case L_BRACKET_CHR:
 			AddToken(L_BRACKET_CHR, node::L_BRACKET);
+			is_next_to_word = false;
 			break;
 		case R_BRACKET_CHR:
 			AddToken(R_BRACKET_CHR, node::R_BRACKET);
+			is_next_to_word = false;
 			break;
 		case SHARP_CHR:
 			SkipComment(it);
+			is_next_to_word = false;
 			break;
 		default:
-			AddWordToken(it);
+			if (is_next_to_word) {
+				AddWordToken(it);
+			} else {
+				AddContextDirectiveWordToken(it);
+			}
+			is_next_to_word = true;
 			break;
 		}
 	}
@@ -63,8 +83,18 @@ void Lexer::AddToken(const std::string &symbol, node::TokenType token_type) {
 }
 
 void Lexer::AddWordToken(std::string::const_iterator &it) {
-	std::string new_str = "";
-	while (!utils::IsSpace(*it) && *it != SEMICOLON_CHR) {
+	std::string new_str;
+	while (!IsSpace(*it) && *it != SEMICOLON_CHR) {
+		new_str += *it;
+		++it;
+	}
+	AddToken(new_str, node::WORD);
+	--it; // loopでWordの次の文字から処理
+}
+
+void Lexer::AddContextDirectiveWordToken(std::string::const_iterator &it) {
+	std::string new_str;
+	while (!IsSpace(*it) && *it != SEMICOLON_CHR) {
 		new_str += *it;
 		++it;
 	}

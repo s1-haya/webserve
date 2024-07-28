@@ -1,8 +1,10 @@
 # Add target test directories.
 # Each directory should have a Makefile with a 'run' target.
 TEST_DIRS	:=	convert_str \
+				http_parse \
 				sock_context \
-				split_str
+				split_str \
+				virtual_server
 
 .PHONY	: run
 run:
