@@ -151,6 +151,21 @@ void AddServerInfoForTest(
 	expected_server_info[server_fd] = server_info;
 }
 
+// test用にcontextとexpectedに同じclient,serverを追加する
+void AddClientInfoForTest(
+	server::SockContext                    &context,
+	server::SockContext::ClientInfoMap     &expected_client_info,
+	server::SockContext::HostServerInfoMap &expected_host_server_info,
+	int                                     client_fd,
+	const server::ClientInfo               &client_info,
+	int                                     server_fd,
+	const server::ServerInfo               *server_info
+) {
+	context.AddClientInfo(client_fd, client_info, server_fd);
+	expected_client_info[client_fd]      = client_info;
+	expected_host_server_info[client_fd] = server_info;
+}
+
 /*
 
 以下のような接続状況を仮定しテストする
@@ -213,9 +228,15 @@ int RunTestSockContext() {
 	// - ClientInfoMap     = {{6, ClientInfo1}}
 	// - HostServerInfoMap = {{6, ServerInfo1*}}
 	const int client_fd1 = 6;
-	context.AddClientInfo(client_fd1, client_info1, server_fd1);
-	expected_client_info[client_fd1]      = client_info1;
-	expected_host_server_info[client_fd1] = &server_info1;
+	AddClientInfoForTest(
+		context,
+		expected_client_info,
+		expected_host_server_info,
+		client_fd1,
+		client_info1,
+		server_fd1,
+		&server_info1
+	);
 	// contextのメンバと自作のexpectedが同じか確認
 	ret_code |= Test(RunGetClientInfo(context, expected_client_info, client_fd1));
 	ret_code |= Test(RunGetConnectedServerInfo(context, expected_host_server_info, client_fd1));
@@ -228,9 +249,15 @@ int RunTestSockContext() {
 	// - ClientInfoMap     = {{6, ClientInfo1}, {7, ClientInfo2}}
 	// - HostServerInfoMap = {{6, ServerInfo1*}, {7, ServerInfo2*}}
 	const int client_fd2 = 7;
-	context.AddClientInfo(client_fd2, client_info2, server_fd2);
-	expected_client_info[client_fd2]      = client_info2;
-	expected_host_server_info[client_fd2] = &server_info2;
+	AddClientInfoForTest(
+		context,
+		expected_client_info,
+		expected_host_server_info,
+		client_fd2,
+		client_info2,
+		server_fd2,
+		&server_info2
+	);
 	// contextのメンバと自作のexpectedが同じか確認
 	ret_code |= Test(RunGetClientInfo(context, expected_client_info, client_fd2));
 	ret_code |= Test(RunGetConnectedServerInfo(context, expected_host_server_info, client_fd2));
