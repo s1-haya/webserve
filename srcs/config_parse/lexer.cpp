@@ -39,7 +39,7 @@ void Lexer::LexBuffer() {
 
 	for (std::string::const_iterator it = buffer_.begin(); it != buffer_.end() && *it != '\0';
 		 ++it) {
-		if (utils::IsSpace(*it))
+		if (IsSpace(*it))
 			continue;
 		switch (*it) {
 		case SEMICOLON_CHR:
