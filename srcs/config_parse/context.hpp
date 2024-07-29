@@ -4,6 +4,7 @@
 #include <list>
 #include <string>
 
+namespace config {
 namespace context {
 
 struct LocationCon {
@@ -20,5 +21,6 @@ struct ServerCon {
 };
 
 } // namespace context
+} // namespace config
 
 #endif
