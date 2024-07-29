@@ -13,9 +13,10 @@ class Buffer {
 	typedef std::map<int, std::string> Buffers;
 	Buffer();
 	~Buffer();
-	ssize_t      Read(int fd);
-	void         Delete(int fd);
-	std::string &GetBuffer(int fd);
+	ssize_t Read(int fd);
+	void    Delete(int fd);
+	// getter
+	const std::string &GetBuffer(int fd) const;
 
   private:
 	// prohibit copy

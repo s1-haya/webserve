@@ -4,6 +4,7 @@
 #include <list>
 #include <vector>
 
+namespace config {
 namespace lexer {
 
 class Lexer {
@@ -21,6 +22,7 @@ class Lexer {
 	void            AddToken(char, node::TokenType);
 	void            AddToken(const std::string &, node::TokenType);
 	void            AddWordToken(std::string::const_iterator &);
+	void            AddContextDirectiveWordToken(std::string::const_iterator &);
 	void            SkipComment(std::string::const_iterator &);
 	node::TokenType SearchWordTokenType(std::string &);
 
@@ -42,5 +44,6 @@ class Lexer {
 };
 
 } // namespace lexer
+} // namespace config
 
 #endif
