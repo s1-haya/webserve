@@ -2,12 +2,6 @@
 #include "context.hpp"
 #include "lexer.hpp"
 #include "parser.hpp"
-/*  消す  */
-#include "../../../../srcs/config_parse/context.hpp"
-#include "../../../../srcs/config_parse/lexer.hpp"
-#include "../../../../srcs/config_parse/parser.hpp"
-#include "../../../../srcs/utils/color.hpp"
-/*-------*/
 #include <cstdlib>
 #include <iostream>
 #include <sstream>
