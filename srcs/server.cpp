@@ -18,7 +18,12 @@ VirtualServer::LocationList ConvertLocations(const config::context::LocationList
 
 	typedef config::context::LocationList::const_iterator Itr;
 	for (Itr it = config_locations.begin(); it != config_locations.end(); ++it) {
-		location_list.push_back(it->location);
+		Location location;
+		location.location       = it->location;
+		location.root           = it->root;
+		location.index          = it->index;
+		location.allowed_method = it->allowed_method;
+		location_list.push_back(location);
 	}
 	return location_list;
 }
@@ -158,11 +163,11 @@ std::string Server::CreateHttpResponse(int client_fd) const {
 		const VirtualServer &virtual_server          = virtual_servers_.GetVirtualServer(server_fd);
 		const std::string   &server_name             = virtual_server.GetServerName();
 		const VirtualServer::LocationList &locations = virtual_server.GetLocations();
+		(void)locations;
 		utils::Debug(
 			"server",
 			"ClientInfo - IP: " + client_ip + " / ServerInfo - name: " + server_name +
-				", location: " + utils::FormatListToStr(locations) + ", port: " + server_port +
-				", fd",
+				", port: " + server_port + ", fd",
 			server_fd
 		);
 		// todo: call cgi(client_info, server_info)?
