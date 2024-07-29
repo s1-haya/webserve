@@ -4,6 +4,7 @@
 #include <list>
 #include <vector>
 
+namespace config {
 namespace lexer {
 
 class Lexer {
@@ -43,5 +44,6 @@ class Lexer {
 };
 
 } // namespace lexer
+} // namespace config
 
 #endif
