@@ -2,6 +2,7 @@
 # Each directory should have a Makefile with a 'run' target.
 TEST_DIRS	:=	convert_str \
 				http_parse \
+				http_storage \
 				sock_context \
 				split_str \
 				virtual_server \

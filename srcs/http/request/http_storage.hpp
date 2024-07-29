@@ -31,14 +31,16 @@ class HttpStorage {
 	// Get
 	const ClientSaveData &GetClientSaveData(int client_fd);
 	// Update
+	void UpdateClientSaveData(int client_fd, const ClientSaveData &client_data);
 	// Delete
+	void DeleteClientSaveData(int client_fd);
 
   private:
 	HttpStorage(const HttpStorage &other);
-	HttpStorage                          &operator=(const HttpStorage &other);
-	typedef std::map<int, ClientSaveData> ClientSaveDataMap;
+	HttpStorage &operator=(const HttpStorage &other);
 	// client_fd -> 前回保存した情報にアクセスするためのデータ構造
-	ClientSaveDataMap save_data_;
+	typedef std::map<int, ClientSaveData> ClientSaveDataMap;
+	ClientSaveDataMap                     save_data_;
 	// Create
 	void CreateClientSaveData(int client_fd);
 	// Check
