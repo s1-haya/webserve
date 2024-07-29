@@ -1,5 +1,4 @@
 #include "lexer.hpp"
-#include "../utils/utils.hpp"
 #include <algorithm>
 #include <iostream>
 
@@ -85,7 +84,7 @@ void Lexer::AddToken(const std::string &symbol, node::TokenType token_type) {
 
 void Lexer::AddWordToken(std::string::const_iterator &it) {
 	std::string new_str;
-	while (!IsSpace(*it) && *it != SEMICOLON_CHR) {
+	while (it != buffer_.end() && !IsSpace(*it) && *it != SEMICOLON_CHR) {
 		new_str += *it;
 		++it;
 	}
@@ -95,7 +94,7 @@ void Lexer::AddWordToken(std::string::const_iterator &it) {
 
 void Lexer::AddContextDirectiveWordToken(std::string::const_iterator &it) {
 	std::string new_str;
-	while (!IsSpace(*it) && *it != SEMICOLON_CHR) {
+	while (it != buffer_.end() && !IsSpace(*it) && *it != SEMICOLON_CHR) {
 		new_str += *it;
 		++it;
 	}
