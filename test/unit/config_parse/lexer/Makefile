@@ -29,7 +29,7 @@ OBJS		:=	$(patsubst %.cpp, $(OBJ_DIR)/%.o, $(notdir $(SRCS)))
 INCLUDES	:=	$(addprefix -I, $(SRCS_DIR))
 
 CXX			:=	c++
-CXXFLAGS	:=	-std=c++98 -MMD -MP -pedantic # -Wall -Wextra -Werror
+CXXFLAGS	:=	-std=c++98 -Wall -Wextra -Werror -MMD -MP -pedantic
 
 DEPS		:=	$(OBJS:.o=.d)
 MKDIR		:=	mkdir -p

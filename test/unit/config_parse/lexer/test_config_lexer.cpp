@@ -127,7 +127,7 @@ int RunTests(const TestCase test_cases[], std::size_t num_test_cases) {
 
 } // namespace
 
-int main(int argc, char *argv[]) {
+int main() {
 	int ret_code = EXIT_SUCCESS;
 
 	/* Test1 */
