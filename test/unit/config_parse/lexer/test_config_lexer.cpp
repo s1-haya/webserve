@@ -143,7 +143,7 @@ int main(int argc, char *argv[]) {
 	/* Test1 */
 	NodeList   expected_result_test_1;
 	node::Node expected_test_1_node_1 = {"server", node::CONTEXT};
-	node::Node expected_test_1_node_2 = {" ", node::L_BRACKET};
+	node::Node expected_test_1_node_2 = {"{", node::L_BRACKET};
 	node::Node expected_test_1_node_3 = {"}", node::R_BRACKET};
 	expected_result_test_1.push_back(expected_test_1_node_1);
 	expected_result_test_1.push_back(expected_test_1_node_2);
