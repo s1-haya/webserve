@@ -190,13 +190,24 @@ int main(int argc, char *argv[]) {
 	ServerList     expected_result_test_1;
 	std::list<int> expected_test_1_ports_1;
 	expected_test_1_ports_1.push_back(8080);
-	LocationList expected_test_1_locationlist_1;
-	// context::LocationCon expected_test_1_location_1 = {"/", "/www/", "index.html", "GET"};
-	// expected_test_1_locationlist_1.push_back(expected_test_1_location_1);
+	LocationList       expected_test_1_locationlist_1;
 	context::ServerCon expected_test_1_server_1 = {
 		expected_test_1_ports_1, "localhost", expected_test_1_locationlist_1
 	};
 	expected_result_test_1.push_back(expected_test_1_server_1);
+
+	/* Test2 */
+	ServerList     expected_result_test_2;
+	std::list<int> expected_test_2_ports_1;
+	expected_test_2_ports_1.push_back(8080);
+	expected_test_2_ports_1.push_back(80);
+	LocationList         expected_test_2_locationlist_1;
+	context::LocationCon expected_test_2_location_1 = {"/", "/www/", "index.html"};
+	expected_test_2_locationlist_1.push_back(expected_test_2_location_1);
+	context::ServerCon expected_test_2_server_1 = {
+		expected_test_2_ports_1, "localhost", expected_test_2_locationlist_1
+	};
+	expected_result_test_2.push_back(expected_test_2_server_1);
 
 	static const TestCase test_cases[] = {
 		TestCase(
@@ -206,6 +217,17 @@ int main(int argc, char *argv[]) {
 				}\n",
 			expected_result_test_1
 		),
+		TestCase(
+			"server {\n \
+				server_name localhost;\n \
+				listen 8080 80;\n \
+				location / {\n \
+					root /www/;\n \
+					index index.html;\n \
+					} \
+				}\n",
+			expected_result_test_2
+		)
 	};
 
 	ret_code |= RunTests(test_cases, ARRAY_SIZE(test_cases));
