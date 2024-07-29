@@ -142,6 +142,20 @@ void Server::ReadRequest(const event::Event &event) {
 	}
 }
 
+namespace {
+
+// todo: tmp for debug
+void PrintLocations(const VirtualServer::LocationList &locations) {
+	typedef VirtualServer::LocationList::const_iterator Itr;
+	for (Itr it = locations.begin(); it != locations.end(); ++it) {
+		const server::Location &location = *it;
+		std::cerr << "- location: " << location.location << ", root: " << location.root
+				  << ", index: " << location.index << std::endl;
+	}
+}
+
+} // namespace
+
 std::string Server::CreateHttpResponse(int client_fd) const {
 	const std::string &request_buf = buffers_.GetBuffer(client_fd);
 
@@ -163,13 +177,11 @@ std::string Server::CreateHttpResponse(int client_fd) const {
 		const VirtualServer &virtual_server          = virtual_servers_.GetVirtualServer(server_fd);
 		const std::string   &server_name             = virtual_server.GetServerName();
 		const VirtualServer::LocationList &locations = virtual_server.GetLocations();
-		(void)locations;
-		utils::Debug(
-			"server",
-			"ClientInfo - IP: " + client_ip + " / ServerInfo - name: " + server_name +
-				", port: " + server_port + ", fd",
-			server_fd
-		);
+		utils::Debug("server", "ClientInfo - IP: " + client_ip + ", fd", client_fd);
+		utils::Debug("server", "recieved ServerInfo, fd", server_fd);
+		std::cerr << "server_name: " << server_name << ", port: " << server_port << std::endl;
+		std::cerr << "locations: " << std::endl;
+		PrintLocations(locations);
 		// todo: call cgi(client_info, server_info)?
 	}
 	return http.CreateResponse();
