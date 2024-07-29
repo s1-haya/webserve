@@ -1,5 +1,6 @@
 #include "color.hpp"
 #include "lexer.hpp"
+#include <cstdlib>
 #include <iostream>
 #include <sstream>
 
