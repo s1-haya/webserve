@@ -84,6 +84,9 @@ void Lexer::AddToken(const std::string &symbol, node::TokenType token_type) {
 	tokens_.push_back(token);
 }
 
+/*LexBuffer()内でfor文で++itしているため、最後の文字から次の処理をさせるために各関数の最後に--itがついています
+ex. server -> rから次のfor文に*/
+
 void Lexer::AddWordToken(std::string::const_iterator &it) {
 	std::string new_str;
 	while (it != buffer_.end() && !IsSpace(*it) && *it != SEMICOLON_CHR) {
@@ -91,7 +94,7 @@ void Lexer::AddWordToken(std::string::const_iterator &it) {
 		++it;
 	}
 	AddToken(new_str, node::WORD);
-	--it; // loopでWordの次の文字から処理
+	--it;
 }
 
 void Lexer::AddContextDirectiveWordToken(std::string::const_iterator &it) {
@@ -101,13 +104,14 @@ void Lexer::AddContextDirectiveWordToken(std::string::const_iterator &it) {
 		++it;
 	}
 	AddToken(new_str, SearchWordTokenType(new_str)); // 予約語の検索
-	--it;                                            // loopでWordの次の文字から処理
+	--it;
 }
 
 void Lexer::SkipComment(std::string::const_iterator &it) {
 	while (it != buffer_.end() && *it != '\n') {
 		++it;
 	}
+	--it;
 }
 
 node::TokenType Lexer::SearchWordTokenType(std::string &word) {
