@@ -149,8 +149,34 @@ int main(int argc, char *argv[]) {
 	expected_result_test_1.push_back(expected_test_1_node_2);
 	expected_result_test_1.push_back(expected_test_1_node_3);
 
+	/* Test2 */
+	NodeList   expected_result_test_2;
+	node::Node expected_test_2_node_1 = {"server", node::CONTEXT};
+	node::Node expected_test_2_node_2 = {"{", node::L_BRACKET};
+	node::Node expected_test_2_node_3 = {"location", node::CONTEXT};
+	node::Node expected_test_2_node_4 = {"{", node::L_BRACKET};
+	node::Node expected_test_2_node_5 = {"}", node::R_BRACKET};
+	node::Node expected_test_2_node_6 = {"}", node::R_BRACKET};
+	expected_result_test_2.push_back(expected_test_2_node_1);
+	expected_result_test_2.push_back(expected_test_2_node_2);
+	expected_result_test_2.push_back(expected_test_2_node_3);
+	expected_result_test_2.push_back(expected_test_2_node_4);
+	expected_result_test_2.push_back(expected_test_2_node_5);
+	expected_result_test_2.push_back(expected_test_2_node_6);
+
 	static const TestCase test_cases[] = {
-		TestCase("server {\n}\n", expected_result_test_1),
+		TestCase(
+			"server { \
+				}\n",
+			expected_result_test_1
+		),
+		TestCase(
+			"server { \
+					location { \
+					} \
+				}\n",
+			expected_result_test_2
+		)
 	};
 
 	ret_code |= RunTests(test_cases, ARRAY_SIZE(test_cases));
