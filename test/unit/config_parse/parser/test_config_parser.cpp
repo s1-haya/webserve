@@ -183,7 +183,7 @@ int RunTests(const TestCase test_cases[], std::size_t num_test_cases) {
 
 } // namespace
 
-int main(int argc, char *argv[]) {
+int main() {
 	int ret_code = EXIT_SUCCESS;
 
 	/* Test1 */
@@ -202,7 +202,7 @@ int main(int argc, char *argv[]) {
 	expected_test_2_ports_1.push_back(8080);
 	expected_test_2_ports_1.push_back(80);
 	LocationList         expected_test_2_locationlist_1;
-	context::LocationCon expected_test_2_location_1 = {"/", "/www/", "index.html"};
+	context::LocationCon expected_test_2_location_1 = {"/", "/www/", "index.html", ""};
 	expected_test_2_locationlist_1.push_back(expected_test_2_location_1);
 	context::ServerCon expected_test_2_server_1 = {
 		expected_test_2_ports_1, "localhost", expected_test_2_locationlist_1
