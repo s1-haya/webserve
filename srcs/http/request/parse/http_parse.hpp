@@ -35,6 +35,19 @@ struct HttpRequestResult {
 	HttpRequestResult() : status_code(OK) {}
 };
 
+struct IsHttpRequestFormat {
+	IsHttpRequestFormat()
+		: is_request_line(false), is_header_fields(false), is_body_message(false){};
+	bool is_request_line;
+	bool is_header_fields;
+	bool is_body_message;
+};
+
+struct HttpRequestParsedResult {
+	HttpRequestResult request_result;
+	IsHttpRequestFormat is_http_request_format;
+}
+
 class HttpParse {
   public:
 	static HttpRequestResult Run(const std::string &buf);
