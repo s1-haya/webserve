@@ -9,16 +9,24 @@ int GetTestCaseNum() {
 	return test_case_num;
 }
 
+int ResultOk() {
+	std::cout << utils::color::GREEN << GetTestCaseNum() << ".[OK]" << utils::color::RESET
+			  << std::endl;
+	return EXIT_SUCCESS;
+}
+
+int ResultNg() {
+	std::cerr << utils::color::RED << GetTestCaseNum() << ".[NG] " << utils::color::RESET
+			  << std::endl;
+	return EXIT_FAILURE;
+}
+
 template <typename T>
 int HandleResult(const T &result, const T &expected) {
 	if (result == expected) {
-		std::cout << utils::color::GREEN << GetTestCaseNum() << ".[OK]" << utils::color::RESET
-				  << std::endl;
-		return EXIT_SUCCESS;
+		return ResultOk();
 	} else {
-		std::cerr << utils::color::RED << GetTestCaseNum() << ".[NG] " << utils::color::RESET
-				  << std::endl;
-		return EXIT_FAILURE;
+		return ResultNg();
 	}
 }
 
@@ -35,21 +43,43 @@ int main(void) {
 	ret_code |= HandleResult(save_data.save_request_result.status_code, http::OK);
 
 	// ClientSaveDataを更新 -> OK
-	save_data.save_request_result.status_code = http::BAD_REQUEST;
-	storage.UpdateClientSaveData(1, save_data);
-	http::ClientSaveData update_data = storage.GetClientSaveData(1);
-	ret_code |= HandleResult(update_data.save_request_result.status_code, http::BAD_REQUEST);
+	try {
+		save_data.save_request_result.status_code = http::BAD_REQUEST;
+		storage.UpdateClientSaveData(1, save_data);
+		http::ClientSaveData update_data = storage.GetClientSaveData(1);
+		ret_code |= HandleResult(update_data.save_request_result.status_code, http::BAD_REQUEST);
+	} catch (const std::logic_error &e) {
+		ret_code |= ResultNg();
+		std::cerr << e.what() << std::endl;
+	}
 
 	// 更新するClientSaveDataが存在しない場合 -> Logic Error
-	// storage.UpdateClientSaveData(100, save_data);
+	try {
+		storage.UpdateClientSaveData(100, save_data);
+		ret_code |= ResultNg();
+	} catch (const std::logic_error &e) {
+		ret_code |= ResultOk();
+		std::cerr << e.what() << std::endl;
+	}
 
 	// ClientSaveDataを削除 -> OK
-	storage.DeleteClientSaveData(1);
-	new_data = storage.GetClientSaveData(1);
-	// 更新したSaveData情報を削除されているかどうかを確認するため、BAD_REQUESTではなくOK
-	ret_code |= HandleResult(new_data.save_request_result.status_code, http::OK);
+	try {
+		storage.DeleteClientSaveData(1);
+		new_data = storage.GetClientSaveData(1);
+		// 更新したSaveData情報を削除されているかどうかを確認するため、BAD_REQUESTではなくOK
+		ret_code |= HandleResult(new_data.save_request_result.status_code, http::OK);
+	} catch (const std::logic_error &e) {
+		ret_code |= ResultNg();
+		std::cerr << e.what() << std::endl;
+	}
 
 	// 削除するClientSaveDataが存在しない場合 -> Logic Error
-	// storage.DeleteClientSaveData(100);
+	try {
+		storage.DeleteClientSaveData(100);
+		ret_code |= ResultNg();
+	} catch (const std::logic_error &e) {
+		ret_code |= ResultOk();
+		std::cerr << e.what() << std::endl;
+	}
 	return ret_code;
 }

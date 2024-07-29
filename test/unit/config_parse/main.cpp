@@ -6,7 +6,8 @@
 #include <iostream>
 #include <sstream>
 
-namespace config {
+using namespace config;
+
 namespace {
 
 void PrintServers(std::list<context::ServerCon> *servers_) { /*デバッグ用*/
@@ -73,5 +74,3 @@ int main() {
 		return EXIT_FAILURE;
 	}
 }
-
-} // namespace config

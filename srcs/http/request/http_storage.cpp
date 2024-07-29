@@ -9,11 +9,7 @@ HttpStorage::~HttpStorage() {}
 
 // ClientSaveDataを初期化する関数
 void HttpStorage::CreateClientSaveData(int client_fd) {
-	if (IsClientSaveData(client_fd)) {
-		throw std::logic_error("ClientSaveData already exists.");
-	} else {
-		save_data_[client_fd] = ClientSaveData();
-	}
+	save_data_[client_fd] = ClientSaveData();
 }
 
 // ClientSaveDataが存在するかを確認する関数
