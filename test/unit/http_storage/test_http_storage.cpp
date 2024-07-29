@@ -30,7 +30,6 @@ int HandleResult(const T &result, const T &expected) {
 	}
 }
 
-
 int main(void) {
 	int               ret_code = 0;
 	http::HttpStorage storage;
