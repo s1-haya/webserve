@@ -91,8 +91,8 @@ Result IsSameStatusCode(http::StatusCode status_code, http::StatusCode expected)
 	if (status_code != expected) {
 		std::ostringstream error_log;
 		error_log << "Error: Status Code\n";
-		error_log << "- Expected: [" << status_code << "]\n";
-		error_log << "- Result  : [" << expected << "]\n";
+		error_log << "- Expected: [" << expected << "]\n";
+		error_log << "- Result  : [" << status_code << "]\n";
 		status_code_result.is_success = false;
 		status_code_result.error_log  = error_log.str();
 	}
