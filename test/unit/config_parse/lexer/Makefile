@@ -1,6 +1,12 @@
 NAME			:=	a.out
 
 # 1. Set each directory name
+TEST_DIR		:=	lexer
+
+LOG_DIR			:=	log
+LOG_FILE_NAME	:=	$(TEST_DIR).log
+LOG_FILE_PATH	:=	$(LOG_DIR)/$(LOG_FILE_NAME)
+
 # 2. Add target webserv files
 WS_SRCS_DIR		:=	../../../../srcs
 WS_UTILS_DIR	:=	$(WS_SRCS_DIR)/utils
@@ -50,8 +56,21 @@ fclean: clean
 .PHONY	: re
 re: fclean all
 
+#--------------------------------------------
+# PIPESTATUSがbash固有のため
+SHELL=/bin/bash
+
 .PHONY	: run
 run: all
-	./$(NAME)
+	@$(MKDIR) $(dir $(LOG_FILE_PATH))
+	@./$(NAME) 2>&1 | tee $(LOG_FILE_PATH); \
+	status=$${PIPESTATUS[0]}; \
+	echo -e "\nunit test's log =>" $(LOG_FILE_PATH); \
+	exit $$status;
+
+.PHONY	: val
+val: all
+	@valgrind ./$(NAME)
+#--------------------------------------------
 
 -include $(DEPS)
