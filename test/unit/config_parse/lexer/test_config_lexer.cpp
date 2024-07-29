@@ -34,16 +34,6 @@ void PrintError(const std::string &message) {
 	std::cerr << utils::color::RED << message << utils::color::RESET << std::endl;
 }
 
-int Test(Result result) {
-	if (result.is_success) {
-		PrintOk();
-		return EXIT_SUCCESS;
-	}
-	PrintNg();
-	PrintError(result.error_log);
-	return EXIT_FAILURE;
-}
-
 } // namespace
 
 /*------------------------------------------------------------------*/
@@ -103,7 +93,6 @@ Result Run(const std::string &src, const NodeList &expected) {
 	lexer::Lexer lex(src, nodes);
 	if (nodes != expected) {
 		std::ostringstream error_log;
-		error_log << "Error: Status Code\n";
 		error_log << "- Expected: [ " << expected << " ]\n";
 		error_log << "- Result  : [ " << nodes << " ]\n";
 		run_result.is_success = false;
@@ -112,13 +101,13 @@ Result Run(const std::string &src, const NodeList &expected) {
 	return run_result;
 }
 
-int HandleResult(const Result &result, const std::string &src) {
+int Test(const Result &result, const std::string &src) {
 	if (result.is_success) {
 		PrintOk();
 		return EXIT_SUCCESS;
 	} else {
 		PrintNg();
-		std::cerr << utils::color::RED << "ConfigLexer failed:" << utils::color::RESET << std::endl;
+		PrintError("ConfigLexer failed:");
 		std::cerr << "src:[\n" << src << "]" << std::endl;
 		std::cerr << "--------------------------------" << std::endl;
 		std::cerr << result.error_log;
@@ -131,7 +120,7 @@ int RunTests(const TestCase test_cases[], std::size_t num_test_cases) {
 
 	for (std::size_t i = 0; i < num_test_cases; i++) {
 		const TestCase test_case = test_cases[i];
-		ret_code |= HandleResult(Run(test_case.input, test_case.expected), test_case.input);
+		ret_code |= Test(Run(test_case.input, test_case.expected), test_case.input);
 	}
 	return ret_code;
 }
@@ -167,14 +156,14 @@ int main(int argc, char *argv[]) {
 
 	static const TestCase test_cases[] = {
 		TestCase(
-			"server { \
+			"server {\n \
 				}\n",
 			expected_result_test_1
 		),
 		TestCase(
-			"server { \
-					location { \
-					} \
+			"server {\n \
+					location {\n \
+					}\n \
 				}\n",
 			expected_result_test_2
 		)
