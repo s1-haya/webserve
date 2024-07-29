@@ -1,5 +1,5 @@
-#include "_config.hpp"
 #include "color.hpp"
+#include "config.hpp"
 #include "server.hpp"
 #include <cstdlib> // EXIT_
 #include <iostream>
@@ -27,10 +27,10 @@ int main(int argc, char **argv) {
 	} else {
 		path_config = std::string(argv[1]);
 	}
-	_config::Config::ConfigData config = _config::Config::ParseConfig(path_config);
-
 	try {
-		server::Server server(config);
+		config::ConfigInstance->Create(path_config);
+		server::Server server(config::ConfigInstance->servers_);
+		config::ConfigInstance->Destroy();
 		server.Init();
 		server.Run();
 	} catch (const std::exception &e) {
