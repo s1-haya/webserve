@@ -60,7 +60,9 @@ int main() {
 		std::string conf = "config_samp.conf";
 		config::ConfigInstance->Create(conf);
 		config::PrintServersLocation(&(config::ConfigInstance->servers_));
+		config::ConfigInstance->Destroy();
 	} catch (const std::exception &e) {
 		std::cerr << e.what() << '\n';
+		config::ConfigInstance->Destroy();
 	}
 }

@@ -1,6 +1,7 @@
 /*-----------------Parser----------------*/
 #include "../../../srcs/config_parse/lexer.hpp"
 #include "../../../srcs/config_parse/parser.hpp"
+#include <cstdlib>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -60,8 +61,8 @@ int main() {
 	ss << conf.rdbuf();
 	std::string buffer = ss.str();
 	try {
-		std::list<config::node::Node> *tokens_ = new std::list<node::Node>;
-		lexer::Lexer                   lex(buffer, *tokens_);
+		std::list<node::Node> *tokens_ = new std::list<node::Node>;
+		lexer::Lexer           lex(buffer, *tokens_);
 		// PrintTokens(tokens_);
 		parser::Parser                par(*tokens_);
 		std::list<context::ServerCon> servers = par.GetServers();

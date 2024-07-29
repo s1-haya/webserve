@@ -12,12 +12,12 @@ namespace config {
 
 class Config {
   private:
+	Config();
 	Config(const std::string &file_path);
 	Config(const Config &);
-	Config                &operator=(const Config &);
-	static const Config   *s_cInstance;
-	std::list<node::Node> *tokens_;
-	std::ifstream          config_file_;
+	Config              &operator=(const Config &);
+	static const Config *s_cInstance;
+	std::ifstream        config_file_;
 
   public:
 	~Config();

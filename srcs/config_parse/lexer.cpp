@@ -1,10 +1,19 @@
 #include "lexer.hpp"
-#include "../utils/utils.hpp"
 #include <algorithm>
 #include <iostream>
 
 namespace config {
 namespace lexer {
+namespace {
+
+bool IsSpace(char c) { // 必要か
+	if (c == ' ' || c == '\t' || c == '\r' || c == '\n') {
+		return true;
+	}
+	return false;
+}
+
+} // namespace
 
 Lexer::Lexer(const std::string &buffer, std::list<node::Node> &tokens)
 	: tokens_(tokens), buffer_(buffer) {
@@ -30,8 +39,9 @@ void Lexer::LexBuffer() {
 
 	for (std::string::const_iterator it = buffer_.begin(); it != buffer_.end() && *it != '\0';
 		 ++it) {
-		if (utils::IsSpace(*it))
+		if (IsSpace(*it)) {
 			continue;
+		}
 		switch (*it) {
 		case SEMICOLON_CHR:
 			AddToken(SEMICOLON_CHR, node::DELIM);
@@ -50,10 +60,11 @@ void Lexer::LexBuffer() {
 			is_next_to_word = false;
 			break;
 		default:
-			if (is_next_to_word)
+			if (is_next_to_word) {
 				AddWordToken(it);
-			else
+			} else {
 				AddContextDirectiveWordToken(it);
+			}
 			is_next_to_word = true;
 			break;
 		}
@@ -73,36 +84,42 @@ void Lexer::AddToken(const std::string &symbol, node::TokenType token_type) {
 	tokens_.push_back(token);
 }
 
+/*LexBuffer()内でfor文で++itしているため、最後の文字から次の処理をさせるために各関数の最後に--itがついています
+ex. server -> rから次のfor文に*/
+
 void Lexer::AddWordToken(std::string::const_iterator &it) {
-	std::string new_str = "";
-	while (it != buffer_.end() && !utils::IsSpace(*it) && *it != SEMICOLON_CHR) {
+	std::string new_str;
+	while (it != buffer_.end() && !IsSpace(*it) && *it != SEMICOLON_CHR) {
 		new_str += *it;
 		++it;
 	}
 	AddToken(new_str, node::WORD);
-	--it; // loopでWordの次の文字から処理
+	--it;
 }
 
 void Lexer::AddContextDirectiveWordToken(std::string::const_iterator &it) {
-	std::string new_str = "";
-	while (it != buffer_.end() && !utils::IsSpace(*it) && *it != SEMICOLON_CHR) {
+	std::string new_str;
+	while (it != buffer_.end() && !IsSpace(*it) && *it != SEMICOLON_CHR) {
 		new_str += *it;
 		++it;
 	}
 	AddToken(new_str, SearchWordTokenType(new_str)); // 予約語の検索
-	--it;                                            // loopでWordの次の文字から処理
+	--it;
 }
 
 void Lexer::SkipComment(std::string::const_iterator &it) {
-	while (it != buffer_.end() && *it != '\n')
+	while (it != buffer_.end() && *it != '\n') {
 		++it;
+	}
+	--it;
 }
 
 node::TokenType Lexer::SearchWordTokenType(std::string &word) {
-	if (std::find(context_.begin(), context_.end(), word) != context_.end())
+	if (std::find(context_.begin(), context_.end(), word) != context_.end()) {
 		return node::CONTEXT;
-	else if (std::find(directive_.begin(), directive_.end(), word) != directive_.end())
+	} else if (std::find(directive_.begin(), directive_.end(), word) != directive_.end()) {
 		return node::DIRECTIVE;
+	}
 	return node::WORD;
 }
 
