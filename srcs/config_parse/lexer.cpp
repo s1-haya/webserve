@@ -7,8 +7,9 @@ namespace lexer {
 namespace {
 
 bool IsSpace(char c) { // 必要か
-	if (c == ' ' || c == '\t' || c == '\r' || c == '\n')
+	if (c == ' ' || c == '\t' || c == '\r' || c == '\n') {
 		return true;
+	}
 	return false;
 }
 
@@ -38,8 +39,9 @@ void Lexer::LexBuffer() {
 
 	for (std::string::const_iterator it = buffer_.begin(); it != buffer_.end() && *it != '\0';
 		 ++it) {
-		if (IsSpace(*it))
+		if (IsSpace(*it)) {
 			continue;
+		}
 		switch (*it) {
 		case SEMICOLON_CHR:
 			AddToken(SEMICOLON_CHR, node::DELIM);
@@ -103,15 +105,17 @@ void Lexer::AddContextDirectiveWordToken(std::string::const_iterator &it) {
 }
 
 void Lexer::SkipComment(std::string::const_iterator &it) {
-	while (it != buffer_.end() && *it != '\n')
+	while (it != buffer_.end() && *it != '\n') {
 		++it;
+	}
 }
 
 node::TokenType Lexer::SearchWordTokenType(std::string &word) {
-	if (std::find(context_.begin(), context_.end(), word) != context_.end())
+	if (std::find(context_.begin(), context_.end(), word) != context_.end()) {
 		return node::CONTEXT;
-	else if (std::find(directive_.begin(), directive_.end(), word) != directive_.end())
+	} else if (std::find(directive_.begin(), directive_.end(), word) != directive_.end()) {
 		return node::DIRECTIVE;
+	}
 	return node::WORD;
 }
 
