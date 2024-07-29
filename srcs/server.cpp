@@ -38,8 +38,8 @@ std::list<TempConfig> CreateTempConfig() {
 VirtualServer::PortList ConvertPorts(const std::list<std::string> &ports_str) {
 	VirtualServer::PortList port_list;
 
-	typedef std::list<std::string>::const_iterator It;
-	for (It it = ports_str.begin(); it != ports_str.end(); ++it) {
+	typedef std::list<std::string>::const_iterator Itr;
+	for (Itr it = ports_str.begin(); it != ports_str.end(); ++it) {
 		unsigned int port;
 		if (!utils::ConvertStrToUint(*it, port)) {
 			// todo: original exception
