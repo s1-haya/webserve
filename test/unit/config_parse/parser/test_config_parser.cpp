@@ -90,7 +90,7 @@ struct TestCase {
 	const ServerList  expected;
 };
 
-std::ostream &operator<<(std::ostream &os, const context::LocationCon location) {
+std::ostream &operator<<(std::ostream &os, const context::LocationCon &location) {
 	os << "{location: " << location.location << ", "
 	   << "root: " << location.root << ", "
 	   << "index: " << location.index << ", "
@@ -98,10 +98,34 @@ std::ostream &operator<<(std::ostream &os, const context::LocationCon location) 
 	return os;
 }
 
-std::ostream &operator<<(std::ostream &os, const context::ServerCon server) {
-	os << "{port: " << *(server.port.begin()) << ", " // tmp
+std::ostream &operator<<(std::ostream &os, const LocationList &locations) {
+	LocationList::const_iterator it = locations.begin();
+	while (it != locations.end()) {
+		os << *it;
+		++it;
+		if (it != locations.end()) {
+			os << ", ";
+		}
+	}
+	return os;
+}
+
+std::ostream &operator<<(std::ostream &os, const std::list<int> &ports) {
+	std::list<int>::const_iterator it = ports.begin();
+	while (it != ports.end()) {
+		os << *it;
+		++it;
+		if (it != ports.end()) {
+			os << ", ";
+		}
+	}
+	return os;
+}
+
+std::ostream &operator<<(std::ostream &os, const context::ServerCon &server) {
+	os << "{port: " << server.port << ", "
 	   << "server_name: " << server.server_name << ", "
-	   << "location_context: " << *(server.location_con.begin()) << "}"; // tmp
+	   << "location_context: " << server.location_con << "}"; // {}で括る
 	return os;
 }
 
