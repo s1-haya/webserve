@@ -4,6 +4,19 @@
 #include <iostream>
 #include <sstream> // ostringstream
 
+namespace server {
+
+// テストfail時のPortListのdebug出力用
+std::ostream &operator<<(std::ostream &os, const VirtualServer::PortList &ports) {
+	typedef VirtualServer::PortList::const_iterator It;
+	for (It it = ports.begin(); it != ports.end(); ++it) {
+		os << "[" << *it << "]";
+	}
+	return os;
+}
+
+} // namespace server
+
 namespace {
 
 typedef server::VirtualServer::LocationList LocationList;
@@ -71,6 +84,8 @@ Result TestIsSameMembers(
 	const LocationList          &expected_locations,
 	const PortList              &expected_ports
 ) {
+	using namespace server;
+
 	Result result;
 	result.is_ok = true;
 	std::ostringstream oss;
@@ -101,9 +116,9 @@ Result TestIsSameMembers(
 		result.is_ok = false;
 		oss << "ports" << std::endl;
 		oss << "- result  " << std::endl;
-		oss << "[" << PrintList(ports) << "]" << std::endl;
+		oss << ports << std::endl;
 		oss << "- expected" << std::endl;
-		oss << "[" << PrintList(expected_ports) << "]" << std::endl;
+		oss << expected_ports << std::endl;
 	}
 
 	result.error_log = oss.str();
