@@ -119,7 +119,7 @@ std::ostream &operator<<(std::ostream &os, const std::list<int> &ports) {
 std::ostream &operator<<(std::ostream &os, const context::ServerCon &server) {
 	os << "{port: " << server.port << ", "
 	   << "server_name: " << server.server_name << ", "
-	   << "location_context: " << server.location_con << "}"; // {}で括る
+	   << "location_context: " << server.location_con << "}";
 	return os;
 }
 
