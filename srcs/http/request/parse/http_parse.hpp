@@ -60,6 +60,8 @@ class HttpParse {
   private:
 	HttpParse();
 	~HttpParse();
+	static void ParseRequestLine(HttpRequestParsedData *data);
+
 	static RequestLine  SetRequestLine(const std::vector<std::string> &request_line);
 	static HeaderFields SetHeaderFields(const std::vector<std::string> &header_fields_info);
 	static void         CheckValidRequestLine(const std::vector<std::string> &request_line_info);
