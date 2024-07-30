@@ -4,7 +4,8 @@ TEST_DIRS	:=	convert_str \
 				http_parse \
 				split_str \
 				virtual_server \
-				virtual_server_storage
+				virtual_server_storage \
+				config_parse/lexer
 
 .PHONY	: run
 run:
