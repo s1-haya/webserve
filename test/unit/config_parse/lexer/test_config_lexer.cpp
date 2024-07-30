@@ -136,6 +136,7 @@ NodeList MakeExpectedTest1() {
 	node::Node expected_node_1 = {"server", node::CONTEXT};
 	node::Node expected_node_2 = {"{", node::L_BRACKET};
 	node::Node expected_node_3 = {"}", node::R_BRACKET};
+
 	expected_result.push_back(expected_node_1);
 	expected_result.push_back(expected_node_2);
 	expected_result.push_back(expected_node_3);
@@ -150,15 +151,18 @@ NodeList MakeExpectedTest2() {
 	node::Node expected_node_1 = {"server", node::CONTEXT};
 	node::Node expected_node_2 = {"{", node::L_BRACKET};
 	node::Node expected_node_3 = {"location", node::CONTEXT};
-	node::Node expected_node_4 = {"{", node::L_BRACKET};
-	node::Node expected_node_5 = {"}", node::R_BRACKET};
+	node::Node expected_node_4 = {"/", node::WORD};
+	node::Node expected_node_5 = {"{", node::L_BRACKET};
 	node::Node expected_node_6 = {"}", node::R_BRACKET};
+	node::Node expected_node_7 = {"}", node::R_BRACKET};
+
 	expected_result.push_back(expected_node_1);
 	expected_result.push_back(expected_node_2);
 	expected_result.push_back(expected_node_3);
 	expected_result.push_back(expected_node_4);
 	expected_result.push_back(expected_node_5);
 	expected_result.push_back(expected_node_6);
+	expected_result.push_back(expected_node_7);
 
 	return expected_result;
 }
@@ -179,7 +183,7 @@ int main() {
 		),
 		TestCase(
 			"server {\n \
-					location {\n \
+					location / {\n \
 					}\n \
 				}\n",
 			expected_result_test_2
