@@ -43,6 +43,10 @@ std::string StrTrimLeadingOptionalWhitespace(const std::string &str) {
 
 } // namespace
 
+// todo: is_request_lineがfalseの場合
+// - current_bufをCRLFまで切り取る。
+// - HttpRequestResultを格納する。
+// - is_request_line = true;
 void HttpParse::ParseRequestLine(HttpRequestParsedData *data) {
 	if (!data->is_request_format.is_request_line) {
 		size_t pos = data->current_buf.find(CRLF);
@@ -56,6 +60,11 @@ void HttpParse::ParseRequestLine(HttpRequestParsedData *data) {
 	}
 }
 
+// todo: is_request_lineがtrue, is_header_filedsがfalseの場合
+// - current_bufをCRLFCRLFまで切り取る。
+// - HttpRequestResultを格納する。
+// - is_header_fileds = true;
+// - ContentLengthとTRANSFER_ENCORDINGがない場合 is_body_message = true;
 void HttpParse::ParseHeaderFields(HttpRequestParsedData *data) {
 	if (data->is_request_format.is_request_line && !data->is_request_format.is_header_fields) {
 		size_t pos = data->current_buf.find(CRLF + CRLF);
@@ -75,30 +84,26 @@ void HttpParse::ParseHeaderFields(HttpRequestParsedData *data) {
 	}
 }
 
+// todo: is_request_lineとis_header_fieldsがtrue, is_bodyがfalseの場合（今回はContentLengthのみ
+// - current_bufをContentLength文まで読み取り、HttpRequestResultを格納する。
+// - is_body_message = true;
+void HttpParse::ParseBodyMessage(HttpRequestParsedData *data) {
+	if (data->is_request_format.is_request_line && data->is_request_format.is_header_fields &&
+		!data->is_request_format.is_body_message) {
+		// todo: current_bufをContentLength文まで読み取り、HttpRequestResultを格納する
+		// todo: ContentLengthまで読み込んだらtrueになる
+		data->is_request_format.is_body_message = true;
+	}
+}
+
 void HttpParse::TmpRun(HttpRequestParsedData *data) {
 	try {
 		ParseRequestLine(data);
 		ParseHeaderFields(data);
+		ParseBodyMessage(data);
 	} catch (const HttpParseException &e) {
 		data->request_result.status_code = e.GetStatusCode();
 	}
-
-	// todo: is_request_lineがtrue, is_header_filedsがfalseの場合
-	// if (is_request_line && !is_header_fileds) {
-	// todo:
-	// - current_bufをCRLFCRLFまで切り取る。
-	// - HttpRequestResultを格納する。
-	// - is_header_fileds = true;
-	// - ContentLengthとTRANSFER_ENCORDINGがない場合 is_body_message = true;
-	//}
-
-	// todo: is_request_lineとis_header_fieldsがtrue,
-	// is_bodyがfalseの場合（今回はContentLengthのみ） if (is_request_line && is_header_fileds &&
-	// !is_body_message) { todo:
-	// - current_bufをContentLength文まで読み取る。
-	// - HttpRequestResultを格納する。
-	// - is_body_message = true;
-	//}
 }
 
 // todo: tmp request_

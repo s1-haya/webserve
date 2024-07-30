@@ -62,6 +62,7 @@ class HttpParse {
 	~HttpParse();
 	static void ParseRequestLine(HttpRequestParsedData *data);
 	static void ParseHeaderFields(HttpRequestParsedData *data);
+	static void ParseBodyMessage(HttpRequestParsedData *data);
 
 	static RequestLine  SetRequestLine(const std::vector<std::string> &request_line);
 	static HeaderFields SetHeaderFields(const std::vector<std::string> &header_fields_info);

@@ -68,7 +68,7 @@ int main(void) {
 	ret_code |= HandleResult(test3_header_fileds.GetStatusCode(1), http::OK);
 	ret_code |= HandleResult(test3_header_fileds.GetIsRequestLineFormat(1), true);
 	ret_code |= HandleResult(test3_header_fileds.GetIsHeaderFieldsFormat(1), true);
-	ret_code |= HandleResult(test3_header_fileds.GetIsBodyMessageFormat(1), false);
+	ret_code |= HandleResult(test3_header_fileds.GetIsBodyMessageFormat(1), true);
 
 	// const std::string &expected1 = "OK";
 	// ret_code |= HandleResult(test.CreateHttpResponse(1), expected1);
