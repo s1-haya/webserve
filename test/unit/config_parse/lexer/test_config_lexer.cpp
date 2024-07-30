@@ -323,6 +323,41 @@ NodeList MakeExpectedTest6() {
 	return expected_result;
 }
 
+/* Test7 Quotation*/
+NodeList MakeExpectedTest7() {
+	NodeList expected_result;
+
+	node::Node expected_node_1  = {"server", node::CONTEXT};
+	node::Node expected_node_2  = {"{", node::L_BRACKET};
+	node::Node expected_node_3  = {"server_name", node::DIRECTIVE};
+	node::Node expected_node_4  = {"test.serv", node::WORD};
+	node::Node expected_node_5  = {";", node::DELIM};
+	node::Node expected_node_6  = {"location", node::CONTEXT};
+	node::Node expected_node_7  = {"/", node::WORD};
+	node::Node expected_node_8  = {"{", node::L_BRACKET};
+	node::Node expected_node_9  = {"index", node::DIRECTIVE};
+	node::Node expected_node_10 = {"index.html", node::WORD};
+	node::Node expected_node_11 = {";", node::DELIM};
+	node::Node expected_node_12 = {"}", node::R_BRACKET};
+	node::Node expected_node_13 = {"}", node::R_BRACKET};
+
+	expected_result.push_back(expected_node_1);
+	expected_result.push_back(expected_node_2);
+	expected_result.push_back(expected_node_3);
+	expected_result.push_back(expected_node_4);
+	expected_result.push_back(expected_node_5);
+	expected_result.push_back(expected_node_6);
+	expected_result.push_back(expected_node_7);
+	expected_result.push_back(expected_node_8);
+	expected_result.push_back(expected_node_9);
+	expected_result.push_back(expected_node_10);
+	expected_result.push_back(expected_node_11);
+	expected_result.push_back(expected_node_12);
+	expected_result.push_back(expected_node_13);
+
+	return expected_result;
+}
+
 } // namespace
 
 int main() {
@@ -334,6 +369,7 @@ int main() {
 	NodeList expected_result_test_4 = MakeExpectedTest4();
 	NodeList expected_result_test_5 = MakeExpectedTest5();
 	NodeList expected_result_test_6 = MakeExpectedTest6();
+	NodeList expected_result_test_7 = MakeExpectedTest7();
 
 	static TestCase test_cases[] = {
 		TestCase(
@@ -384,6 +420,15 @@ int main() {
 					}\n \
 				}\n",
 			expected_result_test_6
+		),
+		TestCase(
+			"server {\n \
+					server_name \"test.serv\";\n \
+					location / {\n \
+						index \"index.html\";\n \
+					}\n \
+				}\n",
+			expected_result_test_7
 		),
 	};
 
