@@ -50,4 +50,9 @@ bool TmpHttp::GetIsRequestLineFormat(int client_fd) {
 	return (save_data.is_request_format.is_request_line);
 }
 
+bool TmpHttp::GetIsHeaderFieldsFormat(int client_fd) {
+	HttpRequestParsedData save_data = storage_.GetClientSaveData(client_fd);
+	return (save_data.is_request_format.is_header_fields);
+}
+
 } // namespace http

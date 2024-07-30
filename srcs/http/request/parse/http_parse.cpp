@@ -51,6 +51,20 @@ void HttpParse::ParseRequestLine(HttpRequestParsedData *data) {
 			data->request_result.request.request_line =
 				SetRequestLine(utils::SplitStr(request_line, SP));
 			data->is_request_format.is_request_line = true;
+			data->current_buf.erase(0, pos + 2);
+		}
+	}
+}
+
+void HttpParse::ParseHeaderFields(HttpRequestParsedData *data) {
+	if (data->is_request_format.is_request_line && !data->is_request_format.is_header_fields) {
+		size_t pos = data->current_buf.find(CRLF + CRLF);
+		if (pos != std::string::npos) {
+			std::string header_fileds = data->current_buf.substr(0, pos);
+			data->request_result.request.header_fields =
+				SetHeaderFields(utils::SplitStr(header_fileds, CRLF));
+			data->is_request_format.is_header_fields = true;
+			data->current_buf.erase(0, pos + 2);
 		}
 	}
 }
@@ -58,6 +72,7 @@ void HttpParse::ParseRequestLine(HttpRequestParsedData *data) {
 void HttpParse::TmpRun(HttpRequestParsedData *data) {
 	try {
 		ParseRequestLine(data);
+		ParseHeaderFields(data);
 	} catch (const HttpParseException &e) {
 		data->request_result.status_code = e.GetStatusCode();
 	}

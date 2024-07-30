@@ -44,6 +44,20 @@ int main(void) {
 	ret_code |= HandleResult(test3.GetStatusCode(1), http::OK);
 	ret_code |= HandleResult(test3.GetIsRequestLineFormat(1), false);
 
+	// ヘッダフィールドの書式が正しい場合
+	http::TmpHttp test1_header_fileds;
+	test1_header_fileds.ParseHttpRequestFormat(1, "GET / HTTP/1.1\r\nHost: a\r\n\r\n");
+	ret_code |= HandleResult(test1_header_fileds.GetStatusCode(1), http::OK);
+	ret_code |= HandleResult(test1_header_fileds.GetIsRequestLineFormat(1), true);
+	ret_code |= HandleResult(test1_header_fileds.GetIsHeaderFieldsFormat(1), true);
+
+	// ヘッダフィールドの書式が正しくない場合
+	http::TmpHttp test2_header_fileds;
+	test2_header_fileds.ParseHttpRequestFormat(1, "GET / HTTP/1.1\r\nHost \r\n\r\n");
+	ret_code |= HandleResult(test2_header_fileds.GetStatusCode(1), http::BAD_REQUEST);
+	ret_code |= HandleResult(test2_header_fileds.GetIsRequestLineFormat(1), true);
+	ret_code |= HandleResult(test2_header_fileds.GetIsHeaderFieldsFormat(1), false);
+
 	// const std::string &expected1 = "OK";
 	// ret_code |= HandleResult(test.CreateHttpResponse(1), expected1);
 	// ret_code |= HandleResult(test.GetIsHttpRequestFormatComplete(1), false);

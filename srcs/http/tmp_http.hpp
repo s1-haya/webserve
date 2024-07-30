@@ -18,6 +18,7 @@ class TmpHttp {
 	// For test
 	StatusCode GetStatusCode(int client_fd);
 	bool       GetIsRequestLineFormat(int client_fd);
+	bool       GetIsHeaderFieldsFormat(int client_fd);
 
   private:
 	TmpHttp(const TmpHttp &other);
