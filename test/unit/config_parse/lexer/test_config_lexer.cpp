@@ -167,6 +167,84 @@ NodeList MakeExpectedTest2() {
 	return expected_result;
 }
 
+/* Test3 */
+NodeList MakeExpectedTest3() {
+	NodeList expected_result;
+
+	node::Node expected_node_1  = {"server", node::CONTEXT};
+	node::Node expected_node_2  = {"{", node::L_BRACKET};
+	node::Node expected_node_3  = {"listen", node::DIRECTIVE};
+	node::Node expected_node_4  = {"8080", node::WORD};
+	node::Node expected_node_5  = {";", node::DELIM};
+	node::Node expected_node_6  = {"server_name", node::DIRECTIVE};
+	node::Node expected_node_7  = {"localhost", node::WORD};
+	node::Node expected_node_8  = {";", node::DELIM};
+	node::Node expected_node_9  = {"location", node::CONTEXT};
+	node::Node expected_node_10 = {"/", node::WORD};
+	node::Node expected_node_11 = {"{", node::L_BRACKET};
+	node::Node expected_node_12 = {"root", node::DIRECTIVE};
+	node::Node expected_node_13 = {"/data/", node::WORD};
+	node::Node expected_node_14 = {";", node::DELIM};
+	node::Node expected_node_15 = {"index", node::DIRECTIVE};
+	node::Node expected_node_16 = {"index.html", node::WORD};
+	node::Node expected_node_17 = {";", node::DELIM};
+	node::Node expected_node_18 = {"}", node::R_BRACKET};
+	node::Node expected_node_19 = {"}", node::R_BRACKET};
+
+	expected_result.push_back(expected_node_1);
+	expected_result.push_back(expected_node_2);
+	expected_result.push_back(expected_node_3);
+	expected_result.push_back(expected_node_4);
+	expected_result.push_back(expected_node_5);
+	expected_result.push_back(expected_node_6);
+	expected_result.push_back(expected_node_7);
+	expected_result.push_back(expected_node_8);
+	expected_result.push_back(expected_node_9);
+	expected_result.push_back(expected_node_10);
+	expected_result.push_back(expected_node_11);
+	expected_result.push_back(expected_node_12);
+	expected_result.push_back(expected_node_13);
+	expected_result.push_back(expected_node_14);
+	expected_result.push_back(expected_node_15);
+	expected_result.push_back(expected_node_16);
+	expected_result.push_back(expected_node_17);
+	expected_result.push_back(expected_node_18);
+	expected_result.push_back(expected_node_19);
+
+	return expected_result;
+}
+
+/* Test4 */
+NodeList MakeExpectedTest4() {
+	NodeList expected_result;
+
+	node::Node expected_node_1  = {"server", node::CONTEXT};
+	node::Node expected_node_2  = {"{", node::L_BRACKET};
+	node::Node expected_node_3  = {"listen", node::DIRECTIVE};
+	node::Node expected_node_4  = {"8080", node::WORD};
+	node::Node expected_node_5  = {"8000", node::WORD};
+	node::Node expected_node_6  = {"80", node::WORD};
+	node::Node expected_node_7  = {";", node::DELIM};
+	node::Node expected_node_8  = {"server_name", node::DIRECTIVE};
+	node::Node expected_node_9  = {"server_name", node::WORD};
+	node::Node expected_node_10 = {";", node::DELIM};
+	node::Node expected_node_11 = {"}", node::R_BRACKET};
+
+	expected_result.push_back(expected_node_1);
+	expected_result.push_back(expected_node_2);
+	expected_result.push_back(expected_node_3);
+	expected_result.push_back(expected_node_4);
+	expected_result.push_back(expected_node_5);
+	expected_result.push_back(expected_node_6);
+	expected_result.push_back(expected_node_7);
+	expected_result.push_back(expected_node_8);
+	expected_result.push_back(expected_node_9);
+	expected_result.push_back(expected_node_10);
+	expected_result.push_back(expected_node_11);
+
+	return expected_result;
+}
+
 } // namespace
 
 int main() {
@@ -174,6 +252,8 @@ int main() {
 
 	NodeList expected_result_test_1 = MakeExpectedTest1();
 	NodeList expected_result_test_2 = MakeExpectedTest2();
+	NodeList expected_result_test_3 = MakeExpectedTest3();
+	NodeList expected_result_test_4 = MakeExpectedTest4();
 
 	static TestCase test_cases[] = {
 		TestCase(
@@ -187,6 +267,24 @@ int main() {
 					}\n \
 				}\n",
 			expected_result_test_2
+		),
+		TestCase(
+			"server {\n \
+					listen 8080;\n \
+					server_name localhost;\n \
+					location / {\n \
+						root /data/;\n \
+						index index.html;\n \
+					}\n \
+				}\n",
+			expected_result_test_3
+		),
+		TestCase(
+			"server {\n \
+					listen 8080 8000 80;\n \
+					server_name server_name;\n \
+				}\n",
+			expected_result_test_4
 		)
 	};
 
