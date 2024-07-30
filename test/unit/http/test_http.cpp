@@ -50,13 +50,25 @@ int main(void) {
 	ret_code |= HandleResult(test1_header_fileds.GetStatusCode(1), http::OK);
 	ret_code |= HandleResult(test1_header_fileds.GetIsRequestLineFormat(1), true);
 	ret_code |= HandleResult(test1_header_fileds.GetIsHeaderFieldsFormat(1), true);
+	ret_code |= HandleResult(test1_header_fileds.GetIsBodyMessageFormat(1), true);
 
 	// ヘッダフィールドの書式が正しくない場合
 	http::TmpHttp test2_header_fileds;
-	test2_header_fileds.ParseHttpRequestFormat(1, "GET / HTTP/1.1\r\nHost \r\n\r\n");
+	test2_header_fileds.ParseHttpRequestFormat(1, "GET / HTTP/1.1\r\nHost :\r\n\r\n");
 	ret_code |= HandleResult(test2_header_fileds.GetStatusCode(1), http::BAD_REQUEST);
 	ret_code |= HandleResult(test2_header_fileds.GetIsRequestLineFormat(1), true);
 	ret_code |= HandleResult(test2_header_fileds.GetIsHeaderFieldsFormat(1), false);
+	ret_code |= HandleResult(test2_header_fileds.GetIsBodyMessageFormat(1), false);
+
+	// ヘッダフィールドにContent-Lengthがある場合
+	http::TmpHttp test3_header_fileds;
+	test3_header_fileds.ParseHttpRequestFormat(
+		1, "GET / HTTP/1.1\r\nHost: test\r\nContent-Length: 2\r\n\r\nab"
+	);
+	ret_code |= HandleResult(test3_header_fileds.GetStatusCode(1), http::OK);
+	ret_code |= HandleResult(test3_header_fileds.GetIsRequestLineFormat(1), true);
+	ret_code |= HandleResult(test3_header_fileds.GetIsHeaderFieldsFormat(1), true);
+	ret_code |= HandleResult(test3_header_fileds.GetIsBodyMessageFormat(1), false);
 
 	// const std::string &expected1 = "OK";
 	// ret_code |= HandleResult(test.CreateHttpResponse(1), expected1);

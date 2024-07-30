@@ -9,7 +9,7 @@ HttpStorage::~HttpStorage() {}
 
 // ClientSaveDataを初期化する関数
 void HttpStorage::CreateClientSaveData(int client_fd) {
-	save_data_[client_fd] = ClientSaveData();
+	save_data_[client_fd] = HttpRequestParsedData();
 }
 
 // ClientSaveDataが存在するかを確認する関数
