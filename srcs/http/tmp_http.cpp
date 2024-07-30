@@ -9,7 +9,6 @@ TmpHttp::~TmpHttp() {}
 
 // todo: クライアントのリクエスト情報を読み込む
 void TmpHttp::ParseHttpRequestFormat(int client_fd, const std::string &read_buf) {
-	std::cout << read_buf << std::endl;
 	HttpRequestParsedData save_data = storage_.GetClientSaveData(client_fd);
 	save_data.current_buf += read_buf;
 	// todo: HttpRequestParsedResult(HttpRequestResultとIsHttpRequestFormat)を受け取る。
@@ -38,6 +37,17 @@ bool TmpHttp::GetIsHttpRequestFormatComplete(int client_fd) {
 	return save_data.is_request_format.is_request_line &&
 		   save_data.is_request_format.is_header_fields &&
 		   save_data.is_request_format.is_body_message;
+}
+
+// For test
+StatusCode TmpHttp::GetStatusCode(int client_fd) {
+	HttpRequestParsedData save_data = storage_.GetClientSaveData(client_fd);
+	return (save_data.request_result.status_code);
+}
+
+bool TmpHttp::GetIsRequestLineFormat(int client_fd) {
+	HttpRequestParsedData save_data = storage_.GetClientSaveData(client_fd);
+	return (save_data.is_request_format.is_request_line);
 }
 
 } // namespace http
