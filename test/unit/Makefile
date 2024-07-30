@@ -3,6 +3,7 @@
 TEST_DIRS	:=	convert_str \
 				http \
 				http_parse \
+				http_storage \
 				sock_context \
 				split_str \
 				virtual_server \
