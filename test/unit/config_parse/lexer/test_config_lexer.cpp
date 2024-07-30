@@ -1,3 +1,7 @@
+/*---------------------------------------------------*/
+#include "../../../../srcs/config_parse/lexer.hpp"
+#include "../../../../srcs/utils/color.hpp"
+/*---------------------------------------------------*/
 #include "color.hpp"
 #include "lexer.hpp"
 #include <cstdlib>
@@ -125,13 +129,10 @@ int RunTests(const TestCase test_cases[], std::size_t num_test_cases) {
 	return ret_code;
 }
 
-} // namespace
+/* Test1 */
+NodeList MakeExpectedTest1() {
+	NodeList expected_result_test_1;
 
-int main() {
-	int ret_code = EXIT_SUCCESS;
-
-	/* Test1 */
-	NodeList   expected_result_test_1;
 	node::Node expected_test_1_node_1 = {"server", node::CONTEXT};
 	node::Node expected_test_1_node_2 = {"{", node::L_BRACKET};
 	node::Node expected_test_1_node_3 = {"}", node::R_BRACKET};
@@ -139,8 +140,13 @@ int main() {
 	expected_result_test_1.push_back(expected_test_1_node_2);
 	expected_result_test_1.push_back(expected_test_1_node_3);
 
-	/* Test2 */
-	NodeList   expected_result_test_2;
+	return expected_result_test_1;
+}
+
+/* Test2 */
+NodeList MakeExpectedTest2() {
+	NodeList expected_result_test_2;
+
 	node::Node expected_test_2_node_1 = {"server", node::CONTEXT};
 	node::Node expected_test_2_node_2 = {"{", node::L_BRACKET};
 	node::Node expected_test_2_node_3 = {"location", node::CONTEXT};
@@ -154,7 +160,18 @@ int main() {
 	expected_result_test_2.push_back(expected_test_2_node_5);
 	expected_result_test_2.push_back(expected_test_2_node_6);
 
-	static const TestCase test_cases[] = {
+	return expected_result_test_2;
+}
+
+} // namespace
+
+int main() {
+	int ret_code = EXIT_SUCCESS;
+
+	NodeList expected_result_test_1 = MakeExpectedTest1();
+	NodeList expected_result_test_2 = MakeExpectedTest2();
+
+	static TestCase test_cases[] = {
 		TestCase(
 			"server {\n \
 				}\n",
