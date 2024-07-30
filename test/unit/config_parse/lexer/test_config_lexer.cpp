@@ -131,36 +131,36 @@ int RunTests(const TestCase test_cases[], std::size_t num_test_cases) {
 
 /* Test1 */
 NodeList MakeExpectedTest1() {
-	NodeList expected_result_test_1;
+	NodeList expected_result;
 
-	node::Node expected_test_1_node_1 = {"server", node::CONTEXT};
-	node::Node expected_test_1_node_2 = {"{", node::L_BRACKET};
-	node::Node expected_test_1_node_3 = {"}", node::R_BRACKET};
-	expected_result_test_1.push_back(expected_test_1_node_1);
-	expected_result_test_1.push_back(expected_test_1_node_2);
-	expected_result_test_1.push_back(expected_test_1_node_3);
+	node::Node expected_node_1 = {"server", node::CONTEXT};
+	node::Node expected_node_2 = {"{", node::L_BRACKET};
+	node::Node expected_node_3 = {"}", node::R_BRACKET};
+	expected_result.push_back(expected_node_1);
+	expected_result.push_back(expected_node_2);
+	expected_result.push_back(expected_node_3);
 
-	return expected_result_test_1;
+	return expected_result;
 }
 
 /* Test2 */
 NodeList MakeExpectedTest2() {
-	NodeList expected_result_test_2;
+	NodeList expected_result;
 
-	node::Node expected_test_2_node_1 = {"server", node::CONTEXT};
-	node::Node expected_test_2_node_2 = {"{", node::L_BRACKET};
-	node::Node expected_test_2_node_3 = {"location", node::CONTEXT};
-	node::Node expected_test_2_node_4 = {"{", node::L_BRACKET};
-	node::Node expected_test_2_node_5 = {"}", node::R_BRACKET};
-	node::Node expected_test_2_node_6 = {"}", node::R_BRACKET};
-	expected_result_test_2.push_back(expected_test_2_node_1);
-	expected_result_test_2.push_back(expected_test_2_node_2);
-	expected_result_test_2.push_back(expected_test_2_node_3);
-	expected_result_test_2.push_back(expected_test_2_node_4);
-	expected_result_test_2.push_back(expected_test_2_node_5);
-	expected_result_test_2.push_back(expected_test_2_node_6);
+	node::Node expected_node_1 = {"server", node::CONTEXT};
+	node::Node expected_node_2 = {"{", node::L_BRACKET};
+	node::Node expected_node_3 = {"location", node::CONTEXT};
+	node::Node expected_node_4 = {"{", node::L_BRACKET};
+	node::Node expected_node_5 = {"}", node::R_BRACKET};
+	node::Node expected_node_6 = {"}", node::R_BRACKET};
+	expected_result.push_back(expected_node_1);
+	expected_result.push_back(expected_node_2);
+	expected_result.push_back(expected_node_3);
+	expected_result.push_back(expected_node_4);
+	expected_result.push_back(expected_node_5);
+	expected_result.push_back(expected_node_6);
 
-	return expected_result_test_2;
+	return expected_result;
 }
 
 } // namespace
