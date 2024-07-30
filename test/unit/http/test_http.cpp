@@ -26,9 +26,11 @@ int main(void) {
 	int ret_code = 0;
 
 	http::TmpHttp test;
-	test.ParseHttpRequestFormat(1, "PARSE");
-	const std::string &expected1 = "OK";
-	ret_code |= HandleResult(test.CreateHttpResponse(1), expected1);
-	ret_code |= HandleResult(test.GetIsHttpRequestFormatComplete(1), false);
+	test.ParseHttpRequestFormat(1, "GET / \r\n");
+	http::HttpRequestParsedData a = test.storage_.GetClientSaveData(1);
+	ret_code |= HandleResult(a.request_result.status_code, http::BAD_REQUEST);
+	// const std::string &expected1 = "OK";
+	// ret_code |= HandleResult(test.CreateHttpResponse(1), expected1);
+	// ret_code |= HandleResult(test.GetIsHttpRequestFormatComplete(1), false);
 	return ret_code;
 }

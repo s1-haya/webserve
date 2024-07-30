@@ -22,7 +22,7 @@ class HttpStorage {
 	HttpStorage &operator=(const HttpStorage &other);
 	// client_fd -> 前回保存した情報にアクセスするためのデータ構造
 	typedef std::map<int, HttpRequestParsedData> ClientSaveDataMap;
-	ClientSaveDataMap                     save_data_;
+	ClientSaveDataMap                            save_data_;
 	// Create
 	void CreateClientSaveData(int client_fd);
 	// Check

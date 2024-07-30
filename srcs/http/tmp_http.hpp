@@ -15,10 +15,12 @@ class TmpHttp {
 	bool        GetIsHttpRequestFormatComplete(int client_fd);
 	// todo: 408のtimeoutのレスポンス
 
+	// For test
+	HttpStorage storage_;
+
   private:
 	TmpHttp(const TmpHttp &other);
-	TmpHttp    &operator=(const TmpHttp &other);
-	HttpStorage storage_;
+	TmpHttp &operator=(const TmpHttp &other);
 };
 
 } // namespace http

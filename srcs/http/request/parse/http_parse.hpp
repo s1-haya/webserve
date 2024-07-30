@@ -54,7 +54,8 @@ struct HttpRequestParsedData {
 
 class HttpParse {
   public:
-	static HttpRequestResult Run(const std::string &buf);
+	static HttpRequestResult Run(const std::string &read_buf);
+	static void              TmpRun(HttpRequestParsedData *data);
 
   private:
 	HttpParse();

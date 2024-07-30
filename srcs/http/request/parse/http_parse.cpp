@@ -42,6 +42,45 @@ std::string StrTrimLeadingOptionalWhitespace(const std::string &str) {
 }
 
 } // namespace
+void HttpParse::TmpRun(HttpRequestParsedData *data) {
+	// todo: is_request_lineがfalseの場合
+	try {
+		if (!data->is_request_format.is_request_line) {
+			size_t pos = data->current_buf.find(CRLF);
+			if (pos != std::string::npos) {
+				std::string request_line = data->current_buf.substr(0, pos);
+				data->request_result.request.request_line =
+					SetRequestLine(utils::SplitStr(request_line, SP));
+				data->is_request_format.is_request_line = true;
+			}
+		}
+	} catch (const HttpParseException &e) {
+		data->request_result.status_code = e.GetStatusCode();
+	}
+	// if (is_request_line) {
+	// todo:
+	// - current_bufをCRLFまで切り取る。
+	// - HttpRequestResultを格納する。
+	// - is_request_line = true;
+	//}
+
+	// todo: is_request_lineがtrue, is_header_filedsがfalseの場合
+	// if (is_request_line && !is_header_fileds) {
+	// todo:
+	// - current_bufをCRLFCRLFまで切り取る。
+	// - HttpRequestResultを格納する。
+	// - is_header_fileds = true;
+	// - ContentLengthとTRANSFER_ENCORDINGがない場合 is_body_message = true;
+	//}
+
+	// todo: is_request_lineとis_header_fieldsがtrue,
+	// is_bodyがfalseの場合（今回はContentLengthのみ） if (is_request_line && is_header_fileds &&
+	// !is_body_message) { todo:
+	// - current_bufをContentLength文まで読み取る。
+	// - HttpRequestResultを格納する。
+	// - is_body_message = true;
+	//}
+}
 
 // todo: tmp request_
 HttpRequestResult HttpParse::Run(const std::string &read_buf) {
