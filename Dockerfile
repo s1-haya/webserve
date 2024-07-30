@@ -13,6 +13,7 @@ COPY srcs /webserv/srcs
 COPY html /webserv/html
 COPY Makefile /webserv/Makefile
 COPY Dockerfile /webserv/Dockerfile
+COPY config /webserv/config
 
 RUN rm -rf /var/lib/apt/lists/*
 

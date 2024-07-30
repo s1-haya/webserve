@@ -23,7 +23,7 @@ int main(int argc, char **argv) {
 	// todo: handle parse error
 	std::string path_config;
 	if (argc == 1) {
-		path_config = "default.conf";
+		path_config = "config/default.conf";
 	} else {
 		path_config = std::string(argv[1]);
 	}
