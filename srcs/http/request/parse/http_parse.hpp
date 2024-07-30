@@ -43,10 +43,14 @@ struct IsHttpRequestFormat {
 	bool is_body_message;
 };
 
-struct HttpRequestParsedResult {
+struct HttpRequestParsedData {
+	// HTTP各書式のパースしたかどうか
+	IsHttpRequestFormat is_request_format;
+	// HttpRequestResult
 	HttpRequestResult request_result;
-	IsHttpRequestFormat is_http_request_format;
-}
+	// HTTP各書式をパースする前の読み込んだ情報
+	std::string current_buf;
+};
 
 class HttpParse {
   public:

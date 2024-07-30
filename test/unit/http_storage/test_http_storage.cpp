@@ -34,13 +34,13 @@ int main(void) {
 	int               ret_code = 0;
 	http::HttpStorage storage;
 
-	// ClientSaveDataを新規作成 -> OK
-	http::ClientSaveData new_data = storage.GetClientSaveData(1);
-	ret_code |= HandleResult(new_data.save_request_result.status_code, http::OK);
+	// クライアントのHttpRequestParsedDataを新規作成 -> OK
+	http::HttpRequestParsedData new_data = storage.GetClientSaveData(1);
+	ret_code |= HandleResult(new_data.request_result.status_code, http::OK);
 
-	// client_fdを登録したClientSaveData取得 -> OK
-	http::ClientSaveData save_data = storage.GetClientSaveData(1);
-	ret_code |= HandleResult(save_data.save_request_result.status_code, http::OK);
+	// 登録したクライアントのHttpRequestParsedData取得 -> OK
+	http::HttpRequestParsedData save_data = storage.GetClientSaveData(1);
+	ret_code |= HandleResult(save_data.request_result.status_code, http::OK);
 
 	// ClientSaveDataを更新 -> OK
 	try {
