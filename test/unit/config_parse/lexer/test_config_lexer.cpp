@@ -129,7 +129,7 @@ int RunTests(const TestCase test_cases[], std::size_t num_test_cases) {
 	return ret_code;
 }
 
-/* Test1 */
+/* Test1 One Server*/
 NodeList MakeExpectedTest1() {
 	NodeList expected_result;
 
@@ -144,7 +144,7 @@ NodeList MakeExpectedTest1() {
 	return expected_result;
 }
 
-/* Test2 */
+/* Test2 One Server One Location*/
 NodeList MakeExpectedTest2() {
 	NodeList expected_result;
 
@@ -167,7 +167,7 @@ NodeList MakeExpectedTest2() {
 	return expected_result;
 }
 
-/* Test3 */
+/* Test3 listen, server_name, root, index Directive*/
 NodeList MakeExpectedTest3() {
 	NodeList expected_result;
 
@@ -214,7 +214,7 @@ NodeList MakeExpectedTest3() {
 	return expected_result;
 }
 
-/* Test4 */
+/* Test4 Multiple ports, "server_name" as server_name*/
 NodeList MakeExpectedTest4() {
 	NodeList expected_result;
 
@@ -245,7 +245,7 @@ NodeList MakeExpectedTest4() {
 	return expected_result;
 }
 
-/* Test5 */
+/* Test5 No Delimiter*/
 NodeList MakeExpectedTest5() {
 	NodeList expected_result;
 
@@ -274,7 +274,7 @@ NodeList MakeExpectedTest5() {
 	return expected_result;
 }
 
-/* Test6 */
+/* Test6 Multiple Locations*/
 NodeList MakeExpectedTest6() {
 	NodeList expected_result;
 
