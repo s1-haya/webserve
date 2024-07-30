@@ -55,7 +55,7 @@ void HttpParse::ParseRequestLine(HttpRequestParsedData *data) {
 			data->request_result.request.request_line =
 				SetRequestLine(utils::SplitStr(request_line, SP));
 			data->is_request_format.is_request_line = true;
-			data->current_buf.erase(0, pos + 2);
+			data->current_buf.erase(0, pos + CRLF.size());
 		}
 	}
 }
@@ -73,7 +73,7 @@ void HttpParse::ParseHeaderFields(HttpRequestParsedData *data) {
 			data->request_result.request.header_fields =
 				SetHeaderFields(utils::SplitStr(header_fileds, CRLF));
 			data->is_request_format.is_header_fields = true;
-			data->current_buf.erase(0, pos + 4);
+			data->current_buf.erase(0, pos + CRLF.size() + CRLF.size());
 			if (data->request_result.request.header_fields.find("Content-Length") ==
 					data->request_result.request.header_fields.end() &&
 				data->request_result.request.header_fields.find("Transfer-Encoding") ==
