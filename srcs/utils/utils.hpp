@@ -32,6 +32,17 @@ std::string ToString(T value) {
 	return oss.str();
 }
 
+template <typename T>
+std::string FormatListToStr(const T &list) {
+	std::ostringstream oss;
+
+	typedef typename T::const_iterator It;
+	for (It it = list.begin(); it != list.end(); ++it) {
+		oss << "[" << *it << "]";
+	}
+	return oss.str();
+}
+
 // string
 bool                     ConvertStrToUint(const std::string &str, unsigned int &num);
 std::string              ConvertUintToStr(unsigned int num);

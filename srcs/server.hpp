@@ -6,25 +6,34 @@
 #include "connection.hpp"
 #include "epoll.hpp"
 #include "sock_context.hpp"
+#include "virtual_server_storage.hpp"
+#include <list>
 #include <string>
-#include <vector>
 
 namespace server {
 
+// todo: tmp
+struct TempConfig {
+	std::string            server_name;
+	std::list<std::string> locations;
+	std::list<std::string> ports;
+};
+
 class Server {
   public:
-	typedef std::pair<std::string, std::string> TempConfig; // todo: tmp
-	typedef std::vector<ServerInfo>             ServerInfoVec;
+	typedef std::list<TempConfig> TempAllConfig; // todo: tmp
 	explicit Server(const _config::Config::ConfigData &config);
 	~Server();
+	void Init();
 	void Run();
 
   private:
 	Server();
 	// prohibit copy
 	Server(const Server &other);
-	Server     &operator=(const Server &other);
-	void        Init(const ServerInfoVec &server_infos);
+	Server &operator=(const Server &other);
+	// functions
+	void        AddVirtualServers(const TempAllConfig &all_configs); // todo: tmp
 	void        HandleEvent(const event::Event &event);
 	void        HandleNewConnection(int server_fd);
 	void        HandleExistingConnection(const event::Event &event);
@@ -33,6 +42,8 @@ class Server {
 	void        SendResponse(int client_fd);
 	// const
 	static const int SYSTEM_ERROR = -1;
+	// virtual servers storage
+	VirtualServerStorage virtual_servers_;
 	// connection
 	Connection connection_;
 	// context

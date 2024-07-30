@@ -8,6 +8,7 @@
 namespace {
 
 typedef server::VirtualServer::LocationList LocationList;
+typedef server::VirtualServer::PortList     PortList;
 
 struct Result {
 	bool        is_ok;
@@ -50,15 +51,16 @@ int Test(Result result) {
 }
 
 // -----------------------------------------------------------------------------
-// テストfail時のlocationsのdebug出力
+// テストfail時のlist(locations,ports)のdebug出力
 // (todo: test_virtual_server.cppと全く同じ関数なのでどうにかしても良いかも)
-std::string PrintLocations(const LocationList &locations) {
+template <typename T>
+std::string PrintList(const T &list) {
 	std::ostringstream oss;
 
-	typedef LocationList::const_iterator It;
-	for (It it = locations.begin(); it != locations.end(); ++it) {
+	typedef typename T::const_iterator It;
+	for (It it = list.begin(); it != list.end(); ++it) {
 		oss << *it;
-		if (++LocationList::const_iterator(it) != locations.end()) {
+		if (++It(it) != list.end()) {
 			oss << std::endl;
 		}
 	}
@@ -88,9 +90,21 @@ TestIsSameVirtualServer(const server::VirtualServer &vs, const server::VirtualSe
 		result.is_ok = false;
 		oss << "locations" << std::endl;
 		oss << "- result  " << std::endl;
-		oss << "[" << PrintLocations(locations) << "]" << std::endl;
+		oss << "[" << PrintList(locations) << "]" << std::endl;
 		oss << "- expected" << std::endl;
-		oss << "[" << PrintLocations(expected_locations) << "]" << std::endl;
+		oss << "[" << PrintList(expected_locations) << "]" << std::endl;
+	}
+
+	// ports
+	const PortList &ports          = vs.GetPorts();
+	const PortList &expected_ports = expected_vs.GetPorts();
+	if (!IsSame(ports, expected_ports)) {
+		result.is_ok = false;
+		oss << "ports" << std::endl;
+		oss << "- result  " << std::endl;
+		oss << "[" << PrintList(ports) << "]" << std::endl;
+		oss << "- expected" << std::endl;
+		oss << "[" << PrintList(expected_ports) << "]" << std::endl;
 	}
 
 	result.error_log = oss.str();
@@ -120,13 +134,18 @@ int RunTestVirtualServerStorage() {
 	std::string  expected_server_name1 = "localhost";
 	LocationList expected_locations1;
 	expected_locations1.push_back("/www/");
-	server::VirtualServer vs1(expected_server_name1, expected_locations1);
+	PortList expected_ports1;
+	expected_ports1.push_back(8080);
+	expected_ports1.push_back(12345);
+	server::VirtualServer vs1(expected_server_name1, expected_locations1, expected_ports1);
 
 	std::string  expected_server_name2 = "localhost2";
 	LocationList expected_locations2;
 	expected_locations2.push_back("/");
 	expected_locations2.push_back("/static/");
-	server::VirtualServer vs2(expected_server_name2, expected_locations2);
+	PortList expected_ports2;
+	expected_ports2.push_back(9999);
+	server::VirtualServer vs2(expected_server_name2, expected_locations2, expected_ports2);
 
 	/* -------------- VirtualServerStorage -------------- */
 	server::VirtualServerStorage vs_storage;

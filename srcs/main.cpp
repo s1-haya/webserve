@@ -31,6 +31,7 @@ int main(int argc, char **argv) {
 
 	try {
 		server::Server server(config);
+		server.Init();
 		server.Run();
 	} catch (const std::exception &e) {
 		PrintError(e.what());

@@ -7,6 +7,7 @@
 namespace {
 
 typedef server::VirtualServer::LocationList LocationList;
+typedef server::VirtualServer::PortList     PortList;
 
 struct Result {
 	bool        is_ok;
@@ -49,14 +50,15 @@ int Test(Result result) {
 }
 
 // -----------------------------------------------------------------------------
-// テストfail時のlocationsのdebug出力
-std::string PrintLocations(const LocationList &locations) {
+// テストfail時のlist(locations,ports)のdebug出力
+template <typename T>
+std::string PrintList(const T &list) {
 	std::ostringstream oss;
 
-	typedef LocationList::const_iterator It;
-	for (It it = locations.begin(); it != locations.end(); ++it) {
+	typedef typename T::const_iterator It;
+	for (It it = list.begin(); it != list.end(); ++it) {
 		oss << *it;
-		if (++It(it) != locations.end()) {
+		if (++It(it) != list.end()) {
 			oss << std::endl;
 		}
 	}
@@ -66,7 +68,8 @@ std::string PrintLocations(const LocationList &locations) {
 Result TestIsSameMembers(
 	const server::VirtualServer &under_test_vs,
 	const std::string           &expected_server_name,
-	const LocationList          &expected_locations
+	const LocationList          &expected_locations,
+	const PortList              &expected_ports
 ) {
 	Result result;
 	result.is_ok = true;
@@ -87,9 +90,20 @@ Result TestIsSameMembers(
 		result.is_ok = false;
 		oss << "locations" << std::endl;
 		oss << "- result  " << std::endl;
-		oss << "[" << PrintLocations(locations) << "]" << std::endl;
+		oss << "[" << PrintList(locations) << "]" << std::endl;
 		oss << "- expected" << std::endl;
-		oss << "[" << PrintLocations(expected_locations) << "]" << std::endl;
+		oss << "[" << PrintList(expected_locations) << "]" << std::endl;
+	}
+
+	// VirtualServer.GetPorts()
+	const PortList &ports = under_test_vs.GetPorts();
+	if (!IsSame(ports, expected_ports)) {
+		result.is_ok = false;
+		oss << "ports" << std::endl;
+		oss << "- result  " << std::endl;
+		oss << "[" << PrintList(ports) << "]" << std::endl;
+		oss << "- expected" << std::endl;
+		oss << "[" << PrintList(expected_ports) << "]" << std::endl;
 	}
 
 	result.error_log = oss.str();
@@ -98,37 +112,49 @@ Result TestIsSameMembers(
 
 // test default constructor
 Result RunDefaultConstructor(
-	const std::string &expected_server_name, const LocationList &expected_locations
+	const std::string  &expected_server_name,
+	const LocationList &expected_locations,
+	const PortList     &expected_ports
 ) {
 	// default constructor
 	server::VirtualServer virtual_server;
 
-	return TestIsSameMembers(virtual_server, expected_server_name, expected_locations);
+	return TestIsSameMembers(
+		virtual_server, expected_server_name, expected_locations, expected_ports
+	);
 }
 
 // test copy constructor
 Result RunCopyConstructor(
-	const std::string &expected_server_name, const LocationList &expected_locations
+	const std::string  &expected_server_name,
+	const LocationList &expected_locations,
+	const PortList     &expected_ports
 ) {
 	// construct
-	server::VirtualServer virtual_server(expected_server_name, expected_locations);
+	server::VirtualServer virtual_server(expected_server_name, expected_locations, expected_ports);
 
 	// copy
 	server::VirtualServer copy_virtual_server(virtual_server);
 
-	return TestIsSameMembers(copy_virtual_server, expected_server_name, expected_locations);
+	return TestIsSameMembers(
+		copy_virtual_server, expected_server_name, expected_locations, expected_ports
+	);
 }
 
 // test copy assignment operator=
 Result RunCopyAssignmentOperator(
-	const std::string &expected_server_name, const LocationList &expected_locations
+	const std::string  &expected_server_name,
+	const LocationList &expected_locations,
+	const PortList     &expected_ports
 ) {
 	// construct
-	server::VirtualServer virtual_server(expected_server_name, expected_locations);
+	server::VirtualServer virtual_server(expected_server_name, expected_locations, expected_ports);
 
 	// copy assignment operator=
 	server::VirtualServer copy_virtual_server = virtual_server;
-	return TestIsSameMembers(copy_virtual_server, expected_server_name, expected_locations);
+	return TestIsSameMembers(
+		copy_virtual_server, expected_server_name, expected_locations, expected_ports
+	);
 }
 
 } // namespace
@@ -138,21 +164,30 @@ int main() {
 
 	/* -------------- expected用意 -------------- */
 	// location: 0個
+	// port    : 0個
 	LocationList expected_locations1;
+	PortList     expected_ports1;
 
 	// location: 1個
+	// port    : 1個
 	LocationList expected_locations2;
 	expected_locations2.push_back("/");
+	PortList expected_ports2;
+	expected_ports2.push_back(9999);
 
 	// location: 複数
+	// port    : 複数
 	LocationList expected_locations3;
 	expected_locations3.push_back("/static/");
 	expected_locations3.push_back("/images/");
+	PortList expected_ports3;
+	expected_ports3.push_back(8080);
+	expected_ports3.push_back(12345);
 
 	/* ------------------ test ------------------ */
-	ret_code |= Test(RunDefaultConstructor("", expected_locations1));
-	ret_code |= Test(RunCopyConstructor("localhost", expected_locations2));
-	ret_code |= Test(RunCopyAssignmentOperator("localhost2", expected_locations3));
+	ret_code |= Test(RunDefaultConstructor("", expected_locations1, expected_ports1));
+	ret_code |= Test(RunCopyConstructor("localhost", expected_locations2, expected_ports2));
+	ret_code |= Test(RunCopyAssignmentOperator("localhost2", expected_locations3, expected_ports3));
 
 	return ret_code;
 }
