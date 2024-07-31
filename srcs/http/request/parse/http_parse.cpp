@@ -43,17 +43,17 @@ std::string StrTrimLeadingOptionalWhitespace(const std::string &str) {
 
 } // namespace
 
-void HttpParse::ParseRequestLine(HttpRequestParsedData *data) {
-	if (!data->is_request_format.is_request_line) {
-		size_t pos = data->current_buf.find(CRLF);
+void HttpParse::ParseRequestLine(HttpRequestParsedData &data) {
+	if (!data.is_request_format.is_request_line) {
+		size_t pos = data.current_buf.find(CRLF);
 		if (pos == std::string::npos) {
 			return;
 		}
-		std::string request_line = data->current_buf.substr(0, pos);
-		data->current_buf.erase(0, pos + CRLF.size());
-		data->request_result.request.request_line =
+		std::string request_line = data.current_buf.substr(0, pos);
+		data.current_buf.erase(0, pos + CRLF.size());
+		data.request_result.request.request_line =
 			SetRequestLine(utils::SplitStr(request_line, SP));
-		data->is_request_format.is_request_line = true;
+		data.is_request_format.is_request_line = true;
 	}
 }
 
@@ -65,61 +65,61 @@ bool IsBodyMessage(const HeaderFields &header_fileds) {
 	return true;
 }
 
-void HttpParse::ParseHeaderFields(HttpRequestParsedData *data) {
-	if (!data->is_request_format.is_request_line) {
+void HttpParse::ParseHeaderFields(HttpRequestParsedData &data) {
+	if (!data.is_request_format.is_request_line) {
 		return;
 	}
-	if (!data->is_request_format.is_header_fields) {
-		size_t pos = data->current_buf.find(CRLF + CRLF);
+	if (!data.is_request_format.is_header_fields) {
+		size_t pos = data.current_buf.find(CRLF + CRLF);
 		if (pos == std::string::npos) {
 			return;
 		}
-		std::string header_fileds = data->current_buf.substr(0, pos);
-		data->current_buf.erase(0, pos + CRLF.size() + CRLF.size());
-		data->request_result.request.header_fields =
+		std::string header_fileds = data.current_buf.substr(0, pos);
+		data.current_buf.erase(0, pos + CRLF.size() + CRLF.size());
+		data.request_result.request.header_fields =
 			SetHeaderFields(utils::SplitStr(header_fileds, CRLF));
-		data->is_request_format.is_header_fields = true;
-		if (!IsBodyMessage(data->request_result.request.header_fields)) {
-			data->is_request_format.is_body_message = true;
+		data.is_request_format.is_header_fields = true;
+		if (!IsBodyMessage(data.request_result.request.header_fields)) {
+			data.is_request_format.is_body_message = true;
 		}
 	}
 }
 
-void HttpParse::ParseBodyMessage(HttpRequestParsedData *data) {
-	if (!data->is_request_format.is_request_line) {
+void HttpParse::ParseBodyMessage(HttpRequestParsedData &data) {
+	if (!data.is_request_format.is_request_line) {
 		return;
 	}
-	if (!data->is_request_format.is_header_fields) {
+	if (!data.is_request_format.is_header_fields) {
 		return;
 	}
-	if (!data->is_request_format.is_body_message) {
+	if (!data.is_request_format.is_body_message) {
 		size_t content_length;
 		if (!utils::ConvertStrToSize(
-				data->request_result.request.header_fields[CONTENT_LENGTH], content_length
+				data.request_result.request.header_fields[CONTENT_LENGTH], content_length
 			)) {
 			throw HttpParseException("Error: wrong Content-Length number", BAD_REQUEST);
 		}
 		size_t readable_content_length =
-			content_length - data->request_result.request.body_message.size();
-		if (data->current_buf.size() >= readable_content_length) {
-			data->request_result.request.body_message =
-				data->current_buf.substr(0, readable_content_length);
-			data->current_buf.erase(0, readable_content_length);
-			data->is_request_format.is_body_message = true;
+			content_length - data.request_result.request.body_message.size();
+		if (data.current_buf.size() >= readable_content_length) {
+			data.request_result.request.body_message =
+				data.current_buf.substr(0, readable_content_length);
+			data.current_buf.erase(0, readable_content_length);
+			data.is_request_format.is_body_message = true;
 		} else {
-			data->request_result.request.body_message = data->current_buf;
-			data->current_buf.clear();
+			data.request_result.request.body_message = data.current_buf;
+			data.current_buf.clear();
 		}
 	}
 }
 
-void HttpParse::TmpRun(HttpRequestParsedData *data) {
+void HttpParse::TmpRun(HttpRequestParsedData &data) {
 	try {
 		ParseRequestLine(data);
 		ParseHeaderFields(data);
 		ParseBodyMessage(data);
 	} catch (const HttpParseException &e) {
-		data->request_result.status_code = e.GetStatusCode();
+		data.request_result.status_code = e.GetStatusCode();
 	}
 }
 

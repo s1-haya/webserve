@@ -55,14 +55,14 @@ struct HttpRequestParsedData {
 class HttpParse {
   public:
 	static HttpRequestResult Run(const std::string &read_buf);
-	static void              TmpRun(HttpRequestParsedData *data);
+	static void              TmpRun(HttpRequestParsedData &data);
 
   private:
 	HttpParse();
 	~HttpParse();
-	static void ParseRequestLine(HttpRequestParsedData *data);
-	static void ParseHeaderFields(HttpRequestParsedData *data);
-	static void ParseBodyMessage(HttpRequestParsedData *data);
+	static void ParseRequestLine(HttpRequestParsedData &data);
+	static void ParseHeaderFields(HttpRequestParsedData &data);
+	static void ParseBodyMessage(HttpRequestParsedData &data);
 
 	static RequestLine  SetRequestLine(const std::vector<std::string> &request_line);
 	static HeaderFields SetHeaderFields(const std::vector<std::string> &header_fields_info);

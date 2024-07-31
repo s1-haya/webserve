@@ -11,8 +11,7 @@ TmpHttp::~TmpHttp() {}
 void TmpHttp::ParseHttpRequestFormat(int client_fd, const std::string &read_buf) {
 	HttpRequestParsedData save_data = storage_.GetClientSaveData(client_fd);
 	save_data.current_buf += read_buf;
-	// todo: HttpRequestParsedResult(HttpRequestResultとIsHttpRequestFormat)を受け取る。
-	HttpParse::TmpRun(&save_data);
+	HttpParse::TmpRun(save_data);
 	storage_.UpdateClientSaveData(client_fd, save_data);
 }
 
