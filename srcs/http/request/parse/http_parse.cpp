@@ -43,10 +43,6 @@ std::string StrTrimLeadingOptionalWhitespace(const std::string &str) {
 
 } // namespace
 
-// todo: is_request_lineがfalseの場合
-// - current_bufをCRLFまで切り取る。
-// - HttpRequestResultを格納する。
-// - is_request_line = true;
 void HttpParse::ParseRequestLine(HttpRequestParsedData *data) {
 	if (!data->is_request_format.is_request_line) {
 		size_t pos = data->current_buf.find(CRLF);
@@ -97,8 +93,6 @@ void HttpParse::ParseBodyMessage(HttpRequestParsedData *data) {
 		return;
 	}
 	if (!data->is_request_format.is_body_message) {
-		// todo: current_bufをContentLength文まで読み取り、HttpRequestResultを格納する
-		// todo: ContentLengthまで読み込んだらtrueになる
 		size_t content_length =
 			std::stoi(data->request_result.request.header_fields[CONTENT_LENGTH]);
 		size_t readable_content_length =
