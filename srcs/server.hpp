@@ -1,8 +1,8 @@
 #ifndef SERVER_HPP_
 #define SERVER_HPP_
 
-#include "_config.hpp"
 #include "buffer.hpp"
+#include "config_parse/context.hpp"
 #include "connection.hpp"
 #include "epoll.hpp"
 #include "sock_context.hpp"
@@ -21,8 +21,8 @@ struct TempConfig {
 
 class Server {
   public:
-	typedef std::list<TempConfig> TempAllConfig; // todo: tmp
-	explicit Server(const _config::Config::ConfigData &config);
+	typedef std::list<config::context::ServerCon> ConfigServers;
+	explicit Server(const ConfigServers &config_servers);
 	~Server();
 	void Init();
 	void Run();
@@ -33,7 +33,7 @@ class Server {
 	Server(const Server &other);
 	Server &operator=(const Server &other);
 	// functions
-	void        AddVirtualServers(const TempAllConfig &all_configs); // todo: tmp
+	void        AddVirtualServers(const ConfigServers &config_servers);
 	void        HandleEvent(const event::Event &event);
 	void        HandleNewConnection(int server_fd);
 	void        HandleExistingConnection(const event::Event &event);

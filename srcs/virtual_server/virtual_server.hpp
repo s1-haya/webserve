@@ -6,10 +6,18 @@
 
 namespace server {
 
+// todo: in VirtualServer class?
+struct Location {
+	std::string location;
+	std::string root;
+	std::string index;
+	std::string allowed_method;
+};
+
 // virtual serverとして必要な情報を保持・取得する
 class VirtualServer {
   public:
-	typedef std::list<std::string>  LocationList;
+	typedef std::list<Location>     LocationList;
 	typedef std::list<unsigned int> PortList;
 	// default constructor: necessary for map's insert/[]
 	VirtualServer();

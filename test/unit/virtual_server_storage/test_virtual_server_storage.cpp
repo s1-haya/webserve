@@ -5,8 +5,43 @@
 #include <iostream>
 #include <sstream> // ostringstream
 
+// (todo : test_virtual_server.cppと全く同じoverloadを書いてるのでどうにかしても良いかも)
+namespace server {
+
+// テストfail時のPortListのdebug出力用
+std::ostream &operator<<(std::ostream &os, const VirtualServer::PortList &ports) {
+	typedef VirtualServer::PortList::const_iterator It;
+	for (It it = ports.begin(); it != ports.end(); ++it) {
+		os << "[" << *it << "]";
+	}
+	return os;
+}
+
+// テストfail時のLocationListのdebug出力用
+std::ostream &operator<<(std::ostream &os, const VirtualServer::LocationList &locations) {
+	typedef VirtualServer::LocationList::const_iterator It;
+	for (It it = locations.begin(); it != locations.end(); ++it) {
+		const Location &location = *it;
+		os << "location: [" << location.location << "], root: [" << location.root << "], index: ["
+		   << location.index << "]";
+		if (++It(it) != locations.end()) {
+			os << std::endl;
+		}
+	}
+	return os;
+}
+
+// std::list<Location>のoperator==が呼ばれる時用にstruct Locationのoperator==の実装
+bool operator==(const Location &lhs, const Location &rhs) {
+	return lhs.location == rhs.location && lhs.root == rhs.root && lhs.index == rhs.index &&
+		   lhs.allowed_method == rhs.allowed_method;
+}
+
+} // namespace server
+
 namespace {
 
+typedef server::Location                    Location;
 typedef server::VirtualServer::LocationList LocationList;
 typedef server::VirtualServer::PortList     PortList;
 
@@ -51,24 +86,10 @@ int Test(Result result) {
 }
 
 // -----------------------------------------------------------------------------
-// テストfail時のlist(locations,ports)のdebug出力
-// (todo: test_virtual_server.cppと全く同じ関数なのでどうにかしても良いかも)
-template <typename T>
-std::string PrintList(const T &list) {
-	std::ostringstream oss;
-
-	typedef typename T::const_iterator It;
-	for (It it = list.begin(); it != list.end(); ++it) {
-		oss << *it;
-		if (++It(it) != list.end()) {
-			oss << std::endl;
-		}
-	}
-	return oss.str();
-}
-
 Result
 TestIsSameVirtualServer(const server::VirtualServer &vs, const server::VirtualServer &expected_vs) {
+	using namespace server;
+
 	Result result;
 	result.is_ok = true;
 	std::ostringstream oss;
@@ -90,9 +111,9 @@ TestIsSameVirtualServer(const server::VirtualServer &vs, const server::VirtualSe
 		result.is_ok = false;
 		oss << "locations" << std::endl;
 		oss << "- result  " << std::endl;
-		oss << "[" << PrintList(locations) << "]" << std::endl;
+		oss << locations << std::endl;
 		oss << "- expected" << std::endl;
-		oss << "[" << PrintList(expected_locations) << "]" << std::endl;
+		oss << expected_locations << std::endl;
 	}
 
 	// ports
@@ -102,9 +123,9 @@ TestIsSameVirtualServer(const server::VirtualServer &vs, const server::VirtualSe
 		result.is_ok = false;
 		oss << "ports" << std::endl;
 		oss << "- result  " << std::endl;
-		oss << "[" << PrintList(ports) << "]" << std::endl;
+		oss << ports << std::endl;
 		oss << "- expected" << std::endl;
-		oss << "[" << PrintList(expected_ports) << "]" << std::endl;
+		oss << expected_ports << std::endl;
 	}
 
 	result.error_log = oss.str();
@@ -121,6 +142,20 @@ Result RunGetVirtualServer(
 	return TestIsSameVirtualServer(vs, expected_vs);
 }
 
+Location CreateLocation(
+	const std::string &location,
+	const std::string &root,
+	const std::string &index,
+	const std::string &allowed_method
+) {
+	server::Location location_directive;
+	location_directive.location       = location;
+	location_directive.root           = root;
+	location_directive.index          = index;
+	location_directive.allowed_method = allowed_method;
+	return location_directive;
+}
+
 // -----------------------------------------------------------------------------
 // - virtual_serverは以下の想定
 // virtual_server | server_name | locations         | ports
@@ -133,7 +168,7 @@ int RunTestVirtualServerStorage() {
 	/* -------------- VirtualServer2個用意 -------------- */
 	std::string  expected_server_name1 = "localhost";
 	LocationList expected_locations1;
-	expected_locations1.push_back("/www/");
+	expected_locations1.push_back(CreateLocation("/www/", "/data/", "index.html", "GET"));
 	PortList expected_ports1;
 	expected_ports1.push_back(8080);
 	expected_ports1.push_back(12345);
@@ -141,8 +176,10 @@ int RunTestVirtualServerStorage() {
 
 	std::string  expected_server_name2 = "localhost2";
 	LocationList expected_locations2;
-	expected_locations2.push_back("/");
-	expected_locations2.push_back("/static/");
+	expected_locations2.push_back(CreateLocation("/", "/data/www/test", "index.html", "GET POST"));
+	expected_locations2.push_back(
+		CreateLocation("/static/", "/data/www", "index.html", "GET POST DELETE")
+	);
 	PortList expected_ports2;
 	expected_ports2.push_back(9999);
 	server::VirtualServer vs2(expected_server_name2, expected_locations2, expected_ports2);
