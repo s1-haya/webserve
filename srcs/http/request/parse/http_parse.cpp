@@ -60,6 +60,14 @@ void HttpParse::ParseRequestLine(HttpRequestParsedData *data) {
 	}
 }
 
+bool IsBodyMessage(const HeaderFields &header_fileds) {
+	if (header_fileds.find(CONTENT_LENGTH) == header_fileds.end() &&
+		header_fileds.find(TRANSFER_ENCODING) == header_fileds.end()) {
+		return false;
+	}
+	return true;
+}
+
 // todo: is_request_lineがtrue, is_header_filedsがfalseの場合
 // - current_bufをCRLFCRLFまで切り取る。
 // - HttpRequestResultを格納する。
@@ -73,11 +81,7 @@ void HttpParse::ParseHeaderFields(HttpRequestParsedData *data) {
 			data->request_result.request.header_fields =
 				SetHeaderFields(utils::SplitStr(header_fileds, CRLF));
 			data->is_request_format.is_header_fields = true;
-			data->current_buf.erase(0, pos + CRLF.size() + CRLF.size());
-			if (data->request_result.request.header_fields.find("Content-Length") ==
-					data->request_result.request.header_fields.end() &&
-				data->request_result.request.header_fields.find("Transfer-Encoding") ==
-					data->request_result.request.header_fields.end()) {
+			if (!IsBodyMessage(data->request_result.request.header_fields)) {
 				data->is_request_format.is_body_message = true;
 			}
 		}
