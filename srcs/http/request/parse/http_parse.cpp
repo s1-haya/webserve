@@ -50,13 +50,14 @@ std::string StrTrimLeadingOptionalWhitespace(const std::string &str) {
 void HttpParse::ParseRequestLine(HttpRequestParsedData *data) {
 	if (!data->is_request_format.is_request_line) {
 		size_t pos = data->current_buf.find(CRLF);
-		if (pos != std::string::npos) {
-			std::string request_line = data->current_buf.substr(0, pos);
-			data->request_result.request.request_line =
-				SetRequestLine(utils::SplitStr(request_line, SP));
-			data->is_request_format.is_request_line = true;
-			data->current_buf.erase(0, pos + CRLF.size());
+		if (pos == std::string::npos) {
+			return;
 		}
+		std::string request_line = data->current_buf.substr(0, pos);
+		data->current_buf.erase(0, pos + CRLF.size());
+		data->request_result.request.request_line =
+			SetRequestLine(utils::SplitStr(request_line, SP));
+		data->is_request_format.is_request_line = true;
 	}
 }
 
@@ -68,32 +69,34 @@ bool IsBodyMessage(const HeaderFields &header_fileds) {
 	return true;
 }
 
-// todo: is_request_lineがtrue, is_header_filedsがfalseの場合
-// - current_bufをCRLFCRLFまで切り取る。
-// - HttpRequestResultを格納する。
-// - is_header_fileds = true;
-// - ContentLengthとTRANSFER_ENCORDINGがない場合 is_body_message = true;
 void HttpParse::ParseHeaderFields(HttpRequestParsedData *data) {
-	if (data->is_request_format.is_request_line && !data->is_request_format.is_header_fields) {
+	if (!data->is_request_format.is_request_line) {
+		return;
+	}
+	if (!data->is_request_format.is_header_fields) {
 		size_t pos = data->current_buf.find(CRLF + CRLF);
-		if (pos != std::string::npos) {
-			std::string header_fileds = data->current_buf.substr(0, pos);
-			data->request_result.request.header_fields =
-				SetHeaderFields(utils::SplitStr(header_fileds, CRLF));
-			data->is_request_format.is_header_fields = true;
-			if (!IsBodyMessage(data->request_result.request.header_fields)) {
-				data->is_request_format.is_body_message = true;
-			}
+		if (pos == std::string::npos) {
+			return;
+		}
+		std::string header_fileds = data->current_buf.substr(0, pos);
+		data->current_buf.erase(0, pos + CRLF.size() + CRLF.size());
+		data->request_result.request.header_fields =
+			SetHeaderFields(utils::SplitStr(header_fileds, CRLF));
+		data->is_request_format.is_header_fields = true;
+		if (!IsBodyMessage(data->request_result.request.header_fields)) {
+			data->is_request_format.is_body_message = true;
 		}
 	}
 }
 
-// todo: is_request_lineとis_header_fieldsがtrue, is_bodyがfalseの場合（今回はContentLengthのみ
-// - current_bufをContentLength文まで読み取り、HttpRequestResultを格納する。
-// - is_body_message = true;
 void HttpParse::ParseBodyMessage(HttpRequestParsedData *data) {
-	if (data->is_request_format.is_request_line && data->is_request_format.is_header_fields &&
-		!data->is_request_format.is_body_message) {
+	if (!data->is_request_format.is_request_line) {
+		return;
+	}
+	if (!data->is_request_format.is_header_fields) {
+		return;
+	}
+	if (!data->is_request_format.is_body_message) {
 		// todo: current_bufをContentLength文まで読み取り、HttpRequestResultを格納する
 		// todo: ContentLengthまで読み込んだらtrueになる
 		data->is_request_format.is_body_message = true;
