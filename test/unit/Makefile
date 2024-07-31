@@ -6,7 +6,8 @@ TEST_DIRS	:=	convert_str \
 				sock_context \
 				split_str \
 				virtual_server \
-				virtual_server_storage
+				virtual_server_storage \
+				config_parse/lexer
 
 .PHONY	: run
 run:

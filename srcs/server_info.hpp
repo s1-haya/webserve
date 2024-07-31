@@ -9,20 +9,18 @@ class ServerInfo {
   public:
 	// default constructor: necessary for map's insert/[]
 	ServerInfo();
-	ServerInfo(const std::string &name, unsigned int port);
+	explicit ServerInfo(unsigned int port);
 	~ServerInfo();
 	ServerInfo(const ServerInfo &other);
 	ServerInfo &operator=(const ServerInfo &other);
 	// getter
-	int                GetFd() const;
-	const std::string &GetName() const;
-	unsigned int       GetPort() const;
+	int          GetFd() const;
+	unsigned int GetPort() const;
 	// setter
 	void SetSockFd(int fd);
 
   private:
 	int          fd_;
-	std::string  name_;
 	unsigned int port_;
 };
 
