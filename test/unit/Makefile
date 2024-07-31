@@ -8,7 +8,8 @@ TEST_DIRS	:=	convert_str \
 				split_str \
 				virtual_server \
 				virtual_server_storage \
-				config_parse/lexer
+				config_parse/lexer \
+				config_parse/parser
 
 .PHONY	: run
 run:
