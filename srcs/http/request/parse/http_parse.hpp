@@ -19,7 +19,7 @@ typedef std::map<std::string, std::string> HeaderFields;
 struct HttpRequest {
 	RequestLine  request_line;
 	HeaderFields header_fields;
-	std::string  message_body;
+	std::string  body_message;
 };
 
 enum StatusCode {

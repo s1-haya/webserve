@@ -70,6 +70,18 @@ int main(void) {
 	ret_code |= HandleResult(test3_header_fileds.GetIsHeaderFieldsFormat(1), true);
 	ret_code |= HandleResult(test3_header_fileds.GetIsBodyMessageFormat(1), true);
 
+	// Content-Lengthの数値以上にボディメッセージがある場合
+	http::TmpHttp test4_header_fileds;
+	test4_header_fileds.ParseHttpRequestFormat(
+		1, "GET / HTTP/1.1\r\nHost: test\r\nContent-Length: 2\r\n\r\nabccccccccc"
+	);
+	const std::string &test4_body_message = "ab";
+	ret_code |= HandleResult(test4_header_fileds.GetStatusCode(1), http::OK);
+	ret_code |= HandleResult(test4_header_fileds.GetIsRequestLineFormat(1), true);
+	ret_code |= HandleResult(test4_header_fileds.GetIsHeaderFieldsFormat(1), true);
+	ret_code |= HandleResult(test4_header_fileds.GetIsBodyMessageFormat(1), true);
+	ret_code |= HandleResult(test4_header_fileds.GetBodyMessage(1), test4_body_message);
+
 	// const std::string &expected1 = "OK";
 	// ret_code |= HandleResult(test.CreateHttpResponse(1), expected1);
 	// ret_code |= HandleResult(test.GetIsHttpRequestFormatComplete(1), false);

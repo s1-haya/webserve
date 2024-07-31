@@ -60,4 +60,9 @@ bool TmpHttp::GetIsBodyMessageFormat(int client_fd) {
 	return (save_data.is_request_format.is_body_message);
 }
 
+std::string TmpHttp::GetBodyMessage(int client_fd) {
+	HttpRequestParsedData save_data = storage_.GetClientSaveData(client_fd);
+	return (save_data.request_result.request.body_message);
+}
+
 } // namespace http

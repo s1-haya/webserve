@@ -99,7 +99,19 @@ void HttpParse::ParseBodyMessage(HttpRequestParsedData *data) {
 	if (!data->is_request_format.is_body_message) {
 		// todo: current_bufをContentLength文まで読み取り、HttpRequestResultを格納する
 		// todo: ContentLengthまで読み込んだらtrueになる
-		data->is_request_format.is_body_message = true;
+		size_t content_length =
+			std::stoi(data->request_result.request.header_fields[CONTENT_LENGTH]);
+		size_t readable_content_length =
+			content_length - data->request_result.request.body_message.size();
+		if (data->current_buf.size() >= readable_content_length) {
+			data->request_result.request.body_message =
+				data->current_buf.substr(0, readable_content_length);
+			data->current_buf.erase(0, readable_content_length);
+			data->is_request_format.is_body_message = true;
+		} else {
+			data->request_result.request.body_message = data->current_buf;
+			data->current_buf.clear();
+		}
 	}
 }
 
