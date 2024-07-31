@@ -82,6 +82,15 @@ int main(void) {
 	ret_code |= HandleResult(test4_header_fileds.GetIsBodyMessageFormat(1), true);
 	ret_code |= HandleResult(test4_header_fileds.GetBodyMessage(1), test4_body_message);
 
+	http::TmpHttp test5_header_fileds;
+	test5_header_fileds.ParseHttpRequestFormat(
+		1, "GET / HTTP/1.1\r\nHost: test\r\nContent-Length: dddd\r\n\r\nabccccccccc"
+	);
+	ret_code |= HandleResult(test5_header_fileds.GetStatusCode(1), http::BAD_REQUEST);
+	ret_code |= HandleResult(test5_header_fileds.GetIsRequestLineFormat(1), true);
+	ret_code |= HandleResult(test5_header_fileds.GetIsHeaderFieldsFormat(1), true);
+	ret_code |= HandleResult(test5_header_fileds.GetIsBodyMessageFormat(1), false);
+
 	// const std::string &expected1 = "OK";
 	// ret_code |= HandleResult(test.CreateHttpResponse(1), expected1);
 	// ret_code |= HandleResult(test.GetIsHttpRequestFormatComplete(1), false);

@@ -93,8 +93,12 @@ void HttpParse::ParseBodyMessage(HttpRequestParsedData *data) {
 		return;
 	}
 	if (!data->is_request_format.is_body_message) {
-		size_t content_length =
-			std::stoi(data->request_result.request.header_fields[CONTENT_LENGTH]);
+		size_t content_length;
+		if (!utils::ConvertStrToSize(
+				data->request_result.request.header_fields[CONTENT_LENGTH], content_length
+			)) {
+			throw HttpParseException("Error: wrong Content-Length number", BAD_REQUEST);
+		}
 		size_t readable_content_length =
 			content_length - data->request_result.request.body_message.size();
 		if (data->current_buf.size() >= readable_content_length) {
