@@ -177,11 +177,10 @@ int RunTests(const TestCase test_cases[], std::size_t num_test_cases) {
 
 /* Test1 */
 ServerList MakeExpectedTest1() {
-	ServerList     expected_result;
-	std::list<int> expected_ports_1;
-	expected_ports_1.push_back(8080);
+	ServerList         expected_result;
+	std::list<int>     expected_ports_1;
 	LocationList       expected_locationlist_1;
-	context::ServerCon expected_server_1 = {expected_ports_1, "localhost", expected_locationlist_1};
+	context::ServerCon expected_server_1 = {expected_ports_1, "", expected_locationlist_1};
 	expected_result.push_back(expected_server_1);
 
 	return expected_result;
@@ -189,14 +188,12 @@ ServerList MakeExpectedTest1() {
 
 /* Test2 */
 ServerList MakeExpectedTest2() {
-	ServerList     expected_result;
-	std::list<int> expected_ports_1;
-	expected_ports_1.push_back(8080);
-	expected_ports_1.push_back(80);
+	ServerList           expected_result;
+	std::list<int>       expected_ports_1;
 	LocationList         expected_locationlist_1;
-	context::LocationCon expected_location_1_1 = {"/", "/www/", "index.html", ""};
+	context::LocationCon expected_location_1_1 = {"/", "", "", ""};
 	expected_locationlist_1.push_back(expected_location_1_1);
-	context::ServerCon expected_server_1 = {expected_ports_1, "localhost", expected_locationlist_1};
+	context::ServerCon expected_server_1 = {expected_ports_1, "", expected_locationlist_1};
 	expected_result.push_back(expected_server_1);
 
 	return expected_result;
@@ -210,22 +207,16 @@ int main() {
 	ServerList expected_result_test_1 = MakeExpectedTest1();
 	ServerList expected_result_test_2 = MakeExpectedTest2();
 
-	static const TestCase test_cases[] = {
+	static TestCase test_cases[] = {
 		TestCase(
 			"server {\n \
-				server_name localhost;\n \
-				listen 8080;\n \
 				}\n",
 			expected_result_test_1
 		),
 		TestCase(
 			"server {\n \
-				server_name localhost;\n \
-				listen 8080 80;\n \
-				location / {\n \
-					root /www/;\n \
-					index index.html;\n \
-					} \
+					location / {\n \
+					}\n \
 				}\n",
 			expected_result_test_2
 		)
