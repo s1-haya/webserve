@@ -175,6 +175,22 @@ int RunTests(const TestCase test_cases[], std::size_t num_test_cases) {
 	return ret_code;
 }
 
+/* For Error Test */
+// int RunErrorTests(const TestCase test_cases[], std::size_t num_test_cases) {
+// 	int ret_code = 0;
+
+// 	for (std::size_t i = 0; i < num_test_cases; i++) {
+// 		const TestCase test_case = test_cases[i];
+// 		try {
+// 			ret_code |= Test(Run(test_case.input, test_case.expected), test_case.input);
+// 			PrintNg();
+// 		} catch (const std::exception &e) {
+// 			PrintOk();
+// 		}
+// 	}
+// 	return ret_code;
+// }
+
 // TODO: Lexerとテストケースを揃える
 
 /* Test1 */
@@ -305,6 +321,27 @@ int main() {
 	};
 
 	ret_code |= RunTests(test_cases, ARRAY_SIZE(test_cases));
+
+	// ServerList expected_result_error_test;
+
+	// static TestCase error_test_cases[] = {
+	// 	TestCase(
+	// 		"server {\n
+	// 				listen 8080\n
+	// 				server_name localhost;\n
+	// 			}\n",
+	// 		expected_result_error_test
+	// 	),
+	// 	TestCase(
+	// 		"server {\n
+	// 				listen 8080;\n
+	// 				server_name localhost\n
+	// 			}\n",
+	// 		expected_result_error_test
+	// 	)
+	// };
+
+	// ret_code |= RunErrorTests(error_test_cases, ARRAY_SIZE(error_test_cases));
 
 	return ret_code;
 }
