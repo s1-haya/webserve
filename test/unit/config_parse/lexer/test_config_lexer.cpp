@@ -125,36 +125,249 @@ int RunTests(const TestCase test_cases[], std::size_t num_test_cases) {
 	return ret_code;
 }
 
+/* Test1 One Server*/
+NodeList MakeExpectedTest1() {
+	NodeList expected_result;
+
+	node::Node expected_node_1 = {"server", node::CONTEXT};
+	node::Node expected_node_2 = {"{", node::L_BRACKET};
+	node::Node expected_node_3 = {"}", node::R_BRACKET};
+
+	expected_result.push_back(expected_node_1);
+	expected_result.push_back(expected_node_2);
+	expected_result.push_back(expected_node_3);
+
+	return expected_result;
+}
+
+/* Test2 One Server One Location*/
+NodeList MakeExpectedTest2() {
+	NodeList expected_result;
+
+	node::Node expected_node_1 = {"server", node::CONTEXT};
+	node::Node expected_node_2 = {"{", node::L_BRACKET};
+	node::Node expected_node_3 = {"location", node::CONTEXT};
+	node::Node expected_node_4 = {"/", node::WORD};
+	node::Node expected_node_5 = {"{", node::L_BRACKET};
+	node::Node expected_node_6 = {"}", node::R_BRACKET};
+	node::Node expected_node_7 = {"}", node::R_BRACKET};
+
+	expected_result.push_back(expected_node_1);
+	expected_result.push_back(expected_node_2);
+	expected_result.push_back(expected_node_3);
+	expected_result.push_back(expected_node_4);
+	expected_result.push_back(expected_node_5);
+	expected_result.push_back(expected_node_6);
+	expected_result.push_back(expected_node_7);
+
+	return expected_result;
+}
+
+/* Test3 listen, server_name, root, index Directive*/
+NodeList MakeExpectedTest3() {
+	NodeList expected_result;
+
+	node::Node expected_node_1  = {"server", node::CONTEXT};
+	node::Node expected_node_2  = {"{", node::L_BRACKET};
+	node::Node expected_node_3  = {"listen", node::DIRECTIVE};
+	node::Node expected_node_4  = {"8080", node::WORD};
+	node::Node expected_node_5  = {";", node::DELIM};
+	node::Node expected_node_6  = {"server_name", node::DIRECTIVE};
+	node::Node expected_node_7  = {"localhost", node::WORD};
+	node::Node expected_node_8  = {";", node::DELIM};
+	node::Node expected_node_9  = {"location", node::CONTEXT};
+	node::Node expected_node_10 = {"/", node::WORD};
+	node::Node expected_node_11 = {"{", node::L_BRACKET};
+	node::Node expected_node_12 = {"root", node::DIRECTIVE};
+	node::Node expected_node_13 = {"/data/", node::WORD};
+	node::Node expected_node_14 = {";", node::DELIM};
+	node::Node expected_node_15 = {"index", node::DIRECTIVE};
+	node::Node expected_node_16 = {"index.html", node::WORD};
+	node::Node expected_node_17 = {";", node::DELIM};
+	node::Node expected_node_18 = {"}", node::R_BRACKET};
+	node::Node expected_node_19 = {"}", node::R_BRACKET};
+
+	expected_result.push_back(expected_node_1);
+	expected_result.push_back(expected_node_2);
+	expected_result.push_back(expected_node_3);
+	expected_result.push_back(expected_node_4);
+	expected_result.push_back(expected_node_5);
+	expected_result.push_back(expected_node_6);
+	expected_result.push_back(expected_node_7);
+	expected_result.push_back(expected_node_8);
+	expected_result.push_back(expected_node_9);
+	expected_result.push_back(expected_node_10);
+	expected_result.push_back(expected_node_11);
+	expected_result.push_back(expected_node_12);
+	expected_result.push_back(expected_node_13);
+	expected_result.push_back(expected_node_14);
+	expected_result.push_back(expected_node_15);
+	expected_result.push_back(expected_node_16);
+	expected_result.push_back(expected_node_17);
+	expected_result.push_back(expected_node_18);
+	expected_result.push_back(expected_node_19);
+
+	return expected_result;
+}
+
+/* Test4 Multiple ports, "server_name" as server_name*/
+NodeList MakeExpectedTest4() {
+	NodeList expected_result;
+
+	node::Node expected_node_1  = {"server", node::CONTEXT};
+	node::Node expected_node_2  = {"{", node::L_BRACKET};
+	node::Node expected_node_3  = {"listen", node::DIRECTIVE};
+	node::Node expected_node_4  = {"8080", node::WORD};
+	node::Node expected_node_5  = {"8000", node::WORD};
+	node::Node expected_node_6  = {"80", node::WORD};
+	node::Node expected_node_7  = {";", node::DELIM};
+	node::Node expected_node_8  = {"server_name", node::DIRECTIVE};
+	node::Node expected_node_9  = {"server_name", node::WORD};
+	node::Node expected_node_10 = {";", node::DELIM};
+	node::Node expected_node_11 = {"}", node::R_BRACKET};
+
+	expected_result.push_back(expected_node_1);
+	expected_result.push_back(expected_node_2);
+	expected_result.push_back(expected_node_3);
+	expected_result.push_back(expected_node_4);
+	expected_result.push_back(expected_node_5);
+	expected_result.push_back(expected_node_6);
+	expected_result.push_back(expected_node_7);
+	expected_result.push_back(expected_node_8);
+	expected_result.push_back(expected_node_9);
+	expected_result.push_back(expected_node_10);
+	expected_result.push_back(expected_node_11);
+
+	return expected_result;
+}
+
+/* Test5 No Delimiter*/
+NodeList MakeExpectedTest5() {
+	NodeList expected_result;
+
+	node::Node expected_node_1  = {"server", node::CONTEXT};
+	node::Node expected_node_2  = {"{", node::L_BRACKET};
+	node::Node expected_node_3  = {"listen", node::DIRECTIVE};
+	node::Node expected_node_4  = {"8080", node::WORD};
+	node::Node expected_node_5  = {"8000", node::WORD};
+	node::Node expected_node_6  = {"80", node::WORD};
+	node::Node expected_node_7  = {"server_name", node::WORD};
+	node::Node expected_node_8  = {"localhost", node::WORD};
+	node::Node expected_node_9  = {";", node::DELIM};
+	node::Node expected_node_10 = {"}", node::R_BRACKET};
+
+	expected_result.push_back(expected_node_1);
+	expected_result.push_back(expected_node_2);
+	expected_result.push_back(expected_node_3);
+	expected_result.push_back(expected_node_4);
+	expected_result.push_back(expected_node_5);
+	expected_result.push_back(expected_node_6);
+	expected_result.push_back(expected_node_7);
+	expected_result.push_back(expected_node_8);
+	expected_result.push_back(expected_node_9);
+	expected_result.push_back(expected_node_10);
+
+	return expected_result;
+}
+
+/* Test6 Multiple Locations*/
+NodeList MakeExpectedTest6() {
+	NodeList expected_result;
+
+	node::Node expected_node_1  = {"server", node::CONTEXT};
+	node::Node expected_node_2  = {"{", node::L_BRACKET};
+	node::Node expected_node_3  = {"server_name", node::DIRECTIVE};
+	node::Node expected_node_4  = {"test.serv", node::WORD};
+	node::Node expected_node_5  = {";", node::DELIM};
+	node::Node expected_node_6  = {"location", node::CONTEXT};
+	node::Node expected_node_7  = {"/", node::WORD};
+	node::Node expected_node_8  = {"{", node::L_BRACKET};
+	node::Node expected_node_9  = {"index", node::DIRECTIVE};
+	node::Node expected_node_10 = {"index.html", node::WORD};
+	node::Node expected_node_11 = {";", node::DELIM};
+	node::Node expected_node_12 = {"}", node::R_BRACKET};
+	node::Node expected_node_13 = {"location", node::CONTEXT};
+	node::Node expected_node_14 = {"/www/", node::WORD};
+	node::Node expected_node_15 = {"{", node::L_BRACKET};
+	node::Node expected_node_16 = {"index", node::DIRECTIVE};
+	node::Node expected_node_17 = {"index", node::WORD};
+	node::Node expected_node_18 = {";", node::DELIM};
+	node::Node expected_node_19 = {"}", node::R_BRACKET};
+	node::Node expected_node_20 = {"}", node::R_BRACKET};
+
+	expected_result.push_back(expected_node_1);
+	expected_result.push_back(expected_node_2);
+	expected_result.push_back(expected_node_3);
+	expected_result.push_back(expected_node_4);
+	expected_result.push_back(expected_node_5);
+	expected_result.push_back(expected_node_6);
+	expected_result.push_back(expected_node_7);
+	expected_result.push_back(expected_node_8);
+	expected_result.push_back(expected_node_9);
+	expected_result.push_back(expected_node_10);
+	expected_result.push_back(expected_node_11);
+	expected_result.push_back(expected_node_12);
+	expected_result.push_back(expected_node_13);
+	expected_result.push_back(expected_node_14);
+	expected_result.push_back(expected_node_15);
+	expected_result.push_back(expected_node_16);
+	expected_result.push_back(expected_node_17);
+	expected_result.push_back(expected_node_18);
+	expected_result.push_back(expected_node_19);
+	expected_result.push_back(expected_node_20);
+
+	return expected_result;
+}
+
+/* Test7 Quotation*/
+// NodeList MakeExpectedTest7() {
+// 	NodeList expected_result;
+
+// 	node::Node expected_node_1  = {"server", node::CONTEXT};
+// 	node::Node expected_node_2  = {"{", node::L_BRACKET};
+// 	node::Node expected_node_3  = {"server_name", node::DIRECTIVE};
+// 	node::Node expected_node_4  = {"test.serv", node::WORD};
+// 	node::Node expected_node_5  = {";", node::DELIM};
+// 	node::Node expected_node_6  = {"location", node::CONTEXT};
+// 	node::Node expected_node_7  = {"/", node::WORD};
+// 	node::Node expected_node_8  = {"{", node::L_BRACKET};
+// 	node::Node expected_node_9  = {"index", node::DIRECTIVE};
+// 	node::Node expected_node_10 = {"index.html", node::WORD};
+// 	node::Node expected_node_11 = {";", node::DELIM};
+// 	node::Node expected_node_12 = {"}", node::R_BRACKET};
+// 	node::Node expected_node_13 = {"}", node::R_BRACKET};
+
+// 	expected_result.push_back(expected_node_1);
+// 	expected_result.push_back(expected_node_2);
+// 	expected_result.push_back(expected_node_3);
+// 	expected_result.push_back(expected_node_4);
+// 	expected_result.push_back(expected_node_5);
+// 	expected_result.push_back(expected_node_6);
+// 	expected_result.push_back(expected_node_7);
+// 	expected_result.push_back(expected_node_8);
+// 	expected_result.push_back(expected_node_9);
+// 	expected_result.push_back(expected_node_10);
+// 	expected_result.push_back(expected_node_11);
+// 	expected_result.push_back(expected_node_12);
+// 	expected_result.push_back(expected_node_13);
+
+// 	return expected_result;
+// }
+
 } // namespace
 
 int main() {
 	int ret_code = EXIT_SUCCESS;
 
-	/* Test1 */
-	NodeList   expected_result_test_1;
-	node::Node expected_test_1_node_1 = {"server", node::CONTEXT};
-	node::Node expected_test_1_node_2 = {"{", node::L_BRACKET};
-	node::Node expected_test_1_node_3 = {"}", node::R_BRACKET};
-	expected_result_test_1.push_back(expected_test_1_node_1);
-	expected_result_test_1.push_back(expected_test_1_node_2);
-	expected_result_test_1.push_back(expected_test_1_node_3);
+	NodeList expected_result_test_1 = MakeExpectedTest1();
+	NodeList expected_result_test_2 = MakeExpectedTest2();
+	NodeList expected_result_test_3 = MakeExpectedTest3();
+	NodeList expected_result_test_4 = MakeExpectedTest4();
+	NodeList expected_result_test_5 = MakeExpectedTest5();
+	NodeList expected_result_test_6 = MakeExpectedTest6();
+	// NodeList expected_result_test_7 = MakeExpectedTest7();
 
-	/* Test2 */
-	NodeList   expected_result_test_2;
-	node::Node expected_test_2_node_1 = {"server", node::CONTEXT};
-	node::Node expected_test_2_node_2 = {"{", node::L_BRACKET};
-	node::Node expected_test_2_node_3 = {"location", node::CONTEXT};
-	node::Node expected_test_2_node_4 = {"{", node::L_BRACKET};
-	node::Node expected_test_2_node_5 = {"}", node::R_BRACKET};
-	node::Node expected_test_2_node_6 = {"}", node::R_BRACKET};
-	expected_result_test_2.push_back(expected_test_2_node_1);
-	expected_result_test_2.push_back(expected_test_2_node_2);
-	expected_result_test_2.push_back(expected_test_2_node_3);
-	expected_result_test_2.push_back(expected_test_2_node_4);
-	expected_result_test_2.push_back(expected_test_2_node_5);
-	expected_result_test_2.push_back(expected_test_2_node_6);
-
-	static const TestCase test_cases[] = {
+	static TestCase test_cases[] = {
 		TestCase(
 			"server {\n \
 				}\n",
@@ -162,11 +375,58 @@ int main() {
 		),
 		TestCase(
 			"server {\n \
-					location {\n \
+					location / {\n \
 					}\n \
 				}\n",
 			expected_result_test_2
-		)
+		),
+		TestCase(
+			"server {\n \
+					listen 8080;\n \
+					server_name localhost;\n \
+					location / {\n \
+						root /data/;\n \
+						index index.html;\n \
+					}\n \
+				}\n",
+			expected_result_test_3
+		),
+		TestCase(
+			"server {\n \
+					listen 8080 8000 80;\n \
+					server_name server_name;\n \
+				}\n",
+			expected_result_test_4
+		),
+		TestCase(
+			"server {\n \
+					listen 8080 8000 80\n \
+					server_name localhost;\n \
+				}\n",
+			expected_result_test_5
+		),
+		TestCase(
+			"server {\n \
+					server_name test.serv;\n \
+					location / {\n \
+						index index.html;\n \
+					}\n \
+					location /www/ {\n \
+						index index;\n \
+					}\n \
+				}\n",
+			expected_result_test_6
+		),
+		// TODO: \を追加
+		// TestCase(
+		// 	"server {\n
+		// 			server_name \"test.serv\";\n
+		// 			location / {\n
+		// 				index \"index.html\";\n
+		// 			}\n
+		// 		}\n",
+		// 	expected_result_test_7
+		// ),
 	};
 
 	ret_code |= RunTests(test_cases, ARRAY_SIZE(test_cases));
