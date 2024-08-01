@@ -175,33 +175,40 @@ int RunTests(const TestCase test_cases[], std::size_t num_test_cases) {
 	return ret_code;
 }
 
+/* Test1 */
+ServerList MakeExpectedTest1() {
+	ServerList     expected_result;
+	std::list<int> expected_ports_1;
+	expected_ports_1.push_back(8080);
+	LocationList       expected_locationlist_1;
+	context::ServerCon expected_server_1 = {expected_ports_1, "localhost", expected_locationlist_1};
+	expected_result.push_back(expected_server_1);
+
+	return expected_result;
+}
+
+/* Test2 */
+ServerList MakeExpectedTest2() {
+	ServerList     expected_result;
+	std::list<int> expected_ports_1;
+	expected_ports_1.push_back(8080);
+	expected_ports_1.push_back(80);
+	LocationList         expected_locationlist_1;
+	context::LocationCon expected_location_1_1 = {"/", "/www/", "index.html", ""};
+	expected_locationlist_1.push_back(expected_location_1_1);
+	context::ServerCon expected_server_1 = {expected_ports_1, "localhost", expected_locationlist_1};
+	expected_result.push_back(expected_server_1);
+
+	return expected_result;
+}
+
 } // namespace
 
 int main() {
 	int ret_code = EXIT_SUCCESS;
 
-	/* Test1 */
-	ServerList     expected_result_test_1;
-	std::list<int> expected_test_1_ports;
-	expected_test_1_ports.push_back(8080);
-	LocationList       expected_test_1_locationlist;
-	context::ServerCon expected_test_1_server_1 = {
-		expected_test_1_ports, "localhost", expected_test_1_locationlist
-	};
-	expected_result_test_1.push_back(expected_test_1_server_1);
-
-	/* Test2 */
-	ServerList     expected_result_test_2;
-	std::list<int> expected_test_2_ports;
-	expected_test_2_ports.push_back(8080);
-	expected_test_2_ports.push_back(80);
-	LocationList         expected_test_2_locationlist;
-	context::LocationCon expected_test_2_location_1 = {"/", "/www/", "index.html", ""};
-	expected_test_2_locationlist.push_back(expected_test_2_location_1);
-	context::ServerCon expected_test_2_server_1 = {
-		expected_test_2_ports, "localhost", expected_test_2_locationlist
-	};
-	expected_result_test_2.push_back(expected_test_2_server_1);
+	ServerList expected_result_test_1 = MakeExpectedTest1();
+	ServerList expected_result_test_2 = MakeExpectedTest2();
 
 	static const TestCase test_cases[] = {
 		TestCase(
