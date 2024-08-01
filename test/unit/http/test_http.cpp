@@ -103,7 +103,6 @@ int main(void) {
 	test6_header_fileds.ParseHttpRequestFormat(1, "bc");
 	const std::string &test6_body_message = "abc";
 	ret_code |= HandleResult(test6_header_fileds.GetIsBodyMessageFormat(1), true);
-	std::cout << test6_header_fileds.GetBodyMessage(1) ;ret_code |=
-		HandleResult(test6_header_fileds.GetBodyMessage(1), test6_body_message);
+	ret_code |= HandleResult(test6_header_fileds.GetBodyMessage(1), test6_body_message);
 	return ret_code;
 }

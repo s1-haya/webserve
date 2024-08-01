@@ -41,27 +41,27 @@ bool TmpHttp::GetIsHttpRequestFormatComplete(int client_fd) {
 // For test
 StatusCode TmpHttp::GetStatusCode(int client_fd) {
 	HttpRequestParsedData save_data = storage_.GetClientSaveData(client_fd);
-	return (save_data.request_result.status_code);
+	return save_data.request_result.status_code;
 }
 
 bool TmpHttp::GetIsRequestLineFormat(int client_fd) {
 	HttpRequestParsedData save_data = storage_.GetClientSaveData(client_fd);
-	return (save_data.is_request_format.is_request_line);
+	return save_data.is_request_format.is_request_line;
 }
 
 bool TmpHttp::GetIsHeaderFieldsFormat(int client_fd) {
 	HttpRequestParsedData save_data = storage_.GetClientSaveData(client_fd);
-	return (save_data.is_request_format.is_header_fields);
+	return save_data.is_request_format.is_header_fields;
 }
 
 bool TmpHttp::GetIsBodyMessageFormat(int client_fd) {
 	HttpRequestParsedData save_data = storage_.GetClientSaveData(client_fd);
-	return (save_data.is_request_format.is_body_message);
+	return save_data.is_request_format.is_body_message;
 }
 
 std::string TmpHttp::GetBodyMessage(int client_fd) {
 	HttpRequestParsedData save_data = storage_.GetClientSaveData(client_fd);
-	return (save_data.request_result.request.body_message);
+	return save_data.request_result.request.body_message;
 }
 
 } // namespace http
