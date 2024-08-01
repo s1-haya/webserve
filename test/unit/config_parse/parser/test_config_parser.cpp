@@ -199,6 +199,53 @@ ServerList MakeExpectedTest2() {
 	return expected_result;
 }
 
+/* Test3 */
+ServerList MakeExpectedTest3() {
+	ServerList     expected_result;
+	std::list<int> expected_ports_1;
+	expected_ports_1.push_back(8080);
+	LocationList         expected_locationlist_1;
+	context::LocationCon expected_location_1_1 = {"/", "/data/", "index.html", ""};
+	expected_locationlist_1.push_back(expected_location_1_1);
+	context::ServerCon expected_server_1 = {expected_ports_1, "localhost", expected_locationlist_1};
+	expected_result.push_back(expected_server_1);
+
+	return expected_result;
+}
+
+/* Test4 */
+ServerList MakeExpectedTest4() {
+	ServerList     expected_result;
+	std::list<int> expected_ports_1;
+	expected_ports_1.push_back(8080);
+	expected_ports_1.push_back(8000);
+	expected_ports_1.push_back(80);
+	LocationList       expected_locationlist_1;
+	context::ServerCon expected_server_1 = {
+		expected_ports_1, "server_name", expected_locationlist_1
+	};
+	expected_result.push_back(expected_server_1);
+
+	return expected_result;
+}
+
+/* Test5 */
+
+/* Test6 */
+ServerList MakeExpectedTest6() {
+	ServerList           expected_result;
+	std::list<int>       expected_ports_1;
+	LocationList         expected_locationlist_1;
+	context::LocationCon expected_location_1_1 = {"/", "", "index.html", ""};
+	context::LocationCon expected_location_1_2 = {"/www/", "", "index", ""};
+	expected_locationlist_1.push_back(expected_location_1_1);
+	expected_locationlist_1.push_back(expected_location_1_2);
+	context::ServerCon expected_server_1 = {expected_ports_1, "test.serv", expected_locationlist_1};
+	expected_result.push_back(expected_server_1);
+
+	return expected_result;
+}
+
 } // namespace
 
 int main() {
@@ -206,6 +253,10 @@ int main() {
 
 	ServerList expected_result_test_1 = MakeExpectedTest1();
 	ServerList expected_result_test_2 = MakeExpectedTest2();
+	ServerList expected_result_test_3 = MakeExpectedTest3();
+	ServerList expected_result_test_4 = MakeExpectedTest4();
+	// ServerList expected_result_test_5 = MakeExpectedTest5();
+	ServerList expected_result_test_6 = MakeExpectedTest6();
 
 	static TestCase test_cases[] = {
 		TestCase(
@@ -219,6 +270,43 @@ int main() {
 					}\n \
 				}\n",
 			expected_result_test_2
+		),
+		TestCase(
+			"server {\n \
+					listen 8080;\n \
+					server_name localhost;\n \
+					location / {\n \
+						root /data/;\n \
+						index index.html;\n \
+					}\n \
+				}\n",
+			expected_result_test_3
+		),
+		TestCase(
+			"server {\n \
+					listen 8080 8000 80;\n \
+					server_name server_name;\n \
+				}\n",
+			expected_result_test_4
+		),
+		// TestCase(
+		// 	"server {\n
+		// 			listen 8080 8000 80\n
+		// 			server_name localhost;\n
+		// 		}\n",
+		// 	expected_result_test_5
+		// ),
+		TestCase(
+			"server {\n \
+					server_name test.serv;\n \
+					location / {\n \
+						index index.html;\n \
+					}\n \
+					location /www/ {\n \
+						index index;\n \
+					}\n \
+				}\n",
+			expected_result_test_6
 		)
 	};
 
