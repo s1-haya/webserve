@@ -269,6 +269,21 @@ ServerList MakeExpectedTest5() {
 	return expected_result;
 }
 
+/* Test6 Tab+Space, Comment */
+ServerList MakeExpectedTest6() {
+	ServerList           expected_result;
+	std::list<int>       expected_ports_1;
+	LocationList         expected_locationlist_1;
+	context::LocationCon expected_location_1_1 = {"/", "", "index.html", ""};
+	expected_locationlist_1.push_back(expected_location_1_1);
+	context::ServerCon expected_server_1 = {
+		expected_ports_1, "comment.serv", expected_locationlist_1
+	};
+	expected_result.push_back(expected_server_1);
+
+	return expected_result;
+}
+
 } // namespace
 
 int main() {
@@ -279,6 +294,7 @@ int main() {
 	ServerList expected_result_test_3 = MakeExpectedTest3();
 	ServerList expected_result_test_4 = MakeExpectedTest4();
 	ServerList expected_result_test_5 = MakeExpectedTest5();
+	ServerList expected_result_test_6 = MakeExpectedTest6();
 
 	static TestCase test_cases[] = {
 		TestCase(
@@ -324,6 +340,19 @@ int main() {
 					}\n \
 				}\n",
 			expected_result_test_5
+		),
+		TestCase(
+			"server {\n \
+					\n \
+				    \n \
+			#ashjkahsk\n\
+					server_name comment.serv;\n \
+					location / {\n \
+						index index.html;\n \
+				    #ashjkahsk\n \
+					}\n \
+				}\n",
+			expected_result_test_6
 		)
 	};
 
@@ -332,12 +361,12 @@ int main() {
 	ServerList expected_result_error_test;
 
 	static TestCase error_test_cases[] = {
-		/* Test6 */ TestCase(
+		/* Test7 */ TestCase(
 			"server {\n \
 				\n",
 			expected_result_error_test
 		),
-		/* Test7 */
+		/* Test8 */
 		TestCase(
 			"server {\n \
 					server {\n \
@@ -345,21 +374,21 @@ int main() {
 				}\n",
 			expected_result_error_test
 		),
-		/* Test8 */
+		/* Test9 */
 		TestCase(
 			"server {\n \
 					listen\n \
 				}\n",
 			expected_result_error_test
 		),
-		/* Test9 */
+		/* Test10 */
 		TestCase(
 			"server {\n \
 					server_name server_name\n \
 				}\n",
 			expected_result_error_test
 		),
-		/* Test10 */
+		/* Test11 */
 		TestCase(
 			"server {\n \
 					listen 8080\n \
@@ -367,7 +396,7 @@ int main() {
 				}\n",
 			expected_result_error_test
 		),
-		/* Test11 */
+		/* Test12 */
 		TestCase(
 			"server {\n \
 					listen 8080 8000;\n \
@@ -375,13 +404,13 @@ int main() {
 				}\n",
 			expected_result_error_test
 		),
-		/* Test12 */
+		/* Test13 */
 		TestCase(
 			"serv {\n \
 				}\n",
 			expected_result_error_test
 		),
-		/* Test13 */
+		/* Test14 */
 		TestCase(
 			"server {\n \
 					location / /www/ {\n \
@@ -389,7 +418,7 @@ int main() {
 				}\n",
 			expected_result_error_test
 		),
-		/* Test14 */
+		/* Test15 */
 		TestCase(
 			"server {\n \
 					location /www/ {\n \
@@ -397,7 +426,7 @@ int main() {
 				}\n",
 			expected_result_error_test
 		),
-		/* Test15 */
+		/* Test16 */
 		TestCase(
 			"server {\n \
 					listen 8080;\n \
@@ -408,26 +437,26 @@ int main() {
 				}\n",
 			expected_result_error_test
 		),
-		/* Test16 */
+		/* Test17 */
 		TestCase(
 			"{\n \
 				}\n",
 			expected_result_error_test
 		),
-		/* Test17 */
+		/* Test18 */
 		TestCase(
 			"server	{{{\n \
 				}\n",
 			expected_result_error_test
 		),
-		/* Test18 */
+		/* Test19 */
 		TestCase(
 			"server 	{\n \
 				server_name server; ;;;;\n \
 				}\n",
 			expected_result_error_test
 		),
-		/* Test19 */
+		/* Test20 */
 		TestCase(
 			"server {\n \
 				unknown test;\n \
