@@ -2,6 +2,7 @@
 #include "context.hpp"
 #include "lexer.hpp"
 #include "parser.hpp"
+#include "utils.hpp"
 #include <cstdlib>
 #include <iostream>
 #include <sstream>
@@ -191,6 +192,7 @@ int RunErrorTests(const TestCase test_cases[], std::size_t num_test_cases) {
 			ret_code |= EXIT_FAILURE;
 		} catch (const std::exception &e) {
 			PrintOk();
+			utils::Debug(e.what());
 		}
 	}
 	return ret_code;
