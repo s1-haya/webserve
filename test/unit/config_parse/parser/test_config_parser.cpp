@@ -283,7 +283,9 @@ int main() {
 		),
 		TestCase(
 			"server {\n \
-					listen 8080 8000 80;\n \
+					listen 8080;\n \
+					listen 8000;\n \
+					listen 80;\n \
 					server_name server_name;\n \
 				}\n",
 			expected_result_test_4
