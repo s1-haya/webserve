@@ -362,39 +362,12 @@ int main() {
 		/* Test10 */
 		TestCase(
 			"server {\n \
-					location / /www/ {\n \
-					}\n \
-				}\n",
-			expected_result_error_test
-		),
-		/* Test11 */
-		TestCase(
-			"server {\n \
-					location /www/ {\n \
-					\n \
-				}\n",
-			expected_result_error_test
-		),
-		/* Test12 */
-		TestCase(
-			"server {\n \
-					listen 8080;\n \
-					server_name localhost;\n \
-					location / {\n \
-						root\n \
-					}\n \
-				}\n",
-			expected_result_error_test
-		),
-		/* Test13 */
-		TestCase(
-			"server {\n \
 					listen 8080\n \
 					server_name localhost;\n \
 				}\n",
 			expected_result_error_test
 		),
-		/* Test14 */
+		/* Test11 */
 		TestCase(
 			"server {\n \
 					listen 8080 8000;\n \
@@ -402,9 +375,36 @@ int main() {
 				}\n",
 			expected_result_error_test
 		),
-		/* Test15 */
+		/* Test12 */
 		TestCase(
 			"serv {\n \
+				}\n",
+			expected_result_error_test
+		),
+		/* Test13 */
+		TestCase(
+			"server {\n \
+					location / /www/ {\n \
+					}\n \
+				}\n",
+			expected_result_error_test
+		),
+		/* Test14 */
+		TestCase(
+			"server {\n \
+					location /www/ {\n \
+					\n \
+				}\n",
+			expected_result_error_test
+		),
+		/* Test15 */
+		TestCase(
+			"server {\n \
+					listen 8080;\n \
+					server_name localhost;\n \
+					location / {\n \
+						root\n \
+					}\n \
 				}\n",
 			expected_result_error_test
 		)
