@@ -104,5 +104,7 @@ int main(void) {
 	const std::string &test6_body_message = "abc";
 	ret_code |= HandleResult(test6_header_fileds.GetIsBodyMessageFormat(1), true);
 	ret_code |= HandleResult(test6_header_fileds.GetBodyMessage(1), test6_body_message);
+
+	std::cout << test6_header_fileds.CreateHttpResponse(1) << std::endl;
 	return ret_code;
 }

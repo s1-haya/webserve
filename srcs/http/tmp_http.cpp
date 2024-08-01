@@ -17,17 +17,16 @@ void TmpHttp::ParseHttpRequestFormat(int client_fd, const std::string &read_buf)
 
 // todo: レスポンスを作成する
 std::string TmpHttp::CreateHttpResponse(int client_fd) {
-	std::string           response  = "OK";
 	HttpRequestParsedData save_data = storage_.GetClientSaveData(client_fd);
 	// todo: ステータスコードを確認し、OK以外はレスポンスを作成し、savedataを削除してから出力する
 	if (save_data.request_result.status_code != OK) {
 		storage_.DeleteClientSaveData(client_fd);
-		return response;
+		return HttpResponse::TmpRun(client_fd);
 	}
 	// todo: VirtualServerクラス？？を引数で受けとり、リクエスト情報が正しいかどうかを確認する。
 	// todo: check status_code
 	storage_.DeleteClientSaveData(client_fd);
-	return response;
+	return HttpResponse::TmpRun(client_fd);
 }
 
 // todo: HTTPRequestの書式が完全かどうか(どのように取得するかは要検討)

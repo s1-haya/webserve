@@ -2,6 +2,7 @@
 #define TMP_HTTP_HPP_
 
 #include "http_parse.hpp"
+#include "http_response.hpp"
 #include "http_storage.hpp"
 
 namespace http {
