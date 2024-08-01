@@ -407,6 +407,32 @@ int main() {
 					}\n \
 				}\n",
 			expected_result_error_test
+		),
+		/* Test16 */
+		TestCase(
+			"{\n \
+				}\n",
+			expected_result_error_test
+		),
+		/* Test17 */
+		TestCase(
+			"server	{{{\n \
+				}\n",
+			expected_result_error_test
+		),
+		/* Test18 */
+		TestCase(
+			"server 	{\n \
+				server_name server; ;;;;\n \
+				}\n",
+			expected_result_error_test
+		),
+		/* Test19 */
+		TestCase(
+			"server {\n \
+				unknown test;\n \
+				}\n",
+			expected_result_error_test
 		)
 	};
 
