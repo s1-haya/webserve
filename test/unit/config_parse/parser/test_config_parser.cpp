@@ -200,7 +200,7 @@ int RunErrorTests(const TestCase test_cases[], std::size_t num_test_cases) {
 
 // TODO: Lexerとテストケースを揃える
 
-/* Test1 */
+/* Test1 One Server */
 ServerList MakeExpectedTest1() {
 	ServerList         expected_result;
 	std::list<int>     expected_ports_1;
@@ -211,7 +211,7 @@ ServerList MakeExpectedTest1() {
 	return expected_result;
 }
 
-/* Test2 */
+/* Test2 One Server, One Location */
 ServerList MakeExpectedTest2() {
 	ServerList           expected_result;
 	std::list<int>       expected_ports_1;
@@ -224,7 +224,7 @@ ServerList MakeExpectedTest2() {
 	return expected_result;
 }
 
-/* Test3 */
+/* Test3 Server, Location Directive */
 ServerList MakeExpectedTest3() {
 	ServerList     expected_result;
 	std::list<int> expected_ports_1;
@@ -238,7 +238,7 @@ ServerList MakeExpectedTest3() {
 	return expected_result;
 }
 
-/* Test4 */
+/* Test4 Multiple ports */
 ServerList MakeExpectedTest4() {
 	ServerList     expected_result;
 	std::list<int> expected_ports_1;
@@ -254,7 +254,7 @@ ServerList MakeExpectedTest4() {
 	return expected_result;
 }
 
-/* Test5 */
+/* Test5 Multiple Locations */
 ServerList MakeExpectedTest5() {
 	ServerList           expected_result;
 	std::list<int>       expected_ports_1;
