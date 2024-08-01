@@ -39,6 +39,10 @@ bool TmpHttp::GetIsHttpRequestFormatComplete(int client_fd) {
 }
 
 // For test
+HttpRequestParsedData TmpHttp::GetClientData(int client_fd) {
+	return storage_.GetClientSaveData(client_fd);
+}
+
 StatusCode TmpHttp::GetStatusCode(int client_fd) {
 	HttpRequestParsedData save_data = storage_.GetClientSaveData(client_fd);
 	return (save_data.request_result.status_code);

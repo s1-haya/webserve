@@ -3,6 +3,18 @@
 #include <cstdlib>
 #include <iostream>
 
+namespace {
+
+struct TestCase {
+	TestCase(
+		int client_fd, const std::string &read_buf, const http::HttpRequestParsedData &expected
+	)
+		: client_fd(client_fd), read_buf(read_buf), expected(expected) {}
+	int                               client_fd;
+	const std::string                 read_buf;
+	const http::HttpRequestParsedData expected;
+};
+
 int GetTestCaseNum() {
 	static unsigned int test_case_num = 0;
 	++test_case_num;
@@ -21,6 +33,27 @@ int HandleResult(const T &result, const T &expected) {
 		return EXIT_FAILURE;
 	}
 }
+
+int Run(int client_fd, const std::string &read_buf, const http::HttpRequestParsedData &expected) {
+	http::TmpHttp http;
+	http.ParseHttpRequestFormat(client_fd, read_buf);
+	http::HttpRequestParsedData client_data = http.GetClientData(client_fd);
+	return HandleResult(
+		client_data.request_result.status_code, expected.request_result.status_code
+	);
+}
+
+int RunTestCases(const TestCase test_cases[], std::size_t num_test_cases) {
+	int ret_code = 0;
+
+	for (std::size_t i = 0; i < num_test_cases; i++) {
+		const TestCase test_case = test_cases[i];
+		ret_code |= Run(test_case.client_fd, test_case.read_buf, test_case.expected);
+	}
+	return ret_code;
+}
+
+} // namespace
 
 int main(void) {
 	int ret_code = 0;
@@ -103,7 +136,16 @@ int main(void) {
 	test6_header_fileds.ParseHttpRequestFormat(1, "bc");
 	const std::string &test6_body_message = "abc";
 	ret_code |= HandleResult(test6_header_fileds.GetIsBodyMessageFormat(1), true);
-	std::cout << test6_header_fileds.GetBodyMessage(1) ;ret_code |=
-		HandleResult(test6_header_fileds.GetBodyMessage(1), test6_body_message);
+	ret_code |= HandleResult(test6_header_fileds.GetBodyMessage(1), test6_body_message);
+
+	http::HttpRequestParsedData test1_request_line;
+	test1_request_line.request_result.status_code         = http::OK;
+	static const TestCase test_case_http_request_format[] = {
+		TestCase(1, "GET / HTTP/1.1\r\n", test1_request_line)
+	};
+	ret_code |= RunTestCases(
+		test_case_http_request_format,
+		sizeof(test_case_http_request_format) / sizeof(test_case_http_request_format[0])
+	);
 	return ret_code;
 }
