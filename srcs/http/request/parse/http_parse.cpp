@@ -102,12 +102,12 @@ void HttpParse::ParseBodyMessage(HttpRequestParsedData &data) {
 		size_t readable_content_length =
 			content_length - data.request_result.request.body_message.size();
 		if (data.current_buf.size() >= readable_content_length) {
-			data.request_result.request.body_message =
+			data.request_result.request.body_message +=
 				data.current_buf.substr(0, readable_content_length);
 			data.current_buf.erase(0, readable_content_length);
 			data.is_request_format.is_body_message = true;
 		} else {
-			data.request_result.request.body_message = data.current_buf;
+			data.request_result.request.body_message += data.current_buf;
 			data.current_buf.clear();
 		}
 	}

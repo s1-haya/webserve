@@ -91,8 +91,19 @@ int main(void) {
 	ret_code |= HandleResult(test5_header_fileds.GetIsHeaderFieldsFormat(1), true);
 	ret_code |= HandleResult(test5_header_fileds.GetIsBodyMessageFormat(1), false);
 
-	// const std::string &expected1 = "OK";
-	// ret_code |= HandleResult(test.CreateHttpResponse(1), expected1);
-	// ret_code |= HandleResult(test.GetIsHttpRequestFormatComplete(1), false);
+	// ボディメッセージを追加で送信した場合
+	http::TmpHttp test6_header_fileds;
+	test6_header_fileds.ParseHttpRequestFormat(
+		1, "GET / HTTP/1.1\r\nHost: test\r\nContent-Length:  3\r\n\r\na"
+	);
+	ret_code |= HandleResult(test6_header_fileds.GetStatusCode(1), http::OK);
+	ret_code |= HandleResult(test6_header_fileds.GetIsRequestLineFormat(1), true);
+	ret_code |= HandleResult(test6_header_fileds.GetIsHeaderFieldsFormat(1), true);
+	ret_code |= HandleResult(test6_header_fileds.GetIsBodyMessageFormat(1), false);
+	test6_header_fileds.ParseHttpRequestFormat(1, "bc");
+	const std::string &test6_body_message = "abc";
+	ret_code |= HandleResult(test6_header_fileds.GetIsBodyMessageFormat(1), true);
+	std::cout << test6_header_fileds.GetBodyMessage(1) ;ret_code |=
+		HandleResult(test6_header_fileds.GetBodyMessage(1), test6_body_message);
 	return ret_code;
 }
