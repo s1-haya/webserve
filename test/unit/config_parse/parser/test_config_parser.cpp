@@ -331,65 +331,65 @@ int main() {
 
 	ServerList expected_result_error_test;
 
-	static TestCase error_test_cases[] = {/* Test6 */
-										  TestCase(
-											  "server {\n \
+	static TestCase error_test_cases[] = {
+		/* Test6 */ TestCase(
+			"server {\n \
 				\n",
-											  expected_result_error_test
-										  ),
-										  /* Test7 */
-										  TestCase(
-											  "server {\n \
+			expected_result_error_test
+		),
+		/* Test7 */
+		TestCase(
+			"server {\n \
 					server {\n \
 					}\n \
 				}\n",
-											  expected_result_test_2
-										  ),
-										  /* Test8 */
-										  TestCase(
-											  "server {\n \
+			expected_result_error_test
+		),
+		/* Test8 */
+		TestCase(
+			"server {\n \
 					location / /www/ {\n \
 					}\n \
 				}\n",
-											  expected_result_test_2
-										  ),
-										  /* Test9 */
-										  TestCase(
-											  "server {\n \
+			expected_result_error_test
+		),
+		/* Test9 */
+		TestCase(
+			"server {\n \
 					listen\n \
 				}\n",
-											  expected_result_error_test
-										  ),
-										  /* Test10 */
-										  TestCase(
-											  "server {\n \
+			expected_result_error_test
+		),
+		/* Test10 */
+		TestCase(
+			"server {\n \
 					listen 8080\n \
 					server_name localhost;\n \
 				}\n",
-											  expected_result_error_test
-										  ),
-										  /* Test11 */
-										  TestCase(
-											  "server {\n \
+			expected_result_error_test
+		),
+		/* Test11 */
+		TestCase(
+			"server {\n \
 					listen 8080;\n \
 					server_name localhost\n \
 				}\n",
-											  expected_result_error_test
-										  ),
-										  /* Test12 */
-										  TestCase(
-											  "server {\n \
+			expected_result_error_test
+		),
+		/* Test12 */
+		TestCase(
+			"server {\n \
 					listen 8080 8000;\n \
 					server_name localhost;\n \
 				}\n",
-											  expected_result_error_test
-										  ),
-										  /* Test13 */
-										  TestCase(
-											  "serv {\n \
+			expected_result_error_test
+		),
+		/* Test13 */
+		TestCase(
+			"serv {\n \
 				}\n",
-											  expected_result_error_test
-										  )
+			expected_result_error_test
+		)
 	};
 
 	ret_code |= RunErrorTests(error_test_cases, ARRAY_SIZE(error_test_cases));
