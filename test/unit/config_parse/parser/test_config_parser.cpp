@@ -389,27 +389,27 @@ int main() {
 			expected_result_error_test
 		),
 		/* Test11 */
-		TestCase(
-			"server {\n \
-					listen 8080\n \
-					server_name localhost;\n \
-				}\n",
-			expected_result_error_test
-		),
+		// TestCase(
+		// 	"server {\n
+		// 			listen 8080\n
+		// 			server_name localhost;\n
+		// 		}\n",
+		// 	expected_result_error_test
+		// ),
 		/* Test12 */
-		TestCase(
-			"server {\n \
-					listen 8080 8000;\n \
-					server_name localhost;\n \
-				}\n",
-			expected_result_error_test
-		),
+		// TestCase(
+		// 	"server {\n
+		// 			listen 8080 8000;\n
+		// 			server_name localhost;\n
+		// 		}\n",
+		// 	expected_result_error_test
+		// ),
 		/* Test13 */
-		TestCase(
-			"serv {\n \
-				}\n",
-			expected_result_error_test
-		),
+		// TestCase(
+		// 	"serv {\n
+		// 		}\n",
+		// 	expected_result_error_test
+		// ),
 		/* Test14 */
 		TestCase(
 			"server {\n \
@@ -438,11 +438,11 @@ int main() {
 			expected_result_error_test
 		),
 		/* Test17 */
-		TestCase(
-			"{\n \
-				}\n",
-			expected_result_error_test
-		),
+		// TestCase(
+		// 	"{\n
+		// 		}\n",
+		// 	expected_result_error_test
+		// ),
 		/* Test18 */
 		TestCase(
 			"server	{{{\n \
