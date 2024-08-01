@@ -175,6 +175,8 @@ int RunTests(const TestCase test_cases[], std::size_t num_test_cases) {
 	return ret_code;
 }
 
+// TODO: Lexerとテストケースを揃える
+
 /* Test1 */
 ServerList MakeExpectedTest1() {
 	ServerList         expected_result;
@@ -230,9 +232,7 @@ ServerList MakeExpectedTest4() {
 }
 
 /* Test5 */
-
-/* Test6 */
-ServerList MakeExpectedTest6() {
+ServerList MakeExpectedTest5() {
 	ServerList           expected_result;
 	std::list<int>       expected_ports_1;
 	LocationList         expected_locationlist_1;
@@ -255,8 +255,7 @@ int main() {
 	ServerList expected_result_test_2 = MakeExpectedTest2();
 	ServerList expected_result_test_3 = MakeExpectedTest3();
 	ServerList expected_result_test_4 = MakeExpectedTest4();
-	// ServerList expected_result_test_5 = MakeExpectedTest5();
-	ServerList expected_result_test_6 = MakeExpectedTest6();
+	ServerList expected_result_test_5 = MakeExpectedTest5();
 
 	static TestCase test_cases[] = {
 		TestCase(
@@ -289,13 +288,6 @@ int main() {
 				}\n",
 			expected_result_test_4
 		),
-		// TestCase(
-		// 	"server {\n
-		// 			listen 8080 8000 80\n
-		// 			server_name localhost;\n
-		// 		}\n",
-		// 	expected_result_test_5
-		// ),
 		TestCase(
 			"server {\n \
 					server_name test.serv;\n \
@@ -306,7 +298,7 @@ int main() {
 						index index;\n \
 					}\n \
 				}\n",
-			expected_result_test_6
+			expected_result_test_5
 		)
 	};
 
