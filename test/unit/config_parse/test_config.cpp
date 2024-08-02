@@ -17,20 +17,12 @@ struct Result {
 	std::string error_log;
 };
 
-int GetTestCaseNum() {
-	static unsigned int test_case_num = 0;
-	++test_case_num;
-	return test_case_num;
+void PrintOk(int test_num) {
+	std::cout << utils::color::GREEN << test_num << ".[OK] " << utils::color::RESET << std::endl;
 }
 
-void PrintOk() {
-	std::cout << utils::color::GREEN << GetTestCaseNum() << ".[OK] " << utils::color::RESET
-			  << std::endl;
-}
-
-void PrintNg() {
-	std::cerr << utils::color::RED << GetTestCaseNum() << ".[NG] " << utils::color::RESET
-			  << std::endl;
+void PrintNg(int test_num) {
+	std::cerr << utils::color::RED << test_num << ".[NG] " << utils::color::RESET << std::endl;
 }
 
 void PrintError(const std::string &message) {
@@ -151,12 +143,12 @@ Result Run(const std::string &file_path, const ServerList &expected) {
 	return run_result;
 }
 
-int Test(const Result &result, const std::string &src) {
+int Test(const Result &result, const std::string &src, int test_num) {
 	if (result.is_success) {
-		PrintOk();
+		PrintOk(test_num);
 		return EXIT_SUCCESS;
 	} else {
-		PrintNg();
+		PrintNg(test_num);
 		PrintError("ConfigParser failed:");
 		std::cerr << "src:[\n" << src << "]" << std::endl;
 		std::cerr << "--------------------------------" << std::endl;
@@ -165,35 +157,35 @@ int Test(const Result &result, const std::string &src) {
 	}
 }
 
-int RunTests(const TestCase test_cases[], std::size_t num_test_cases) {
-	int ret_code = EXIT_SUCCESS;
+// int RunTests(const TestCase test_cases[], std::size_t num_test_cases) {
+// 	int ret_code = EXIT_SUCCESS;
 
-	for (std::size_t i = 0; i < num_test_cases; i++) {
-		const TestCase test_case = test_cases[i];
-		ret_code |= Test(Run(test_case.input, test_case.expected), test_case.input);
-	}
-	return ret_code;
-}
+// 	for (std::size_t i = 0; i < num_test_cases; i++) {
+// 		const TestCase test_case = test_cases[i];
+// 		ret_code |= Test(Run(test_case.input, test_case.expected), test_case.input);
+// 	}
+// 	return ret_code;
+// }
 
-/* For Error Tests */
-int RunErrorTests(const TestCase test_cases[], std::size_t num_test_cases) {
-	int ret_code = EXIT_SUCCESS;
+// /* For Error Tests */
+// int RunErrorTests(const TestCase test_cases[], std::size_t num_test_cases) {
+// 	int ret_code = EXIT_SUCCESS;
 
-	for (std::size_t i = 0; i < num_test_cases; i++) {
-		const TestCase test_case = test_cases[i];
-		try {
-			Result result = Run(test_case.input, test_case.expected);
-			PrintNg();
-			PrintError("ConfigParser failed (No Throw):");
-			std::cerr << "src:[\n" << test_case.input << "]" << std::endl;
-			ret_code |= EXIT_FAILURE;
-		} catch (const std::exception &e) {
-			PrintOk();
-			utils::Debug(e.what());
-		}
-	}
-	return ret_code;
-}
+// 	for (std::size_t i = 0; i < num_test_cases; i++) {
+// 		const TestCase test_case = test_cases[i];
+// 		try {
+// 			Result result = Run(test_case.input, test_case.expected);
+// 			PrintNg();
+// 			PrintError("ConfigParser failed (No Throw):");
+// 			std::cerr << "src:[\n" << test_case.input << "]" << std::endl;
+// 			ret_code |= EXIT_FAILURE;
+// 		} catch (const std::exception &e) {
+// 			PrintOk();
+// 			utils::Debug(e.what());
+// 		}
+// 	}
+// 	return ret_code;
+// }
 
 // TODO: Lexerとテストケースを揃える
 
@@ -313,8 +305,9 @@ int main(int argc, char *argv[]) {
 	buffer << conf_file.rdbuf();
 
 	ServerList expected;
+	int        test_num = std::atoi(argv[2]);
 
-	switch (std::atoi(argv[2])) {
+	switch (test_num) {
 	case 1:
 		expected = MakeExpectedTest1();
 		break;
@@ -339,7 +332,7 @@ int main(int argc, char *argv[]) {
 	default:
 		break;
 	}
-	ret_code |= Test(Run(argv[1], expected), buffer.str());
+	ret_code |= Test(Run(argv[1], expected), buffer.str(), test_num);
 
 	return ret_code;
 }
