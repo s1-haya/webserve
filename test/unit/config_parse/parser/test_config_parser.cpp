@@ -187,8 +187,6 @@ int RunErrorTests(const TestCase test_cases[], std::size_t num_test_cases) {
 			PrintNg();
 			PrintError("ConfigParser failed (No Throw):");
 			std::cerr << "src:[\n" << test_case.input << "]" << std::endl;
-			std::cerr << "--------------------------------" << std::endl;
-			std::cerr << result.error_log;
 			ret_code |= EXIT_FAILURE;
 		} catch (const std::exception &e) {
 			PrintOk();
