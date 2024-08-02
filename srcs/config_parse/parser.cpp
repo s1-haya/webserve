@@ -9,17 +9,17 @@ namespace {
 void HandleServerContextDirective(context::ServerCon &server, NodeItr &it) {
 	if ((*it).token == "server_name") {
 		++it;
-		if ((*it).token_type != node::WORD)
+		if ((*it).token_type != node::WORD) {
 			throw std::runtime_error("invalid number of arguments in 'server_name' directive");
+		}
 		server.server_name = (*it++).token; // TODO: 複数の名前
 	} else if ((*it).token == "listen") {
 		++it;
-		if ((*it).token_type != node::WORD)
+		if ((*it).token_type != node::WORD) {
 			throw std::runtime_error("invalid number of arguments in 'listen' directive");
-		while ((*it).token_type == node::WORD) {
-			server.port.push_back(std::atoi((*it++).token.c_str())
-			); // TODO: atoi, validation, 重複チェック
 		}
+		server.port.push_back(std::atoi((*it++).token.c_str())
+		); // TODO: atoi, validation, 重複チェック
 	}
 	if ((*it).token_type != node::DELIM)
 		throw std::runtime_error("expect ';' after arguments");

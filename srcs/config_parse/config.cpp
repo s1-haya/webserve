@@ -20,7 +20,7 @@ Config::Config(const std::string &file_path) : config_file_(file_path.c_str()) {
 		parser::Parser        par(tokens);
 		servers_ = par.GetServers();
 	} catch (const std::exception &e) {
-		std::cerr << e.what() << '\n';
+		throw std::runtime_error(e.what());
 	}
 	// try catchをどこでするか
 }
