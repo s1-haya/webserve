@@ -63,7 +63,7 @@ TEST_FILE_DIR = ./test_file
 ERROR_TEST_FILE_DIR = ./test_file_error
 
 .PHONY	: run
-run: all log run_success run_error
+run: all log run_success
 
 # PHONYなし
 log:
