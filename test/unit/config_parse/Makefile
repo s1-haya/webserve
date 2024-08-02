@@ -29,7 +29,7 @@ OBJS		:=	$(patsubst %.cpp, $(OBJ_DIR)/%.o, $(notdir $(SRCS)))
 INCLUDES	:=	$(addprefix -I, $(SRCS_DIR))
 
 CXX			:=	c++
-CXXFLAGS	:=	-std=c++98 -MMD -MP -pedantic # -Wall -Wextra -Werror
+CXXFLAGS	:=	-std=c++98 -Wall -Wextra -Werror -MMD -MP -pedantic
 
 DEPS		:=	$(OBJS:.o=.d)
 MKDIR		:=	mkdir -p
@@ -63,13 +63,16 @@ TEST_FILE_DIR = ./test_file
 ERROR_TEST_FILE_DIR = ./test_file_error
 
 .PHONY	: run
-run: all run_success run_error
+run: all log run_success run_error
+
+# PHONYなし
+log:
+	$(MKDIR) $(dir $(LOG_FILE_PATH))
 
 .PHONY	: run_success
 run_success: all
 	@index=1; \
 	status=0; \
-	$(MKDIR) $(dir $(LOG_FILE_PATH)); \
 	for file in $(TEST_FILE_DIR)/*; do \
 		./$(NAME) success $$file $$index 2>&1 | tee -a $(LOG_FILE_PATH); \
 		current_status=$${PIPESTATUS[0]}; \
@@ -78,14 +81,13 @@ run_success: all
 		fi; \
 		index=$$((index+1)); \
 	done; \
-	echo -e "\nunit test's log => $(LOG_FILE_PATH)"; \
+	echo -e "\nunit success test's log => $(LOG_FILE_PATH)\n"; \
 	exit $$status;
 
 .PHONY	: run_error
 run_error: all
 	@index=1; \
 	status=0; \
-	$(MKDIR) $(dir $(LOG_FILE_PATH)); \
 	for file in $(ERROR_TEST_FILE_DIR)/*; do \
 		./$(NAME) error $$file $$index 2>&1 | tee -a $(LOG_FILE_PATH); \
 		current_status=$${PIPESTATUS[0]}; \
@@ -94,7 +96,7 @@ run_error: all
 		fi; \
 		index=$$((index+1)); \
 	done; \
-	echo -e "\nunit test's log => $(LOG_FILE_PATH)"; \
+	echo -e "\nunit error test's log => $(LOG_FILE_PATH)\n"; \
 	exit $$status;
 
 .PHONY	: val
