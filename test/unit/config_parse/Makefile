@@ -60,6 +60,7 @@ re: fclean all
 # PIPESTATUSがbash固有のため
 SHELL=/bin/bash
 TEST_FILE_DIR = ./test_file
+ERROR_TEST_FILE_DIR = ./test_file_error
 
 .PHONY	: run
 run: all run_success run_error
@@ -85,7 +86,7 @@ run_error: all
 	@index=1; \
 	status=0; \
 	$(MKDIR) $(dir $(LOG_FILE_PATH)); \
-	for file in $(TEST_FILE_DIR)/*; do \
+	for file in $(ERROR_TEST_FILE_DIR)/*; do \
 		./$(NAME) error $$file $$index 2>&1 | tee -a $(LOG_FILE_PATH); \
 		current_status=$${PIPESTATUS[0]}; \
 		if [ $$current_status -ne 0 ]; then \
