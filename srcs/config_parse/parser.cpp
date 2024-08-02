@@ -47,6 +47,8 @@ Parser::Parser(std::list<node::Node> &tokens) : tokens_(tokens) {
 	for (NodeItr it = tokens_.begin(); it != tokens_.end(); ++it) {
 		if ((*it).token_type == node::CONTEXT && (*it).token == "server") {
 			servers_.push_back(CreateServerContext(++it));
+		} else {
+			throw std::runtime_error("expect server context");
 		}
 	}
 }
