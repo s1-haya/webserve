@@ -20,7 +20,7 @@ struct HttpResponseResult {
 
 class HttpResponse {
   public:
-	static std::string TmpRun(const HttpResponseResult &request);
+	static std::string CreateHttpResponse(const HttpResponseResult &response);
 
   private:
 	HttpResponse();

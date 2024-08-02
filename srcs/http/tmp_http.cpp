@@ -29,8 +29,9 @@ std::string TmpHttp::CreateHttpResponse(int client_fd) {
 	response.status_line.status_reason   = "OK";
 	response.header_fields["Host"]       = "sawa";
 	response.header_fields["Connection"] = "close";
-	response.body_message = "Good Morning! You can't connect the dots looking forward.";
-	return HttpResponse::TmpRun(response);
+	response.body_message = "You can't connect the dots looking forword. You can only connect the "
+							"dots looking backwards";
+	return HttpResponse::CreateHttpResponse(response);
 }
 
 // todo: HTTPRequestの書式が完全かどうか(どのように取得するかは要検討)

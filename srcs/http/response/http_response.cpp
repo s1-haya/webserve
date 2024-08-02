@@ -5,7 +5,8 @@
 
 namespace http {
 
-std::string HttpResponse::TmpRun(const HttpResponseResult &response) {
+// HttpResponseResult構造体をHttpResponseのフォーマットを文字列に出力する
+std::string HttpResponse::CreateHttpResponse(const HttpResponseResult &response) {
 	std::ostringstream response_stream;
 	CreateStatusLine(response_stream, response.status_line);
 	CreateHeaderFields(response_stream, response.header_fields);
@@ -22,7 +23,7 @@ void HttpResponse::CreateStatusLine(std::ostream &response_stream, const StatusL
 void HttpResponse::CreateHeaderField(
 	std::ostream &response_stream, const std::string &name, const std::string &value
 ) {
-	response_stream << name << ":" << SP << value << SP << CRLF;
+	response_stream << name << ":" << SP << value << CRLF;
 }
 
 void HttpResponse::CreateHeaderFields(

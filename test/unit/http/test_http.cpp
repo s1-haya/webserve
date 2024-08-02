@@ -105,6 +105,9 @@ int main(void) {
 	ret_code |= HandleResult(test6_header_fileds.GetIsBodyMessageFormat(1), true);
 	ret_code |= HandleResult(test6_header_fileds.GetBodyMessage(1), test6_body_message);
 
-	std::cout << test6_header_fileds.CreateHttpResponse(1) << std::endl;
+	const std::string test6_expected_response =
+		"HTTP/1.1 200 OK\r\nConnection: close\r\nHost: sawa\r\n\r\nYou can't connect the dots "
+		"looking forword. You can only connect the dots looking backwards";
+	ret_code |= HandleResult(test6_header_fileds.CreateHttpResponse(1), test6_expected_response);
 	return ret_code;
 }
