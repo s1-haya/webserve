@@ -318,6 +318,24 @@ int main(int argc, char *argv[]) {
 	case 1:
 		expected = MakeExpectedTest1();
 		break;
+	case 2:
+		expected = MakeExpectedTest2();
+		break;
+	case 3:
+		expected = MakeExpectedTest3();
+		break;
+	case 4:
+		expected = MakeExpectedTest4();
+		break;
+	case 5:
+		expected = MakeExpectedTest5();
+		break;
+	case 6:
+		expected = MakeExpectedTest6();
+		break;
+	case 7:
+		expected = MakeExpectedTest7();
+		break;
 	default:
 		break;
 	}
