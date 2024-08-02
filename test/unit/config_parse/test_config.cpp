@@ -157,25 +157,24 @@ int Test(const Result &result, const std::string &src, int test_num) {
 	}
 }
 
-// /* For Error Tests */
-// int RunErrorTests(const TestCase test_cases[], std::size_t num_test_cases) {
-// 	int ret_code = EXIT_SUCCESS;
+/* For Error Tests */
+int ErrorTest(
+	const std::string &file_path, const std::string &src, const ServerList &expected, int test_num
+) {
+	int ret_code = EXIT_SUCCESS;
 
-// 	for (std::size_t i = 0; i < num_test_cases; i++) {
-// 		const TestCase test_case = test_cases[i];
-// 		try {
-// 			Result result = Run(test_case.input, test_case.expected);
-// 			PrintNg();
-// 			PrintError("ConfigParser failed (No Throw):");
-// 			std::cerr << "src:[\n" << test_case.input << "]" << std::endl;
-// 			ret_code |= EXIT_FAILURE;
-// 		} catch (const std::exception &e) {
-// 			PrintOk();
-// 			utils::Debug(e.what());
-// 		}
-// 	}
-// 	return ret_code;
-// }
+	try {
+		Result result = Run(file_path, expected);
+		PrintNg(test_num);
+		PrintError("ConfigParser failed (No Throw):");
+		std::cerr << "src:[\n" << src << "]" << std::endl;
+		ret_code |= EXIT_FAILURE;
+	} catch (const std::exception &e) {
+		PrintOk(test_num);
+		utils::Debug(e.what());
+	}
+	return ret_code;
+}
 
 // TODO: Lexerとテストケースを揃える
 
@@ -288,7 +287,7 @@ int main(int argc, char *argv[]) {
 	(void)argc;
 	int ret_code = EXIT_SUCCESS;
 
-	std::ifstream conf_file(argv[1]);
+	std::ifstream conf_file(argv[2]);
 	if (!conf_file) {
 		return EXIT_FAILURE;
 	}
@@ -296,34 +295,37 @@ int main(int argc, char *argv[]) {
 	buffer << conf_file.rdbuf();
 
 	ServerList expected;
-	int        test_num = std::atoi(argv[2]);
-
-	switch (test_num) {
-	case 1:
-		expected = MakeExpectedTest1();
-		break;
-	case 2:
-		expected = MakeExpectedTest2();
-		break;
-	case 3:
-		expected = MakeExpectedTest3();
-		break;
-	case 4:
-		expected = MakeExpectedTest4();
-		break;
-	case 5:
-		expected = MakeExpectedTest5();
-		break;
-	case 6:
-		expected = MakeExpectedTest6();
-		break;
-	case 7:
-		expected = MakeExpectedTest7();
-		break;
-	default:
-		break;
+	int        test_num = std::atoi(argv[3]);
+	if (std::string(argv[1]) == "success") {
+		switch (test_num) {
+		case 1:
+			expected = MakeExpectedTest1();
+			break;
+		case 2:
+			expected = MakeExpectedTest2();
+			break;
+		case 3:
+			expected = MakeExpectedTest3();
+			break;
+		case 4:
+			expected = MakeExpectedTest4();
+			break;
+		case 5:
+			expected = MakeExpectedTest5();
+			break;
+		case 6:
+			expected = MakeExpectedTest6();
+			break;
+		case 7:
+			expected = MakeExpectedTest7();
+			break;
+		default:
+			break;
+		}
+		ret_code |= Test(Run(argv[2], expected), buffer.str(), test_num);
+	} else if (std::string(argv[1]) == "error") {
+		ret_code |= ErrorTest(argv[2], buffer.str(), expected, test_num);
 	}
-	ret_code |= Test(Run(argv[1], expected), buffer.str(), test_num);
 
 	return ret_code;
 }

@@ -62,12 +62,31 @@ SHELL=/bin/bash
 TEST_FILE_DIR = ./test_file
 
 .PHONY	: run
-run: all
+run: all run_success run_error
+
+.PHONY	: run_success
+run_success: all
 	@index=1; \
 	status=0; \
 	$(MKDIR) $(dir $(LOG_FILE_PATH)); \
 	for file in $(TEST_FILE_DIR)/*; do \
-		./$(NAME) $$file $$index 2>&1 | tee -a $(LOG_FILE_PATH); \
+		./$(NAME) success $$file $$index 2>&1 | tee -a $(LOG_FILE_PATH); \
+		current_status=$${PIPESTATUS[0]}; \
+		if [ $$current_status -ne 0 ]; then \
+			status=$$current_status; \
+		fi; \
+		index=$$((index+1)); \
+	done; \
+	echo -e "\nunit test's log => $(LOG_FILE_PATH)"; \
+	exit $$status;
+
+.PHONY	: run_error
+run_error: all
+	@index=1; \
+	status=0; \
+	$(MKDIR) $(dir $(LOG_FILE_PATH)); \
+	for file in $(TEST_FILE_DIR)/*; do \
+		./$(NAME) error $$file $$index 2>&1 | tee -a $(LOG_FILE_PATH); \
 		current_status=$${PIPESTATUS[0]}; \
 		if [ $$current_status -ne 0 ]; then \
 			status=$$current_status; \
