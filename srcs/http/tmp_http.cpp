@@ -1,4 +1,5 @@
 #include "tmp_http.hpp"
+#include "http_message.hpp"
 #include "iostream"
 
 namespace http {
@@ -18,15 +19,18 @@ void TmpHttp::ParseHttpRequestFormat(int client_fd, const std::string &read_buf)
 // todo: レスポンスを作成する
 std::string TmpHttp::CreateHttpResponse(int client_fd) {
 	HttpRequestParsedData save_data = storage_.GetClientSaveData(client_fd);
-	// todo: ステータスコードを確認し、OK以外はレスポンスを作成し、savedataを削除してから出力する
-	if (save_data.request_result.status_code != OK) {
-		storage_.DeleteClientSaveData(client_fd);
-		return HttpResponse::TmpRun(client_fd);
-	}
 	// todo: VirtualServerクラス？？を引数で受けとり、リクエスト情報が正しいかどうかを確認する。
-	// todo: check status_code
+	// HttpResponseParsedData data = HttpResponseParse(const HttpRequestParsedData& data,
+	// VirtualServer server);
 	storage_.DeleteClientSaveData(client_fd);
-	return HttpResponse::TmpRun(client_fd);
+	HttpResponseResult response;
+	response.status_line.version         = HTTP_VERSION;
+	response.status_line.status_code     = "200";
+	response.status_line.status_reason   = "OK";
+	response.header_fields["Host"]       = "sawa";
+	response.header_fields["Connection"] = "close";
+	response.body_message = "Good Morning! You can't connect the dots looking forward.";
+	return HttpResponse::TmpRun(response);
 }
 
 // todo: HTTPRequestの書式が完全かどうか(どのように取得するかは要検討)
