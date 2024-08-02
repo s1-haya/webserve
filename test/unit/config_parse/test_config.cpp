@@ -157,6 +157,25 @@ int Test(const Result &result, const std::string &src, int test_num) {
 	}
 }
 
+/* For Error Tests */
+int RunErrorTest(
+	const std::string &file_path, const ServerList &expected, const std::string &src, int test_num
+) {
+	int ret_code = EXIT_SUCCESS;
+
+	try {
+		Result result = Run(file_path, expected);
+		PrintNg(test_num);
+		PrintError("ConfigParser failed (No Throw):");
+		std::cerr << "src:[\n" << src << "]" << std::endl;
+		ret_code |= EXIT_FAILURE;
+	} catch (const std::exception &e) {
+		PrintOk(test_num);
+		utils::Debug(e.what());
+	}
+	return ret_code;
+}
+
 /* Test1 One Server */
 ServerList MakeExpectedTest1() {
 	ServerList         expected_result;
@@ -303,7 +322,7 @@ int main(int argc, char *argv[]) {
 		}
 		ret_code |= Test(Run(argv[2], expected), buffer.str(), test_num);
 	} else if (std::string(argv[1]) == "error") {
-		ret_code |= Test(Run(argv[2], expected), buffer.str(), test_num);
+		ret_code |= RunErrorTest(argv[2], expected, buffer.str(), test_num);
 	}
 
 	return ret_code;
