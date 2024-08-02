@@ -157,16 +157,6 @@ int Test(const Result &result, const std::string &src, int test_num) {
 	}
 }
 
-// int RunTests(const TestCase test_cases[], std::size_t num_test_cases) {
-// 	int ret_code = EXIT_SUCCESS;
-
-// 	for (std::size_t i = 0; i < num_test_cases; i++) {
-// 		const TestCase test_case = test_cases[i];
-// 		ret_code |= Test(Run(test_case.input, test_case.expected), test_case.input);
-// 	}
-// 	return ret_code;
-// }
-
 // /* For Error Tests */
 // int RunErrorTests(const TestCase test_cases[], std::size_t num_test_cases) {
 // 	int ret_code = EXIT_SUCCESS;
@@ -295,6 +285,7 @@ ServerList MakeExpectedTest7() {
 } // namespace
 
 int main(int argc, char *argv[]) {
+	(void)argc;
 	int ret_code = EXIT_SUCCESS;
 
 	std::ifstream conf_file(argv[1]);
