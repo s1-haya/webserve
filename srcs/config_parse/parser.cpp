@@ -88,6 +88,9 @@ context::ServerCon Parser::CreateServerContext(NodeItr &it) {
 context::LocationCon Parser::CreateLocationContext(NodeItr &it) {
 	context::LocationCon location;
 
+	location.autoindex            = false;
+	location.client_max_body_size = 1024;
+
 	if ((*it).token_type != node::WORD)
 		throw std::runtime_error("invalid number of arguments in 'location' directive");
 	location.location = (*it).token;
