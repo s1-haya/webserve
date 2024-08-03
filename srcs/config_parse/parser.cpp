@@ -4,15 +4,16 @@
 
 namespace config {
 namespace parser {
-namespace {
 
-void HandleServerContextDirective(context::ServerCon &server, NodeItr &it) {
+void Parser::HandleServerContextDirective(context::ServerCon &server, NodeItr &it) {
 	if ((*it).token == "server_name") {
 		++it;
-		if ((*it).token_type != node::WORD) {
-			throw std::runtime_error("invalid number of arguments in 'server_name' directive");
+		while ((*it).token_type != node::DELIM && (*it).token_type == node::WORD) {
+			server.server_names.push_back((*it++).token);
+			if (it == tokens_.end()) {
+				throw std::runtime_error("invalid arguments of'server_name' directive");
+			}
 		}
-		server.server_name = (*it++).token; // TODO: 複数の名前
 	} else if ((*it).token == "listen") {
 		++it;
 		if ((*it).token_type != node::WORD) {
@@ -25,7 +26,7 @@ void HandleServerContextDirective(context::ServerCon &server, NodeItr &it) {
 		throw std::runtime_error("expect ';' after arguments");
 }
 
-void HandleLocationContextDirective(context::LocationCon &location, NodeItr &it) {
+void Parser::HandleLocationContextDirective(context::LocationCon &location, NodeItr &it) {
 	if ((*it).token == "root") {
 		++it;
 		if ((*it).token_type != node::WORD)
@@ -40,8 +41,6 @@ void HandleLocationContextDirective(context::LocationCon &location, NodeItr &it)
 	if ((*it).token_type != node::DELIM)
 		throw std::runtime_error("expect ';' after arguments");
 }
-
-} // namespace
 
 Parser::Parser(std::list<node::Node> &tokens) : tokens_(tokens) {
 	for (NodeItr it = tokens_.begin(); it != tokens_.end(); ++it) {

@@ -49,12 +49,12 @@ bool operator!=(const LocationCon &lhs, const LocationCon &rhs) {
 }
 
 bool operator==(const ServerCon &lhs, const ServerCon &rhs) {
-	return lhs.port == rhs.port && lhs.server_name == rhs.server_name &&
+	return lhs.port == rhs.port && lhs.server_names == rhs.server_names &&
 		   lhs.location_con == rhs.location_con;
 }
 
 bool operator!=(const ServerCon &lhs, const ServerCon &rhs) {
-	return lhs.port != rhs.port || lhs.server_name != rhs.server_name ||
+	return lhs.port != rhs.port || lhs.server_names != rhs.server_names ||
 		   lhs.location_con != rhs.location_con;
 }
 
@@ -97,6 +97,18 @@ std::ostream &operator<<(std::ostream &os, const LocationList &locations) {
 	return os;
 }
 
+std::ostream &operator<<(std::ostream &os, const std::list<std::string> &server_names) {
+	std::list<std::string>::const_iterator it = server_names.begin();
+	while (it != server_names.end()) {
+		os << *it;
+		++it;
+		if (it != server_names.end()) {
+			os << ", ";
+		}
+	}
+	return os;
+}
+
 std::ostream &operator<<(std::ostream &os, const std::list<int> &ports) {
 	std::list<int>::const_iterator it = ports.begin();
 	while (it != ports.end()) {
@@ -111,7 +123,7 @@ std::ostream &operator<<(std::ostream &os, const std::list<int> &ports) {
 
 std::ostream &operator<<(std::ostream &os, const context::ServerCon &server) {
 	os << "{port: " << server.port << ", "
-	   << "server_name: " << server.server_name << ", "
+	   << "server_name: " << server.server_names << ", "
 	   << "location_context: " << server.location_con << "}";
 	return os;
 }
@@ -178,10 +190,13 @@ int RunErrorTest(
 
 /* Test1 One Server */
 ServerList MakeExpectedTest1() {
-	ServerList         expected_result;
-	std::list<int>     expected_ports_1;
-	LocationList       expected_locationlist_1;
-	context::ServerCon expected_server_1 = {expected_ports_1, "", expected_locationlist_1};
+	ServerList             expected_result;
+	std::list<int>         expected_ports_1;
+	std::list<std::string> server_names_1;
+	LocationList           expected_locationlist_1;
+	context::ServerCon     expected_server_1 = {
+        expected_ports_1, server_names_1, expected_locationlist_1
+    };
 	expected_result.push_back(expected_server_1);
 
 	return expected_result;
@@ -189,12 +204,15 @@ ServerList MakeExpectedTest1() {
 
 /* Test2 One Server, One Location */
 ServerList MakeExpectedTest2() {
-	ServerList           expected_result;
-	std::list<int>       expected_ports_1;
-	LocationList         expected_locationlist_1;
-	context::LocationCon expected_location_1_1 = {"/", "", "", ""};
+	ServerList             expected_result;
+	std::list<int>         expected_ports_1;
+	std::list<std::string> server_names_1;
+	LocationList           expected_locationlist_1;
+	context::LocationCon   expected_location_1_1 = {"/", "", "", ""};
 	expected_locationlist_1.push_back(expected_location_1_1);
-	context::ServerCon expected_server_1 = {expected_ports_1, "", expected_locationlist_1};
+	context::ServerCon expected_server_1 = {
+		expected_ports_1, server_names_1, expected_locationlist_1
+	};
 	expected_result.push_back(expected_server_1);
 
 	return expected_result;
@@ -205,10 +223,14 @@ ServerList MakeExpectedTest3() {
 	ServerList     expected_result;
 	std::list<int> expected_ports_1;
 	expected_ports_1.push_back(8080);
+	std::list<std::string> server_names_1;
+	server_names_1.push_back("localhost");
 	LocationList         expected_locationlist_1;
 	context::LocationCon expected_location_1_1 = {"/", "/data/", "index.html", ""};
 	expected_locationlist_1.push_back(expected_location_1_1);
-	context::ServerCon expected_server_1 = {expected_ports_1, "localhost", expected_locationlist_1};
+	context::ServerCon expected_server_1 = {
+		expected_ports_1, server_names_1, expected_locationlist_1
+	};
 	expected_result.push_back(expected_server_1);
 
 	return expected_result;
@@ -216,14 +238,17 @@ ServerList MakeExpectedTest3() {
 
 /* Test4 Multiple ports */
 ServerList MakeExpectedTest4() {
-	ServerList     expected_result;
+	ServerList             expected_result;
+	std::list<std::string> server_names_1;
+	server_names_1.push_back("server_name");
+	server_names_1.push_back("server");
 	std::list<int> expected_ports_1;
 	expected_ports_1.push_back(8080);
 	expected_ports_1.push_back(8000);
 	expected_ports_1.push_back(80);
 	LocationList       expected_locationlist_1;
 	context::ServerCon expected_server_1 = {
-		expected_ports_1, "server_name", expected_locationlist_1
+		expected_ports_1, server_names_1, expected_locationlist_1
 	};
 	expected_result.push_back(expected_server_1);
 
@@ -232,14 +257,18 @@ ServerList MakeExpectedTest4() {
 
 /* Test5 Multiple Locations */
 ServerList MakeExpectedTest5() {
-	ServerList           expected_result;
-	std::list<int>       expected_ports_1;
+	ServerList             expected_result;
+	std::list<int>         expected_ports_1;
+	std::list<std::string> server_names_1;
+	server_names_1.push_back("test.serv");
 	LocationList         expected_locationlist_1;
 	context::LocationCon expected_location_1_1 = {"/", "", "index.html", ""};
 	context::LocationCon expected_location_1_2 = {"/www/", "", "index", ""};
 	expected_locationlist_1.push_back(expected_location_1_1);
 	expected_locationlist_1.push_back(expected_location_1_2);
-	context::ServerCon expected_server_1 = {expected_ports_1, "test.serv", expected_locationlist_1};
+	context::ServerCon expected_server_1 = {
+		expected_ports_1, server_names_1, expected_locationlist_1
+	};
 	expected_result.push_back(expected_server_1);
 
 	return expected_result;
@@ -247,13 +276,15 @@ ServerList MakeExpectedTest5() {
 
 /* Test6 Tab+Space, Comment */
 ServerList MakeExpectedTest6() {
-	ServerList           expected_result;
+	ServerList             expected_result;
+	std::list<std::string> server_names_1;
+	server_names_1.push_back("comment.serv");
 	std::list<int>       expected_ports_1;
 	LocationList         expected_locationlist_1;
 	context::LocationCon expected_location_1_1 = {"/", "", "index.html", ""};
 	expected_locationlist_1.push_back(expected_location_1_1);
 	context::ServerCon expected_server_1 = {
-		expected_ports_1, "comment.serv", expected_locationlist_1
+		expected_ports_1, server_names_1, expected_locationlist_1
 	};
 	expected_result.push_back(expected_server_1);
 
@@ -266,14 +297,22 @@ ServerList MakeExpectedTest7() {
 
 	std::list<int> expected_ports_1;
 	expected_ports_1.push_back(8080);
+	std::list<std::string> server_names_1;
+	server_names_1.push_back("localhost");
 	LocationList       expected_locationlist_1;
-	context::ServerCon expected_server_1 = {expected_ports_1, "localhost", expected_locationlist_1};
+	context::ServerCon expected_server_1 = {
+		expected_ports_1, server_names_1, expected_locationlist_1
+	};
 	expected_result.push_back(expected_server_1);
 
 	std::list<int> expected_ports_2;
 	expected_ports_2.push_back(12345);
+	std::list<std::string> server_names_2;
+	server_names_2.push_back("test.www");
 	LocationList       expected_locationlist_2;
-	context::ServerCon expected_server_2 = {expected_ports_2, "test.www", expected_locationlist_2};
+	context::ServerCon expected_server_2 = {
+		expected_ports_2, server_names_2, expected_locationlist_2
+	};
 	expected_result.push_back(expected_server_2);
 
 	return expected_result;

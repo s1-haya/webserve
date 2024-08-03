@@ -19,9 +19,9 @@ typedef std::list<int>         PortList;
 typedef std::list<LocationCon> LocationList;
 
 struct ServerCon {
-	PortList     port;
-	std::string  server_name;
-	LocationList location_con;
+	PortList               port;
+	std::list<std::string> server_names;
+	LocationList           location_con;
 };
 
 } // namespace context
