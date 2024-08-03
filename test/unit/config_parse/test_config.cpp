@@ -41,13 +41,13 @@ namespace context {
 bool operator==(const LocationCon &lhs, const LocationCon &rhs) {
 	return lhs.location == rhs.location && lhs.root == rhs.root && lhs.index == rhs.index &&
 		   lhs.autoindex == rhs.autoindex && lhs.error_page == rhs.error_page &&
-		   lhs.allowed_methods == rhs.allowed_methods;
+		   lhs.allowed_methods == rhs.allowed_methods && lhs.redirect == rhs.redirect;
 }
 
 bool operator!=(const LocationCon &lhs, const LocationCon &rhs) {
 	return lhs.location != rhs.location || lhs.root != rhs.root || lhs.index != rhs.index ||
 		   lhs.autoindex != rhs.autoindex || lhs.error_page != rhs.error_page ||
-		   lhs.allowed_methods != rhs.allowed_methods;
+		   lhs.allowed_methods != rhs.allowed_methods || lhs.redirect != rhs.redirect;
 }
 
 bool operator==(const ServerCon &lhs, const ServerCon &rhs) {
@@ -114,7 +114,9 @@ std::ostream &operator<<(std::ostream &os, const context::LocationCon &location)
 	   << "autoindex: " << (location.autoindex ? "true" : "false") << ", "
 	   << "error_page(status): " << location.error_page.first << ", "
 	   << "error_page(index): " << location.error_page.second << ", "
-	   << "allowed_method: " << location.allowed_methods << "}";
+	   << "allowed_method: " << location.allowed_methods << ", "
+	   << "return(status): " << location.redirect.first << ", "
+	   << "return(index): " << location.redirect.second << "}";
 	return os;
 }
 
@@ -220,8 +222,9 @@ ServerList MakeExpectedTest2() {
 	LocationList                         expected_locationlist_1;
 	std::pair<unsigned int, std::string> error_page_1;
 	std::list<std::string>               allowed_methods_1;
+	std::pair<unsigned int, std::string> redirect_1;
 	context::LocationCon                 expected_location_1_1 = {
-        "/", "", "", false, error_page_1, allowed_methods_1
+        "/", "", "", false, error_page_1, allowed_methods_1, redirect_1
     };
 	expected_locationlist_1.push_back(expected_location_1_1);
 	context::ServerCon expected_server_1 = {
@@ -242,8 +245,9 @@ ServerList MakeExpectedTest3() {
 	LocationList                         expected_locationlist_1;
 	std::pair<unsigned int, std::string> error_page_1;
 	std::list<std::string>               allowed_methods_1;
+	std::pair<unsigned int, std::string> redirect_1;
 	context::LocationCon                 expected_location_1_1 = {
-        "/", "/data/", "index.html", false, error_page_1, allowed_methods_1
+        "/", "/data/", "index.html", false, error_page_1, allowed_methods_1, redirect_1
     };
 	expected_locationlist_1.push_back(expected_location_1_1);
 	context::ServerCon expected_server_1 = {
@@ -280,15 +284,17 @@ ServerList MakeExpectedTest5() {
 	std::list<std::string> server_names_1;
 	server_names_1.push_back("test.serv");
 	LocationList                         expected_locationlist_1;
-	std::pair<unsigned int, std::string> error_page_1_1;
+	std::pair<unsigned int, std::string> error_page_1;
 	std::list<std::string>               allowed_methods_1;
+	std::pair<unsigned int, std::string> redirect_1;
 	context::LocationCon                 expected_location_1_1 = {
-        "/", "", "index.html", false, error_page_1_1, allowed_methods_1
+        "/", "", "index.html", false, error_page_1, allowed_methods_1, redirect_1
     };
-	std::pair<unsigned int, std::string> error_page_1_2;
+	std::pair<unsigned int, std::string> error_page_2;
 	std::list<std::string>               allowed_methods_2;
+	std::pair<unsigned int, std::string> redirect_2;
 	context::LocationCon                 expected_location_1_2 = {
-        "/www/", "", "index", false, error_page_1_2, allowed_methods_2
+        "/www/", "", "index", false, error_page_2, allowed_methods_2, redirect_2
     };
 	expected_locationlist_1.push_back(expected_location_1_1);
 	expected_locationlist_1.push_back(expected_location_1_2);
@@ -309,8 +315,9 @@ ServerList MakeExpectedTest6() {
 	LocationList                         expected_locationlist_1;
 	std::pair<unsigned int, std::string> error_page_1;
 	std::list<std::string>               allowed_methods_1;
+	std::pair<unsigned int, std::string> redirect_1;
 	context::LocationCon                 expected_location_1_1 = {
-        "/", "", "index.html", false, error_page_1, allowed_methods_1
+        "/", "", "index.html", false, error_page_1, allowed_methods_1, redirect_1
     };
 	expected_locationlist_1.push_back(expected_location_1_1);
 	context::ServerCon expected_server_1 = {
@@ -360,9 +367,10 @@ ServerList MakeExpectedTest8() {
 	std::list<std::string>               allowed_methods_1;
 	allowed_methods_1.push_back("GET");
 	allowed_methods_1.push_back("POST");
-	context::LocationCon expected_location_1_1 = {
-		"/", "/data/", "index.html", true, error_page_1, allowed_methods_1
-	};
+	std::pair<unsigned int, std::string> redirect_1(302, "/redirect.html");
+	context::LocationCon                 expected_location_1_1 = {
+        "/", "/data/", "index.html", true, error_page_1, allowed_methods_1, redirect_1
+    };
 	expected_locationlist_1.push_back(expected_location_1_1);
 	context::ServerCon expected_server_1 = {
 		expected_ports_1, server_names_1, expected_locationlist_1, 2024
