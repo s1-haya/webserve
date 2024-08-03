@@ -15,6 +15,14 @@ class TmpHttp {
 	bool        GetIsHttpRequestFormatComplete(int client_fd);
 	// todo: 408のtimeoutのレスポンス
 
+	// For test
+	StatusCode GetStatusCode(int client_fd);
+	bool       GetIsRequestLineFormat(int client_fd);
+	bool       GetIsHeaderFieldsFormat(int client_fd);
+	bool       GetIsBodyMessageFormat(int client_fd);
+
+	std::string GetBodyMessage(int client_fd);
+
   private:
 	TmpHttp(const TmpHttp &other);
 	TmpHttp    &operator=(const TmpHttp &other);

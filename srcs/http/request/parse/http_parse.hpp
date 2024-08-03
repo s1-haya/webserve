@@ -19,7 +19,7 @@ typedef std::map<std::string, std::string> HeaderFields;
 struct HttpRequest {
 	RequestLine  request_line;
 	HeaderFields header_fields;
-	std::string  message_body;
+	std::string  body_message;
 };
 
 enum StatusCode {
@@ -35,13 +35,35 @@ struct HttpRequestResult {
 	HttpRequestResult() : status_code(OK) {}
 };
 
+struct IsHttpRequestFormat {
+	IsHttpRequestFormat()
+		: is_request_line(false), is_header_fields(false), is_body_message(false){};
+	bool is_request_line;
+	bool is_header_fields;
+	bool is_body_message;
+};
+
+struct HttpRequestParsedData {
+	// HTTP各書式のパースしたかどうか
+	IsHttpRequestFormat is_request_format;
+	// HttpRequestResult
+	HttpRequestResult request_result;
+	// HTTP各書式をパースする前の読み込んだ情報
+	std::string current_buf;
+};
+
 class HttpParse {
   public:
-	static HttpRequestResult Run(const std::string &buf);
+	static HttpRequestResult Run(const std::string &read_buf);
+	static void              TmpRun(HttpRequestParsedData &data);
 
   private:
 	HttpParse();
 	~HttpParse();
+	static void ParseRequestLine(HttpRequestParsedData &data);
+	static void ParseHeaderFields(HttpRequestParsedData &data);
+	static void ParseBodyMessage(HttpRequestParsedData &data);
+
 	static RequestLine  SetRequestLine(const std::vector<std::string> &request_line);
 	static HeaderFields SetHeaderFields(const std::vector<std::string> &header_fields_info);
 	static void         CheckValidRequestLine(const std::vector<std::string> &request_line_info);

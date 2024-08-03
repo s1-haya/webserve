@@ -9,7 +9,7 @@ HttpStorage::~HttpStorage() {}
 
 // ClientSaveDataを初期化する関数
 void HttpStorage::CreateClientSaveData(int client_fd) {
-	save_data_[client_fd] = ClientSaveData();
+	save_data_[client_fd] = HttpRequestParsedData();
 }
 
 // ClientSaveDataが存在するかを確認する関数
@@ -18,7 +18,7 @@ bool HttpStorage::IsClientSaveData(int client_fd) {
 }
 
 // ClientSaveDataを取得する関数
-const ClientSaveData &HttpStorage::GetClientSaveData(int client_fd) {
+const HttpRequestParsedData &HttpStorage::GetClientSaveData(int client_fd) {
 	if (!IsClientSaveData(client_fd)) {
 		CreateClientSaveData(client_fd);
 	}
@@ -26,11 +26,11 @@ const ClientSaveData &HttpStorage::GetClientSaveData(int client_fd) {
 }
 
 // クライアント情報を更新する関数
-void HttpStorage::UpdateClientSaveData(int client_fd, const ClientSaveData &client_data) {
+void HttpStorage::UpdateClientSaveData(int client_fd, const HttpRequestParsedData &client_data) {
 	if (IsClientSaveData(client_fd)) {
 		save_data_[client_fd] = client_data;
 	} else {
-		throw std::logic_error("ClientSaveData doesn't exists.");
+		throw std::logic_error("HttpRequestParsedData doesn't exists.");
 	}
 }
 

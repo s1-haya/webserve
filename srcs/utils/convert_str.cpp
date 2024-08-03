@@ -28,4 +28,20 @@ std::string ConvertUintToStr(unsigned int num) {
 	return oss.str();
 }
 
+bool ConvertStrToSize(const std::string &str, size_t &num) {
+	if (str.empty() || !IsDigit(str[0])) {
+		return false;
+	}
+
+	char            *end;
+	static const int BASE = 10;
+	errno                 = 0;
+	unsigned long tmp_num = std::strtoul(str.c_str(), &end, BASE);
+	if (errno == ERANGE || *end != '\0' || tmp_num > std::numeric_limits<size_t>::max()) {
+		return false;
+	}
+	num = static_cast<size_t>(tmp_num);
+	return true;
+}
+
 } // namespace utils
