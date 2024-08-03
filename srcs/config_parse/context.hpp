@@ -13,7 +13,6 @@ struct LocationCon {
 	std::string                          index;
 	bool                                 autoindex;
 	std::pair<unsigned int, std::string> error_page;
-	std::size_t                          client_max_body_size;
 	std::string                          allowed_method;
 };
 
@@ -25,6 +24,7 @@ struct ServerCon {
 	PortList               port;
 	std::list<std::string> server_names;
 	LocationList           location_con;
+	std::size_t            client_max_body_size;
 };
 
 } // namespace context

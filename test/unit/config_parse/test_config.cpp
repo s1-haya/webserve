@@ -41,25 +41,25 @@ namespace context {
 bool operator==(const LocationCon &lhs, const LocationCon &rhs) {
 	return lhs.location == rhs.location && lhs.root == rhs.root && lhs.index == rhs.index &&
 		   lhs.autoindex == rhs.autoindex && lhs.error_page == rhs.error_page &&
-		   lhs.client_max_body_size == rhs.client_max_body_size &&
 		   lhs.allowed_method == rhs.allowed_method;
 }
 
 bool operator!=(const LocationCon &lhs, const LocationCon &rhs) {
 	return lhs.location != rhs.location || lhs.root != rhs.root || lhs.index != rhs.index ||
 		   lhs.autoindex != rhs.autoindex || lhs.error_page != rhs.error_page ||
-		   lhs.client_max_body_size != rhs.client_max_body_size ||
 		   lhs.allowed_method != rhs.allowed_method;
 }
 
 bool operator==(const ServerCon &lhs, const ServerCon &rhs) {
 	return lhs.port == rhs.port && lhs.server_names == rhs.server_names &&
-		   lhs.location_con == rhs.location_con;
+		   lhs.location_con == rhs.location_con &&
+		   lhs.client_max_body_size == rhs.client_max_body_size;
 }
 
 bool operator!=(const ServerCon &lhs, const ServerCon &rhs) {
 	return lhs.port != rhs.port || lhs.server_names != rhs.server_names ||
-		   lhs.location_con != rhs.location_con;
+		   lhs.location_con != rhs.location_con ||
+		   lhs.client_max_body_size != rhs.client_max_body_size;
 }
 
 } // namespace context
@@ -88,7 +88,6 @@ std::ostream &operator<<(std::ostream &os, const context::LocationCon &location)
 	   << "autoindex: " << (location.autoindex ? "true" : "false") << ", "
 	   << "error_page(status): " << location.error_page.first << ", "
 	   << "error_page(index): " << location.error_page.second << ", "
-	   << "client_max_body_size: " << location.client_max_body_size << ", "
 	   << "allowed_method: " << location.allowed_method << "}";
 	return os;
 }
@@ -132,7 +131,8 @@ std::ostream &operator<<(std::ostream &os, const std::list<int> &ports) {
 std::ostream &operator<<(std::ostream &os, const context::ServerCon &server) {
 	os << "{port: " << server.port << ", "
 	   << "server_name: " << server.server_names << ", "
-	   << "location_context: " << server.location_con << "}";
+	   << "location_context: " << server.location_con << ", "
+	   << "client_max_body_size: " << server.client_max_body_size << "}";
 	return os;
 }
 
@@ -203,7 +203,7 @@ ServerList MakeExpectedTest1() {
 	std::list<std::string> server_names_1;
 	LocationList           expected_locationlist_1;
 	context::ServerCon     expected_server_1 = {
-        expected_ports_1, server_names_1, expected_locationlist_1
+        expected_ports_1, server_names_1, expected_locationlist_1, 1024
     };
 	expected_result.push_back(expected_server_1);
 
@@ -217,10 +217,10 @@ ServerList MakeExpectedTest2() {
 	std::list<std::string>               server_names_1;
 	LocationList                         expected_locationlist_1;
 	std::pair<unsigned int, std::string> error_page_1;
-	context::LocationCon expected_location_1_1 = {"/", "", "", false, error_page_1, 1024, ""};
+	context::LocationCon expected_location_1_1 = {"/", "", "", false, error_page_1, ""};
 	expected_locationlist_1.push_back(expected_location_1_1);
 	context::ServerCon expected_server_1 = {
-		expected_ports_1, server_names_1, expected_locationlist_1
+		expected_ports_1, server_names_1, expected_locationlist_1, 1024
 	};
 	expected_result.push_back(expected_server_1);
 
@@ -237,11 +237,11 @@ ServerList MakeExpectedTest3() {
 	LocationList                         expected_locationlist_1;
 	std::pair<unsigned int, std::string> error_page_1;
 	context::LocationCon                 expected_location_1_1 = {
-        "/", "/data/", "index.html", false, error_page_1, 1024, ""
+        "/", "/data/", "index.html", false, error_page_1, ""
     };
 	expected_locationlist_1.push_back(expected_location_1_1);
 	context::ServerCon expected_server_1 = {
-		expected_ports_1, server_names_1, expected_locationlist_1
+		expected_ports_1, server_names_1, expected_locationlist_1, 1024
 	};
 	expected_result.push_back(expected_server_1);
 
@@ -260,7 +260,7 @@ ServerList MakeExpectedTest4() {
 	expected_ports_1.push_back(80);
 	LocationList       expected_locationlist_1;
 	context::ServerCon expected_server_1 = {
-		expected_ports_1, server_names_1, expected_locationlist_1
+		expected_ports_1, server_names_1, expected_locationlist_1, 1024
 	};
 	expected_result.push_back(expected_server_1);
 
@@ -275,17 +275,13 @@ ServerList MakeExpectedTest5() {
 	server_names_1.push_back("test.serv");
 	LocationList                         expected_locationlist_1;
 	std::pair<unsigned int, std::string> error_page_1_1;
-	context::LocationCon                 expected_location_1_1 = {
-        "/", "", "index.html", false, error_page_1_1, 1024, ""
-    };
+	context::LocationCon expected_location_1_1 = {"/", "", "index.html", false, error_page_1_1, ""};
 	std::pair<unsigned int, std::string> error_page_1_2;
-	context::LocationCon                 expected_location_1_2 = {
-        "/www/", "", "index", false, error_page_1_2, 1024, ""
-    };
+	context::LocationCon expected_location_1_2 = {"/www/", "", "index", false, error_page_1_2, ""};
 	expected_locationlist_1.push_back(expected_location_1_1);
 	expected_locationlist_1.push_back(expected_location_1_2);
 	context::ServerCon expected_server_1 = {
-		expected_ports_1, server_names_1, expected_locationlist_1
+		expected_ports_1, server_names_1, expected_locationlist_1, 1024
 	};
 	expected_result.push_back(expected_server_1);
 
@@ -300,12 +296,10 @@ ServerList MakeExpectedTest6() {
 	std::list<int>                       expected_ports_1;
 	LocationList                         expected_locationlist_1;
 	std::pair<unsigned int, std::string> error_page_1;
-	context::LocationCon                 expected_location_1_1 = {
-        "/", "", "index.html", false, error_page_1, 1024, ""
-    };
+	context::LocationCon expected_location_1_1 = {"/", "", "index.html", false, error_page_1, ""};
 	expected_locationlist_1.push_back(expected_location_1_1);
 	context::ServerCon expected_server_1 = {
-		expected_ports_1, server_names_1, expected_locationlist_1
+		expected_ports_1, server_names_1, expected_locationlist_1, 1024
 	};
 	expected_result.push_back(expected_server_1);
 
@@ -322,7 +316,7 @@ ServerList MakeExpectedTest7() {
 	server_names_1.push_back("localhost");
 	LocationList       expected_locationlist_1;
 	context::ServerCon expected_server_1 = {
-		expected_ports_1, server_names_1, expected_locationlist_1
+		expected_ports_1, server_names_1, expected_locationlist_1, 1024
 	};
 	expected_result.push_back(expected_server_1);
 
@@ -332,7 +326,7 @@ ServerList MakeExpectedTest7() {
 	server_names_2.push_back("test.www");
 	LocationList       expected_locationlist_2;
 	context::ServerCon expected_server_2 = {
-		expected_ports_2, server_names_2, expected_locationlist_2
+		expected_ports_2, server_names_2, expected_locationlist_2, 1024
 	};
 	expected_result.push_back(expected_server_2);
 

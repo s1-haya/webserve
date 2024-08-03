@@ -21,6 +21,11 @@ void Parser::HandleServerContextDirective(context::ServerCon &server, NodeItr &i
 		}
 		server.port.push_back(std::atoi((*it++).token.c_str())
 		); // TODO: atoi, validation, 重複チェック
+	} else if ((*it).token == "client_max_body_size") {
+		++it;
+		if ((*it).token_type != node::WORD)
+			throw std::runtime_error("invalid number of arguments in 'error_page' directive");
+		server.client_max_body_size = std::atoi((*it++).token.c_str()); // tmp: atoi
 	}
 	if ((*it).token_type != node::DELIM)
 		throw std::runtime_error("expect ';' after arguments");
@@ -68,6 +73,8 @@ Parser::~Parser() {}
 context::ServerCon Parser::CreateServerContext(NodeItr &it) {
 	context::ServerCon server;
 
+	server.client_max_body_size = 1024; // default
+
 	if ((*it).token_type != node::L_BRACKET)
 		throw std::runtime_error("expect { after server");
 	++it; // skip L_BRACKET
@@ -99,8 +106,7 @@ context::ServerCon Parser::CreateServerContext(NodeItr &it) {
 context::LocationCon Parser::CreateLocationContext(NodeItr &it) {
 	context::LocationCon location;
 
-	location.autoindex            = false;
-	location.client_max_body_size = 1024;
+	location.autoindex = false; // default
 
 	if ((*it).token_type != node::WORD)
 		throw std::runtime_error("invalid number of arguments in 'location' directive");
