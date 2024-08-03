@@ -175,56 +175,173 @@ int RunTests(const TestCase test_cases[], std::size_t num_test_cases) {
 	return ret_code;
 }
 
+/* For Error Test */
+// int RunErrorTests(const TestCase test_cases[], std::size_t num_test_cases) {
+// 	int ret_code = 0;
+
+// 	for (std::size_t i = 0; i < num_test_cases; i++) {
+// 		const TestCase test_case = test_cases[i];
+// 		try {
+// 			ret_code |= Test(Run(test_case.input, test_case.expected), test_case.input);
+// 			PrintNg();
+// 		} catch (const std::exception &e) {
+// 			PrintOk();
+// 		}
+// 	}
+// 	return ret_code;
+// }
+
+// TODO: Lexerとテストケースを揃える
+
+/* Test1 */
+ServerList MakeExpectedTest1() {
+	ServerList         expected_result;
+	std::list<int>     expected_ports_1;
+	LocationList       expected_locationlist_1;
+	context::ServerCon expected_server_1 = {expected_ports_1, "", expected_locationlist_1};
+	expected_result.push_back(expected_server_1);
+
+	return expected_result;
+}
+
+/* Test2 */
+ServerList MakeExpectedTest2() {
+	ServerList           expected_result;
+	std::list<int>       expected_ports_1;
+	LocationList         expected_locationlist_1;
+	context::LocationCon expected_location_1_1 = {"/", "", "", ""};
+	expected_locationlist_1.push_back(expected_location_1_1);
+	context::ServerCon expected_server_1 = {expected_ports_1, "", expected_locationlist_1};
+	expected_result.push_back(expected_server_1);
+
+	return expected_result;
+}
+
+/* Test3 */
+ServerList MakeExpectedTest3() {
+	ServerList     expected_result;
+	std::list<int> expected_ports_1;
+	expected_ports_1.push_back(8080);
+	LocationList         expected_locationlist_1;
+	context::LocationCon expected_location_1_1 = {"/", "/data/", "index.html", ""};
+	expected_locationlist_1.push_back(expected_location_1_1);
+	context::ServerCon expected_server_1 = {expected_ports_1, "localhost", expected_locationlist_1};
+	expected_result.push_back(expected_server_1);
+
+	return expected_result;
+}
+
+/* Test4 */
+ServerList MakeExpectedTest4() {
+	ServerList     expected_result;
+	std::list<int> expected_ports_1;
+	expected_ports_1.push_back(8080);
+	expected_ports_1.push_back(8000);
+	expected_ports_1.push_back(80);
+	LocationList       expected_locationlist_1;
+	context::ServerCon expected_server_1 = {
+		expected_ports_1, "server_name", expected_locationlist_1
+	};
+	expected_result.push_back(expected_server_1);
+
+	return expected_result;
+}
+
+/* Test5 */
+ServerList MakeExpectedTest5() {
+	ServerList           expected_result;
+	std::list<int>       expected_ports_1;
+	LocationList         expected_locationlist_1;
+	context::LocationCon expected_location_1_1 = {"/", "", "index.html", ""};
+	context::LocationCon expected_location_1_2 = {"/www/", "", "index", ""};
+	expected_locationlist_1.push_back(expected_location_1_1);
+	expected_locationlist_1.push_back(expected_location_1_2);
+	context::ServerCon expected_server_1 = {expected_ports_1, "test.serv", expected_locationlist_1};
+	expected_result.push_back(expected_server_1);
+
+	return expected_result;
+}
+
 } // namespace
 
 int main() {
 	int ret_code = EXIT_SUCCESS;
 
-	/* Test1 */
-	ServerList     expected_result_test_1;
-	std::list<int> expected_test_1_ports;
-	expected_test_1_ports.push_back(8080);
-	LocationList       expected_test_1_locationlist;
-	context::ServerCon expected_test_1_server_1 = {
-		expected_test_1_ports, "localhost", expected_test_1_locationlist
-	};
-	expected_result_test_1.push_back(expected_test_1_server_1);
+	ServerList expected_result_test_1 = MakeExpectedTest1();
+	ServerList expected_result_test_2 = MakeExpectedTest2();
+	ServerList expected_result_test_3 = MakeExpectedTest3();
+	ServerList expected_result_test_4 = MakeExpectedTest4();
+	ServerList expected_result_test_5 = MakeExpectedTest5();
 
-	/* Test2 */
-	ServerList     expected_result_test_2;
-	std::list<int> expected_test_2_ports;
-	expected_test_2_ports.push_back(8080);
-	expected_test_2_ports.push_back(80);
-	LocationList         expected_test_2_locationlist;
-	context::LocationCon expected_test_2_location_1 = {"/", "/www/", "index.html", ""};
-	expected_test_2_locationlist.push_back(expected_test_2_location_1);
-	context::ServerCon expected_test_2_server_1 = {
-		expected_test_2_ports, "localhost", expected_test_2_locationlist
-	};
-	expected_result_test_2.push_back(expected_test_2_server_1);
-
-	static const TestCase test_cases[] = {
+	static TestCase test_cases[] = {
 		TestCase(
 			"server {\n \
-				server_name localhost;\n \
-				listen 8080;\n \
 				}\n",
 			expected_result_test_1
 		),
 		TestCase(
 			"server {\n \
-				server_name localhost;\n \
-				listen 8080 80;\n \
-				location / {\n \
-					root /www/;\n \
-					index index.html;\n \
-					} \
+					location / {\n \
+					}\n \
 				}\n",
 			expected_result_test_2
+		),
+		TestCase(
+			"server {\n \
+					listen 8080;\n \
+					server_name localhost;\n \
+					location / {\n \
+						root /data/;\n \
+						index index.html;\n \
+					}\n \
+				}\n",
+			expected_result_test_3
+		),
+		TestCase(
+			"server {\n \
+					listen 8080;\n \
+					listen 8000;\n \
+					listen 80;\n \
+					server_name server_name;\n \
+				}\n",
+			expected_result_test_4
+		),
+		TestCase(
+			"server {\n \
+					server_name test.serv;\n \
+					location / {\n \
+						index index.html;\n \
+					}\n \
+					location /www/ {\n \
+						index index;\n \
+					}\n \
+				}\n",
+			expected_result_test_5
 		)
 	};
 
 	ret_code |= RunTests(test_cases, ARRAY_SIZE(test_cases));
+
+	// ServerList expected_result_error_test;
+
+	// static TestCase error_test_cases[] = {
+	// 	TestCase(
+	// 		"server {\n
+	// 				listen 8080\n
+	// 				server_name localhost;\n
+	// 			}\n",
+	// 		expected_result_error_test
+	// 	),
+	// 	TestCase(
+	// 		"server {\n
+	// 				listen 8080;\n
+	// 				server_name localhost\n
+	// 			}\n",
+	// 		expected_result_error_test
+	// 	)
+	// };
+
+	// ret_code |= RunErrorTests(error_test_cases, ARRAY_SIZE(error_test_cases));
 
 	return ret_code;
 }
