@@ -358,9 +358,11 @@ ServerList MakeExpectedTest8() {
 	LocationList                         expected_locationlist_1;
 	std::pair<unsigned int, std::string> error_page_1(404, "/404.html");
 	std::list<std::string>               allowed_methods_1;
-	context::LocationCon                 expected_location_1_1 = {
-        "/", "/data/", "index.html", true, error_page_1, allowed_methods_1
-    };
+	allowed_methods_1.push_back("GET");
+	allowed_methods_1.push_back("POST");
+	context::LocationCon expected_location_1_1 = {
+		"/", "/data/", "index.html", true, error_page_1, allowed_methods_1
+	};
 	expected_locationlist_1.push_back(expected_location_1_1);
 	context::ServerCon expected_server_1 = {
 		expected_ports_1, server_names_1, expected_locationlist_1, 2024
