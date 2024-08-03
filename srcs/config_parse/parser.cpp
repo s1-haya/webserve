@@ -61,6 +61,12 @@ void Parser::HandleLocationContextDirective(context::LocationCon &location, Node
 				throw std::runtime_error("invalid arguments of 'allowed_methods' directive");
 			}
 		}
+	} else if ((*it).token == "return") {
+		++it;
+		if ((*it).token_type != node::WORD || (*++NodeItr(it)).token_type != node::WORD)
+			throw std::runtime_error("invalid number of arguments in 'return' directive");
+		location.redirect = std::make_pair(std::atoi((*it++).token.c_str()), (*it++).token);
+		// ex. 302 /index.html, tmp: atoi
 	}
 	if ((*it).token_type != node::DELIM)
 		throw std::runtime_error("expect ';' after arguments");

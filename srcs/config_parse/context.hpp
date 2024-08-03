@@ -14,6 +14,7 @@ struct LocationCon {
 	bool                                 autoindex;
 	std::pair<unsigned int, std::string> error_page;
 	std::list<std::string>               allowed_methods;
+	std::pair<unsigned int, std::string> redirect; // cannnot use return
 };
 
 // todo: PortListをstd::list<unsigned int>で作成？

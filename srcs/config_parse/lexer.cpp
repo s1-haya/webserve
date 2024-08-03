@@ -36,6 +36,7 @@ void Lexer::InitDefinition() {
 	directive_.push_back("error_page");
 	directive_.push_back("client_max_body_size");
 	directive_.push_back("allowed_methods");
+	directive_.push_back("return");
 }
 
 void Lexer::LexBuffer() {
