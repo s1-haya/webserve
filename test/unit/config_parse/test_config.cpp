@@ -40,11 +40,15 @@ namespace context {
 
 bool operator==(const LocationCon &lhs, const LocationCon &rhs) {
 	return lhs.location == rhs.location && lhs.root == rhs.root && lhs.index == rhs.index &&
+		   lhs.autoindex == rhs.autoindex && lhs.error_page == rhs.error_page &&
+		   lhs.client_max_body_size == rhs.client_max_body_size &&
 		   lhs.allowed_method == rhs.allowed_method;
 }
 
 bool operator!=(const LocationCon &lhs, const LocationCon &rhs) {
 	return lhs.location != rhs.location || lhs.root != rhs.root || lhs.index != rhs.index ||
+		   lhs.autoindex != rhs.autoindex || lhs.error_page != rhs.error_page ||
+		   lhs.client_max_body_size != rhs.client_max_body_size ||
 		   lhs.allowed_method != rhs.allowed_method;
 }
 
@@ -81,6 +85,10 @@ std::ostream &operator<<(std::ostream &os, const context::LocationCon &location)
 	os << "{location: " << location.location << ", "
 	   << "root: " << location.root << ", "
 	   << "index: " << location.index << ", "
+	   << "autoindex: " << (location.autoindex ? "true" : "false") << ", "
+	   << "error_page(status): " << location.error_page.first << ", "
+	   << "error_page(index): " << location.error_page.second << ", "
+	   << "client_max_body_size: " << location.client_max_body_size << ", "
 	   << "allowed_method: " << location.allowed_method << "}";
 	return os;
 }
