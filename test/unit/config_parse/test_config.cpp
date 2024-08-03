@@ -284,17 +284,17 @@ ServerList MakeExpectedTest5() {
 	std::list<std::string> server_names_1;
 	server_names_1.push_back("test.serv");
 	LocationList                         expected_locationlist_1;
-	std::pair<unsigned int, std::string> error_page_1;
-	std::list<std::string>               allowed_methods_1;
-	std::pair<unsigned int, std::string> redirect_1;
+	std::pair<unsigned int, std::string> error_page_1_1;
+	std::list<std::string>               allowed_methods_1_1;
+	std::pair<unsigned int, std::string> redirect_1_1;
 	context::LocationCon                 expected_location_1_1 = {
-        "/", "", "index.html", false, error_page_1, allowed_methods_1, redirect_1
+        "/", "", "index.html", false, error_page_1_1, allowed_methods_1_1, redirect_1_1
     };
-	std::pair<unsigned int, std::string> error_page_2;
-	std::list<std::string>               allowed_methods_2;
-	std::pair<unsigned int, std::string> redirect_2;
+	std::pair<unsigned int, std::string> error_page_1_2;
+	std::list<std::string>               allowed_methods_1_2;
+	std::pair<unsigned int, std::string> redirect_1_2;
 	context::LocationCon                 expected_location_1_2 = {
-        "/www/", "", "index", false, error_page_2, allowed_methods_2, redirect_2
+        "/www/", "", "index", false, error_page_1_2, allowed_methods_1_2, redirect_1_2
     };
 	expected_locationlist_1.push_back(expected_location_1_1);
 	expected_locationlist_1.push_back(expected_location_1_2);
@@ -355,7 +355,7 @@ ServerList MakeExpectedTest7() {
 	return expected_result;
 }
 
-/* Test8 */
+/* Test8 Additional Directives */
 ServerList MakeExpectedTest8() {
 	ServerList     expected_result;
 	std::list<int> expected_ports_1;
