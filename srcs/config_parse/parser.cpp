@@ -24,7 +24,9 @@ void Parser::HandleServerContextDirective(context::ServerCon &server, NodeItr &i
 	} else if ((*it).token == "client_max_body_size") {
 		++it;
 		if ((*it).token_type != node::WORD)
-			throw std::runtime_error("invalid number of arguments in 'error_page' directive");
+			throw std::runtime_error(
+				"invalid number of arguments in 'client_max_body_size' directive"
+			);
 		server.client_max_body_size = std::atoi((*it++).token.c_str()); // tmp: atoi
 	}
 	if ((*it).token_type != node::DELIM)
@@ -45,7 +47,7 @@ void Parser::HandleLocationContextDirective(context::LocationCon &location, Node
 	} else if ((*it).token == "autoindex") {
 		++it;
 		if ((*it).token_type != node::WORD || ((*it).token != "on" && (*it).token != "off"))
-			throw std::runtime_error("invalid number of arguments in 'autoindex' directive");
+			throw std::runtime_error("invalid arguments in 'autoindex' directive");
 		location.autoindex = ((*it++).token == "on");
 	} else if ((*it).token == "error_page") {
 		++it;
