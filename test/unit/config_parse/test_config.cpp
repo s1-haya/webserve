@@ -216,7 +216,7 @@ ServerList MakeExpectedTest2() {
 	std::list<int>                       expected_ports_1;
 	std::list<std::string>               server_names_1;
 	LocationList                         expected_locationlist_1;
-	std::pair<unsigned int, std::string> error_page_1(404, "/404.html");
+	std::pair<unsigned int, std::string> error_page_1;
 	context::LocationCon expected_location_1_1 = {"/", "", "", false, error_page_1, 1024, ""};
 	expected_locationlist_1.push_back(expected_location_1_1);
 	context::ServerCon expected_server_1 = {
@@ -235,7 +235,7 @@ ServerList MakeExpectedTest3() {
 	std::list<std::string> server_names_1;
 	server_names_1.push_back("localhost");
 	LocationList                         expected_locationlist_1;
-	std::pair<unsigned int, std::string> error_page_1(404, "/404.html");
+	std::pair<unsigned int, std::string> error_page_1;
 	context::LocationCon                 expected_location_1_1 = {
         "/", "/data/", "index.html", false, error_page_1, 1024, ""
     };
@@ -274,11 +274,11 @@ ServerList MakeExpectedTest5() {
 	std::list<std::string> server_names_1;
 	server_names_1.push_back("test.serv");
 	LocationList                         expected_locationlist_1;
-	std::pair<unsigned int, std::string> error_page_1_1(404, "/404.html");
+	std::pair<unsigned int, std::string> error_page_1_1;
 	context::LocationCon                 expected_location_1_1 = {
         "/", "", "index.html", false, error_page_1_1, 1024, ""
     };
-	std::pair<unsigned int, std::string> error_page_1_2(404, "/404.html");
+	std::pair<unsigned int, std::string> error_page_1_2;
 	context::LocationCon                 expected_location_1_2 = {
         "/www/", "", "index", false, error_page_1_2, 1024, ""
     };
@@ -299,7 +299,7 @@ ServerList MakeExpectedTest6() {
 	server_names_1.push_back("comment.serv");
 	std::list<int>                       expected_ports_1;
 	LocationList                         expected_locationlist_1;
-	std::pair<unsigned int, std::string> error_page_1(404, "/404.html");
+	std::pair<unsigned int, std::string> error_page_1;
 	context::LocationCon                 expected_location_1_1 = {
         "/", "", "index.html", false, error_page_1, 1024, ""
     };
