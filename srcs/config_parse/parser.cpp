@@ -37,6 +37,17 @@ void Parser::HandleLocationContextDirective(context::LocationCon &location, Node
 		if ((*it).token_type != node::WORD)
 			throw std::runtime_error("invalid number of arguments in 'index' directive");
 		location.index = (*it++).token;
+	} else if ((*it).token == "autoindex") {
+		++it;
+		if ((*it).token_type != node::WORD || ((*it).token != "on" && (*it).token != "off"))
+			throw std::runtime_error("invalid number of arguments in 'autoindex' directive");
+		location.autoindex = ((*it++).token == "on");
+	} else if ((*it).token == "error_page") {
+		++it;
+		if ((*it).token_type != node::WORD || (*++NodeItr(it)).token_type != node::WORD)
+			throw std::runtime_error("invalid number of arguments in 'error_page' directive");
+		location.error_page = std::make_pair(std::atoi((*it++).token.c_str()), (*it++).token);
+		// ex. 404 /404.html, tmp: atoi
 	}
 	if ((*it).token_type != node::DELIM)
 		throw std::runtime_error("expect ';' after arguments");
