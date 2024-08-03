@@ -21,6 +21,7 @@ struct HttpResponseResult {
 class HttpResponse {
   public:
 	static std::string CreateHttpResponse(const HttpResponseResult &response);
+	static HttpResponseResult CreateHttpResponseResult(const HttpRequestResult& request_info);
 
   private:
 	HttpResponse();

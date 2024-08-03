@@ -18,19 +18,12 @@ void TmpHttp::ParseHttpRequestFormat(int client_fd, const std::string &read_buf)
 
 // todo: レスポンスを作成する
 std::string TmpHttp::CreateHttpResponse(int client_fd) {
-	HttpRequestParsedData save_data = storage_.GetClientSaveData(client_fd);
+	HttpRequestParsedData data = storage_.GetClientSaveData(client_fd);
 	// todo: VirtualServerクラス？？を引数で受けとり、リクエスト情報が正しいかどうかを確認する。
 	// HttpResponseParsedData data = HttpResponseParse(const HttpRequestParsedData& data,
 	// VirtualServer server);
+	HttpResponseResult response = HttpResponse::CreateHttpResponseResult(data.request_result);
 	storage_.DeleteClientSaveData(client_fd);
-	HttpResponseResult response;
-	response.status_line.version         = HTTP_VERSION;
-	response.status_line.status_code     = "200";
-	response.status_line.status_reason   = "OK";
-	response.header_fields["Host"]       = "sawa";
-	response.header_fields["Connection"] = "close";
-	response.body_message = "You can't connect the dots looking forword. You can only connect the "
-							"dots looking backwards";
 	return HttpResponse::CreateHttpResponse(response);
 }
 
