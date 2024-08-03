@@ -13,7 +13,7 @@ struct LocationCon {
 	std::string                          index;
 	bool                                 autoindex;
 	std::pair<unsigned int, std::string> error_page;
-	std::string                          allowed_method;
+	std::list<std::string>               allowed_methods;
 };
 
 // todo: PortListをstd::list<unsigned int>で作成？
