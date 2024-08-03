@@ -8,10 +8,13 @@ namespace config {
 namespace context {
 
 struct LocationCon {
-	std::string location;
-	std::string root;
-	std::string index;
-	std::string allowed_method;
+	std::string                          location;
+	std::string                          root;
+	std::string                          index;
+	bool                                 autoindex;
+	std::pair<unsigned int, std::string> error_page;
+	std::size_t                          client_max_body_size;
+	std::string                          allowed_method;
 };
 
 // todo: PortListをstd::list<unsigned int>で作成？
