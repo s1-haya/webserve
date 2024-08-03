@@ -333,6 +333,27 @@ ServerList MakeExpectedTest7() {
 	return expected_result;
 }
 
+/* Test8 */
+ServerList MakeExpectedTest8() {
+	ServerList     expected_result;
+	std::list<int> expected_ports_1;
+	expected_ports_1.push_back(8080);
+	std::list<std::string> server_names_1;
+	server_names_1.push_back("localhost");
+	LocationList                         expected_locationlist_1;
+	std::pair<unsigned int, std::string> error_page_1(404, "/404.html");
+	context::LocationCon                 expected_location_1_1 = {
+        "/", "/data/", "index.html", true, error_page_1, ""
+    };
+	expected_locationlist_1.push_back(expected_location_1_1);
+	context::ServerCon expected_server_1 = {
+		expected_ports_1, server_names_1, expected_locationlist_1, 2024
+	};
+	expected_result.push_back(expected_server_1);
+
+	return expected_result;
+}
+
 } // namespace
 
 int main(int argc, char *argv[]) {
@@ -370,6 +391,9 @@ int main(int argc, char *argv[]) {
 			break;
 		case 7:
 			expected = MakeExpectedTest7();
+			break;
+		case 8:
+			expected = MakeExpectedTest8();
 			break;
 		default:
 			break;
