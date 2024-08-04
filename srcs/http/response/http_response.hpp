@@ -20,19 +20,12 @@ struct HttpResponseResult {
 
 class HttpResponse {
   public:
-	static std::string CreateHttpResponse(const HttpResponseResult &response);
-	static HttpResponseResult CreateHttpResponseResult(const HttpRequestResult& request_info);
+	static std::string        CreateHttpResponse(const HttpResponseResult &response);
+	static HttpResponseResult CreateHttpResponseResult(const HttpRequestResult &request_info);
 
   private:
 	HttpResponse();
 	~HttpResponse();
-	static void CreateStatusLine(std::ostream &response_stream, const StatusLine &status_line);
-	static void CreateHeaderField(
-		std::ostream &response_stream, const std::string &name, const std::string &value
-	);
-	static void
-	CreateHeaderFields(std::ostream &response_stream, const HeaderFields &header_fields);
-	static void CreateBodyMessage(std::ostream &response_stream, const std::string &body_message);
 };
 
 } // namespace http
