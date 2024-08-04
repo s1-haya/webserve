@@ -5,28 +5,9 @@
 
 namespace http {
 
-// todo: リクエスト情報が正しいかどうかを確認し、HttpResponseResultを作成する関数（命名規則は仮）
-// 引数はリクエスト情報とリクエストを送信したクライアントの仮想サーバーの情報
+// todo:　HttpResponseParsedDataを元にHttpResponseResultを作成する
 HttpResponseResult HttpResponse::CreateHttpResponseResult(const HttpRequestResult &request_info) {
-	(void) request_info;
-	// todo: okの場合　
-	// todo: SelectLocation: リクエストターゲットがどの仮想サーバーのロケーションディレクトリに対応するか
-		// 合致しない場合は 404のステータスコード
-		// locationのpathが末尾にプレフィックスが付いてない場合。301のステータスコード
-		// 例: ついてる場合 location /root/
-			// ついてない場合 location /root
-		// todo: root directiveの場合 root + request_target
-			// - serverのrootよりlocationのrootが優先される
-			// - rootが複数設定されてる場合は最初のroot以降は無視？
-		// todo: CheckValidRequest:仮想サーバーのディレクトリからリクエストの有効性を確認する
-		// - リソースがサーバー上に存在しない
-		// - ファイルのアクセス権限ない
-		// - メソッドが許可されてない
-		// todo: cgiをリクエストしている場合は実行する。条件は以下だ。
-		// - サーバーのディレクトリにcgi拡張子ファイルを許可するディレクティブがある場合
-		// - リソースが上記のサーバーのディレクトリの場合
-	// - メソッドがGET, POSTかつそれらが許可されてる場合
-	// todo:　HttpRequestResultとServerConfig, LocationConfigを元にHttpResponseResultを作成する
+	(void)request_info;
 	HttpResponseResult response;
 	response.status_line.version         = HTTP_VERSION;
 	response.status_line.status_code     = "200";
@@ -37,6 +18,18 @@ HttpResponseResult HttpResponse::CreateHttpResponseResult(const HttpRequestResul
 							"dots looking backwards";
 	return response;
 }
+
+// todo: CheckValidRequest:仮想サーバーとロケーションのディレクトリからリクエストの有効性を確認する
+// HttpResponseParsedData HttpResponse::CheckValidRequest(const HttpRequestResult &request_info,
+// const SeverConfig& server_config_info) {
+// - リソースがサーバー上に存在しない
+// - ファイルのアクセス権限ない
+// - メソッドが許可されてない
+// todo: cgiをリクエストしている場合は実行する。条件は以下だ。
+// - サーバーのディレクトリにcgi拡張子ファイルを許可するディレクティブがある場合
+// - リソースが上記のサーバーのディレクトリの場合
+// - メソッドがGET, POSTかつそれらが許可されてる場合
+// }
 
 // HttpResponseResult構造体をHttpResponseのフォーマットを文字列に出力する
 std::string HttpResponse::CreateHttpResponse(const HttpResponseResult &response) {
