@@ -26,8 +26,9 @@ void ContextManager::AddVirtualServer(const VirtualServer &virtual_server) {
 }
 
 void ContextManager::AddServerInfo(
-	int server_fd, const ServerInfo &server_info, const VirtualServer *virtual_server
+	const ServerInfo &server_info, const VirtualServer *virtual_server
 ) {
+	const int server_fd = server_info.GetFd();
 	virtual_servers_.AddMapping(server_fd, virtual_server);
 	sock_context_.AddServerInfo(server_fd, server_info);
 }

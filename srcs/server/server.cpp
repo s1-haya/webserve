@@ -212,7 +212,7 @@ void Server::Init() {
 			server_info.SetSockFd(server_fd);
 
 			// add to context
-			context_.AddServerInfo(server_fd, server_info, &virtual_server);
+			context_.AddServerInfo(server_info, &virtual_server);
 			event_monitor_.Add(server_fd, event::EVENT_READ);
 			utils::Debug("server", "listen", server_fd);
 		}
