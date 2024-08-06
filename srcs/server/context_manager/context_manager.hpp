@@ -2,11 +2,17 @@
 #define CONTEXT_MANAGER_HPP_
 
 #include "sock_context.hpp"
+#include "virtual_server.hpp"
 #include <string>
 
 namespace server {
 
-class VirtualServer;
+struct DtoServerInfos {
+	int                         server_fd;
+	std::string                 server_name;
+	std::string                 server_port;
+	VirtualServer::LocationList locations;
+};
 
 // holds and manages virtual server info and socket context(server socket info, client socket info).
 class ContextManager {
