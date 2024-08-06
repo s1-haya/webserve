@@ -40,12 +40,12 @@ HttpResponseResult HttpResponse::CreateErrorHttpResponseResult(const HttpRequest
 	response.status_line.status_code   = utils::ToString(request_info.status_code);
 	response.status_line.status_reason = status_reason[request_info.status_code];
 	// todo: StatusCodeをクラスにして、プライベートで保持する。
-	// response.status_line.status_reason   = request_info.status_code.GetStatusCode();
+	// response.status_line.status_code   = request_info.status_code.GetStrStatusCode();
 	// response.status_line.status_reason   = request_info.status_code.GetStatusReason();
-	response.header_fields["Host"]       = "sawa";
-	response.header_fields["Connection"] = "close";
-	response.body_message = "You can't connect the dots looking forword. You can only connect the "
-							"dots looking backwards";
+	response.header_fields["Content-Type"] = "text/html";
+	response.header_fields["Server"]       = SERVER_VERSION;
+	response.header_fields["Connection"]     = "close";
+	response.header_fields["Content-Length"] = utils::ToString(response.body_message.length());
 	return response;
 }
 

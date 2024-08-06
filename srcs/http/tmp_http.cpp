@@ -21,7 +21,7 @@ std::string TmpHttp::CreateHttpResponse(int client_fd) {
 	HttpRequestParsedData data = storage_.GetClientSaveData(client_fd);
 	HttpResponseResult    response;
 	if (data.request_result.status_code == OK) {
-		// todo: VirtualServerクラス？？を引数で受けとり、リクエスト情報が正しいかどうかを確認する。
+		// todo: リクエスト情報が正しいかどうかを確認する。
 		// HttpResponseParsedData data = HttpResponseParse(const HttpRequestParsedData& data,
 		// VirtualServer server);
 		// todo: 引数はHttpResponseParsedDataになる。
