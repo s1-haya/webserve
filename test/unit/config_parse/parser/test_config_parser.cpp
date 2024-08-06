@@ -2,6 +2,7 @@
 #include "context.hpp"
 #include "lexer.hpp"
 #include "parser.hpp"
+#include "utils.hpp"
 #include <cstdlib>
 #include <iostream>
 #include <sstream>
@@ -166,7 +167,7 @@ int Test(const Result &result, const std::string &src) {
 }
 
 int RunTests(const TestCase test_cases[], std::size_t num_test_cases) {
-	int ret_code = 0;
+	int ret_code = EXIT_SUCCESS;
 
 	for (std::size_t i = 0; i < num_test_cases; i++) {
 		const TestCase test_case = test_cases[i];
@@ -175,25 +176,29 @@ int RunTests(const TestCase test_cases[], std::size_t num_test_cases) {
 	return ret_code;
 }
 
-/* For Error Test */
-// int RunErrorTests(const TestCase test_cases[], std::size_t num_test_cases) {
-// 	int ret_code = 0;
+/* For Error Tests */
+int RunErrorTests(const TestCase test_cases[], std::size_t num_test_cases) {
+	int ret_code = EXIT_SUCCESS;
 
-// 	for (std::size_t i = 0; i < num_test_cases; i++) {
-// 		const TestCase test_case = test_cases[i];
-// 		try {
-// 			ret_code |= Test(Run(test_case.input, test_case.expected), test_case.input);
-// 			PrintNg();
-// 		} catch (const std::exception &e) {
-// 			PrintOk();
-// 		}
-// 	}
-// 	return ret_code;
-// }
+	for (std::size_t i = 0; i < num_test_cases; i++) {
+		const TestCase test_case = test_cases[i];
+		try {
+			Result result = Run(test_case.input, test_case.expected);
+			PrintNg();
+			PrintError("ConfigParser failed (No Throw):");
+			std::cerr << "src:[\n" << test_case.input << "]" << std::endl;
+			ret_code |= EXIT_FAILURE;
+		} catch (const std::exception &e) {
+			PrintOk();
+			utils::Debug(e.what());
+		}
+	}
+	return ret_code;
+}
 
 // TODO: Lexerとテストケースを揃える
 
-/* Test1 */
+/* Test1 One Server */
 ServerList MakeExpectedTest1() {
 	ServerList         expected_result;
 	std::list<int>     expected_ports_1;
@@ -204,7 +209,7 @@ ServerList MakeExpectedTest1() {
 	return expected_result;
 }
 
-/* Test2 */
+/* Test2 One Server, One Location */
 ServerList MakeExpectedTest2() {
 	ServerList           expected_result;
 	std::list<int>       expected_ports_1;
@@ -217,7 +222,7 @@ ServerList MakeExpectedTest2() {
 	return expected_result;
 }
 
-/* Test3 */
+/* Test3 Server, Location Directive */
 ServerList MakeExpectedTest3() {
 	ServerList     expected_result;
 	std::list<int> expected_ports_1;
@@ -231,7 +236,7 @@ ServerList MakeExpectedTest3() {
 	return expected_result;
 }
 
-/* Test4 */
+/* Test4 Multiple ports */
 ServerList MakeExpectedTest4() {
 	ServerList     expected_result;
 	std::list<int> expected_ports_1;
@@ -247,7 +252,7 @@ ServerList MakeExpectedTest4() {
 	return expected_result;
 }
 
-/* Test5 */
+/* Test5 Multiple Locations */
 ServerList MakeExpectedTest5() {
 	ServerList           expected_result;
 	std::list<int>       expected_ports_1;
@@ -262,6 +267,40 @@ ServerList MakeExpectedTest5() {
 	return expected_result;
 }
 
+/* Test6 Tab+Space, Comment */
+ServerList MakeExpectedTest6() {
+	ServerList           expected_result;
+	std::list<int>       expected_ports_1;
+	LocationList         expected_locationlist_1;
+	context::LocationCon expected_location_1_1 = {"/", "", "index.html", ""};
+	expected_locationlist_1.push_back(expected_location_1_1);
+	context::ServerCon expected_server_1 = {
+		expected_ports_1, "comment.serv", expected_locationlist_1
+	};
+	expected_result.push_back(expected_server_1);
+
+	return expected_result;
+}
+
+/* Test7 Multiple Servers */
+ServerList MakeExpectedTest7() {
+	ServerList expected_result;
+
+	std::list<int> expected_ports_1;
+	expected_ports_1.push_back(8080);
+	LocationList       expected_locationlist_1;
+	context::ServerCon expected_server_1 = {expected_ports_1, "localhost", expected_locationlist_1};
+	expected_result.push_back(expected_server_1);
+
+	std::list<int> expected_ports_2;
+	expected_ports_2.push_back(12345);
+	LocationList       expected_locationlist_2;
+	context::ServerCon expected_server_2 = {expected_ports_2, "test.www", expected_locationlist_2};
+	expected_result.push_back(expected_server_2);
+
+	return expected_result;
+}
+
 } // namespace
 
 int main() {
@@ -272,6 +311,8 @@ int main() {
 	ServerList expected_result_test_3 = MakeExpectedTest3();
 	ServerList expected_result_test_4 = MakeExpectedTest4();
 	ServerList expected_result_test_5 = MakeExpectedTest5();
+	ServerList expected_result_test_6 = MakeExpectedTest6();
+	ServerList expected_result_test_7 = MakeExpectedTest7();
 
 	static TestCase test_cases[] = {
 		TestCase(
@@ -317,31 +358,143 @@ int main() {
 					}\n \
 				}\n",
 			expected_result_test_5
+		),
+		TestCase(
+			"server {\n \
+					\n \
+				    \n \
+			#ashjkahsk\n\
+					server_name comment.serv;\n \
+					location / {\n \
+						index index.html;\n \
+				    #ashjkahsk\n \
+					}\n \
+				}\n",
+			expected_result_test_6
+		),
+		TestCase(
+			"server {\n \
+					listen 8080;\n \
+					server_name localhost;\n \
+				}\n \
+			 server {\n \
+					listen 12345;\n \
+					server_name test.www;\n \
+				}\n",
+			expected_result_test_7
 		)
 	};
 
 	ret_code |= RunTests(test_cases, ARRAY_SIZE(test_cases));
 
-	// ServerList expected_result_error_test;
+	ServerList expected_result_error_test;
 
-	// static TestCase error_test_cases[] = {
-	// 	TestCase(
-	// 		"server {\n
-	// 				listen 8080\n
-	// 				server_name localhost;\n
-	// 			}\n",
-	// 		expected_result_error_test
-	// 	),
-	// 	TestCase(
-	// 		"server {\n
-	// 				listen 8080;\n
-	// 				server_name localhost\n
-	// 			}\n",
-	// 		expected_result_error_test
-	// 	)
-	// };
+	static TestCase error_test_cases[] = {
+		/* Test8 */ TestCase(
+			"server {\n \
+				\n",
+			expected_result_error_test
+		),
+		/* Test9 */
+		TestCase(
+			"server {\n \
+					server {\n \
+					}\n \
+				}\n",
+			expected_result_error_test
+		),
+		/* Test10 */
+		TestCase(
+			"server {\n \
+					listen\n \
+				}\n",
+			expected_result_error_test
+		),
+		/* Test11 */
+		TestCase(
+			"server {\n \
+					server_name server_name\n \
+				}\n",
+			expected_result_error_test
+		),
+		/* Test12 */
+		// TestCase(
+		// 	"server {\n
+		// 			listen 8080\n
+		// 			server_name localhost;\n
+		// 		}\n",
+		// 	expected_result_error_test
+		// ),
+		/* Test13 */
+		// TestCase(
+		// 	"server {\n
+		// 			listen 8080 8000;\n
+		// 			server_name localhost;\n
+		// 		}\n",
+		// 	expected_result_error_test
+		// ),
+		/* Test14 */
+		// TestCase(
+		// 	"serv {\n
+		// 		}\n",
+		// 	expected_result_error_test
+		// ),
+		/* Test15 */
+		TestCase(
+			"server {\n \
+					location / /www/ {\n \
+					}\n \
+				}\n",
+			expected_result_error_test
+		),
+		/* Test16 */
+		TestCase(
+			"server {\n \
+					location /www/ {\n \
+					\n \
+				}\n",
+			expected_result_error_test
+		),
+		/* Test17 */
+		TestCase(
+			"server {\n \
+					listen 8080;\n \
+					server_name localhost;\n \
+					location / {\n \
+						root\n \
+					}\n \
+				}\n",
+			expected_result_error_test
+		),
+		/* Test18 */
+		// TestCase(
+		// 	"{\n
+		// 		}\n",
+		// 	expected_result_error_test
+		// ),
+		/* Test19 */
+		TestCase(
+			"server	{{{\n \
+				}\n",
+			expected_result_error_test
+		),
+		/* Test20 */
+		TestCase(
+			"server 	{\n \
+				server_name server; ;;;;\n \
+				}\n",
+			expected_result_error_test
+		),
+		/* Test21 */
+		TestCase(
+			"server {\n \
+				unknown test;\n \
+				}\n",
+			expected_result_error_test
+		)
+	};
 
-	// ret_code |= RunErrorTests(error_test_cases, ARRAY_SIZE(error_test_cases));
+	ret_code |= RunErrorTests(error_test_cases, ARRAY_SIZE(error_test_cases));
 
 	return ret_code;
 }
