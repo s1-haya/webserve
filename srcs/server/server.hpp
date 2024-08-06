@@ -4,9 +4,8 @@
 #include "buffer.hpp"
 #include "config_parse/context.hpp"
 #include "connection.hpp"
+#include "context_manager.hpp"
 #include "epoll.hpp"
-#include "sock_context.hpp"
-#include "virtual_server_storage.hpp"
 #include <list>
 #include <string>
 
@@ -35,12 +34,10 @@ class Server {
 	void        SendResponse(int client_fd);
 	// const
 	static const int SYSTEM_ERROR = -1;
-	// virtual servers storage
-	VirtualServerStorage virtual_servers_;
+	// context(virtual server,client)
+	ContextManager context_;
 	// connection
 	Connection connection_;
-	// context
-	SockContext context_;
 	// event poll
 	epoll::Epoll event_monitor_;
 	// request buffers
