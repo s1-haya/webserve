@@ -8,7 +8,11 @@
 namespace {
 
 std::string LoadFileContent(const std::string &file_path) {
-	std::ifstream      file(file_path.c_str());
+	std::ifstream file(file_path.c_str());
+	if (!file) {
+		std::cerr << "Error opening file: " << file_path << std::endl;
+		return "";
+	}
 	std::ostringstream file_content;
 	file_content << file.rdbuf();
 	return file_content.str();
