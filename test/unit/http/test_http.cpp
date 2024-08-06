@@ -7,7 +7,7 @@
 
 namespace {
 
-std::string LoadFileContent(const std::string& file_path){
+std::string LoadFileContent(const std::string &file_path) {
 	std::ifstream      file(file_path);
 	std::ostringstream file_content;
 	file_content << file.rdbuf();
@@ -33,7 +33,7 @@ int HandleResult(const T &result, const T &expected) {
 	}
 }
 
-}
+} // namespace
 
 int main(void) {
 	int ret_code = 0;
@@ -133,11 +133,7 @@ int main(void) {
 	test2_response.ParseHttpRequestFormat(
 		1, "GET / HTTP/1.\r\nHost test\r\nContent-Length:  3\r\n\r\na"
 	);
-	std::string test2_expected_body_message = LoadFileContent("expected_body_message/test2.txt");
-	const std::string test2_expected_response =
-			"HTTP/1.1 400 BAD REQUEST\r\nConnection: close\r\nContent-Length: 149\r\nContent-Type: "
-			"text/html\r\nServer: webserv/1.1\r\n\r\n" +
-			test2_expected_body_message;
+	std::string test2_expected_response = LoadFileContent("expected_response/test2.txt");
 	ret_code |= HandleResult(test2_response.CreateHttpResponse(1), test2_expected_response);
 	return ret_code;
 }

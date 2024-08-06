@@ -10,9 +10,9 @@ namespace http {
 HttpResponse::StatusReason InitStatusReason() {
 	HttpResponse::StatusReason init_status_reason;
 	init_status_reason[OK]              = "OK";
-	init_status_reason[BAD_REQUEST]     = "BAD REQUEST";
-	init_status_reason[NOT_FOUND]       = "NOT FOUND";
-	init_status_reason[NOT_IMPLEMENTED] = "NOT IMPLEMENTED";
+	init_status_reason[BAD_REQUEST]     = "Bad Request";
+	init_status_reason[NOT_FOUND]       = "Not Found";
+	init_status_reason[NOT_IMPLEMENTED] = "Not Implemented";
 	return init_status_reason;
 }
 
@@ -36,12 +36,10 @@ std::string HttpResponse::CreateErrorBodyMessage(
 	const std::string &status_code, const std::string &status_reason
 ) {
 	std::ostringstream body_message;
-	body_message << "<html>\n<head><title>" << status_code << SP
-				 << status_reason << "</title></head>\n"
-				 << "<body>\n<center><h1>" << status_code << SP
-				 << status_reason << "</h1></center>\n"
-				 << "<hr><center>" << SERVER_VERSION << "</center>\n"
-				 << "</body>\n</html>\n";
+	body_message << "<html>" << CRLF << "<head><title>" << status_code << SP << status_reason
+				 << "</title></head>" << CRLF << "<body>" << CRLF << "<center><h1>" << status_code
+				 << SP << status_reason << "</h1></center>" << CRLF << "<hr><center>"
+				 << SERVER_VERSION << "</center>" << CRLF << "</body>" << CRLF << "</html>" << CRLF;
 	return body_message.str();
 }
 
@@ -57,7 +55,7 @@ HttpResponseResult HttpResponse::CreateErrorHttpResponseResult(const HttpRequest
 	// response.status_line.status_reason   = request_info.status_code.GetStatusReason();
 	response.header_fields["Content-Type"] = "text/html";
 	response.header_fields["Server"]       = SERVER_VERSION;
-	response.header_fields["Connection"]     = "close";
+	response.header_fields["Connection"]   = "close";
 	response.body_message                  = CreateErrorBodyMessage(
         response.status_line.status_code, response.status_line.status_reason
     );
