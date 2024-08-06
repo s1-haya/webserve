@@ -10,6 +10,10 @@ build:
 run:
 	@docker run -d --name $(CONTAINER_NAME) -p 80:80 $(IMAGE_NAME)
 
+.PHONY	: re-run
+re-run:
+	@make fclean && make build && make run
+
 .PHONY	: stop
 stop:
 	@docker stop $(CONTAINER_NAME)
