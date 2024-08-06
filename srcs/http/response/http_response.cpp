@@ -81,7 +81,7 @@ std::string HttpResponse::CreateHttpResponse(const HttpResponseResult &response)
 	response_stream << response.status_line.version << SP << response.status_line.status_code << SP
 					<< response.status_line.status_reason << CRLF;
 	typedef HeaderFields::const_iterator It;
-	for (It it = response.header_fields.begin(); it != response.header_fields.end(); it++) {
+	for (It it = response.header_fields.begin(); it != response.header_fields.end(); ++it) {
 		response_stream << it->first << ":" << SP << it->second << CRLF;
 	}
 	response_stream << CRLF;
