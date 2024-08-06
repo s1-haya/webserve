@@ -1,5 +1,5 @@
-#ifndef CONTEXT_MANAGER_HPP_
-#define CONTEXT_MANAGER_HPP_
+#ifndef SERVER_CONTEXTMANAGER_CONTEXTMANAGER_HPP_
+#define SERVER_CONTEXTMANAGER_CONTEXTMANAGER_HPP_
 
 #include "sock_context.hpp"
 #include "virtual_server.hpp"
@@ -41,4 +41,4 @@ class ContextManager {
 
 } // namespace server
 
-#endif /* CONTEXT_MANAGER_HPP_ */
+#endif /* SERVER_CONTEXTMANAGER_CONTEXTMANAGER_HPP_ */

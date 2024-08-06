@@ -1,5 +1,5 @@
-#ifndef SOCK_INFO_HPP_
-#define SOCK_INFO_HPP_
+#ifndef SERVER_CONTEXTMANAGER_SOCKCONTEXT_SERVERINFO_HPP_
+#define SERVER_CONTEXTMANAGER_SOCKCONTEXT_SERVERINFO_HPP_
 
 #include <string>
 
@@ -26,4 +26,4 @@ class ServerInfo {
 
 } // namespace server
 
-#endif /* SOCK_INFO_HPP_ */
+#endif /* SERVER_CONTEXTMANAGER_SOCKCONTEXT_SERVERINFO_HPP_ */

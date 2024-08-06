@@ -1,5 +1,5 @@
-#ifndef SERVER_HPP_
-#define SERVER_HPP_
+#ifndef SERVER_SERVER_HPP_
+#define SERVER_SERVER_HPP_
 
 #include "buffer.hpp"
 #include "config_parse/context.hpp"
@@ -46,4 +46,4 @@ class Server {
 
 } // namespace server
 
-#endif /* SERVER_HPP_ */
+#endif /* SERVER_SERVER_HPP_ */

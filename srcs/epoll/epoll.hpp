@@ -1,5 +1,5 @@
-#ifndef EPOLL_HPP_
-#define EPOLL_HPP_
+#ifndef EPOLL_EPOLL_HPP_
+#define EPOLL_EPOLL_HPP_
 
 #include "event.hpp"
 #include <cstddef>     // size_t
@@ -32,4 +32,4 @@ class Epoll {
 
 } // namespace epoll
 
-#endif /* EPOLL_HPP_ */
+#endif /* EPOLL_EPOLL_HPP_ */
