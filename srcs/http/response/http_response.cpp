@@ -1,9 +1,22 @@
 #include "http_response.hpp"
 #include "http_message.hpp"
+#include "utils.hpp"
 #include <iostream>
 #include <sstream>
 
 namespace http {
+
+// todo: StatusCodeクラスへ
+HttpResponse::StatusReason InitStatusReason() {
+	HttpResponse::StatusReason init_status_reason;
+	init_status_reason[OK]              = "OK";
+	init_status_reason[BAD_REQUEST]     = "BAD REQUEST";
+	init_status_reason[NOT_FOUND]       = "NOT FOUND";
+	init_status_reason[NOT_IMPLEMENTED] = "NOT IMPLEMENTED";
+	return init_status_reason;
+}
+
+HttpResponse::StatusReason status_reason = InitStatusReason();
 
 // todo:　HttpResponseParsedDataを元にHttpResponseResultを作成する
 HttpResponseResult HttpResponse::CreateHttpResponseResult(const HttpRequestResult &request_info) {
@@ -12,6 +25,23 @@ HttpResponseResult HttpResponse::CreateHttpResponseResult(const HttpRequestResul
 	response.status_line.version         = HTTP_VERSION;
 	response.status_line.status_code     = "200";
 	response.status_line.status_reason   = "OK";
+	response.header_fields["Host"]       = "sawa";
+	response.header_fields["Connection"] = "close";
+	response.body_message = "You can't connect the dots looking forword. You can only connect the "
+							"dots looking backwards";
+	return response;
+}
+
+HttpResponseResult HttpResponse::CreateErrorHttpResponseResult(const HttpRequestResult &request_info
+) {
+	(void)request_info;
+	HttpResponseResult response;
+	response.status_line.version       = HTTP_VERSION;
+	response.status_line.status_code   = utils::ToString(request_info.status_code);
+	response.status_line.status_reason = status_reason[request_info.status_code];
+	// todo: StatusCodeをクラスにして、プライベートで保持する。
+	// response.status_line.status_reason   = request_info.status_code.GetStatusCode();
+	// response.status_line.status_reason   = request_info.status_code.GetStatusReason();
 	response.header_fields["Host"]       = "sawa";
 	response.header_fields["Connection"] = "close";
 	response.body_message = "You can't connect the dots looking forword. You can only connect the "
