@@ -3,6 +3,7 @@
 
 #include "sock_context.hpp"
 #include "virtual_server.hpp"
+#include "virtual_server_storage.hpp"
 #include <string>
 
 namespace server {
@@ -22,17 +23,20 @@ class ContextManager {
 	ContextManager(const ContextManager &other);
 	ContextManager &operator=(const ContextManager &other);
 	// functions
+	void AddVirtualServer(const VirtualServer &virtual_server);
 	void AddServerInfo(
 		int server_fd, const ServerInfo &server_info, const VirtualServer *virtual_server
 	);
 	void AddClientInfo(int client_fd, const ClientInfo &client_info, int server_fd);
 	void DeleteClientInfo(int client_fd);
 	// getter
-	const ServerInfo  &GetServerInfo(int client_fd) const;
-	const std::string &GetClientInfo(int client_fd) const;
+	const VirtualServerStorage::VirtualServerList &GetVirtualServerList() const;
+	DtoServerInfos                                 GetServerInfo(int client_fd) const;
+	const std::string                             &GetClientInfo(int client_fd) const;
 
   private:
-	SockContext sock_context_;
+	VirtualServerStorage virtual_servers_;
+	SockContext          sock_context_;
 };
 
 } // namespace server
