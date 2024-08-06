@@ -12,13 +12,6 @@
 
 namespace server {
 
-// todo: tmp
-struct TempConfig {
-	std::string            server_name;
-	std::list<std::string> locations;
-	std::list<std::string> ports;
-};
-
 class Server {
   public:
 	typedef std::list<config::context::ServerCon> ConfigServers;

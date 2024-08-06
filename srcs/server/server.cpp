@@ -52,7 +52,6 @@ VirtualServer ConvertToVirtualServer(const config::context::ServerCon &config_se
 void Server::AddVirtualServers(const ConfigServers &config_servers) {
 	typedef ConfigServers::const_iterator Itr;
 	for (Itr it = config_servers.begin(); it != config_servers.end(); ++it) {
-		// todo: validate server_name, port, etc?
 		VirtualServer virtual_server = ConvertToVirtualServer(*it);
 		virtual_servers_.AddVirtualServer(virtual_server);
 	}
@@ -61,6 +60,7 @@ void Server::AddVirtualServers(const ConfigServers &config_servers) {
 Server::Server(const ConfigServers &config_servers) {
 	AddVirtualServers(config_servers);
 }
+
 Server::~Server() {}
 
 void Server::Run() {
@@ -215,7 +215,7 @@ void Server::Init() {
 		// 各virtual serverの全portをsocket通信
 		typedef VirtualServer::PortList::const_iterator ItPort;
 		for (ItPort it_port = ports.begin(); it_port != ports.end(); ++it_port) {
-			// create ServerInfo
+			// create ServerInfo & listen
 			ServerInfo server_info(*it_port);
 			const int  server_fd = connection_.Connect(server_info);
 			server_info.SetSockFd(server_fd);
