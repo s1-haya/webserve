@@ -1,0 +1,7 @@
+<html>
+<head><title>400 BAD REQUEST</title></head>
+<body>
+<center><h1>400 BAD REQUEST</h1></center>
+<hr><center>webserv/1.1</center>
+</body>
+</html>

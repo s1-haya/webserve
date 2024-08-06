@@ -1,7 +1,18 @@
 #include "tmp_http.hpp"
 #include "utils.hpp"
 #include <cstdlib>
+#include <fstream>
 #include <iostream>
+#include <sstream>
+
+namespace {
+
+std::string LoadFileContent(const std::string& file_path){
+	std::ifstream      file(file_path);
+	std::ostringstream file_content;
+	file_content << file.rdbuf();
+	return file_content.str();
+}
 
 int GetTestCaseNum() {
 	static unsigned int test_case_num = 0;
@@ -20,6 +31,8 @@ int HandleResult(const T &result, const T &expected) {
 				  << std::endl;
 		return EXIT_FAILURE;
 	}
+}
+
 }
 
 int main(void) {
@@ -120,10 +133,11 @@ int main(void) {
 	test2_response.ParseHttpRequestFormat(
 		1, "GET / HTTP/1.\r\nHost test\r\nContent-Length:  3\r\n\r\na"
 	);
+	std::string test2_expected_body_message = LoadFileContent("expected_body_message/test2.txt");
 	const std::string test2_expected_response =
-		"HTTP/1.1 400 BAD REQUEST\r\nConnection: close\r\nHost: sawa\r\n\r\nYou can't connect the "
-		"dots "
-		"looking forword. You can only connect the dots looking backwards";
+			"HTTP/1.1 400 BAD REQUEST\r\nConnection: close\r\nContent-Length: 149\r\nContent-Type: "
+			"text/html\r\nServer: webserv/1.1\r\n\r\n" +
+			test2_expected_body_message;
 	ret_code |= HandleResult(test2_response.CreateHttpResponse(1), test2_expected_response);
 	return ret_code;
 }

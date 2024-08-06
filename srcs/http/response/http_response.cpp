@@ -32,6 +32,19 @@ HttpResponseResult HttpResponse::CreateHttpResponseResult(const HttpRequestResul
 	return response;
 }
 
+std::string HttpResponse::CreateErrorBodyMessage(
+	const std::string &status_code, const std::string &status_reason
+) {
+	std::ostringstream body_message;
+	body_message << "<html>\n<head><title>" << status_code << SP
+				 << status_reason << "</title></head>\n"
+				 << "<body>\n<center><h1>" << status_code << SP
+				 << status_reason << "</h1></center>\n"
+				 << "<hr><center>" << SERVER_VERSION << "</center>\n"
+				 << "</body>\n</html>\n";
+	return body_message.str();
+}
+
 HttpResponseResult HttpResponse::CreateErrorHttpResponseResult(const HttpRequestResult &request_info
 ) {
 	(void)request_info;
@@ -45,6 +58,9 @@ HttpResponseResult HttpResponse::CreateErrorHttpResponseResult(const HttpRequest
 	response.header_fields["Content-Type"] = "text/html";
 	response.header_fields["Server"]       = SERVER_VERSION;
 	response.header_fields["Connection"]     = "close";
+	response.body_message                  = CreateErrorBodyMessage(
+        response.status_line.status_code, response.status_line.status_reason
+    );
 	response.header_fields["Content-Length"] = utils::ToString(response.body_message.length());
 	return response;
 }

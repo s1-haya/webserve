@@ -29,6 +29,9 @@ class HttpResponse {
   private:
 	HttpResponse();
 	~HttpResponse();
+
+	static std::string CreateErrorBodyMessage(
+		const std::string &status_code, const std::string &status_reason);
 };
 
 } // namespace http
