@@ -98,7 +98,7 @@ void Server::HandleNewConnection(int server_fd) {
 	}
 
 	// add to context
-	context_.AddClientInfo(client_fd, new_client_info, server_fd);
+	context_.AddClientInfo(new_client_info, server_fd);
 	event_monitor_.Add(client_fd, event::EVENT_READ);
 	utils::Debug("server", "add new client", client_fd);
 }

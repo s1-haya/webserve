@@ -33,7 +33,8 @@ void ContextManager::AddServerInfo(
 	sock_context_.AddServerInfo(server_fd, server_info);
 }
 
-void ContextManager::AddClientInfo(int client_fd, const ClientInfo &client_info, int server_fd) {
+void ContextManager::AddClientInfo(const ClientInfo &client_info, int server_fd) {
+	const int client_fd = client_info.GetFd();
 	sock_context_.AddClientInfo(client_fd, client_info, server_fd);
 }
 
