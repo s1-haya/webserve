@@ -21,6 +21,14 @@ struct Result {
 	std::string error_log;
 };
 
+std::string BoolToStr(bool boolean) {
+	if (boolean) {
+		return "True";
+	} else {
+		return "False";
+	}
+}
+
 int GetTestCaseNum() {
 	static unsigned int test_case_num = 0;
 	++test_case_num;
@@ -40,6 +48,11 @@ int HandleResult(const T &result, const T &expected) {
 	}
 }
 
+template <typename T>
+bool IsSame(const T &result, const T &expected) {
+	return result == expected;
+}
+
 int HandleResult(const Result &result) {
 	if (result.is_success) {
 		std::cout << utils::color::GREEN << GetTestCaseNum() << ".[OK]" << utils::color::RESET
@@ -53,25 +66,46 @@ int HandleResult(const Result &result) {
 	}
 }
 
-Result IsHttpRequestParsedData(
+bool IsSameHttpRequestFormat(
+	const http::IsHttpRequestFormat &result, const http::IsHttpRequestFormat &expected
+) {
+	return IsSame(result.is_request_line, expected.is_request_line) &&
+		   IsSame(result.is_header_fields, expected.is_header_fields) &&
+		   IsSame(result.is_body_message, expected.is_body_message);
+}
+
+Result IsSameHttpRequestParsedData(
 	const http::HttpRequestParsedData &result, const http::HttpRequestParsedData &expected
 ) {
 	Result             request_parsed_result;
-	std::ostringstream error_log;
-	if (result.request_result.status_code != expected.request_result.status_code) {
-		error_log << "Error: StatusCode\n";
-		error_log << "- Expected: [" << expected.request_result.status_code << "]\n";
-		error_log << "- Result  : [" << result.request_result.status_code << "]\n";
+	std::ostringstream oss;
+	if (!IsSame(result.request_result.status_code, expected.request_result.status_code)) {
+		oss << "Error: Status Code\n";
+		oss << "- Expected: [" << expected.request_result.status_code << "]\n";
+		oss << "- Result  : [" << result.request_result.status_code << "]\n";
 		request_parsed_result.is_success = false;
 	}
-	request_parsed_result.error_log = error_log.str();
+	if (!IsSameHttpRequestFormat(result.is_request_format, expected.is_request_format)) {
+		oss << "Error: Is Http Request Format\n";
+		oss << "Request Line\n";
+		oss << "- Expected: [" << BoolToStr(expected.is_request_format.is_request_line) << "]\n";
+		oss << "- Result  : [" << BoolToStr(result.is_request_format.is_request_line) << "]\n";
+		oss << "Header Fields\n";
+		oss << "- Expected: [" << BoolToStr(expected.is_request_format.is_header_fields) << "]\n";
+		oss << "- Result  : [" << BoolToStr(result.is_request_format.is_header_fields) << "]\n";
+		oss << "Body Message\n";
+		oss << "- Expected: [" << BoolToStr(expected.is_request_format.is_body_message) << "]\n";
+		oss << "- Result  : [" << BoolToStr(result.is_request_format.is_body_message) << "]\n";
+		request_parsed_result.is_success = false;
+	}
+	request_parsed_result.error_log = oss.str();
 	return request_parsed_result;
 }
 
 int Run(int client_fd, const std::string &read_buf, const http::HttpRequestParsedData &expected) {
 	http::TmpHttp http;
 	http.ParseHttpRequestFormat(client_fd, read_buf);
-	const Result &result = IsHttpRequestParsedData(http.GetClientData(client_fd), expected);
+	const Result &result = IsSameHttpRequestParsedData(http.GetClientData(client_fd), expected);
 	return HandleResult(result);
 }
 
@@ -171,7 +205,8 @@ int main(void) {
 	ret_code |= HandleResult(test6_header_fileds.GetBodyMessage(1), test6_body_message);
 
 	http::HttpRequestParsedData test1_request_line;
-	test1_request_line.request_result.status_code = http::OK;
+	test1_request_line.request_result.status_code        = http::OK;
+	test1_request_line.is_request_format.is_request_line = true;
 
 	http::HttpRequestParsedData test2_request_line;
 	test2_request_line.request_result.status_code = http::BAD_REQUEST;
