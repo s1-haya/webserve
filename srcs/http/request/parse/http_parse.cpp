@@ -72,12 +72,12 @@ void HttpParse::ParseHeaderFields(HttpRequestParsedData &data) {
 	if (data.is_request_format.is_header_fields) {
 		return;
 	}
-	size_t pos = data.current_buf.find(CRLF + CRLF);
+	size_t pos = data.current_buf.find(HEADER_FIELDS_END);
 	if (pos == std::string::npos) {
 		return;
 	}
 	std::string header_fields = data.current_buf.substr(0, pos);
-	data.current_buf.erase(0, pos + CRLF.size() + CRLF.size());
+	data.current_buf.erase(0, pos + HEADER_FIELDS_END.size());
 	data.request_result.request.header_fields =
 		SetHeaderFields(utils::SplitStr(header_fields, CRLF));
 	data.is_request_format.is_header_fields = true;
@@ -96,6 +96,8 @@ void HttpParse::ParseBodyMessage(HttpRequestParsedData &data) {
 	if (data.is_request_format.is_body_message) {
 		return;
 	}
+	// todo: HttpRequestParsedDataクラスでcontent_lengthを保持？
+	// why: ParseBodyMessageが呼ばれるたびにcontent_lengthを変換するのを避けるため
 	size_t content_length;
 	if (!utils::ConvertStrToSize(
 			data.request_result.request.header_fields[CONTENT_LENGTH], content_length
@@ -130,7 +132,7 @@ HttpRequestResult HttpParse::Run(const std::string &read_buf) {
 	HttpRequestResult result;
 	// a: [request_line ＋ header_fields, messagebody]
 	// b: [request_line, header_fields]
-	std::vector<std::string> a = utils::SplitStr(read_buf, CRLF + CRLF);
+	std::vector<std::string> a = utils::SplitStr(read_buf, HEADER_FIELDS_END);
 	std::vector<std::string> b = utils::SplitStr(a[0], CRLF);
 	try {
 		result.request.request_line = SetRequestLine(utils::SplitStr(b[0], SP));
