@@ -41,6 +41,14 @@ std::string StrTrimLeadingOptionalWhitespace(const std::string &str) {
 	}
 }
 
+bool IsBodyMessageReadingRequired(const HeaderFields &header_fields) {
+	if (header_fields.find(CONTENT_LENGTH) == header_fields.end() &&
+		header_fields.find(TRANSFER_ENCODING) == header_fields.end()) {
+		return false;
+	}
+	return true;
+}
+
 } // namespace
 
 void HttpParse::ParseRequestLine(HttpRequestParsedData &data) {
@@ -57,14 +65,6 @@ void HttpParse::ParseRequestLine(HttpRequestParsedData &data) {
 	data.is_request_format.is_request_line   = true;
 }
 
-bool IsBodyMessage(const HeaderFields &header_fileds) {
-	if (header_fileds.find(CONTENT_LENGTH) == header_fileds.end() &&
-		header_fileds.find(TRANSFER_ENCODING) == header_fileds.end()) {
-		return false;
-	}
-	return true;
-}
-
 void HttpParse::ParseHeaderFields(HttpRequestParsedData &data) {
 	if (!data.is_request_format.is_request_line) {
 		return;
@@ -76,12 +76,12 @@ void HttpParse::ParseHeaderFields(HttpRequestParsedData &data) {
 	if (pos == std::string::npos) {
 		return;
 	}
-	std::string header_fileds = data.current_buf.substr(0, pos);
+	std::string header_fields = data.current_buf.substr(0, pos);
 	data.current_buf.erase(0, pos + CRLF.size() + CRLF.size());
 	data.request_result.request.header_fields =
-		SetHeaderFields(utils::SplitStr(header_fileds, CRLF));
+		SetHeaderFields(utils::SplitStr(header_fields, CRLF));
 	data.is_request_format.is_header_fields = true;
-	if (!IsBodyMessage(data.request_result.request.header_fields)) {
+	if (!IsBodyMessageReadingRequired(data.request_result.request.header_fields)) {
 		data.is_request_format.is_body_message = true;
 	}
 }
