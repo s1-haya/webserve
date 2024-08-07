@@ -15,6 +15,12 @@ struct TestCase {
 	const http::HttpRequestParsedData expected;
 };
 
+struct Result {
+	Result() : is_success(true) {}
+	bool        is_success;
+	std::string error_log;
+};
+
 int GetTestCaseNum() {
 	static unsigned int test_case_num = 0;
 	++test_case_num;
@@ -34,13 +40,39 @@ int HandleResult(const T &result, const T &expected) {
 	}
 }
 
+int HandleResult(const Result &result) {
+	if (result.is_success) {
+		std::cout << utils::color::GREEN << GetTestCaseNum() << ".[OK]" << utils::color::RESET
+				  << std::endl;
+		return EXIT_SUCCESS;
+	} else {
+		std::cerr << utils::color::RED << GetTestCaseNum() << ".[NG] " << utils::color::RESET
+				  << std::endl;
+		std::cerr << result.error_log;
+		return EXIT_FAILURE;
+	}
+}
+
+Result IsHttpRequestParsedData(
+	const http::HttpRequestParsedData &result, const http::HttpRequestParsedData &expected
+) {
+	Result             request_parsed_result;
+	std::ostringstream error_log;
+	if (result.request_result.status_code != expected.request_result.status_code) {
+		error_log << "Error: StatusCode\n";
+		error_log << "- Expected: [" << expected.request_result.status_code << "]\n";
+		error_log << "- Result  : [" << result.request_result.status_code << "]\n";
+		request_parsed_result.is_success = false;
+	}
+	request_parsed_result.error_log = error_log.str();
+	return request_parsed_result;
+}
+
 int Run(int client_fd, const std::string &read_buf, const http::HttpRequestParsedData &expected) {
 	http::TmpHttp http;
 	http.ParseHttpRequestFormat(client_fd, read_buf);
-	http::HttpRequestParsedData client_data = http.GetClientData(client_fd);
-	return HandleResult(
-		client_data.request_result.status_code, expected.request_result.status_code
-	);
+	const Result &result = IsHttpRequestParsedData(http.GetClientData(client_fd), expected);
+	return HandleResult(result);
 }
 
 int RunTestCases(const TestCase test_cases[], std::size_t num_test_cases) {
@@ -139,9 +171,14 @@ int main(void) {
 	ret_code |= HandleResult(test6_header_fileds.GetBodyMessage(1), test6_body_message);
 
 	http::HttpRequestParsedData test1_request_line;
-	test1_request_line.request_result.status_code         = http::OK;
+	test1_request_line.request_result.status_code = http::OK;
+
+	http::HttpRequestParsedData test2_request_line;
+	test2_request_line.request_result.status_code = http::BAD_REQUEST;
+
 	static const TestCase test_case_http_request_format[] = {
-		TestCase(1, "GET / HTTP/1.1\r\n", test1_request_line)
+		TestCase(1, "GET / HTTP/1.1\r\n", test1_request_line),
+		TestCase(1, "GET / HTTP/1.\r\n", test2_request_line)
 	};
 	ret_code |= RunTestCases(
 		test_case_http_request_format,
