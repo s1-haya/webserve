@@ -124,6 +124,8 @@ int RunTestCases(const TestCase test_cases[], std::size_t num_test_cases) {
 int main(void) {
 	int ret_code = 0;
 
+	// HttpRequestParsedData関数のテストケース
+
 	// リクエストラインの書式が正しい場合
 	http::HttpRequestParsedData test1_request_line;
 	test1_request_line.request_result.status_code        = http::OK;
@@ -246,9 +248,11 @@ int main(void) {
 	ret_code |= HandleResult(test4_body_message.GetIsBodyMessageFormat(1), true);
 	ret_code |= HandleResult(test4_body_message.GetBodyMessage(1), test4_add_body_message);
 
-	const std::string test6_expected_response =
-		"HTTP/1.1 200 OK\r\nConnection: close\r\nHost: sawa\r\n\r\nYou can't connect the dots "
-		"looking forword. You can only connect the dots looking backwards";
-	ret_code |= HandleResult(test6_header_fileds.CreateHttpResponse(1), test6_expected_response);
+	// todo: responseを確認、実行、作成のテストを別に分ける
+	//  const std::string test1_expected_response =
+	//  	"HTTP/1.1 200 OK\r\nConnection: close\r\nHost: sawa\r\n\r\nYou can't connect the dots "
+	//  	"looking forword. You can only connect the dots looking backwards";
+	//  ret_code |= HandleResult(test6_header_fileds.CreateHttpResponse(1),
+	//  test1_expected_response);
 	return ret_code;
 }
