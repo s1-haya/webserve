@@ -14,10 +14,14 @@ struct LocationCon {
 	std::string allowed_method;
 };
 
+// todo: PortListをstd::list<unsigned int>で作成？
+typedef std::list<int>         PortList;
+typedef std::list<LocationCon> LocationList;
+
 struct ServerCon {
-	std::list<int>         port;
-	std::string            server_name;
-	std::list<LocationCon> location_con;
+	PortList     port;
+	std::string  server_name;
+	LocationList location_con;
 };
 
 } // namespace context

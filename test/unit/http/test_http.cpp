@@ -242,8 +242,13 @@ int main(void) {
 	ret_code |= HandleResult(test4_body_message.GetIsHeaderFieldsFormat(1), true);
 	ret_code |= HandleResult(test4_body_message.GetIsBodyMessageFormat(1), false);
 	test4_body_message.ParseHttpRequestFormat(1, "bc");
-	const std::string &test6_body_message = "abc";
+	const std::string &test4_add_body_message = "abc";
 	ret_code |= HandleResult(test4_body_message.GetIsBodyMessageFormat(1), true);
-	ret_code |= HandleResult(test4_body_message.GetBodyMessage(1), test6_body_message);
+	ret_code |= HandleResult(test4_body_message.GetBodyMessage(1), test4_add_body_message);
+
+	const std::string test6_expected_response =
+		"HTTP/1.1 200 OK\r\nConnection: close\r\nHost: sawa\r\n\r\nYou can't connect the dots "
+		"looking forword. You can only connect the dots looking backwards";
+	ret_code |= HandleResult(test6_header_fileds.CreateHttpResponse(1), test6_expected_response);
 	return ret_code;
 }

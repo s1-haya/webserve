@@ -4,6 +4,7 @@
 #include "http.hpp"
 #include "server_info.hpp"
 #include "utils.hpp"
+#include "virtual_server.hpp"
 #include <errno.h>
 #include <sys/socket.h> // socket
 #include <unistd.h>     // close
@@ -11,41 +12,55 @@
 namespace server {
 namespace {
 
-Server::ServerInfoVec ConvertConfigToSockInfoVec(std::vector<Server::TempConfig> server_configs) {
-	Server::ServerInfoVec server_infos;
+VirtualServer::LocationList ConvertLocations(const config::context::LocationList &config_locations
+) {
+	VirtualServer::LocationList location_list;
 
-	typedef std::vector<Server::TempConfig>::const_iterator Itr;
-	for (Itr it = server_configs.begin(); it != server_configs.end(); ++it) {
-		const std::string &server_name = it->first;
-		unsigned int       port;
-		if (!utils::ConvertStrToUint(it->second, port)) {
-			// todo: original exception
-			throw std::logic_error("wrong port number");
-		}
-
-		// todo: validate server_name, port, etc?
-		ServerInfo server_info(server_name, port);
-		server_infos.push_back(server_info);
+	typedef config::context::LocationList::const_iterator Itr;
+	for (Itr it = config_locations.begin(); it != config_locations.end(); ++it) {
+		Location location;
+		location.location       = it->location;
+		location.root           = it->root;
+		location.index          = it->index;
+		location.allowed_method = it->allowed_method;
+		location_list.push_back(location);
 	}
-	return server_infos;
+	return location_list;
+}
+
+// todo: configからstd::list<unsigned int>で渡されるようになったら変更する
+VirtualServer::PortList ConvertPorts(const config::context::PortList &ports_str) {
+	VirtualServer::PortList port_list;
+
+	typedef config::context::PortList::const_iterator Itr;
+	for (Itr it = ports_str.begin(); it != ports_str.end(); ++it) {
+		const unsigned int port = static_cast<unsigned int>(*it);
+		port_list.push_back(port);
+	}
+	return port_list;
+}
+
+VirtualServer ConvertToVirtualServer(const config::context::ServerCon &config_server) {
+	const std::string          &server_name = config_server.server_name;
+	VirtualServer::LocationList locations   = ConvertLocations(config_server.location_con);
+	VirtualServer::PortList     ports       = ConvertPorts(config_server.port);
+	return VirtualServer(server_name, locations, ports);
 }
 
 } // namespace
 
-// todo: set ConfigData -> private variables
-Server::Server(const _config::Config::ConfigData &config) {
-	(void)config;
-
-	// todo: tmp
-	std::vector<TempConfig> server_configs;
-	server_configs.push_back(std::make_pair("localhost", "8080"));
-	server_configs.push_back(std::make_pair("localhost", "12345"));
-	// server_configs.push_back(std::make_pair("::1", "8080"));
-
-	ServerInfoVec server_infos = ConvertConfigToSockInfoVec(server_configs);
-	Init(server_infos);
+void Server::AddVirtualServers(const ConfigServers &config_servers) {
+	typedef ConfigServers::const_iterator Itr;
+	for (Itr it = config_servers.begin(); it != config_servers.end(); ++it) {
+		// todo: validate server_name, port, etc?
+		VirtualServer virtual_server = ConvertToVirtualServer(*it);
+		virtual_servers_.AddVirtualServer(virtual_server);
+	}
 }
 
+Server::Server(const ConfigServers &config_servers) {
+	AddVirtualServers(config_servers);
+}
 Server::~Server() {}
 
 void Server::Run() {
@@ -127,6 +142,20 @@ void Server::ReadRequest(const event::Event &event) {
 	}
 }
 
+namespace {
+
+// todo: tmp for debug
+void PrintLocations(const VirtualServer::LocationList &locations) {
+	typedef VirtualServer::LocationList::const_iterator Itr;
+	for (Itr it = locations.begin(); it != locations.end(); ++it) {
+		const server::Location &location = *it;
+		std::cerr << "- location: " << location.location << ", root: " << location.root
+				  << ", index: " << location.index << std::endl;
+	}
+}
+
+} // namespace
+
 std::string Server::CreateHttpResponse(int client_fd) const {
 	const std::string &request_buf = buffers_.GetBuffer(client_fd);
 
@@ -135,15 +164,24 @@ std::string Server::CreateHttpResponse(int client_fd) const {
 	// todo: tmp
 	const bool is_cgi = true;
 	if (is_cgi) {
-		const ClientInfo &client_info = context_.GetClientInfo(client_fd);
-		const ServerInfo &server_info = context_.GetConnectedServerInfo(client_fd);
-		utils::Debug(
-			"server",
-			"ClientInfo - IP: " + client_info.GetIp() +
-				" / ServerInfo - name: " + server_info.GetName() +
-				", port: " + utils::ConvertUintToStr(server_info.GetPort()) + ", fd",
-			server_info.GetFd()
-		);
+		// use client_info -> get client_ip
+		const ClientInfo  &client_info = context_.GetClientInfo(client_fd);
+		const std::string &client_ip   = client_info.GetIp();
+
+		// use server_info -> get server_fd, server_port
+		const ServerInfo  &server_info = context_.GetConnectedServerInfo(client_fd);
+		const int          server_fd   = server_info.GetFd();
+		const std::string &server_port = utils::ConvertUintToStr(server_info.GetPort());
+
+		// use virtual_server -> get server_name, locations
+		const VirtualServer &virtual_server          = virtual_servers_.GetVirtualServer(server_fd);
+		const std::string   &server_name             = virtual_server.GetServerName();
+		const VirtualServer::LocationList &locations = virtual_server.GetLocations();
+		utils::Debug("server", "ClientInfo - IP: " + client_ip + ", fd", client_fd);
+		utils::Debug("server", "recieved ServerInfo, fd", server_fd);
+		std::cerr << "server_name: " << server_name << ", port: " << server_port << std::endl;
+		std::cerr << "locations: " << std::endl;
+		PrintLocations(locations);
 		// todo: call cgi(client_info, server_info)?
 	}
 	return http.CreateResponse();
@@ -164,18 +202,30 @@ void Server::SendResponse(int client_fd) {
 	utils::Debug("------------------------------------------");
 }
 
-void Server::Init(const ServerInfoVec &server_infos) {
-	typedef ServerInfoVec::const_iterator Itr;
-	for (Itr it = server_infos.begin(); it != server_infos.end(); ++it) {
-		ServerInfo server_info = *it;
-		// connect & listen
-		const int server_fd = connection_.Connect(server_info);
-		server_info.SetSockFd(server_fd);
+void Server::Init() {
+	const VirtualServerStorage::VirtualServerList &all_virtual_server_list =
+		virtual_servers_.GetAllVirtualServerList();
 
-		// add to context
-		context_.AddServerInfo(server_fd, server_info);
-		event_monitor_.Add(server_fd, event::EVENT_READ);
-		utils::Debug("server", "init server & listen", server_fd);
+	typedef VirtualServerStorage::VirtualServerList::const_iterator ItVirtualServer;
+	for (ItVirtualServer it = all_virtual_server_list.begin(); it != all_virtual_server_list.end();
+		 ++it) {
+		const VirtualServer           &virtual_server = *it;
+		const VirtualServer::PortList &ports          = virtual_server.GetPorts();
+
+		// 各virtual serverの全portをsocket通信
+		typedef VirtualServer::PortList::const_iterator ItPort;
+		for (ItPort it_port = ports.begin(); it_port != ports.end(); ++it_port) {
+			// create ServerInfo
+			ServerInfo server_info(*it_port);
+			const int  server_fd = connection_.Connect(server_info);
+			server_info.SetSockFd(server_fd);
+
+			// add to context
+			context_.AddServerInfo(server_fd, server_info);
+			virtual_servers_.AddMapping(server_fd, &virtual_server);
+			event_monitor_.Add(server_fd, event::EVENT_READ);
+			utils::Debug("server", "listen", server_fd);
+		}
 	}
 }
 
