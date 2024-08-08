@@ -12,7 +12,6 @@ struct LocationCon {
 	std::string                          root;
 	std::string                          index;
 	bool                                 autoindex;
-	std::pair<unsigned int, std::string> error_page;
 	std::list<std::string>               allowed_methods;
 	std::pair<unsigned int, std::string> redirect; // cannnot use return
 };
@@ -22,10 +21,11 @@ typedef std::list<int>         PortList;
 typedef std::list<LocationCon> LocationList;
 
 struct ServerCon {
-	PortList               port;
-	std::list<std::string> server_names;
-	LocationList           location_con;
-	std::size_t            client_max_body_size;
+	PortList                             port;
+	std::list<std::string>               server_names;
+	LocationList                         location_con;
+	std::size_t                          client_max_body_size;
+	std::pair<unsigned int, std::string> error_page;
 };
 
 } // namespace context

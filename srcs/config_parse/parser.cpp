@@ -28,6 +28,12 @@ void Parser::HandleServerContextDirective(context::ServerCon &server, NodeItr &i
 				"invalid number of arguments in 'client_max_body_size' directive"
 			);
 		server.client_max_body_size = std::atoi((*it++).token.c_str()); // tmp: atoi
+	} else if ((*it).token == "error_page") {
+		++it;
+		if ((*it).token_type != node::WORD || (*++NodeItr(it)).token_type != node::WORD)
+			throw std::runtime_error("invalid number of arguments in 'error_page' directive");
+		server.error_page = std::make_pair(std::atoi((*it++).token.c_str()), (*it++).token);
+		// ex. 404 /404.html, tmp: atoi
 	}
 	if ((*it).token_type != node::DELIM)
 		throw std::runtime_error("expect ';' after arguments");
@@ -49,12 +55,6 @@ void Parser::HandleLocationContextDirective(context::LocationCon &location, Node
 		if ((*it).token_type != node::WORD || ((*it).token != "on" && (*it).token != "off"))
 			throw std::runtime_error("invalid arguments in 'autoindex' directive");
 		location.autoindex = ((*it++).token == "on");
-	} else if ((*it).token == "error_page") {
-		++it;
-		if ((*it).token_type != node::WORD || (*++NodeItr(it)).token_type != node::WORD)
-			throw std::runtime_error("invalid number of arguments in 'error_page' directive");
-		location.error_page = std::make_pair(std::atoi((*it++).token.c_str()), (*it++).token);
-		// ex. 404 /404.html, tmp: atoi
 	} else if ((*it).token == "allowed_methods") {
 		++it;
 		while ((*it).token_type != node::DELIM && (*it).token_type == node::WORD) {
@@ -126,7 +126,7 @@ context::LocationCon Parser::CreateLocationContext(NodeItr &it) {
 
 	if ((*it).token_type != node::WORD)
 		throw std::runtime_error("invalid number of arguments in 'location' directive");
-	location.location = (*it).token;
+	location.request_uri = (*it).token;
 	++it; // skip /www/
 	if ((*it).token_type != node::L_BRACKET)
 		throw std::runtime_error("expect { after location argument");
