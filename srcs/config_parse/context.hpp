@@ -8,7 +8,7 @@ namespace config {
 namespace context {
 
 struct LocationCon {
-	std::string                          location;
+	std::string                          request_uri;
 	std::string                          root;
 	std::string                          index;
 	bool                                 autoindex;
