@@ -235,18 +235,29 @@ int main(void) {
 	);
 
 	// ボディメッセージを追加で送信した場合
-	http::TmpHttp test4_body_message;
+	http::TmpHttp               test4_body_message;
+	http::HttpRequestParsedData test4_expected_body_message;
+	test4_expected_body_message.request_result.status_code          = http::OK;
+	test4_expected_body_message.is_request_format.is_request_line   = true;
+	test4_expected_body_message.is_request_format.is_header_fields  = true;
+	test4_expected_body_message.is_request_format.is_body_message   = false;
+	test4_expected_body_message.request_result.request.body_message = "abc";
+
 	test4_body_message.ParseHttpRequestFormat(
 		1, "GET / HTTP/1.1\r\nHost: test\r\nContent-Length:  3\r\n\r\na"
 	);
-	ret_code |= HandleResult(test4_body_message.GetStatusCode(1), http::OK);
-	ret_code |= HandleResult(test4_body_message.GetIsRequestLineFormat(1), true);
-	ret_code |= HandleResult(test4_body_message.GetIsHeaderFieldsFormat(1), true);
-	ret_code |= HandleResult(test4_body_message.GetIsBodyMessageFormat(1), false);
+	Result result = IsSameHttpRequestParsedData(
+		test4_body_message.GetClientData(1), test4_expected_body_message
+	);
+	ret_code |= HandleResult(result);
+
+	// 追加でボディメッセージを送信
 	test4_body_message.ParseHttpRequestFormat(1, "bc");
-	const std::string &test4_add_body_message = "abc";
-	ret_code |= HandleResult(test4_body_message.GetIsBodyMessageFormat(1), true);
-	ret_code |= HandleResult(test4_body_message.GetBodyMessage(1), test4_add_body_message);
+	test4_expected_body_message.is_request_format.is_body_message = true;
+	result                                                        = IsSameHttpRequestParsedData(
+        test4_body_message.GetClientData(1), test4_expected_body_message
+    );
+	ret_code |= HandleResult(result);
 
 	// todo: responseを確認、実行、作成のテストを別に分ける
 	//  const std::string test1_expected_response =
