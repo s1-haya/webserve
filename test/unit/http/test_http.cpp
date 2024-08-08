@@ -36,19 +36,6 @@ int GetTestCaseNum() {
 }
 
 template <typename T>
-int HandleResult(const T &result, const T &expected) {
-	if (result == expected) {
-		std::cout << utils::color::GREEN << GetTestCaseNum() << ".[OK]" << utils::color::RESET
-				  << std::endl;
-		return EXIT_SUCCESS;
-	} else {
-		std::cerr << utils::color::RED << GetTestCaseNum() << ".[NG] " << utils::color::RESET
-				  << std::endl;
-		return EXIT_FAILURE;
-	}
-}
-
-template <typename T>
 bool IsSame(const T &result, const T &expected) {
 	return result == expected;
 }
