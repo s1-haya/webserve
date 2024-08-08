@@ -97,8 +97,6 @@ Parser::~Parser() {}
 context::ServerCon Parser::CreateServerContext(NodeItr &it) {
 	context::ServerCon server;
 
-	server.client_max_body_size = 1024; // default
-
 	if ((*it).token_type != node::L_BRACKET) {
 		throw std::runtime_error("expect { after server");
 	}
@@ -132,8 +130,6 @@ context::ServerCon Parser::CreateServerContext(NodeItr &it) {
 
 context::LocationCon Parser::CreateLocationContext(NodeItr &it) {
 	context::LocationCon location;
-
-	location.autoindex = false; // default
 
 	if ((*it).token_type != node::WORD) {
 		throw std::runtime_error("invalid number of arguments in 'location' directive");

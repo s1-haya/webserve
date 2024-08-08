@@ -81,6 +81,43 @@ struct TestCase {
 	const ServerList  expected;
 };
 
+/* Factory Functions */
+// 引数付きのFactory Function: 引数ありコンストラクタはここでしか使わないため
+context::LocationCon BuildLocationCon(
+	const std::string                          &request_uri,
+	const std::string                          &root,
+	const std::string                          &index,
+	bool                                        autoindex,
+	const std::list<std::string>               &allowed_methods,
+	const std::pair<unsigned int, std::string> &redirect
+) {
+	context::LocationCon loc;
+	loc.request_uri     = request_uri;
+	loc.root            = root;
+	loc.index           = index;
+	loc.autoindex       = autoindex;
+	loc.allowed_methods = allowed_methods;
+	loc.redirect        = redirect;
+	return loc;
+}
+
+// 引数付きのFactory Function: 引数ありコンストラクタはここでしか使わないため
+context::ServerCon BuildServerCon(
+	const std::list<int>                       &port,
+	const std::list<std::string>               &server_names,
+	const LocationList                         &location_con,
+	std::size_t                                 client_max_body_size,
+	const std::pair<unsigned int, std::string> &error_page
+) {
+	context::ServerCon server;
+	server.port                 = port;
+	server.server_names         = server_names;
+	server.location_con         = location_con;
+	server.client_max_body_size = client_max_body_size;
+	server.error_page           = error_page;
+	return server;
+}
+
 /* For server_names, allowed_methods */
 std::ostream &operator<<(std::ostream &os, const std::list<std::string> &str_list) {
 	std::list<std::string>::const_iterator it = str_list.begin();
@@ -207,9 +244,9 @@ ServerList MakeExpectedTest1() {
 	std::list<std::string>               server_names_1;
 	LocationList                         expected_locationlist_1;
 	std::pair<unsigned int, std::string> error_page_1;
-	context::ServerCon                   expected_server_1 = {
+	context::ServerCon                   expected_server_1 = BuildServerCon(
         expected_ports_1, server_names_1, expected_locationlist_1, 1024, error_page_1
-    };
+    );
 	expected_result.push_back(expected_server_1);
 
 	return expected_result;
@@ -223,14 +260,13 @@ ServerList MakeExpectedTest2() {
 	LocationList                         expected_locationlist_1;
 	std::list<std::string>               allowed_methods_1;
 	std::pair<unsigned int, std::string> redirect_1;
-	context::LocationCon                 expected_location_1_1 = {
-        "/", "", "", false, allowed_methods_1, redirect_1
-    };
+	context::LocationCon                 expected_location_1_1 =
+		BuildLocationCon("/", "", "", false, allowed_methods_1, redirect_1);
 	expected_locationlist_1.push_back(expected_location_1_1);
 	std::pair<unsigned int, std::string> error_page_1;
-	context::ServerCon                   expected_server_1 = {
+	context::ServerCon                   expected_server_1 = BuildServerCon(
         expected_ports_1, server_names_1, expected_locationlist_1, 1024, error_page_1
-    };
+    );
 	expected_result.push_back(expected_server_1);
 
 	return expected_result;
@@ -246,14 +282,13 @@ ServerList MakeExpectedTest3() {
 	LocationList                         expected_locationlist_1;
 	std::list<std::string>               allowed_methods_1;
 	std::pair<unsigned int, std::string> redirect_1;
-	context::LocationCon                 expected_location_1_1 = {
-        "/", "/data/", "index.html", false, allowed_methods_1, redirect_1
-    };
+	context::LocationCon                 expected_location_1_1 =
+		BuildLocationCon("/", "/data/", "index.html", false, allowed_methods_1, redirect_1);
 	expected_locationlist_1.push_back(expected_location_1_1);
 	std::pair<unsigned int, std::string> error_page_1;
-	context::ServerCon                   expected_server_1 = {
+	context::ServerCon                   expected_server_1 = BuildServerCon(
         expected_ports_1, server_names_1, expected_locationlist_1, 1024, error_page_1
-    };
+    );
 	expected_result.push_back(expected_server_1);
 
 	return expected_result;
@@ -271,9 +306,9 @@ ServerList MakeExpectedTest4() {
 	expected_ports_1.push_back(80);
 	LocationList                         expected_locationlist_1;
 	std::pair<unsigned int, std::string> error_page_1;
-	context::ServerCon                   expected_server_1 = {
+	context::ServerCon                   expected_server_1 = BuildServerCon(
         expected_ports_1, server_names_1, expected_locationlist_1, 1024, error_page_1
-    };
+    );
 	expected_result.push_back(expected_server_1);
 
 	return expected_result;
@@ -288,20 +323,18 @@ ServerList MakeExpectedTest5() {
 	LocationList                         expected_locationlist_1;
 	std::list<std::string>               allowed_methods_1_1;
 	std::pair<unsigned int, std::string> redirect_1_1;
-	context::LocationCon                 expected_location_1_1 = {
-        "/", "", "index.html", false, allowed_methods_1_1, redirect_1_1
-    };
+	context::LocationCon                 expected_location_1_1 =
+		BuildLocationCon("/", "", "index.html", false, allowed_methods_1_1, redirect_1_1);
 	std::list<std::string>               allowed_methods_1_2;
 	std::pair<unsigned int, std::string> redirect_1_2;
-	context::LocationCon                 expected_location_1_2 = {
-        "/www/", "", "index", false, allowed_methods_1_2, redirect_1_2
-    };
+	context::LocationCon                 expected_location_1_2 =
+		BuildLocationCon("/www/", "", "index", false, allowed_methods_1_2, redirect_1_2);
 	expected_locationlist_1.push_back(expected_location_1_1);
 	expected_locationlist_1.push_back(expected_location_1_2);
 	std::pair<unsigned int, std::string> error_page_1;
-	context::ServerCon                   expected_server_1 = {
+	context::ServerCon                   expected_server_1 = BuildServerCon(
         expected_ports_1, server_names_1, expected_locationlist_1, 1024, error_page_1
-    };
+    );
 	expected_result.push_back(expected_server_1);
 
 	return expected_result;
@@ -316,14 +349,13 @@ ServerList MakeExpectedTest6() {
 	LocationList                         expected_locationlist_1;
 	std::list<std::string>               allowed_methods_1;
 	std::pair<unsigned int, std::string> redirect_1;
-	context::LocationCon                 expected_location_1_1 = {
-        "/", "", "index.html", false, allowed_methods_1, redirect_1
-    };
+	context::LocationCon                 expected_location_1_1 =
+		BuildLocationCon("/", "", "index.html", false, allowed_methods_1, redirect_1);
 	expected_locationlist_1.push_back(expected_location_1_1);
 	std::pair<unsigned int, std::string> error_page_1;
-	context::ServerCon                   expected_server_1 = {
+	context::ServerCon                   expected_server_1 = BuildServerCon(
         expected_ports_1, server_names_1, expected_locationlist_1, 1024, error_page_1
-    };
+    );
 	expected_result.push_back(expected_server_1);
 
 	return expected_result;
@@ -339,9 +371,9 @@ ServerList MakeExpectedTest7() {
 	server_names_1.push_back("localhost");
 	LocationList                         expected_locationlist_1;
 	std::pair<unsigned int, std::string> error_page_1;
-	context::ServerCon                   expected_server_1 = {
+	context::ServerCon                   expected_server_1 = BuildServerCon(
         expected_ports_1, server_names_1, expected_locationlist_1, 1024, error_page_1
-    };
+    );
 	expected_result.push_back(expected_server_1);
 
 	std::list<int> expected_ports_2;
@@ -350,9 +382,9 @@ ServerList MakeExpectedTest7() {
 	server_names_2.push_back("test.www");
 	LocationList                         expected_locationlist_2;
 	std::pair<unsigned int, std::string> error_page_2;
-	context::ServerCon                   expected_server_2 = {
+	context::ServerCon                   expected_server_2 = BuildServerCon(
         expected_ports_2, server_names_2, expected_locationlist_2, 1024, error_page_2
-    };
+    );
 	expected_result.push_back(expected_server_2);
 
 	return expected_result;
@@ -370,14 +402,13 @@ ServerList MakeExpectedTest8() {
 	allowed_methods_1.push_back("GET");
 	allowed_methods_1.push_back("POST");
 	std::pair<unsigned int, std::string> redirect_1(302, "/redirect.html");
-	context::LocationCon                 expected_location_1_1 = {
-        "/", "/data/", "index.html", true, allowed_methods_1, redirect_1
-    };
+	context::LocationCon                 expected_location_1_1 =
+		BuildLocationCon("/", "/data/", "index.html", true, allowed_methods_1, redirect_1);
 	expected_locationlist_1.push_back(expected_location_1_1);
 	std::pair<unsigned int, std::string> error_page_1(404, "/404.html");
-	context::ServerCon                   expected_server_1 = {
+	context::ServerCon                   expected_server_1 = BuildServerCon(
         expected_ports_1, server_names_1, expected_locationlist_1, 2024, error_page_1
-    };
+    );
 	expected_result.push_back(expected_server_1);
 
 	return expected_result;
