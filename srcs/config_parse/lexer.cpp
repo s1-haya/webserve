@@ -30,7 +30,7 @@ void Lexer::InitDefinition() {
 	directive_.push_back("server_name");
 	directive_.push_back("listen");
 	directive_.push_back("rewrite");
-	directive_.push_back("root");
+	directive_.push_back("alias");
 	directive_.push_back("index");
 	directive_.push_back("autoindex");
 	directive_.push_back("error_page");

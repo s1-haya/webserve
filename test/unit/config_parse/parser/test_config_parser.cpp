@@ -47,13 +47,13 @@ namespace config {
 namespace context {
 
 bool operator==(const LocationCon &lhs, const LocationCon &rhs) {
-	return lhs.request_uri == rhs.request_uri && lhs.root == rhs.root && lhs.index == rhs.index &&
+	return lhs.request_uri == rhs.request_uri && lhs.alias == rhs.alias && lhs.index == rhs.index &&
 		   lhs.autoindex == rhs.autoindex && lhs.allowed_methods == rhs.allowed_methods &&
 		   lhs.redirect == rhs.redirect;
 }
 
 bool operator!=(const LocationCon &lhs, const LocationCon &rhs) {
-	return lhs.request_uri != rhs.request_uri || lhs.root != rhs.root || lhs.index != rhs.index ||
+	return lhs.request_uri != rhs.request_uri || lhs.alias != rhs.alias || lhs.index != rhs.index ||
 		   lhs.autoindex != rhs.autoindex || lhs.allowed_methods != rhs.allowed_methods ||
 		   lhs.redirect != rhs.redirect;
 }
@@ -93,7 +93,7 @@ struct TestCase {
 // 引数付きのFactory Function: 引数ありコンストラクタはここでしか使わないため
 context::LocationCon BuildLocationCon(
 	const std::string                          &request_uri,
-	const std::string                          &root,
+	const std::string                          &alias,
 	const std::string                          &index,
 	bool                                        autoindex,
 	const std::list<std::string>               &allowed_methods,
@@ -101,7 +101,7 @@ context::LocationCon BuildLocationCon(
 ) {
 	context::LocationCon loc;
 	loc.request_uri     = request_uri;
-	loc.root            = root;
+	loc.alias           = alias;
 	loc.index           = index;
 	loc.autoindex       = autoindex;
 	loc.allowed_methods = allowed_methods;
@@ -154,7 +154,7 @@ std::ostream &operator<<(std::ostream &os, const std::list<int> &int_list) {
 
 std::ostream &operator<<(std::ostream &os, const context::LocationCon &location) {
 	os << "{location: " << location.request_uri << ", "
-	   << "root: " << location.root << ", "
+	   << "alias: " << location.alias << ", "
 	   << "index: " << location.index << ", "
 	   << "autoindex: " << (location.autoindex ? "true" : "false") << ", "
 	   << "allowed_method: " << location.allowed_methods << ", "
@@ -443,7 +443,7 @@ int main() {
 					listen 8080;\n \
 					server_name localhost;\n \
 					location / {\n \
-						root /data/;\n \
+						alias /data/;\n \
 						index index.html;\n \
 					}\n \
 				}\n",
@@ -572,7 +572,7 @@ int main() {
 					listen 8080;\n \
 					server_name localhost;\n \
 					location / {\n \
-						root\n \
+						alias\n \
 					}\n \
 				}\n",
 			expected_result_error_test

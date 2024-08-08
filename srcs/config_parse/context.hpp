@@ -9,7 +9,7 @@ namespace context {
 
 struct LocationCon {
 	std::string                          request_uri;
-	std::string                          root;
+	std::string                          alias;
 	std::string                          index;
 	bool                                 autoindex;
 	std::list<std::string>               allowed_methods;

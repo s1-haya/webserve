@@ -43,12 +43,12 @@ void Parser::HandleServerContextDirective(context::ServerCon &server, NodeItr &i
 }
 
 void Parser::HandleLocationContextDirective(context::LocationCon &location, NodeItr &it) {
-	if ((*it).token == "root") {
+	if ((*it).token == "alias") {
 		++it;
 		if ((*it).token_type != node::WORD) {
-			throw std::runtime_error("invalid number of arguments in 'root' directive");
+			throw std::runtime_error("invalid number of arguments in 'alias' directive");
 		}
-		location.root = (*it++).token;
+		location.alias = (*it++).token;
 	} else if ((*it).token == "index") {
 		++it;
 		if ((*it).token_type != node::WORD) {
