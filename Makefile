@@ -40,7 +40,7 @@ re: fclean all
 
 #--------------------------------------------
 
-PATH_CONFIG	:=	default.conf
+PATH_CONFIG	:=	config/default.conf
 
 .PHONY	: run
 run: all
