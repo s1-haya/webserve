@@ -1,5 +1,5 @@
-#ifndef CLIENT_INFO_HPP_
-#define CLIENT_INFO_HPP_
+#ifndef SERVER_CONTEXTMANAGER_SOCKCONTEXT_CLIENTINFO_HPP_
+#define SERVER_CONTEXTMANAGER_SOCKCONTEXT_CLIENTINFO_HPP_
 
 #include <string>
 #include <sys/socket.h> // struct sockaddr_storage,socklen_t
@@ -28,4 +28,4 @@ class ClientInfo {
 
 } // namespace server
 
-#endif /* CLIENT_INFO_HPP_ */
+#endif /* SERVER_CONTEXTMANAGER_SOCKCONTEXT_CLIENTINFO_HPP_ */

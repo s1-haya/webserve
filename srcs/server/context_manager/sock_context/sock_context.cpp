@@ -18,6 +18,19 @@ SockContext::~SockContext() {
 	}
 }
 
+SockContext::SockContext(const SockContext &other) {
+	*this = other;
+}
+
+SockContext &SockContext::operator=(const SockContext &other) {
+	if (this != &other) {
+		server_context_ = other.server_context_;
+		client_context_ = other.client_context_;
+		host_servers_   = other.host_servers_;
+	}
+	return *this;
+}
+
 void SockContext::AddServerInfo(int server_fd, const ServerInfo &server_info) {
 	typedef std::pair<ServerInfoMap::const_iterator, bool> InsertResult;
 	InsertResult result = server_context_.insert(std::make_pair(server_fd, server_info));
