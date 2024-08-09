@@ -34,8 +34,11 @@ void Parser::HandleServerContextDirective(context::ServerCon &server, NodeItr &i
 		if ((*it).token_type != node::WORD || (*++NodeItr(it)).token_type != node::WORD) {
 			throw std::runtime_error("invalid number of arguments in 'error_page' directive");
 		}
-		server.error_page = std::make_pair(std::atoi((*it++).token.c_str()), (*it++).token);
 		// ex. 404 /404.html, tmp: atoi
+		NodeItr tmp_it = it; // 404
+		it++;                // /404.html
+		server.error_page = std::make_pair(std::atoi((*tmp_it).token.c_str()), (*it).token);
+		it++;
 	}
 	if ((*it).token_type != node::DELIM) {
 		throw std::runtime_error("expect ';' after arguments");
@@ -74,8 +77,11 @@ void Parser::HandleLocationContextDirective(context::LocationCon &location, Node
 		if ((*it).token_type != node::WORD || (*++NodeItr(it)).token_type != node::WORD) {
 			throw std::runtime_error("invalid number of arguments in 'return' directive");
 		}
-		location.redirect = std::make_pair(std::atoi((*it++).token.c_str()), (*it++).token);
 		// ex. 302 /index.html, tmp: atoi
+		NodeItr tmp_it = it; // 302
+		it++;                // /index.html
+		location.redirect = std::make_pair(std::atoi((*tmp_it).token.c_str()), (*it).token);
+		it++;
 	}
 	if ((*it).token_type != node::DELIM) {
 		throw std::runtime_error("expect ';' after arguments");
