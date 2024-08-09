@@ -19,8 +19,8 @@ VirtualServer::LocationList ConvertLocations(const config::context::LocationList
 	typedef config::context::LocationList::const_iterator Itr;
 	for (Itr it = config_locations.begin(); it != config_locations.end(); ++it) {
 		Location location;
-		location.location       = it->location;
-		location.root           = it->root;
+		location.location       = it->request_uri;
+		location.root           = it->alias;
 		location.index          = it->index;
 		location.allowed_method = *(it->allowed_methods.begin()); // tmp
 		location_list.push_back(location);
