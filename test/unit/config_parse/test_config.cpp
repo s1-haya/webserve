@@ -241,7 +241,7 @@ int RunErrorTest(const std::string &file_path, const ServerList &expected, const
 	int ret_code = EXIT_SUCCESS;
 
 	try {
-		Result result = Run(file_path, expected);
+		Run(file_path, expected);
 		PrintNg();
 		PrintError("ConfigParser failed (No Throw):");
 		std::cerr << "src:[\n" << src << "]" << std::endl;
