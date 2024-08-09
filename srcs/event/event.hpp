@@ -1,5 +1,5 @@
-#ifndef EVENT_HPP_
-#define EVENT_HPP_
+#ifndef EVENT_EVENT_HPP_
+#define EVENT_EVENT_HPP_
 
 #include <stdint.h> // uint32_t
 
@@ -20,4 +20,4 @@ struct Event {
 
 } // namespace event
 
-#endif /* EVENT_HPP_ */
+#endif /* EVENT_EVENT_HPP_ */

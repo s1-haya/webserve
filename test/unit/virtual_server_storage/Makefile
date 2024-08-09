@@ -11,7 +11,7 @@ LOG_FILE_PATH	:=	$(LOG_DIR)/$(LOG_FILE_NAME)
 WS_SRCS_DIR		:=	../../../srcs
 WS_UTILS_DIR	:=	$(WS_SRCS_DIR)/utils
 SRCS			+=	$(WS_UTILS_DIR)/color.cpp
-WS_VIRTUAL_SERVER_DIR	:=	$(WS_SRCS_DIR)/virtual_server
+WS_VIRTUAL_SERVER_DIR	:=	$(WS_SRCS_DIR)/server/context_manager/virtual_server
 SRCS					+=	$(WS_VIRTUAL_SERVER_DIR)/virtual_server_storage.cpp \
 							$(WS_VIRTUAL_SERVER_DIR)/virtual_server.cpp
 
