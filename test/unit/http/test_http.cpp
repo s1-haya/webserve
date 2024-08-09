@@ -1,8 +1,8 @@
 #include "tmp_http.hpp"
 #include "utils.hpp"
 #include <cstdlib>
-#include <iostream>
 #include <fstream>
+#include <iostream>
 #include <sstream>
 
 namespace {
@@ -137,7 +137,7 @@ int RunTestCases(const TestCase test_cases[], std::size_t num_test_cases) {
 int main(void) {
 	int ret_code = 0;
 
-	// HttpRequestParsedData関数のテストケース
+	// todo: http/http_response/test_http_request.cpp HttpRequestParsedData関数のテストケース
 
 	// リクエストラインの書式が正しい場合
 	http::HttpRequestParsedData test1_request_line;
@@ -272,13 +272,8 @@ int main(void) {
     );
 	ret_code |= HandleResult(result);
 
-	// todo: responseを確認、実行、作成のテストを別に分ける
-	//  const std::string test1_expected_response =
-	//  	"HTTP/1.1 200 OK\r\nConnection: close\r\nHost: sawa\r\n\r\nYou can't connect the dots "
-	//  	"looking forword. You can only connect the dots looking backwards";
-	//  ret_code |= HandleResult(test6_header_fileds.CreateHttpResponse(1),
-	//  test1_expected_response);
-		// リクエストのステータスコードが200の場合
+	// todo: http/http_response/test_http_response.cpp responseを確認、実行、作成のテスト
+	// リクエストのステータスコードが200の場合
 	http::TmpHttp test1_response;
 	test1_response.ParseHttpRequestFormat(
 		1, "GET / HTTP/1.1\r\nHost: test\r\nContent-Length:  3\r\n\r\na"

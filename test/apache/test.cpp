@@ -9,7 +9,7 @@
 
 int main() {
 	const char *server_ip = "127.0.0.1"; // ApacheサーバのIPアドレス
-	int         port      = 4242;          // Apacheサーバのポート番号
+	int         port      = 4242;        // Apacheサーバのポート番号
 
 	// ソケットの作成
 	int sockfd = socket(AF_INET, SOCK_STREAM, 0);
