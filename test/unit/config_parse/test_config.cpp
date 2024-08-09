@@ -17,12 +17,20 @@ struct Result {
 	std::string error_log;
 };
 
-void PrintOk(int test_num) {
-	std::cout << utils::color::GREEN << test_num << ".[OK] " << utils::color::RESET << std::endl;
+int GetTestCaseNum() {
+	static unsigned int test_case_num = 0;
+	++test_case_num;
+	return test_case_num;
 }
 
-void PrintNg(int test_num) {
-	std::cerr << utils::color::RED << test_num << ".[NG] " << utils::color::RESET << std::endl;
+void PrintOk() {
+	std::cout << utils::color::GREEN << GetTestCaseNum() << ".[OK] " << utils::color::RESET
+			  << std::endl;
+}
+
+void PrintNg() {
+	std::cerr << utils::color::RED << GetTestCaseNum() << ".[NG] " << utils::color::RESET
+			  << std::endl;
 }
 
 void PrintError(const std::string &message) {
@@ -148,7 +156,7 @@ std::ostream &operator<<(std::ostream &os, const context::LocationCon &location)
 	os << "{location: " << location.request_uri << ", "
 	   << "alias: " << location.alias << ", "
 	   << "index: " << location.index << ", "
-	   << "autoindex: " << (location.autoindex ? "true" : "false") << ", "
+	   << "autoindex: " << std::boolalpha << location.autoindex << ", "
 	   << "allowed_method: " << location.allowed_methods << ", "
 	   << "return(status): " << location.redirect.first << ", "
 	   << "return(index): " << location.redirect.second << "}";
@@ -204,14 +212,24 @@ Result Run(const std::string &file_path, const ServerList &expected) {
 	return run_result;
 }
 
-int Test(const Result &result, const std::string &src, int test_num) {
+std::string ReadFile(const std::string &file_path) {
+	std::ifstream file(file_path.c_str());
+	if (!file) {
+		throw std::runtime_error("Cannot open file"); // どこかでキャッチすべき？
+	}
+	std::stringstream buffer;
+	buffer << file.rdbuf();
+	return buffer.str();
+}
+
+int Test(const Result &result, const std::string &file_path) {
 	if (result.is_success) {
-		PrintOk(test_num);
+		PrintOk();
 		return EXIT_SUCCESS;
 	} else {
-		PrintNg(test_num);
+		PrintNg();
 		PrintError("ConfigParser failed:");
-		std::cerr << "src:[\n" << src << "]" << std::endl;
+		std::cerr << "src:[\n" << ReadFile(file_path) << "]" << std::endl;
 		std::cerr << "--------------------------------" << std::endl;
 		std::cerr << result.error_log;
 		return EXIT_FAILURE;
@@ -219,19 +237,17 @@ int Test(const Result &result, const std::string &src, int test_num) {
 }
 
 /* For Error Tests */
-int RunErrorTest(
-	const std::string &file_path, const ServerList &expected, const std::string &src, int test_num
-) {
+int RunErrorTest(const std::string &file_path, const ServerList &expected, const std::string &src) {
 	int ret_code = EXIT_SUCCESS;
 
 	try {
 		Result result = Run(file_path, expected);
-		PrintNg(test_num);
+		PrintNg();
 		PrintError("ConfigParser failed (No Throw):");
 		std::cerr << "src:[\n" << src << "]" << std::endl;
 		ret_code |= EXIT_FAILURE;
 	} catch (const std::exception &e) {
-		PrintOk(test_num);
+		PrintOk();
 		utils::Debug(e.what());
 	}
 	return ret_code;
@@ -416,52 +432,70 @@ ServerList MakeExpectedTest8() {
 
 } // namespace
 
-int main(int argc, char *argv[]) {
-	(void)argc;
+int main() {
 	int ret_code = EXIT_SUCCESS;
 
-	std::ifstream conf_file(argv[2]);
-	if (!conf_file) {
-		return EXIT_FAILURE;
-	}
-	std::stringstream buffer;
-	buffer << conf_file.rdbuf();
+	std::cout << "Normal Tests" << std::endl;
+	ret_code |= Test(Run("test_file/test1.conf", MakeExpectedTest1()), "test_file/test1.conf");
+	ret_code |= Test(Run("test_file/test2.conf", MakeExpectedTest2()), "test_file/test2.conf");
+	ret_code |= Test(Run("test_file/test3.conf", MakeExpectedTest3()), "test_file/test3.conf");
+	ret_code |= Test(Run("test_file/test4.conf", MakeExpectedTest4()), "test_file/test4.conf");
+	ret_code |= Test(Run("test_file/test5.conf", MakeExpectedTest5()), "test_file/test5.conf");
+	ret_code |= Test(Run("test_file/test6.conf", MakeExpectedTest6()), "test_file/test6.conf");
+	ret_code |= Test(Run("test_file/test7.conf", MakeExpectedTest7()), "test_file/test7.conf");
+	ret_code |= Test(Run("test_file/test8.conf", MakeExpectedTest8()), "test_file/test8.conf");
 
+	std::cout << std::endl;
+	std::cout << "Error Tests" << std::endl;
 	ServerList expected;
-	int        test_num = std::atoi(argv[3]);
-	if (std::string(argv[1]) == "success") {
-		switch (test_num) {
-		case 1:
-			expected = MakeExpectedTest1();
-			break;
-		case 2:
-			expected = MakeExpectedTest2();
-			break;
-		case 3:
-			expected = MakeExpectedTest3();
-			break;
-		case 4:
-			expected = MakeExpectedTest4();
-			break;
-		case 5:
-			expected = MakeExpectedTest5();
-			break;
-		case 6:
-			expected = MakeExpectedTest6();
-			break;
-		case 7:
-			expected = MakeExpectedTest7();
-			break;
-		case 8:
-			expected = MakeExpectedTest8();
-			break;
-		default:
-			break;
-		}
-		ret_code |= Test(Run(argv[2], expected), buffer.str(), test_num);
-	} else if (std::string(argv[1]) == "error") {
-		ret_code |= RunErrorTest(argv[2], expected, buffer.str(), test_num);
-	}
+	ret_code |= RunErrorTest(
+		"test_file_error/error_test1.conf", expected, "test_file_error/error_test1.conf"
+	);
+	ret_code |= RunErrorTest(
+		"test_file_error/error_test2.conf", expected, "test_file_error/error_test2.conf"
+	);
+	ret_code |= RunErrorTest(
+		"test_file_error/error_test3.conf", expected, "test_file_error/error_test3.conf"
+	);
+	ret_code |= RunErrorTest(
+		"test_file_error/error_test4.conf", expected, "test_file_error/error_test4.conf"
+	);
+	ret_code |= RunErrorTest(
+		"test_file_error/error_test5.conf", expected, "test_file_error/error_test5.conf"
+	);
+	ret_code |= RunErrorTest(
+		"test_file_error/error_test6.conf", expected, "test_file_error/error_test6.conf"
+	);
+	ret_code |= RunErrorTest(
+		"test_file_error/error_test7.conf", expected, "test_file_error/error_test7.conf"
+	);
+	ret_code |= RunErrorTest(
+		"test_file_error/error_test8.conf", expected, "test_file_error/error_test8.conf"
+	);
+	ret_code |= RunErrorTest(
+		"test_file_error/error_test9.conf", expected, "test_file_error/error_test9.conf"
+	);
+	ret_code |= RunErrorTest(
+		"test_file_error/error_test10.conf", expected, "test_file_error/error_test10.conf"
+	);
+	ret_code |= RunErrorTest(
+		"test_file_error/error_test11.conf", expected, "test_file_error/error_test11.conf"
+	);
+	ret_code |= RunErrorTest(
+		"test_file_error/error_test12.conf", expected, "test_file_error/error_test12.conf"
+	);
+	ret_code |= RunErrorTest(
+		"test_file_error/error_test13.conf", expected, "test_file_error/error_test13.conf"
+	);
+	ret_code |= RunErrorTest(
+		"test_file_error/error_test14.conf", expected, "test_file_error/error_test14.conf"
+	);
+	ret_code |= RunErrorTest(
+		"test_file_error/error_test15.conf", expected, "test_file_error/error_test15.conf"
+	);
+	ret_code |= RunErrorTest(
+		"test_file_error/error_test16.conf", expected, "test_file_error/error_test16.conf"
+	);
 
 	return ret_code;
 }
