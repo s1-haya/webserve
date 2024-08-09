@@ -39,6 +39,19 @@ struct ServerCon {
 	ServerCon() : client_max_body_size(1024) {}
 };
 
+struct DtoServerInfos {
+	int          server_fd;
+	std::string  server_name;
+	std::string  server_port;
+	LocationList locations;
+	/*以下serverでは未実装*/
+	std::size_t                          client_max_body_size;
+	std::pair<unsigned int, std::string> error_page;
+};
+
+/*-------------------------------------------------------------------------*/
+/*-------------------------------------------------------------------------*/
+
 class CheckConfig {
   private:
 	/* data */
@@ -60,28 +73,51 @@ struct CheckConfigResult {
 	bool        is_ok;             // Result型で受け渡し？
 };
 
-// まずはLocationをチェックする部分を作成
-CheckConfigResult
-CheckLocationList(std::string server_name, LocationList &locations, HttpRequest &request) {
+CheckConfigResult Check(const DtoServerInfos &server_info, HttpRequest &request) {
 	CheckConfigResult result;
 
 	result.is_ok = true;
+	CheckDTOServerInfo(result, server_info, request);
+	CheckLocationList(result, server_info.locations, request);
+	return result;
+}
+
+// Check Server
+void CheckDTOServerInfo(
+	CheckConfigResult &result, const DtoServerInfos &server_info, HttpRequest &request
+) {
+	if (request.header_fields["host"] != server_info.server_name) { // Check host_name
+		result.is_ok = false;                                       // invalid host
+	} else if (std::atoi(request.header_fields["Content-Length"].c_str()) >
+			   server_info.client_max_body_size) {    // Check content_length
+		result.is_ok = false;                         // content too long
+	} else if (server_info.error_page.second != "") { // Check error_page
+		result.error_status_code = server_info.error_page.first;
+		result.error_page_path   = server_info.error_page.second;
+	}
+	return;
+}
+
+// Check LocationList
+void CheckLocationList(
+	CheckConfigResult &result, const LocationList &locations, HttpRequest &request
+) {
+	if (result.is_ok == false) {
+		return;
+	}
 	try {
-		if (request.header_fields["host"] !=
-			server_name) { // TODO: CheckServer(一個上の呼び出し元)に移す
-			throw std::runtime_error("invalid server_name");
-		}
 		LocationCon match_location = CheckLocation(result, locations, request);
 		CheckAutoIndex(result, match_location, request);
 		CheckAllowedMethods(result, match_location, request);
 	} catch (const std::exception &e) {
 		result.is_ok = false;
 	}
-	return result;
+	return;
 }
 
-LocationCon
-CheckLocation(CheckConfigResult &result, LocationList &locations, HttpRequest &request) {
+LocationCon CheckLocation(
+	CheckConfigResult &result, const LocationList &locations, const HttpRequest &request
+) {
 	size_t      pos = 0;
 	LocationCon match_loc;
 
@@ -91,7 +127,7 @@ CheckLocation(CheckConfigResult &result, LocationList &locations, HttpRequest &r
 	// location2 / -> first not of: 1
 	// Longest Match
 	result.path = request.request_line.request_target;
-	for (LocationList::iterator it = locations.begin(); it != locations.end(); ++it) {
+	for (LocationList::const_iterator it = locations.begin(); it != locations.end(); ++it) {
 		if ((*it).request_uri.find_first_not_of(request.request_line.request_target) > pos) {
 			match_loc = *it;
 		}
@@ -103,7 +139,9 @@ CheckLocation(CheckConfigResult &result, LocationList &locations, HttpRequest &r
 	}
 }
 
-void CheckAutoIndex(CheckConfigResult &result, LocationCon &location, HttpRequest &request) {
+void CheckAutoIndex(
+	CheckConfigResult &result, const LocationCon &location, const HttpRequest &request
+) {
 	if (location.autoindex == true) {
 		result.autoindex = true;
 	}
@@ -121,7 +159,9 @@ void CheckAllowedMethods(CheckConfigResult &result, LocationCon &location, HttpR
 	}
 }
 
-void CheckAlias(CheckConfigResult &result, LocationCon &location, HttpRequest &request) {
+void CheckAlias(
+	CheckConfigResult &result, const LocationCon &location, const HttpRequest &request
+) {
 	if (location.alias == "") {
 		return;
 	}
@@ -133,7 +173,9 @@ void CheckAlias(CheckConfigResult &result, LocationCon &location, HttpRequest &r
 	}
 }
 
-void CheckRedirect(CheckConfigResult &result, LocationCon &location, HttpRequest &request) {
+void CheckRedirect(
+	CheckConfigResult &result, const LocationCon &location, const HttpRequest &request
+) {
 	if (location.redirect.second != "") { // tmp
 		return;
 	}
@@ -142,10 +184,6 @@ void CheckRedirect(CheckConfigResult &result, LocationCon &location, HttpRequest
 	// status code: 301
 	result.status_code = location.redirect.first;
 	result.path        = location.redirect.second;
-}
-
-void CheckErrorPage(CheckConfigResult &result, LocationCon &location, HttpRequest &request) {
-	// TODO: check serverCon?
 }
 
 int main() {}
