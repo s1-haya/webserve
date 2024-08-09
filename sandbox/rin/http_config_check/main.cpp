@@ -17,9 +17,6 @@ struct HttpRequest {
 	std::string  body_message;
 };
 
-typedef std::list<int>         PortList;
-typedef std::list<LocationCon> LocationList;
-
 struct LocationCon {
 	std::string                          request_uri;
 	std::string                          alias;
@@ -29,6 +26,9 @@ struct LocationCon {
 	std::pair<unsigned int, std::string> redirect; // cannnot use return
 	LocationCon() : autoindex(false) {}
 };
+
+typedef std::list<int>         PortList;
+typedef std::list<LocationCon> LocationList;
 
 struct ServerCon {
 	PortList                             port;
@@ -40,10 +40,10 @@ struct ServerCon {
 };
 
 struct DtoServerInfos {
-	int          server_fd;
-	std::string  server_name;
-	std::string  server_port;
-	LocationList locations;
+	int                    server_fd;
+	std::list<std::string> server_names;
+	std::string            server_port;
+	LocationList           locations;
 	/*以下serverでは未実装*/
 	std::size_t                          client_max_body_size;
 	std::pair<unsigned int, std::string> error_page;
@@ -70,50 +70,8 @@ struct CheckConfigResult {
 	int         status_code; // redirectで指定
 	std::string error_page_path;
 	int         error_status_code; // error_pageで指定 まとめる？
-	bool        is_ok;             // Result型で受け渡し？
+	bool        is_ok;             // Result型で受け渡したい
 };
-
-CheckConfigResult Check(const DtoServerInfos &server_info, HttpRequest &request) {
-	CheckConfigResult result;
-
-	result.is_ok = true;
-	CheckDTOServerInfo(result, server_info, request);
-	CheckLocationList(result, server_info.locations, request);
-	return result;
-}
-
-// Check Server
-void CheckDTOServerInfo(
-	CheckConfigResult &result, const DtoServerInfos &server_info, HttpRequest &request
-) {
-	if (request.header_fields["host"] != server_info.server_name) { // Check host_name
-		result.is_ok = false;                                       // invalid host
-	} else if (std::atoi(request.header_fields["Content-Length"].c_str()) >
-			   server_info.client_max_body_size) {    // Check content_length
-		result.is_ok = false;                         // content too long
-	} else if (server_info.error_page.second != "") { // Check error_page
-		result.error_status_code = server_info.error_page.first;
-		result.error_page_path   = server_info.error_page.second;
-	}
-	return;
-}
-
-// Check LocationList
-void CheckLocationList(
-	CheckConfigResult &result, const LocationList &locations, HttpRequest &request
-) {
-	if (result.is_ok == false) {
-		return;
-	}
-	try {
-		LocationCon match_location = CheckLocation(result, locations, request);
-		CheckAutoIndex(result, match_location, request);
-		CheckAllowedMethods(result, match_location, request);
-	} catch (const std::exception &e) {
-		result.is_ok = false;
-	}
-	return;
-}
 
 LocationCon CheckLocation(
 	CheckConfigResult &result, const LocationList &locations, const HttpRequest &request
@@ -130,6 +88,7 @@ LocationCon CheckLocation(
 	for (LocationList::const_iterator it = locations.begin(); it != locations.end(); ++it) {
 		if ((*it).request_uri.find_first_not_of(request.request_line.request_target) > pos) {
 			match_loc = *it;
+			pos       = (*it).request_uri.find_first_not_of(request.request_line.request_target);
 		}
 	}
 	if (pos == 0) {
@@ -156,6 +115,7 @@ void CheckAllowedMethods(CheckConfigResult &result, LocationCon &location, HttpR
 	// ex. allowed_method: [GET, POST], request.method GET
 	if (is_allowed_method == location.allowed_methods.end()) {
 		result.is_ok = false;
+		std::cout << "method" << std::endl;
 	}
 }
 
@@ -186,4 +146,122 @@ void CheckRedirect(
 	result.path        = location.redirect.second;
 }
 
-int main() {}
+// Check LocationList
+void CheckLocationList(
+	CheckConfigResult &result, const LocationList &locations, HttpRequest &request
+) {
+	if (result.is_ok == false) {
+		return;
+	}
+	try {
+		LocationCon match_location = CheckLocation(result, locations, request);
+		CheckAutoIndex(result, match_location, request);
+		CheckAllowedMethods(result, match_location, request);
+	} catch (const std::exception &e) {
+		std::cerr << e.what() << std::endl;
+		result.is_ok = false;
+	}
+	return;
+}
+
+// Check Server
+void CheckDTOServerInfo(
+	CheckConfigResult &result, const DtoServerInfos &server_info, HttpRequest &request
+) {
+	if (std::find(
+			server_info.server_names.begin(),
+			server_info.server_names.end(),
+			request.header_fields["Host"]
+		) == server_info.server_names.end()) { // Check host_name
+		result.is_ok = false;                  // invalid host name
+		std::cout << "host" << std::endl;
+	} else if (std::atoi(request.header_fields["Content-Length"].c_str()) >
+			   server_info.client_max_body_size) { // Check content_length
+		result.is_ok = false;                      // content too long
+		std::cout << "content length" << std::endl;
+	} else if (server_info.error_page.second != "") { // Check error_page
+		result.error_status_code = server_info.error_page.first;
+		result.error_page_path   = server_info.error_page.second;
+	}
+	// TODO: set status code? この呼び出し元で行う？
+	return;
+}
+
+CheckConfigResult Check(const DtoServerInfos &server_info, HttpRequest &request) {
+	CheckConfigResult result;
+
+	result.is_ok = true;
+	CheckDTOServerInfo(result, server_info, request);
+	CheckLocationList(result, server_info.locations, request);
+	return result;
+}
+
+// TODO: Check File existence, File authority (for post, delete)
+// TODO: indexをパスにつける
+
+/*-------------------------------------------------------------------------*/
+/*-------------------------------------------------------------------------*/
+// For Test
+
+namespace {
+
+LocationCon BuildLocationCon(
+	const std::string                          &request_uri,
+	const std::string                          &alias,
+	const std::string                          &index,
+	bool                                        autoindex,
+	const std::list<std::string>               &allowed_methods,
+	const std::pair<unsigned int, std::string> &redirect
+) {
+	LocationCon loc;
+	loc.request_uri     = request_uri;
+	loc.alias           = alias;
+	loc.index           = index;
+	loc.autoindex       = autoindex;
+	loc.allowed_methods = allowed_methods;
+	loc.redirect        = redirect;
+	return loc;
+}
+
+} // namespace
+
+int main() {
+	// request
+	const RequestLine expected_request_line_1 = {"GET", "/", "HTTP/1.1"};
+	HttpRequest       request;
+	request.request_line                = expected_request_line_1;
+	request.header_fields["Host"]       = "localhost";
+	request.header_fields["Connection"] = "keep-alive";
+
+	// LocationList
+	LocationList           locationlist;
+	std::list<std::string> allowed_methods;
+	allowed_methods.push_back("GET");
+	allowed_methods.push_back("POST");
+	std::pair<unsigned int, std::string> redirect(302, "/redirect.html");
+	LocationCon                          location1 =
+		BuildLocationCon("/", "/data/", "index.html", true, allowed_methods, redirect);
+	locationlist.push_back(location1);
+
+	// DTO server_info
+	DtoServerInfos         server_info;
+	std::list<std::string> server_names;
+	server_names.push_back("localhost");
+	server_info.server_names         = server_names;
+	server_info.locations            = locationlist;
+	server_info.client_max_body_size = 1024;
+	std::pair<unsigned int, std::string> error_page(404, "/404.html");
+	server_info.error_page = error_page;
+
+	CheckConfigResult result = Check(server_info, request);
+	std::cout << "is_ok: " << std::boolalpha << result.is_ok << std::endl;
+	std::cout << "path: " << result.path << std::endl;
+	std::cout << "status_code: " << result.status_code << std::endl;
+	std::cout << "autoindex: " << std::boolalpha << result.autoindex << std::endl;
+	std::cout << "error_page_code: " << result.error_status_code << std::endl;
+	std::cout << "error_page_path: " << result.error_page_path << std::endl;
+	if (result.is_ok == false) {
+		return EXIT_FAILURE;
+	}
+	return EXIT_SUCCESS;
+}
