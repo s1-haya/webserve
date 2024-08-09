@@ -25,6 +25,7 @@ const std::string CONTENT_TYPE          = "Content-Type";
 const std::string CONTENT_LENGTH        = "Content-Length";
 const std::string TRANSFER_ENCODING     = "Transfer-Encoding";
 const std::string AUTHORIZATION         = "Authorization";
+const std::string SERVER                = "Server";
 const std::string BASIC_HEADER_FIELDS[] = {
 	HOST,
 	USER_AGENT,
@@ -34,7 +35,8 @@ const std::string BASIC_HEADER_FIELDS[] = {
 	CONTENT_TYPE,
 	CONTENT_LENGTH,
 	TRANSFER_ENCODING,
-	AUTHORIZATION
+	AUTHORIZATION,
+	SERVER
 };
 const std::size_t BASIC_HEADER_FIELDS_SIZE =
 	sizeof(BASIC_HEADER_FIELDS) / sizeof(BASIC_HEADER_FIELDS[0]);
