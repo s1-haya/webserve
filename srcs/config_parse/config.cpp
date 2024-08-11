@@ -14,14 +14,13 @@ Config::Config(const std::string &file_path) : config_file_(file_path.c_str()) {
 	}
 	std::stringstream buffer;
 	buffer << config_file_.rdbuf();
-	try {
-		std::list<node::Node> tokens;
-		lexer::Lexer          lex(buffer.str(), tokens);
-		parser::Parser        par(tokens);
-		servers_ = par.GetServers();
-	} catch (const std::exception &e) {
-		std::cerr << e.what() << '\n';
+	std::list<node::Node> tokens;
+	lexer::Lexer          lex(buffer.str(), tokens);
+	parser::Parser        par(tokens);
+	if (tokens.size() == 0) {
+		throw std::runtime_error("No file content");
 	}
+	servers_ = par.GetServers();
 	// try catchをどこでするか
 }
 
@@ -32,8 +31,9 @@ const Config *Config::GetInstance() {
 }
 
 void Config::Create(const std::string &file_path) {
-	if (!s_cInstance)
+	if (!s_cInstance) {
 		s_cInstance = new Config(file_path);
+	}
 }
 
 void Config::Destroy() {

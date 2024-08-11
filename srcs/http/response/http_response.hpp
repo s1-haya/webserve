@@ -10,7 +10,7 @@ namespace http {
 struct StatusLine {
 	std::string version;
 	std::string status_code;
-	std::string status_reason;
+	std::string reason_phrase;
 };
 
 struct HttpResponseResult {
@@ -21,7 +21,7 @@ struct HttpResponseResult {
 
 class HttpResponse {
   public:
-	typedef std::map<StatusCode, std::string> StatusReason;
+	typedef std::map<StatusCode, std::string> ReasonPhrase;
 	static std::string        CreateHttpResponse(const HttpResponseResult &response);
 	static HttpResponseResult CreateHttpResponseResult(const HttpRequestResult &request_info);
 	static HttpResponseResult CreateErrorHttpResponseResult(const HttpRequestResult &request_info);
@@ -31,7 +31,7 @@ class HttpResponse {
 	~HttpResponse();
 
 	static std::string
-	CreateErrorBodyMessage(const std::string &status_code, const std::string &status_reason);
+	CreateErrorBodyMessage(const std::string &status_code, const std::string &reason_phrase);
 };
 
 } // namespace http
