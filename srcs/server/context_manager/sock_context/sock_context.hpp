@@ -1,5 +1,5 @@
-#ifndef SOCK_CONTEXT_HPP_
-#define SOCK_CONTEXT_HPP_
+#ifndef SERVER_CONTEXTMANAGER_SOCKCONTEXT_SOCKCONTEXT_HPP_
+#define SERVER_CONTEXTMANAGER_SOCKCONTEXT_SOCKCONTEXT_HPP_
 
 #include <map>
 
@@ -16,6 +16,8 @@ class SockContext {
 	typedef std::map<int, const ServerInfo *> HostServerInfoMap;
 	SockContext();
 	~SockContext();
+	SockContext(const SockContext &other);
+	SockContext &operator=(const SockContext &other);
 	// functions
 	// todo: overload?
 	void AddServerInfo(int server_fd, const ServerInfo &server_info);
@@ -26,9 +28,6 @@ class SockContext {
 	const ServerInfo &GetConnectedServerInfo(int client_fd) const;
 
   private:
-	// prohibit copy
-	SockContext(const SockContext &other);
-	SockContext &operator=(const SockContext &other);
 	// function
 	const ServerInfo *GetServerInfo(int server_fd) const;
 	// const
@@ -41,4 +40,4 @@ class SockContext {
 
 } // namespace server
 
-#endif /* SOCK_CONTEXT_HPP_ */
+#endif /* SERVER_CONTEXTMANAGER_SOCKCONTEXT_SOCKCONTEXT_HPP_ */

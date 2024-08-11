@@ -1,9 +1,9 @@
 #include "color.hpp"
+#include "config.hpp"
 #include "context.hpp"
-#include "lexer.hpp"
-#include "parser.hpp"
 #include "utils.hpp"
 #include <cstdlib>
+#include <fstream>
 #include <iostream>
 #include <sstream>
 
@@ -17,20 +17,12 @@ struct Result {
 	std::string error_log;
 };
 
-int GetTestCaseNum() {
-	static unsigned int test_case_num = 0;
-	++test_case_num;
-	return test_case_num;
+void PrintOk(int test_num) {
+	std::cout << utils::color::GREEN << test_num << ".[OK] " << utils::color::RESET << std::endl;
 }
 
-void PrintOk() {
-	std::cout << utils::color::GREEN << GetTestCaseNum() << ".[OK] " << utils::color::RESET
-			  << std::endl;
-}
-
-void PrintNg() {
-	std::cerr << utils::color::RED << GetTestCaseNum() << ".[NG] " << utils::color::RESET
-			  << std::endl;
+void PrintNg(int test_num) {
+	std::cerr << utils::color::RED << test_num << ".[NG] " << utils::color::RESET << std::endl;
 }
 
 void PrintError(const std::string &message) {
@@ -136,28 +128,27 @@ std::ostream &operator<<(std::ostream &os, const ServerList &servers) {
 	return os;
 }
 
-Result Run(const std::string &src, const ServerList &expected) {
+Result Run(const std::string &file_path, const ServerList &expected) {
 	Result run_result;
 
-	NodeList       nodes;
-	lexer::Lexer   lex(src, nodes);
-	parser::Parser par(nodes);
-	if (par.GetServers() != expected) {
+	ConfigInstance->Create(file_path);
+	if (ConfigInstance->servers_ != expected) {
 		std::ostringstream error_log;
 		error_log << "- Expected: [ " << expected << " ]\n";
-		error_log << "- Result  : [ " << par.GetServers() << " ]\n";
+		error_log << "- Result  : [ " << ConfigInstance->servers_ << " ]\n";
 		run_result.is_success = false;
 		run_result.error_log  = error_log.str();
 	}
+	ConfigInstance->Destroy();
 	return run_result;
 }
 
-int Test(const Result &result, const std::string &src) {
+int Test(const Result &result, const std::string &src, int test_num) {
 	if (result.is_success) {
-		PrintOk();
+		PrintOk(test_num);
 		return EXIT_SUCCESS;
 	} else {
-		PrintNg();
+		PrintNg(test_num);
 		PrintError("ConfigParser failed:");
 		std::cerr << "src:[\n" << src << "]" << std::endl;
 		std::cerr << "--------------------------------" << std::endl;
@@ -166,37 +157,24 @@ int Test(const Result &result, const std::string &src) {
 	}
 }
 
-int RunTests(const TestCase test_cases[], std::size_t num_test_cases) {
-	int ret_code = EXIT_SUCCESS;
-
-	for (std::size_t i = 0; i < num_test_cases; i++) {
-		const TestCase test_case = test_cases[i];
-		ret_code |= Test(Run(test_case.input, test_case.expected), test_case.input);
-	}
-	return ret_code;
-}
-
 /* For Error Tests */
-int RunErrorTests(const TestCase test_cases[], std::size_t num_test_cases) {
+int RunErrorTest(
+	const std::string &file_path, const ServerList &expected, const std::string &src, int test_num
+) {
 	int ret_code = EXIT_SUCCESS;
 
-	for (std::size_t i = 0; i < num_test_cases; i++) {
-		const TestCase test_case = test_cases[i];
-		try {
-			Result result = Run(test_case.input, test_case.expected);
-			PrintNg();
-			PrintError("ConfigParser failed (No Throw):");
-			std::cerr << "src:[\n" << test_case.input << "]" << std::endl;
-			ret_code |= EXIT_FAILURE;
-		} catch (const std::exception &e) {
-			PrintOk();
-			utils::Debug(e.what());
-		}
+	try {
+		Result result = Run(file_path, expected);
+		PrintNg(test_num);
+		PrintError("ConfigParser failed (No Throw):");
+		std::cerr << "src:[\n" << src << "]" << std::endl;
+		ret_code |= EXIT_FAILURE;
+	} catch (const std::exception &e) {
+		PrintOk(test_num);
+		utils::Debug(e.what());
 	}
 	return ret_code;
 }
-
-// TODO: Lexerとテストケースを揃える
 
 /* Test1 One Server */
 ServerList MakeExpectedTest1() {
@@ -303,198 +281,49 @@ ServerList MakeExpectedTest7() {
 
 } // namespace
 
-int main() {
+int main(int argc, char *argv[]) {
+	(void)argc;
 	int ret_code = EXIT_SUCCESS;
 
-	ServerList expected_result_test_1 = MakeExpectedTest1();
-	ServerList expected_result_test_2 = MakeExpectedTest2();
-	ServerList expected_result_test_3 = MakeExpectedTest3();
-	ServerList expected_result_test_4 = MakeExpectedTest4();
-	ServerList expected_result_test_5 = MakeExpectedTest5();
-	ServerList expected_result_test_6 = MakeExpectedTest6();
-	ServerList expected_result_test_7 = MakeExpectedTest7();
+	std::ifstream conf_file(argv[2]);
+	if (!conf_file) {
+		return EXIT_FAILURE;
+	}
+	std::stringstream buffer;
+	buffer << conf_file.rdbuf();
 
-	static TestCase test_cases[] = {
-		TestCase(
-			"server {\n \
-				}\n",
-			expected_result_test_1
-		),
-		TestCase(
-			"server {\n \
-					location / {\n \
-					}\n \
-				}\n",
-			expected_result_test_2
-		),
-		TestCase(
-			"server {\n \
-					listen 8080;\n \
-					server_name localhost;\n \
-					location / {\n \
-						root /data/;\n \
-						index index.html;\n \
-					}\n \
-				}\n",
-			expected_result_test_3
-		),
-		TestCase(
-			"server {\n \
-					listen 8080;\n \
-					listen 8000;\n \
-					listen 80;\n \
-					server_name server_name;\n \
-				}\n",
-			expected_result_test_4
-		),
-		TestCase(
-			"server {\n \
-					server_name test.serv;\n \
-					location / {\n \
-						index index.html;\n \
-					}\n \
-					location /www/ {\n \
-						index index;\n \
-					}\n \
-				}\n",
-			expected_result_test_5
-		),
-		TestCase(
-			"server {\n \
-					\n \
-				    \n \
-			#ashjkahsk\n\
-					server_name comment.serv;\n \
-					location / {\n \
-						index index.html;\n \
-				    #ashjkahsk\n \
-					}\n \
-				}\n",
-			expected_result_test_6
-		),
-		TestCase(
-			"server {\n \
-					listen 8080;\n \
-					server_name localhost;\n \
-				}\n \
-			 server {\n \
-					listen 12345;\n \
-					server_name test.www;\n \
-				}\n",
-			expected_result_test_7
-		)
-	};
-
-	ret_code |= RunTests(test_cases, ARRAY_SIZE(test_cases));
-
-	ServerList expected_result_error_test;
-
-	static TestCase error_test_cases[] = {
-		/* Test8 */ TestCase(
-			"server {\n \
-				\n",
-			expected_result_error_test
-		),
-		/* Test9 */
-		TestCase(
-			"server {\n \
-					server {\n \
-					}\n \
-				}\n",
-			expected_result_error_test
-		),
-		/* Test10 */
-		TestCase(
-			"server {\n \
-					listen\n \
-				}\n",
-			expected_result_error_test
-		),
-		/* Test11 */
-		TestCase(
-			"server {\n \
-					server_name server_name\n \
-				}\n",
-			expected_result_error_test
-		),
-		/* Test12 */
-		// TestCase(
-		// 	"server {\n
-		// 			listen 8080\n
-		// 			server_name localhost;\n
-		// 		}\n",
-		// 	expected_result_error_test
-		// ),
-		/* Test13 */
-		// TestCase(
-		// 	"server {\n
-		// 			listen 8080 8000;\n
-		// 			server_name localhost;\n
-		// 		}\n",
-		// 	expected_result_error_test
-		// ),
-		/* Test14 */
-		// TestCase(
-		// 	"serv {\n
-		// 		}\n",
-		// 	expected_result_error_test
-		// ),
-		/* Test15 */
-		TestCase(
-			"server {\n \
-					location / /www/ {\n \
-					}\n \
-				}\n",
-			expected_result_error_test
-		),
-		/* Test16 */
-		TestCase(
-			"server {\n \
-					location /www/ {\n \
-					\n \
-				}\n",
-			expected_result_error_test
-		),
-		/* Test17 */
-		TestCase(
-			"server {\n \
-					listen 8080;\n \
-					server_name localhost;\n \
-					location / {\n \
-						root\n \
-					}\n \
-				}\n",
-			expected_result_error_test
-		),
-		/* Test18 */
-		// TestCase(
-		// 	"{\n
-		// 		}\n",
-		// 	expected_result_error_test
-		// ),
-		/* Test19 */
-		TestCase(
-			"server	{{{\n \
-				}\n",
-			expected_result_error_test
-		),
-		/* Test20 */
-		TestCase(
-			"server 	{\n \
-				server_name server; ;;;;\n \
-				}\n",
-			expected_result_error_test
-		),
-		/* Test21 */
-		TestCase(
-			"server {\n \
-				unknown test;\n \
-				}\n",
-			expected_result_error_test
-		)
-	};
-
-	ret_code |= RunErrorTests(error_test_cases, ARRAY_SIZE(error_test_cases));
+	ServerList expected;
+	int        test_num = std::atoi(argv[3]);
+	if (std::string(argv[1]) == "success") {
+		switch (test_num) {
+		case 1:
+			expected = MakeExpectedTest1();
+			break;
+		case 2:
+			expected = MakeExpectedTest2();
+			break;
+		case 3:
+			expected = MakeExpectedTest3();
+			break;
+		case 4:
+			expected = MakeExpectedTest4();
+			break;
+		case 5:
+			expected = MakeExpectedTest5();
+			break;
+		case 6:
+			expected = MakeExpectedTest6();
+			break;
+		case 7:
+			expected = MakeExpectedTest7();
+			break;
+		default:
+			break;
+		}
+		ret_code |= Test(Run(argv[2], expected), buffer.str(), test_num);
+	} else if (std::string(argv[1]) == "error") {
+		ret_code |= RunErrorTest(argv[2], expected, buffer.str(), test_num);
+	}
 
 	return ret_code;
 }

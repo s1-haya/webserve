@@ -1,5 +1,5 @@
-#ifndef CONNECTION_HPP_
-#define CONNECTION_HPP_
+#ifndef SERVER_CONNECTION_HPP_
+#define SERVER_CONNECTION_HPP_
 
 #include <netdb.h> // struct addrinfo,gai_strerror
 #include <set>
@@ -36,4 +36,4 @@ class Connection {
 
 } // namespace server
 
-#endif /* CONNECTION_HPP_ */
+#endif /* SERVER_CONNECTION_HPP_ */
