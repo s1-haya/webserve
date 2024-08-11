@@ -52,13 +52,21 @@ struct DtoServerInfos {
 /*-------------------------------------------------------------------------*/
 /*-------------------------------------------------------------------------*/
 
+enum CheckStatus {
+	OK,
+	INVALID_HOST,
+	PAYLOAD_TOO_LARGE,
+	LOCATION_NOT_FOUND
+}; // rfc + 見やすいように独自で名前をつけた
+// 呼び出し元でこれをチェックしてstatus codeを付ける用
+
 struct CheckPathResult {
 	std::string path; // root, index, redirectを見る
 	bool        autoindex;
 	int         status_code; // redirectで指定
 	std::string error_page_path;
 	int         error_status_code; // error_pageで指定 まとめる？
-	bool        is_ok;             // Result型で受け渡したい
+	CheckStatus is_ok;
 };
 
 LocationCon
@@ -77,6 +85,9 @@ CheckLocation(CheckPathResult &result, const LocationList &locations, const Http
 			(*it).request_uri.length() > match_loc.request_uri.length()) { // Longest Match
 			match_loc = *it;
 		}
+	}
+	if (match_loc.request_uri.length() == 0) {
+		result.is_ok = LOCATION_NOT_FOUND;
 	}
 	return match_loc;
 }
@@ -97,7 +108,7 @@ void CheckAllowedMethods(CheckPathResult &result, LocationCon &location, HttpReq
 	);
 	// ex. allowed_method: [GET, POST], request.method GET
 	if (is_allowed_method == location.allowed_methods.end()) {
-		result.is_ok = false;
+		// result.is_ok = false;
 		std::cout << "method" << std::endl;
 	}
 }
@@ -131,18 +142,13 @@ void CheckRedirect(
 void CheckLocationList(
 	CheckPathResult &result, const LocationList &locations, HttpRequest &request
 ) {
-	if (result.is_ok == false) {
+	if (result.is_ok != OK) {
 		return;
 	}
-	try {
-		LocationCon match_location = CheckLocation(result, locations, request);
-		std::cout << match_location.request_uri << std::endl; // for debug
-		CheckAutoIndex(result, match_location, request);
-		CheckAllowedMethods(result, match_location, request);
-	} catch (const std::exception &e) {
-		std::cerr << e.what() << std::endl;
-		result.is_ok = false;
-	}
+	LocationCon match_location = CheckLocation(result, locations, request);
+	std::cout << match_location.request_uri << std::endl; // for debug
+	CheckAutoIndex(result, match_location, request);
+	CheckAllowedMethods(result, match_location, request); // なしに
 	return;
 }
 
@@ -155,24 +161,21 @@ void CheckDTOServerInfo(
 			server_info.server_names.end(),
 			request.header_fields["Host"]
 		) == server_info.server_names.end()) { // Check host_name
-		result.is_ok = false;                  // invalid host name
-		std::cout << "host" << std::endl;
+		result.is_ok = INVALID_HOST; // TODO: server_nameではなく、hostをチェック
 	} else if (std::atoi(request.header_fields["Content-Length"].c_str()) >
 			   server_info.client_max_body_size) { // Check content_length
-		result.is_ok = false;                      // content too long
-		std::cout << "content length" << std::endl;
+		result.is_ok = PAYLOAD_TOO_LARGE;
 	} else if (server_info.error_page.second != "") { // Check error_page
 		result.error_status_code = server_info.error_page.first;
 		result.error_page_path   = server_info.error_page.second;
 	}
-	// TODO: set status code? この呼び出し元で行う？
 	return;
 }
 
 CheckPathResult Check(const DtoServerInfos &server_info, HttpRequest &request) {
 	CheckPathResult result;
 
-	result.is_ok = true;
+	result.is_ok = OK;
 	CheckDTOServerInfo(result, server_info, request);
 	CheckLocationList(result, server_info.locations, request);
 	return result;
@@ -248,7 +251,7 @@ int main() {
 	std::cout << "autoindex: " << std::boolalpha << result.autoindex << std::endl;
 	std::cout << "error_page_code: " << result.error_status_code << std::endl;
 	std::cout << "error_page_path: " << result.error_page_path << std::endl;
-	if (result.is_ok == false) {
+	if (result.is_ok != OK) {
 		return EXIT_FAILURE;
 	}
 	return EXIT_SUCCESS;
