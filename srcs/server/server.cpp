@@ -152,7 +152,7 @@ void PrintLocations(const VirtualServer::LocationList &locations) {
 
 } // namespace
 
-std::string Server::CreateHttpResponse(int client_fd) const {
+http::HttpResult Server::CreateHttpResponse(int client_fd) const {
 	const std::string &request_buf = buffers_.GetBuffer(client_fd);
 
 	http::Http http(request_buf);
@@ -175,9 +175,12 @@ std::string Server::CreateHttpResponse(int client_fd) const {
 }
 
 void Server::SendResponse(int client_fd) {
-	// todo: check if it's ready to start write/send
-	const std::string response = CreateHttpResponse(client_fd);
-	send(client_fd, response.c_str(), response.size(), 0);
+	const http::HttpResult http_result = CreateHttpResponse(client_fd);
+	// check if it's ready to start write/send
+	if (!http_result.is_response_complete) {
+		return;
+	}
+	send(client_fd, http_result.response.c_str(), http_result.response.size(), 0);
 	utils::Debug("server", "send response to client", client_fd);
 
 	// disconnect

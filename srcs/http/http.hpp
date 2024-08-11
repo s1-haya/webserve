@@ -6,6 +6,8 @@
 
 namespace http {
 
+struct HttpResult;
+
 class Http {
   public:
 	enum MessageType {
@@ -19,7 +21,7 @@ class Http {
 	typedef std::map<MessageType, std::string> RequestMessage;
 	explicit Http(const std::string &read_buf);
 	~Http();
-	std::string CreateResponse();
+	HttpResult CreateResponse();
 
   private:
 	Http();

@@ -6,9 +6,9 @@
 namespace http {
 
 struct HttpResult {
-	HttpResult() : is_request_complete(false) {}
+	HttpResult() : is_response_complete(false) {}
 
-	bool        is_request_complete;
+	bool        is_response_complete;
 	std::string response;
 };
 

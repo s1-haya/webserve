@@ -1,5 +1,6 @@
 #include "http.hpp"
 #include "http_message.hpp"
+#include "http_result.hpp"
 #include <sstream>
 
 namespace http {
@@ -30,13 +31,17 @@ void CreateBody(std::ostream &response_stream, Http::RequestMessage &request) {
 
 } // namespace
 
-std::string Http::CreateResponse() {
+HttpResult Http::CreateResponse() {
 	std::ostringstream response_stream;
 	CreateStatusLine(response_stream, this->request_);
 	CreateHeaderFields(response_stream, this->request_);
 	CreateCRLF(response_stream);
 	CreateBody(response_stream, this->request_);
-	return response_stream.str();
+
+	HttpResult result;
+	result.is_response_complete = true;
+	result.response             = response_stream.str();
+	return result;
 }
 
 } // namespace http
