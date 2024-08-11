@@ -22,7 +22,7 @@ VirtualServer::LocationList ConvertLocations(const config::context::LocationList
 		location.location       = it->request_uri;
 		location.root           = it->alias;
 		location.index          = it->index;
-		location.allowed_method = *(it->allowed_methods.begin()); // tmp
+		location.allowed_method = "tmp_localhost"; // todo: tmp
 		location_list.push_back(location);
 	}
 	return location_list;
