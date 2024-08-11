@@ -72,8 +72,9 @@ struct CheckPathResult {
 	CheckStatus is_ok;
 };
 
-LocationCon
-CheckLocation(CheckPathResult &result, const LocationList &locations, const HttpRequest &request) {
+LocationCon CheckLocation(
+	CheckPathResult &result, const LocationList &locations, const std::string &request_target
+) {
 	LocationCon match_loc;
 
 	// ex. request.target /www/target.html:
@@ -82,9 +83,9 @@ CheckLocation(CheckPathResult &result, const LocationList &locations, const Http
 	// location1 /www/
 	// location2 /
 	// -> /www/
-	result.path = request.request_line.request_target;
+	result.path = request_target;
 	for (LocationList::const_iterator it = locations.begin(); it != locations.end(); ++it) {
-		if (request.request_line.request_target.find((*it).request_uri) == 0 &&
+		if (request_target.find((*it).request_uri) == 0 &&
 			(*it).request_uri.length() > match_loc.request_uri.length()) { // Longest Match
 			match_loc = *it;
 		}
@@ -95,34 +96,32 @@ CheckLocation(CheckPathResult &result, const LocationList &locations, const Http
 	return match_loc;
 }
 
-void CheckIndex(CheckPathResult &result, const LocationCon &location, const HttpRequest &request) {
+void CheckIndex(CheckPathResult &result, const LocationCon &location) {
 	if (!location.index.empty()) {
 		result.index = location.index;
 	}
 }
 
-void CheckAutoIndex(
-	CheckPathResult &result, const LocationCon &location, const HttpRequest &request
-) {
+void CheckAutoIndex(CheckPathResult &result, const LocationCon &location) {
 	if (location.autoindex == true) {
 		result.autoindex = true;
 	}
 }
 
-void CheckAllowedMethods(CheckPathResult &result, LocationCon &location, HttpRequest &request) {
-	std::list<std::string>::iterator is_allowed_method = std::find(
-		location.allowed_methods.begin(),
-		location.allowed_methods.end(),
-		request.request_line.method
-	);
-	// ex. allowed_method: [GET, POST], request.method GET
-	if (is_allowed_method == location.allowed_methods.end()) {
-		// result.is_ok = false;
-		std::cout << "method" << std::endl;
-	}
-}
+// void CheckAllowedMethods(CheckPathResult &result, LocationCon &location, HttpRequest &request) {
+// 	std::list<std::string>::iterator is_allowed_method = std::find(
+// 		location.allowed_methods.begin(),
+// 		location.allowed_methods.end(),
+// 		request.request_line.method
+// 	);
+// 	// ex. allowed_method: [GET, POST], request.method GET
+// 	if (is_allowed_method == location.allowed_methods.end()) {
+// 		// result.is_ok = false;
+// 		std::cout << "method" << std::endl;
+// 	}
+// }
 
-void CheckAlias(CheckPathResult &result, const LocationCon &location, const HttpRequest &request) {
+void CheckAlias(CheckPathResult &result, const LocationCon &location) {
 	if (location.alias.empty()) {
 		return;
 	}
@@ -134,9 +133,7 @@ void CheckAlias(CheckPathResult &result, const LocationCon &location, const Http
 	}
 }
 
-void CheckRedirect(
-	CheckPathResult &result, const LocationCon &location, const HttpRequest &request
-) {
+void CheckRedirect(CheckPathResult &result, const LocationCon &location) {
 	if (location.redirect.second.empty()) { // tmp
 		return;
 	}
@@ -150,28 +147,28 @@ void CheckRedirect(
 
 // Check LocationList
 void CheckLocationList(
-	CheckPathResult &result, const LocationList &locations, HttpRequest &request
+	CheckPathResult &result, const LocationList &locations, const std::string &request_target
 ) {
 	if (result.is_ok != OK) {
 		return;
 	}
-	LocationCon match_location = CheckLocation(result, locations, request);
+	LocationCon match_location = CheckLocation(result, locations, request_target);
 	std::cout << match_location.request_uri << std::endl; // for debug
-	CheckIndex(result, match_location, request);
-	CheckAutoIndex(result, match_location, request);
-	CheckAllowedMethods(result, match_location, request); // なしに
-	CheckAlias(result, match_location, request);
-	CheckRedirect(result, match_location, request);
+	CheckIndex(result, match_location);
+	CheckAutoIndex(result, match_location);
+	// CheckAllowedMethods(result, match_location, request); // なしに
+	CheckAlias(result, match_location);
+	CheckRedirect(result, match_location);
 	return;
 }
 
 // Check Server
 void CheckDTOServerInfo(
-	CheckPathResult &result, const DtoServerInfos &server_info, HttpRequest &request
+	CheckPathResult &result, const DtoServerInfos &server_info, HeaderFields &header_fields
 ) {
-	if (server_info.host != request.header_fields["Host"]) { // Check host_name
+	if (server_info.host != header_fields["Host"]) { // Check host_name
 		result.is_ok = INVALID_HOST;
-	} else if (std::atoi(request.header_fields["Content-Length"].c_str()) >
+	} else if (static_cast<size_t>(std::atoi(header_fields["Content-Length"].c_str())) >
 			   server_info.client_max_body_size) { // Check content_length
 		result.is_ok = PAYLOAD_TOO_LARGE;
 	} else if (server_info.error_page.second != "") { // Check error_page
@@ -186,8 +183,8 @@ CheckPathResult Check(const DtoServerInfos &server_info, HttpRequest &request) {
 
 	std::memset(&result, 0, sizeof(result));
 	result.is_ok = OK;
-	CheckDTOServerInfo(result, server_info, request);
-	CheckLocationList(result, server_info.locations, request);
+	CheckDTOServerInfo(result, server_info, request.header_fields);
+	CheckLocationList(result, server_info.locations, request.request_line.request_target);
 	return result;
 }
 
