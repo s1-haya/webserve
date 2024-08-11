@@ -218,8 +218,10 @@ void HttpParse::CheckValidVersion(const std::string &version) {
 
 void HttpParse::CheckValidHeaderFieldName(const std::string &header_field_value) {
 	if (std::find(
-			BASIC_HEADER_FIELDS, BASIC_HEADER_FIELDS + BASIC_HEADER_FIELDS_SIZE, header_field_value
-		) == BASIC_HEADER_FIELDS + BASIC_HEADER_FIELDS_SIZE) {
+			REQUEST_HEADER_FIELDS,
+			REQUEST_HEADER_FIELDS + REQUEST_HEADER_FIELDS_SIZE,
+			header_field_value
+		) == REQUEST_HEADER_FIELDS + REQUEST_HEADER_FIELDS_SIZE) {
 		throw HttpParseException(
 			"Error: the value does not exist in format of header fields", BAD_REQUEST
 		);
