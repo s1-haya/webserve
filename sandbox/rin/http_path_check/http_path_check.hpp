@@ -62,7 +62,7 @@ enum CheckStatus {
 // 呼び出し元でこれをチェックしてstatus codeを付ける用
 
 struct CheckPathResult {
-	std::string path; // root, index, redirectを見る
+	std::string path; // alias, index, redirectを見る
 	std::string index;
 	bool        autoindex;
 	int         status_code; // redirectで指定

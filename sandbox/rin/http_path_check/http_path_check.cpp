@@ -1,6 +1,5 @@
 #include "http_path_check.hpp"
 #include <cstdlib> // atoi
-#include <cstring> // memset
 #include <iostream>
 
 namespace http {
@@ -94,7 +93,7 @@ void HttpPathCheck::CheckAlias(CheckPathResult &result, const LocationCon &locat
 }
 
 void HttpPathCheck::CheckRedirect(CheckPathResult &result, const LocationCon &location) {
-	if (location.redirect.second.empty()) { // tmp
+	if (location.redirect.second.empty()) {
 		return;
 	}
 	// ex. return 301 /var/data/index.html
