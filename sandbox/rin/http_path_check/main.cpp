@@ -52,19 +52,7 @@ struct DtoServerInfos {
 /*-------------------------------------------------------------------------*/
 /*-------------------------------------------------------------------------*/
 
-class CheckConfig {
-  private:
-	/* data */
-  public:
-	CheckConfig(/* args */);
-	~CheckConfig();
-};
-
-CheckConfig::CheckConfig(/* args */) {}
-
-CheckConfig::~CheckConfig() {}
-
-struct CheckConfigResult {
+struct CheckPathResult {
 	std::string path; // root, index, redirectを見る
 	bool        autoindex;
 	int         status_code; // redirectで指定
@@ -74,7 +62,7 @@ struct CheckConfigResult {
 };
 
 LocationCon CheckLocation(
-	CheckConfigResult &result, const LocationList &locations, const HttpRequest &request
+	CheckPathResult &result, const LocationList &locations, const HttpRequest &request
 ) {
 	size_t      pos = 0;
 	LocationCon match_loc;
@@ -99,14 +87,14 @@ LocationCon CheckLocation(
 }
 
 void CheckAutoIndex(
-	CheckConfigResult &result, const LocationCon &location, const HttpRequest &request
+	CheckPathResult &result, const LocationCon &location, const HttpRequest &request
 ) {
 	if (location.autoindex == true) {
 		result.autoindex = true;
 	}
 }
 
-void CheckAllowedMethods(CheckConfigResult &result, LocationCon &location, HttpRequest &request) {
+void CheckAllowedMethods(CheckPathResult &result, LocationCon &location, HttpRequest &request) {
 	std::list<std::string>::iterator is_allowed_method = std::find(
 		location.allowed_methods.begin(),
 		location.allowed_methods.end(),
@@ -120,7 +108,7 @@ void CheckAllowedMethods(CheckConfigResult &result, LocationCon &location, HttpR
 }
 
 void CheckAlias(
-	CheckConfigResult &result, const LocationCon &location, const HttpRequest &request
+	CheckPathResult &result, const LocationCon &location, const HttpRequest &request
 ) {
 	if (location.alias == "") {
 		return;
@@ -134,7 +122,7 @@ void CheckAlias(
 }
 
 void CheckRedirect(
-	CheckConfigResult &result, const LocationCon &location, const HttpRequest &request
+	CheckPathResult &result, const LocationCon &location, const HttpRequest &request
 ) {
 	if (location.redirect.second != "") { // tmp
 		return;
@@ -148,7 +136,7 @@ void CheckRedirect(
 
 // Check LocationList
 void CheckLocationList(
-	CheckConfigResult &result, const LocationList &locations, HttpRequest &request
+	CheckPathResult &result, const LocationList &locations, HttpRequest &request
 ) {
 	if (result.is_ok == false) {
 		return;
@@ -166,7 +154,7 @@ void CheckLocationList(
 
 // Check Server
 void CheckDTOServerInfo(
-	CheckConfigResult &result, const DtoServerInfos &server_info, HttpRequest &request
+	CheckPathResult &result, const DtoServerInfos &server_info, HttpRequest &request
 ) {
 	if (std::find(
 			server_info.server_names.begin(),
@@ -187,8 +175,8 @@ void CheckDTOServerInfo(
 	return;
 }
 
-CheckConfigResult Check(const DtoServerInfos &server_info, HttpRequest &request) {
-	CheckConfigResult result;
+CheckPathResult Check(const DtoServerInfos &server_info, HttpRequest &request) {
+	CheckPathResult result;
 
 	result.is_ok = true;
 	CheckDTOServerInfo(result, server_info, request);
@@ -253,7 +241,7 @@ int main() {
 	std::pair<unsigned int, std::string> error_page(404, "/404.html");
 	server_info.error_page = error_page;
 
-	CheckConfigResult result = Check(server_info, request);
+	CheckPathResult result = Check(server_info, request);
 	std::cout << "is_ok: " << std::boolalpha << result.is_ok << std::endl;
 	std::cout << "path: " << result.path << std::endl;
 	std::cout << "status_code: " << result.status_code << std::endl;
