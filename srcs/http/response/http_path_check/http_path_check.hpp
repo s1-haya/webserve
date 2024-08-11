@@ -2,14 +2,13 @@
 #define HTTP_PATH_CHECK_HPP_
 
 #include "http_parse.hpp"
-#include <list>
-#include <map>
 #include <string>
 
 // Mock(Serverの構造体に未実装の部分があるため)
 /*-------------------------------------------------------------*/
 /*-------------------------------------------------------------*/
 
+#include <list>
 struct MockLocationCon { /*一部serverで未実装*/
 	std::string                          request_uri;
 	std::string                          alias;
