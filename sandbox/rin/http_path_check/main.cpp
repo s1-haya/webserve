@@ -61,29 +61,24 @@ struct CheckPathResult {
 	bool        is_ok;             // Result型で受け渡したい
 };
 
-LocationCon CheckLocation(
-	CheckPathResult &result, const LocationList &locations, const HttpRequest &request
-) {
-	size_t      pos = 0;
+LocationCon
+CheckLocation(CheckPathResult &result, const LocationList &locations, const HttpRequest &request) {
 	LocationCon match_loc;
 
 	// ex. request.target /www/target.html:
 	// uri = /www/, target = target.html
-	// location1 /www/data/ -> first not of: 5
-	// location2 / -> first not of: 1
-	// Longest Match
+	// location1 /www/data/
+	// location1 /www/
+	// location2 /
+	// -> /www/
 	result.path = request.request_line.request_target;
 	for (LocationList::const_iterator it = locations.begin(); it != locations.end(); ++it) {
-		if ((*it).request_uri.find_first_not_of(request.request_line.request_target) > pos) {
+		if (request.request_line.request_target.find((*it).request_uri) == 0 &&
+			(*it).request_uri.length() > match_loc.request_uri.length()) { // Longest Match
 			match_loc = *it;
-			pos       = (*it).request_uri.find_first_not_of(request.request_line.request_target);
 		}
 	}
-	if (pos == 0) {
-		throw std::runtime_error("no match Location");
-	} else {
-		return match_loc;
-	}
+	return match_loc;
 }
 
 void CheckAutoIndex(
@@ -107,9 +102,7 @@ void CheckAllowedMethods(CheckPathResult &result, LocationCon &location, HttpReq
 	}
 }
 
-void CheckAlias(
-	CheckPathResult &result, const LocationCon &location, const HttpRequest &request
-) {
+void CheckAlias(CheckPathResult &result, const LocationCon &location, const HttpRequest &request) {
 	if (location.alias == "") {
 		return;
 	}
@@ -143,6 +136,7 @@ void CheckLocationList(
 	}
 	try {
 		LocationCon match_location = CheckLocation(result, locations, request);
+		std::cout << match_location.request_uri << std::endl; // for debug
 		CheckAutoIndex(result, match_location, request);
 		CheckAllowedMethods(result, match_location, request);
 	} catch (const std::exception &e) {
@@ -184,8 +178,8 @@ CheckPathResult Check(const DtoServerInfos &server_info, HttpRequest &request) {
 	return result;
 }
 
-// TODO: Check File existence, File authority (for post, delete)
-// TODO: indexをパスにつける
+// TODO: Check File existence, File authority (for post, delete) -> やらない
+// TODO: indexをパスにつける -> やらない
 
 /*-------------------------------------------------------------------------*/
 /*-------------------------------------------------------------------------*/
@@ -215,7 +209,7 @@ LocationCon BuildLocationCon(
 
 int main() {
 	// request
-	const RequestLine expected_request_line_1 = {"GET", "/", "HTTP/1.1"};
+	const RequestLine expected_request_line_1 = {"GET", "/www/test.html", "HTTP/1.1"};
 	HttpRequest       request;
 	request.request_line                = expected_request_line_1;
 	request.header_fields["Host"]       = "localhost";
@@ -226,10 +220,16 @@ int main() {
 	std::list<std::string> allowed_methods;
 	allowed_methods.push_back("GET");
 	allowed_methods.push_back("POST");
-	std::pair<unsigned int, std::string> redirect(302, "/redirect.html");
+	std::pair<unsigned int, std::string> redirect;
 	LocationCon                          location1 =
 		BuildLocationCon("/", "/data/", "index.html", true, allowed_methods, redirect);
+	LocationCon location2 =
+		BuildLocationCon("/www/", "/data/", "index.html", true, allowed_methods, redirect);
+	LocationCon location3 =
+		BuildLocationCon("/www/data/", "/data/", "index.html", true, allowed_methods, redirect);
 	locationlist.push_back(location1);
+	locationlist.push_back(location2);
+	locationlist.push_back(location3);
 
 	// DTO server_info
 	DtoServerInfos         server_info;
