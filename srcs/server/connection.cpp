@@ -96,17 +96,15 @@ ClientInfo Connection::Accept(int server_fd) {
 	struct sockaddr_storage client_sock_addr;
 	socklen_t               addrlen = sizeof(client_sock_addr);
 	const int client_fd = accept(server_fd, (struct sockaddr *)&client_sock_addr, &addrlen);
+	if (client_fd == SYSTEM_ERROR) {
+		throw std::runtime_error("accept failed");
+	}
 
 	// create new client struct
 	ClientInfo client_info(client_fd, client_sock_addr);
 	utils::Debug(
 		"server", "new ClientInfo created. IP: " + client_info.GetIp() + ", fd", client_fd
 	);
-
-	// todo: need?
-	// if (client_fd == SYSTEM_ERROR) {
-	// 	throw std::runtime_error("accept failed");
-	// }
 	return client_info;
 }
 

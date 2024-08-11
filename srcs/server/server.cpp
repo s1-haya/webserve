@@ -90,12 +90,8 @@ void Server::HandleEvent(const event::Event &event) {
 
 void Server::HandleNewConnection(int server_fd) {
 	// A new socket that has established a connection with the peer socket.
-	// todo: return accept error like Result
 	const ClientInfo new_client_info = Connection::Accept(server_fd);
 	const int        client_fd       = new_client_info.GetFd();
-	if (client_fd == SYSTEM_ERROR) {
-		throw std::runtime_error("accept failed");
-	}
 
 	// add to context
 	context_.AddClientInfo(new_client_info, server_fd);
