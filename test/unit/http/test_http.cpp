@@ -165,18 +165,18 @@ int main(void) {
 	);
 
 	// 4.ヘッダフィールドの書式が正しい場合
-	http::HttpRequestParsedData test1_header_fileds;
-	test1_header_fileds.request_result.status_code         = http::OK;
-	test1_header_fileds.is_request_format.is_request_line  = true;
-	test1_header_fileds.is_request_format.is_header_fields = true;
-	test1_header_fileds.is_request_format.is_body_message  = true;
+	http::HttpRequestParsedData test1_header_fields;
+	test1_header_fields.request_result.status_code         = http::OK;
+	test1_header_fields.is_request_format.is_request_line  = true;
+	test1_header_fields.is_request_format.is_header_fields = true;
+	test1_header_fields.is_request_format.is_body_message  = true;
 
 	// 5.ヘッダフィールドの書式が正しくない場合
-	http::HttpRequestParsedData test2_header_fileds;
-	test2_header_fileds.request_result.status_code         = http::BAD_REQUEST;
-	test2_header_fileds.is_request_format.is_request_line  = true;
-	test2_header_fileds.is_request_format.is_header_fields = false;
-	test2_header_fileds.is_request_format.is_body_message  = false;
+	http::HttpRequestParsedData test2_header_fields;
+	test2_header_fields.request_result.status_code         = http::BAD_REQUEST;
+	test2_header_fields.is_request_format.is_request_line  = true;
+	test2_header_fields.is_request_format.is_header_fields = false;
+	test2_header_fields.is_request_format.is_body_message  = false;
 
 	// 6.ヘッダフィールドにContent-Lengthがあるがボディメッセージがない場合
 	http::HttpRequestParsedData test3_header_fileds;
@@ -187,8 +187,8 @@ int main(void) {
 	test3_header_fileds.is_request_format.is_body_message  = false;
 
 	static const TestCase test_case_http_request_header_fields_format[] = {
-		TestCase(1, "GET / HTTP/1.1\r\nHost: a\r\n\r\n", test1_header_fileds),
-		TestCase(1, "GET / HTTP/1.1\r\nHost :\r\n\r\n", test2_header_fileds),
+		TestCase(1, "GET / HTTP/1.1\r\nHost: a\r\n\r\n", test1_header_fields),
+		TestCase(1, "GET / HTTP/1.1\r\nHost :\r\n\r\n", test2_header_fields),
 		TestCase(
 			1, "GET / HTTP/1.1\r\nHost: test\r\nContent-Length: 2\r\n\r\n", test3_header_fileds
 		),
@@ -278,7 +278,7 @@ int main(void) {
 	);
 	const std::string test1_expected_response =
 		"HTTP/1.1 200 OK\r\nConnection: close\r\nHost: sawa\r\n\r\nYou can't connect the dots "
-		"looking forword. You can only connect the dots looking backwards";
+		"looking forward. You can only connect the dots looking backwards";
 	ret_code |= HandleResult(test1_response.CreateHttpResponse(1), test1_expected_response);
 
 	// リクエストのステータスコードが400の場合

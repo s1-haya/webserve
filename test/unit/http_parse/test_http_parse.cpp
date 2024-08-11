@@ -198,20 +198,20 @@ int main(void) {
 	expected_header_fields_test_3.request.header_fields["Connection"] = "keep-alive";
 
 	// 存在しないfield_nameの場合
-	http::HttpRequestResult expected_header_fileds_test_4;
-	expected_header_fileds_test_4.status_code = http::BAD_REQUEST;
+	http::HttpRequestResult expected_header_fields_test_4;
+	expected_header_fields_test_4.status_code = http::BAD_REQUEST;
 
 	// 複数のヘッダーフィールドの書式が設定の場合
-	http::HttpRequestResult expected_header_fileds_test_5;
-	expected_header_fileds_test_5.status_code = http::BAD_REQUEST;
+	http::HttpRequestResult expected_header_fields_test_5;
+	expected_header_fields_test_5.status_code = http::BAD_REQUEST;
 
 	// セミコロンがない場合
 	http::HttpRequestResult expected_header_fileds_test_6;
 	expected_header_fileds_test_6.status_code = http::BAD_REQUEST;
 
 	// セミコロンが複数ある場合
-	http::HttpRequestResult expected_header_fileds_test_7;
-	expected_header_fileds_test_7.status_code = http::BAD_REQUEST;
+	http::HttpRequestResult expected_header_fields_test_7;
+	expected_header_fields_test_7.status_code = http::BAD_REQUEST;
 
 	static const TestCase test_cases_for_header_fields[] = {
 		TestCase(
@@ -228,12 +228,12 @@ int main(void) {
 		),
 		TestCase(
 			"GET / HTTP/1.1\r\nGold: www.example.com\r\nConnection: keep-alive\r\n\r\n",
-			expected_header_fileds_test_4
+			expected_header_fields_test_4
 		),
 		TestCase(
 			"GET / HTTP/1.1\r\nHost: www.example.com\r\nHost: www.example.com\r\nConnection: "
 			"keep-alive\r\n\r\n",
-			expected_header_fileds_test_5
+			expected_header_fields_test_5
 		),
 		TestCase(
 			"GET / HTTP/1.1\r\nHost\r\nConnection: "
@@ -243,7 +243,7 @@ int main(void) {
 		TestCase(
 			"GET / HTTP/1.1\r\nHost:kkk:kk\r\nConnection: "
 			"keep-alive\r\n\r\n",
-			expected_header_fileds_test_7
+			expected_header_fields_test_7
 		)
 	};
 

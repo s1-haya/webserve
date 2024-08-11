@@ -13,7 +13,7 @@ struct LocationCon {
 	std::string                          index;
 	bool                                 autoindex;
 	std::list<std::string>               allowed_methods;
-	std::pair<unsigned int, std::string> redirect; // cannnot use return
+	std::pair<unsigned int, std::string> redirect; // cannot use return
 	LocationCon() : autoindex(false) {}
 };
 
