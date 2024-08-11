@@ -45,6 +45,7 @@ struct DtoServerInfos {
 	std::string            server_port;
 	LocationList           locations;
 	/*以下serverでは未実装*/
+	std::string                          host;
 	std::size_t                          client_max_body_size;
 	std::pair<unsigned int, std::string> error_page;
 };
@@ -161,12 +162,8 @@ void CheckLocationList(
 void CheckDTOServerInfo(
 	CheckPathResult &result, const DtoServerInfos &server_info, HttpRequest &request
 ) {
-	if (std::find(
-			server_info.server_names.begin(),
-			server_info.server_names.end(),
-			request.header_fields["Host"]
-		) == server_info.server_names.end()) { // Check host_name
-		result.is_ok = INVALID_HOST; // TODO: server_nameではなく、hostをチェック
+	if (server_info.host != request.header_fields["Host"]) { // Check host_name
+		result.is_ok = INVALID_HOST;
 	} else if (std::atoi(request.header_fields["Content-Length"].c_str()) >
 			   server_info.client_max_body_size) { // Check content_length
 		result.is_ok = PAYLOAD_TOO_LARGE;
@@ -246,6 +243,7 @@ int main() {
 	server_names.push_back("localhost");
 	server_info.server_names         = server_names;
 	server_info.locations            = locationlist;
+	server_info.host                 = "localhost";
 	server_info.client_max_body_size = 1024;
 	std::pair<unsigned int, std::string> error_page(404, "/404.html");
 	server_info.error_page = error_page;
