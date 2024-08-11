@@ -1,4 +1,6 @@
 #include "http_path_check.hpp"
+#include <cstdlib> // atoi
+#include <cstring> // memset
 #include <iostream>
 
 namespace http {
@@ -6,8 +8,6 @@ namespace http {
 CheckPathResult HttpPathCheck::Check(const DtoServerInfos &server_info, HttpRequest &request) {
 	CheckPathResult result;
 
-	std::memset(&result, 0, sizeof(result));
-	result.is_ok = OK;
 	CheckDTOServerInfo(result, server_info, request.header_fields);
 	CheckLocationList(result, server_info.locations, request.request_line.request_target);
 	return result;
@@ -22,7 +22,7 @@ void HttpPathCheck::CheckDTOServerInfo(
 	} else if (static_cast<size_t>(std::atoi(header_fields["Content-Length"].c_str())) >
 			   server_info.client_max_body_size) { // Check content_length
 		result.is_ok = PAYLOAD_TOO_LARGE;
-	} else if (server_info.error_page.second != "") { // Check error_page
+	} else if (!server_info.error_page.second.empty()) { // Check error_page
 		result.error_status_code = server_info.error_page.first;
 		result.error_page_path   = server_info.error_page.second;
 	}
@@ -40,7 +40,6 @@ void HttpPathCheck::CheckLocationList(
 	std::cout << match_location.request_uri << std::endl; // for debug
 	CheckIndex(result, match_location);
 	CheckAutoIndex(result, match_location);
-	// CheckAllowedMethods(result, match_location, request); // なしに
 	CheckAlias(result, match_location);
 	CheckRedirect(result, match_location);
 	return;
@@ -86,7 +85,7 @@ void HttpPathCheck::CheckAlias(CheckPathResult &result, const LocationCon &locat
 	if (location.alias.empty()) {
 		return;
 	}
-	// ex. request_uri /www/ alias /var/ -> /www/を削除して/root/に
+	// ex. request_uri /www/ alias /var/ -> /www/を削除して/var/に
 	// /www/target.html -> /var/target.html
 	std::string::size_type alias_start_pos = result.path.find(location.request_uri);
 	if (alias_start_pos != std::string::npos) {

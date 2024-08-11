@@ -1,4 +1,5 @@
 #include "http_path_check.hpp"
+#include <cstdlib>
 #include <iostream>
 
 using namespace http;
