@@ -56,17 +56,19 @@ enum CheckStatus {
 	OK,
 	INVALID_HOST,
 	PAYLOAD_TOO_LARGE,
-	LOCATION_NOT_FOUND
+	LOCATION_NOT_FOUND,
+	REDIRECT
 }; // rfc + 見やすいように独自で名前をつけた
 // 呼び出し元でこれをチェックしてstatus codeを付ける用
 
 struct CheckPathResult {
-	std::string path; // root, index, redirectを見る
-	bool        autoindex;
-	int         status_code; // redirectで指定
-	std::string error_page_path;
-	int         error_status_code; // error_pageで指定 まとめる？
-	CheckStatus is_ok;
+	std::string            path; // root, index, redirectを見る
+	std::list<std::string> index;
+	bool                   autoindex;
+	int                    status_code; // redirectで指定
+	std::string            error_page_path;
+	int                    error_status_code; // error_pageで指定 まとめる？
+	CheckStatus            is_ok;
 };
 
 LocationCon
@@ -128,7 +130,7 @@ void CheckAlias(CheckPathResult &result, const LocationCon &location, const Http
 void CheckRedirect(
 	CheckPathResult &result, const LocationCon &location, const HttpRequest &request
 ) {
-	if (location.redirect.second != "") { // tmp
+	if (location.redirect.second.empty()) { // tmp
 		return;
 	}
 	// ex. return 301 /var/data/index.html
@@ -136,6 +138,7 @@ void CheckRedirect(
 	// status code: 301
 	result.status_code = location.redirect.first;
 	result.path        = location.redirect.second;
+	result.is_ok       = REDIRECT;
 }
 
 // Check LocationList
@@ -149,6 +152,8 @@ void CheckLocationList(
 	std::cout << match_location.request_uri << std::endl; // for debug
 	CheckAutoIndex(result, match_location, request);
 	CheckAllowedMethods(result, match_location, request); // なしに
+	CheckAlias(result, match_location, request);
+	CheckRedirect(result, match_location, request);
 	return;
 }
 
@@ -212,9 +217,9 @@ LocationCon BuildLocationCon(
 
 int main() {
 	// request
-	const RequestLine expected_request_line_1 = {"GET", "/www/test.html", "HTTP/1.1"};
+	const RequestLine request_line_1 = {"GET", "/www/test.html", "HTTP/1.1"};
 	HttpRequest       request;
-	request.request_line                = expected_request_line_1;
+	request.request_line                = request_line_1;
 	request.header_fields["Host"]       = "localhost";
 	request.header_fields["Connection"] = "keep-alive";
 
@@ -224,10 +229,11 @@ int main() {
 	allowed_methods.push_back("GET");
 	allowed_methods.push_back("POST");
 	std::pair<unsigned int, std::string> redirect;
+	std::pair<unsigned int, std::string> redirect_on(301, "/");
 	LocationCon                          location1 =
 		BuildLocationCon("/", "/data/", "index.html", true, allowed_methods, redirect);
 	LocationCon location2 =
-		BuildLocationCon("/www/", "/data/", "index.html", true, allowed_methods, redirect);
+		BuildLocationCon("/www/", "/data/", "index.html", true, allowed_methods, redirect_on);
 	LocationCon location3 =
 		BuildLocationCon("/www/data/", "/data/", "index.html", true, allowed_methods, redirect);
 	locationlist.push_back(location1);
@@ -251,7 +257,7 @@ int main() {
 	std::cout << "autoindex: " << std::boolalpha << result.autoindex << std::endl;
 	std::cout << "error_page_code: " << result.error_status_code << std::endl;
 	std::cout << "error_page_path: " << result.error_page_path << std::endl;
-	if (result.is_ok != OK) {
+	if (result.is_ok != OK && result.is_ok != REDIRECT) {
 		return EXIT_FAILURE;
 	}
 	return EXIT_SUCCESS;
