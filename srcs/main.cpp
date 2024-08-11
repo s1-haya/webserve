@@ -20,7 +20,6 @@ int main(int argc, char **argv) {
 		return EXIT_FAILURE;
 	}
 
-	// todo: handle parse error
 	std::string path_config;
 	if (argc == 1) {
 		path_config = "config/default.conf";
