@@ -1,6 +1,7 @@
 #ifndef SERVER_CONNECTION_HPP_
 #define SERVER_CONNECTION_HPP_
 
+#include "result.hpp"
 #include <netdb.h> // struct addrinfo,gai_strerror
 #include <set>
 #include <string>
@@ -14,6 +15,7 @@ class Connection {
   public:
 	typedef struct addrinfo AddrInfo;
 	typedef std::set<int>   FdSet;
+	typedef Result<int>     BindResult;
 	Connection();
 	~Connection();
 	// function
@@ -26,8 +28,8 @@ class Connection {
 	Connection(const Connection &other);
 	Connection &operator=(const Connection &other);
 	// functions
-	AddrInfo *GetAddrInfoList(const ServerInfo &server_info);
-	int       TryBind(AddrInfo *addrinfo) const;
+	AddrInfo  *GetAddrInfoList(const ServerInfo &server_info);
+	BindResult TryBind(AddrInfo *addrinfo) const;
 	// const
 	static const int SYSTEM_ERROR = -1;
 	// variable
