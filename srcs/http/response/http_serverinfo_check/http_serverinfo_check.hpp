@@ -38,7 +38,7 @@ struct MockDtoServerInfos {
 
 namespace http {
 
-struct CheckPathResult {
+struct CheckServerInfoResult {
 	enum CheckStatus {
 		OK,
 		INVALID_HOST,
@@ -54,31 +54,37 @@ struct CheckPathResult {
 	int         status_code; // redirectで指定
 	std::string error_page_path;
 	int         error_status_code; // error_pageで指定 まとめる？
-	CheckStatus is_ok;
-	CheckPathResult() : autoindex(false), status_code(0), error_status_code(0), is_ok(OK) {};
+	CheckStatus status;
+	CheckServerInfoResult() : autoindex(false), status_code(0), error_status_code(0), status(OK) {};
 };
 
-class HttpPathCheck {
+class HttpServerInfoCheck {
   private:
-	HttpPathCheck();
-	~HttpPathCheck();
+	HttpServerInfoCheck();
+	~HttpServerInfoCheck();
 
 	static void CheckDTOServerInfo(
-		CheckPathResult &result, const MockDtoServerInfos &server_info, HeaderFields &header_fields
+		CheckServerInfoResult    &result,
+		const MockDtoServerInfos &server_info,
+		HeaderFields             &header_fields
 	);
 	static void CheckLocationList(
-		CheckPathResult &result, const LocationList &locations, const std::string &request_target
+		CheckServerInfoResult &result,
+		const LocationList    &locations,
+		const std::string     &request_target
 	);
 	static MockLocationCon CheckLocation(
-		CheckPathResult &result, const LocationList &locations, const std::string &request_target
+		CheckServerInfoResult &result,
+		const LocationList    &locations,
+		const std::string     &request_target
 	);
-	static void CheckIndex(CheckPathResult &result, const MockLocationCon &location);
-	static void CheckAutoIndex(CheckPathResult &result, const MockLocationCon &location);
-	static void CheckAlias(CheckPathResult &result, const MockLocationCon &location);
-	static void CheckRedirect(CheckPathResult &result, const MockLocationCon &location);
+	static void CheckIndex(CheckServerInfoResult &result, const MockLocationCon &location);
+	static void CheckAutoIndex(CheckServerInfoResult &result, const MockLocationCon &location);
+	static void CheckAlias(CheckServerInfoResult &result, const MockLocationCon &location);
+	static void CheckRedirect(CheckServerInfoResult &result, const MockLocationCon &location);
 
   public:
-	static CheckPathResult Check(const MockDtoServerInfos &server_info, HttpRequest &request);
+	static CheckServerInfoResult Check(const MockDtoServerInfos &server_info, HttpRequest &request);
 };
 
 } // namespace http

@@ -4,8 +4,9 @@
 
 namespace http {
 
-CheckPathResult HttpPathCheck::Check(const MockDtoServerInfos &server_info, HttpRequest &request) {
-	CheckPathResult result;
+CheckServerInfoResult
+HttpServerInfoCheck::Check(const MockDtoServerInfos &server_info, HttpRequest &request) {
+	CheckServerInfoResult result;
 
 	CheckDTOServerInfo(result, server_info, request.header_fields);
 	CheckLocationList(result, server_info.locations, request.request_line.request_target);
@@ -13,14 +14,16 @@ CheckPathResult HttpPathCheck::Check(const MockDtoServerInfos &server_info, Http
 }
 
 // Check Server_info
-void HttpPathCheck::CheckDTOServerInfo(
-	CheckPathResult &result, const MockDtoServerInfos &server_info, HeaderFields &header_fields
+void HttpServerInfoCheck::CheckDTOServerInfo(
+	CheckServerInfoResult    &result,
+	const MockDtoServerInfos &server_info,
+	HeaderFields             &header_fields
 ) {
 	if (server_info.host != header_fields["Host"]) { // Check host_name
-		result.is_ok = CheckPathResult::INVALID_HOST;
+		result.status = CheckServerInfoResult::INVALID_HOST;
 	} else if (static_cast<size_t>(std::atoi(header_fields["Content-Length"].c_str())) >
 			   server_info.client_max_body_size) { // Check content_length
-		result.is_ok = CheckPathResult::PAYLOAD_TOO_LARGE;
+		result.status = CheckServerInfoResult::PAYLOAD_TOO_LARGE;
 	} else if (!server_info.error_page.second.empty()) { // Check error_page
 		result.error_status_code = server_info.error_page.first;
 		result.error_page_path   = server_info.error_page.second;
@@ -29,10 +32,10 @@ void HttpPathCheck::CheckDTOServerInfo(
 }
 
 // Check LocationList
-void HttpPathCheck::CheckLocationList(
-	CheckPathResult &result, const LocationList &locations, const std::string &request_target
+void HttpServerInfoCheck::CheckLocationList(
+	CheckServerInfoResult &result, const LocationList &locations, const std::string &request_target
 ) {
-	if (result.is_ok != CheckPathResult::OK) {
+	if (result.status != CheckServerInfoResult::OK) {
 		return;
 	}
 	MockLocationCon match_location = CheckLocation(result, locations, request_target);
@@ -44,8 +47,8 @@ void HttpPathCheck::CheckLocationList(
 	return;
 }
 
-MockLocationCon HttpPathCheck::CheckLocation(
-	CheckPathResult &result, const LocationList &locations, const std::string &request_target
+MockLocationCon HttpServerInfoCheck::CheckLocation(
+	CheckServerInfoResult &result, const LocationList &locations, const std::string &request_target
 ) {
 	MockLocationCon match_loc;
 
@@ -63,24 +66,30 @@ MockLocationCon HttpPathCheck::CheckLocation(
 		}
 	}
 	if (match_loc.request_uri.length() == 0) {
-		result.is_ok = CheckPathResult::LOCATION_NOT_FOUND;
+		result.status = CheckServerInfoResult::LOCATION_NOT_FOUND;
 	}
 	return match_loc;
 }
 
-void HttpPathCheck::CheckIndex(CheckPathResult &result, const MockLocationCon &location) {
+void HttpServerInfoCheck::CheckIndex(
+	CheckServerInfoResult &result, const MockLocationCon &location
+) {
 	if (!location.index.empty()) {
 		result.index = location.index;
 	}
 }
 
-void HttpPathCheck::CheckAutoIndex(CheckPathResult &result, const MockLocationCon &location) {
+void HttpServerInfoCheck::CheckAutoIndex(
+	CheckServerInfoResult &result, const MockLocationCon &location
+) {
 	if (location.autoindex == true) {
 		result.autoindex = true;
 	}
 }
 
-void HttpPathCheck::CheckAlias(CheckPathResult &result, const MockLocationCon &location) {
+void HttpServerInfoCheck::CheckAlias(
+	CheckServerInfoResult &result, const MockLocationCon &location
+) {
 	if (location.alias.empty()) {
 		return;
 	}
@@ -92,7 +101,9 @@ void HttpPathCheck::CheckAlias(CheckPathResult &result, const MockLocationCon &l
 	}
 }
 
-void HttpPathCheck::CheckRedirect(CheckPathResult &result, const MockLocationCon &location) {
+void HttpServerInfoCheck::CheckRedirect(
+	CheckServerInfoResult &result, const MockLocationCon &location
+) {
 	if (location.redirect.second.empty()) {
 		return;
 	}
@@ -101,7 +112,7 @@ void HttpPathCheck::CheckRedirect(CheckPathResult &result, const MockLocationCon
 	// status code: 301
 	result.status_code = location.redirect.first;
 	result.path        = location.redirect.second;
-	result.is_ok       = CheckPathResult::REDIRECT;
+	result.status      = CheckServerInfoResult::REDIRECT;
 }
 
 } // namespace http

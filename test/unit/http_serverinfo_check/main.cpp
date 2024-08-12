@@ -64,9 +64,9 @@ int Test1() {
 	request.header_fields["Host"]       = "localhost";
 	request.header_fields["Connection"] = "keep-alive";
 
-	MockDtoServerInfos server_info = BuildMockDtoServerInfos();
-	CheckPathResult    result      = HttpPathCheck::Check(server_info, request);
-	std::cout << "is_ok: " << std::boolalpha << result.is_ok << std::endl;
+	MockDtoServerInfos    server_info = BuildMockDtoServerInfos();
+	CheckServerInfoResult result      = HttpServerInfoCheck::Check(server_info, request);
+	std::cout << "status: " << std::boolalpha << result.status << std::endl;
 	std::cout << "path: " << result.path << std::endl;
 	std::cout << "status_code: " << result.status_code << std::endl;
 	std::cout << "index: " << result.index << std::endl;
@@ -74,7 +74,8 @@ int Test1() {
 	std::cout << "error_page_code: " << result.error_status_code << std::endl;
 	std::cout << "error_page_path: " << result.error_page_path << std::endl;
 	std::cout << std::endl;
-	if (result.is_ok != CheckPathResult::OK && result.is_ok != CheckPathResult::REDIRECT) {
+	if (result.status != CheckServerInfoResult::OK &&
+		result.status != CheckServerInfoResult::REDIRECT) {
 		return EXIT_FAILURE;
 	}
 	return EXIT_SUCCESS;
@@ -88,9 +89,9 @@ int Test2() {
 	request.header_fields["Host"]       = "localhost";
 	request.header_fields["Connection"] = "keep-alive";
 
-	MockDtoServerInfos server_info = BuildMockDtoServerInfos();
-	CheckPathResult    result      = HttpPathCheck::Check(server_info, request);
-	std::cout << "is_ok: " << std::boolalpha << result.is_ok << std::endl;
+	MockDtoServerInfos    server_info = BuildMockDtoServerInfos();
+	CheckServerInfoResult result      = HttpServerInfoCheck::Check(server_info, request);
+	std::cout << "status: " << std::boolalpha << result.status << std::endl;
 	std::cout << "path: " << result.path << std::endl;
 	std::cout << "status_code: " << result.status_code << std::endl;
 	std::cout << "index: " << result.index << std::endl;
@@ -98,7 +99,8 @@ int Test2() {
 	std::cout << "error_page_code: " << result.error_status_code << std::endl;
 	std::cout << "error_page_path: " << result.error_page_path << std::endl;
 	std::cout << std::endl;
-	if (result.is_ok != CheckPathResult::OK && result.is_ok != CheckPathResult::REDIRECT) {
+	if (result.status != CheckServerInfoResult::OK &&
+		result.status != CheckServerInfoResult::REDIRECT) {
 		return EXIT_FAILURE;
 	}
 	return EXIT_SUCCESS;
@@ -114,9 +116,9 @@ int Test3() {
 	request.header_fields["Host"]       = "localhost";
 	request.header_fields["Connection"] = "keep-alive";
 
-	MockDtoServerInfos server_info = BuildMockDtoServerInfos();
-	CheckPathResult    result      = HttpPathCheck::Check(server_info, request);
-	std::cout << "is_ok: " << std::boolalpha << result.is_ok << std::endl;
+	MockDtoServerInfos    server_info = BuildMockDtoServerInfos();
+	CheckServerInfoResult result      = HttpServerInfoCheck::Check(server_info, request);
+	std::cout << "status: " << std::boolalpha << result.status << std::endl;
 	std::cout << "path: " << result.path << std::endl;
 	std::cout << "status_code: " << result.status_code << std::endl;
 	std::cout << "index: " << result.index << std::endl;
@@ -124,7 +126,8 @@ int Test3() {
 	std::cout << "error_page_code: " << result.error_status_code << std::endl;
 	std::cout << "error_page_path: " << result.error_page_path << std::endl;
 	std::cout << std::endl;
-	if (result.is_ok != CheckPathResult::OK && result.is_ok != CheckPathResult::REDIRECT) {
+	if (result.status != CheckServerInfoResult::OK &&
+		result.status != CheckServerInfoResult::REDIRECT) {
 		return EXIT_FAILURE;
 	}
 	return EXIT_SUCCESS;
