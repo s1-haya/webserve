@@ -1,7 +1,7 @@
 #include "server.hpp"
 #include "client_info.hpp"
 #include "event.hpp"
-#include "http.hpp"
+#include "mock_http.hpp"
 #include "server_info.hpp"
 #include "utils.hpp"
 #include "virtual_server.hpp"
@@ -22,7 +22,7 @@ VirtualServer::LocationList ConvertLocations(const config::context::LocationList
 		location.location       = it->request_uri;
 		location.root           = it->alias;
 		location.index          = it->index;
-		location.allowed_method = *(it->allowed_methods.begin()); // tmp
+		location.allowed_method = "GET"; // todo: tmp
 		location_list.push_back(location);
 	}
 	return location_list;
@@ -90,12 +90,8 @@ void Server::HandleEvent(const event::Event &event) {
 
 void Server::HandleNewConnection(int server_fd) {
 	// A new socket that has established a connection with the peer socket.
-	// todo: return accept error like Result
 	const ClientInfo new_client_info = Connection::Accept(server_fd);
 	const int        client_fd       = new_client_info.GetFd();
-	if (client_fd == SYSTEM_ERROR) {
-		throw std::runtime_error("accept failed");
-	}
 
 	// add to context
 	context_.AddClientInfo(new_client_info, server_fd);
@@ -156,10 +152,10 @@ void PrintLocations(const VirtualServer::LocationList &locations) {
 
 } // namespace
 
-std::string Server::CreateHttpResponse(int client_fd) const {
+http::HttpResult Server::CreateHttpResponse(int client_fd) const {
 	const std::string &request_buf = buffers_.GetBuffer(client_fd);
 
-	http::Http http(request_buf);
+	http::MockHttp mock_http(request_buf);
 	// todo: parse?
 	// todo: tmp
 	const bool is_cgi = true;
@@ -175,13 +171,19 @@ std::string Server::CreateHttpResponse(int client_fd) const {
 		PrintLocations(server_infos.locations);
 		// todo: call cgi(client_info, server_info)?
 	}
-	return http.CreateResponse();
+	return mock_http.Run();
 }
 
 void Server::SendResponse(int client_fd) {
-	// todo: check if it's ready to start write/send
-	const std::string response = CreateHttpResponse(client_fd);
-	send(client_fd, response.c_str(), response.size(), 0);
+	// todo: HttpResultを受け取るのはここではなくIsRequestReceivedComplete()のあたりになる予定
+	// 構成の都合で仮にここで呼んでる
+	const http::HttpResult http_result = CreateHttpResponse(client_fd);
+	// Check if it's ready to start write/send.
+	// If not completed, the request will be re-read by the event_monitor.
+	if (!http_result.is_response_complete) {
+		return;
+	}
+	send(client_fd, http_result.response.c_str(), http_result.response.size(), 0);
 	utils::Debug("server", "send response to client", client_fd);
 
 	// disconnect

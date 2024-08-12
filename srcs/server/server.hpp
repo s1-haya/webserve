@@ -6,6 +6,7 @@
 #include "connection.hpp"
 #include "context_manager.hpp"
 #include "epoll.hpp"
+#include "http_result.hpp"
 #include <list>
 #include <string>
 
@@ -25,13 +26,13 @@ class Server {
 	Server(const Server &other);
 	Server &operator=(const Server &other);
 	// functions
-	void        AddVirtualServers(const ConfigServers &config_servers);
-	void        HandleEvent(const event::Event &event);
-	void        HandleNewConnection(int server_fd);
-	void        HandleExistingConnection(const event::Event &event);
-	void        ReadRequest(const event::Event &event);
-	std::string CreateHttpResponse(int client_fd) const;
-	void        SendResponse(int client_fd);
+	void             AddVirtualServers(const ConfigServers &config_servers);
+	void             HandleEvent(const event::Event &event);
+	void             HandleNewConnection(int server_fd);
+	void             HandleExistingConnection(const event::Event &event);
+	void             ReadRequest(const event::Event &event);
+	http::HttpResult CreateHttpResponse(int client_fd) const;
+	void             SendResponse(int client_fd);
 	// const
 	static const int SYSTEM_ERROR = -1;
 	// context(virtual server,client)
