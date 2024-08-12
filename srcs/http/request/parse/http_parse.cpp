@@ -130,7 +130,7 @@ void HttpParse::TmpRun(HttpRequestParsedData &data) {
 // todo: tmp request_
 HttpRequestResult HttpParse::Run(const std::string &read_buf) {
 	HttpRequestResult result;
-	// a: [request_line ＋ header_fields, messagebody]
+	// a: [request_line ＋ header_fields, message-body]
 	// b: [request_line, header_fields]
 	std::vector<std::string> a = utils::SplitStr(read_buf, HEADER_FIELDS_END);
 	std::vector<std::string> b = utils::SplitStr(a[0], CRLF);
@@ -200,9 +200,9 @@ void HttpParse::CheckValidMethod(const std::string &method) {
 	}
 }
 
-void HttpParse::CheckValidRequestTarget(const std::string &reqest_target) {
+void HttpParse::CheckValidRequestTarget(const std::string &request_target) {
 	// /が先頭になかったら場合 -> 400
-	if (reqest_target.empty() || reqest_target[0] != '/') {
+	if (request_target.empty() || request_target[0] != '/') {
 		throw HttpParseException(
 			"Error: the request target is missing the '/' character at the beginning", BAD_REQUEST
 		);
@@ -238,6 +238,6 @@ StatusCode HttpParse::HttpParseException::GetStatusCode() const {
 }
 
 // status_line && header
-// messagebody
+// message-body
 
 } // namespace http

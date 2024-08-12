@@ -168,7 +168,7 @@ std::string Server::CreateHttpResponse(int client_fd) const {
 		const DtoServerInfos &server_infos = context_.GetServerInfo(client_fd);
 
 		utils::Debug("server", "ClientInfo - IP: " + client_ip + ", fd", client_fd);
-		utils::Debug("server", "recieved ServerInfo, fd", server_infos.server_fd);
+		utils::Debug("server", "received ServerInfo, fd", server_infos.server_fd);
 		std::cerr << "server_name: " << server_infos.server_name
 				  << ", port: " << server_infos.server_port << std::endl;
 		std::cerr << "locations: " << std::endl;
