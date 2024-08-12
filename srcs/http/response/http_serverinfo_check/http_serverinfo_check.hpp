@@ -1,5 +1,5 @@
-#ifndef HTTP_PATH_CHECK_HPP_
-#define HTTP_PATH_CHECK_HPP_
+#ifndef HTTP_SERVERINFO_CHECK_HPP_
+#define HTTP_SERVERINFO_CHECK_HPP_
 
 #include "http_parse.hpp"
 #include <string>

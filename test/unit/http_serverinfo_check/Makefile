@@ -1,7 +1,7 @@
 NAME			:=	a.out
 
 # 1. Set each directory name
-TEST_DIR		:=	http_path_check
+TEST_DIR		:=	http_serverinfo_check
 
 LOG_DIR			:=	log
 LOG_FILE_NAME	:=	$(TEST_DIR).log
@@ -14,9 +14,9 @@ WS_HTTP_DIR				:=	$(WS_SRCS_DIR)/http
 WS_HTTP_REQUEST_DIR		:=	$(WS_HTTP_DIR)/request
 WS_HTTP_PARSE_DIR		:=	$(WS_HTTP_REQUEST_DIR)/parse
 WS_HTTP_RESPONSE_DIR	:=	$(WS_HTTP_DIR)/response
-WS_HTTP_PATH_CHECK_DIR	:=	$(WS_HTTP_RESPONSE_DIR)/http_path_check
+WS_HTTP_SERVERINFO_CHECK_DIR	:=	$(WS_HTTP_RESPONSE_DIR)/http_serverinfo_check
 
-SRCS				+=	$(WS_HTTP_PATH_CHECK_DIR)/http_path_check.cpp
+SRCS				+=	$(WS_HTTP_SERVERINFO_CHECK_DIR)/http_serverinfo_check.cpp
 
 # 3. Add unit test files
 SRCS	+=	main.cpp
@@ -27,7 +27,7 @@ SRCS_DIR	:=	$(WS_UTILS_DIR) \
 				$(WS_HTTP_REQUEST_DIR) \
 				$(WS_HTTP_PARSE_DIR) \
 				$(WS_HTTP_RESPONSE_DIR) \
-				$(WS_HTTP_PATH_CHECK_DIR)
+				$(WS_HTTP_SERVERINFO_CHECK_DIR)
 
 #--------------------------------------------
 OBJ_DIR		:=	objs
