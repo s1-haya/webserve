@@ -171,7 +171,7 @@ http::HttpResult Server::CreateHttpResponse(int client_fd) const {
 		PrintLocations(server_infos.locations);
 		// todo: call cgi(client_info, server_info)?
 	}
-	return mock_http.CreateResponse();
+	return mock_http.Run();
 }
 
 void Server::SendResponse(int client_fd) {

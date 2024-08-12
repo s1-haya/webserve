@@ -22,7 +22,7 @@ class MockHttp : public IHttp {
 	typedef std::map<MessageType, std::string> RequestMessage;
 	explicit MockHttp(const std::string &read_buf);
 	~MockHttp();
-	HttpResult CreateResponse();
+	HttpResult Run();
 
   private:
 	MockHttp();

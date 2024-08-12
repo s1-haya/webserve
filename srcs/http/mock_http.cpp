@@ -96,7 +96,7 @@ void CreateBody(std::ostream &response_stream, MockHttp::RequestMessage &request
 
 } // namespace
 
-HttpResult MockHttp::CreateResponse() {
+HttpResult MockHttp::Run() {
 	std::ostringstream response_stream;
 	CreateStatusLine(response_stream, this->request_);
 	CreateHeaderFields(response_stream, this->request_);
