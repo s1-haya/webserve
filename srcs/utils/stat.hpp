@@ -9,14 +9,15 @@ namespace utils {
 class Stat {
   public:
 	Stat(const std::string &path);
-	~Stat();
 	Stat(const Stat &other);
 	Stat              &operator=(const Stat &other);
+	~Stat();
+
 	bool               IsRegularFile() const;
 	bool               IsDirectory() const;
 	bool               IsReadableFile() const;
 	bool               IsWritableFile() const;
-	const struct stat &GetStatBuffer();
+
 	std::size_t        GetFileSize() const;
 
   private:

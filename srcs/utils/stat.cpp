@@ -16,16 +16,14 @@ Stat::Stat(const std::string &path) {
 Stat::~Stat() {}
 
 Stat::Stat(const Stat &other) {
-	(void)other;
+	*this = other;
 }
 
 Stat &Stat::operator=(const Stat &other) {
-	(void)other;
+	if (this != &other) {
+		this->stat_buf_ = other.stat_buf_;
+	}
 	return *this;
-}
-
-const struct stat &Stat::GetStatBuffer() {
-	return stat_buf_;
 }
 
 bool Stat::IsRegularFile() const {
