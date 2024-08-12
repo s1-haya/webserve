@@ -38,7 +38,7 @@ void HttpServerInfoCheck::CheckLocationList(
 	if (result.status != CheckServerInfoResult::OK) {
 		return;
 	}
-	const MockLocationCon match_location = CheckLocation(result, locations, request_target);
+	const MockLocationCon &match_location = CheckLocation(result, locations, request_target);
 	std::cout << match_location.request_uri << std::endl; // for debug
 	CheckIndex(result, match_location);
 	CheckAutoIndex(result, match_location);
