@@ -3,8 +3,10 @@
 
 namespace utils {
 
-Stat::Stat() {
+Stat::Stat(const std::string &path) {
 	std::cout << "Called default constructor" << std::endl;
+	// todo: error 処理行う
+	stat(path.c_str(), &stat_buf_);
 }
 
 Stat::~Stat() {
@@ -20,6 +22,10 @@ Stat &Stat::operator=(const Stat &other) {
 	(void)other;
 	std::cout << "Called assignment operator" << std::endl;
 	return *this;
+}
+
+const struct stat &Stat::GetStatBuffer() {
+	return stat_buf_;
 }
 
 } // namespace utils
