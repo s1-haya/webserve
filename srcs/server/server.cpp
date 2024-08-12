@@ -175,6 +175,8 @@ http::HttpResult Server::CreateHttpResponse(int client_fd) const {
 }
 
 void Server::SendResponse(int client_fd) {
+	// todo: HttpResultを受け取るのはここではなくIsRequestReceivedComplete()のあたりになる予定
+	// 構成の都合で仮にここで呼んでる
 	const http::HttpResult http_result = CreateHttpResponse(client_fd);
 	// Check if it's ready to start write/send.
 	// If not completed, the request will be re-read by the event_monitor.
