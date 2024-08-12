@@ -1,5 +1,9 @@
 #include "stat.hpp"
+#include "utils.hpp"
+#include <exception>
 #include <iostream>
+
+namespace {
 
 void PrintStatStructMember(const struct stat &sb) {
 	std::cout << "ID of containing device:  [" << major(sb.st_dev) << ", " << minor(sb.st_dev)
@@ -47,9 +51,54 @@ void PrintStatStructMember(const struct stat &sb) {
 	std::cout << "Last file modification:   " << ctime(&sb.st_mtime) << std::endl;
 }
 
+int GetTestCaseNum() {
+	static int test_case_num = 0;
+	++test_case_num;
+	return test_case_num;
+}
+
+void PrintOk() {
+	std::cout << utils::color::GREEN << GetTestCaseNum() << ".[OK]" << utils::color::RESET
+			  << std::endl;
+}
+
+void PrintNg() {
+	std::cerr << utils::color::RED << GetTestCaseNum() << ".[NG] " << utils::color::RESET
+			  << std::endl;
+}
+
+template <typename T>
+bool IsSame(const T &result, const T &expected) {
+	return result == expected;
+}
+
+template <typename T>
+int HandleResult(const T &result, const T &expected) {
+	if (IsSame(result, expected)) {
+		PrintOk();
+		return EXIT_SUCCESS;
+	} else {
+		PrintNg();
+		return EXIT_FAILURE;
+	}
+}
+} // namespace
+
 int main(void) {
+	int ret_code = EXIT_SUCCESS;
+
 	utils::Stat        test("Makefile");
 	const struct stat &makefile_info = test.GetStatBuffer();
 	PrintStatStructMember(makefile_info);
-	return 0;
+
+	ret_code |= HandleResult(test.IsRegularFile(), true);
+	ret_code |= HandleResult(test.IsReadableFile(), true);
+	ret_code |= HandleResult(test.IsWritableFile(), true);
+	ret_code |= HandleResult(test.IsDirectory(), false);
+	try {
+		std::cout << "Makefile size: " << test.GetFileSize() << std::endl;
+	} catch(const std::runtime_error& e) {
+		std::cerr << e.what() << std::endl;
+	}
+	return ret_code;
 }

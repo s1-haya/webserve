@@ -1,31 +1,52 @@
 #include "stat.hpp"
+#include <exception>
 #include <iostream>
 
 namespace utils {
 
 Stat::Stat(const std::string &path) {
-	std::cout << "Called default constructor" << std::endl;
 	// todo: error 処理行う
 	stat(path.c_str(), &stat_buf_);
 }
 
-Stat::~Stat() {
-	std::cout << "Called destructor" << std::endl;
-}
+Stat::~Stat() {}
 
 Stat::Stat(const Stat &other) {
 	(void)other;
-	std::cout << "Called copy constructor" << std::endl;
 }
 
 Stat &Stat::operator=(const Stat &other) {
 	(void)other;
-	std::cout << "Called assignment operator" << std::endl;
 	return *this;
 }
 
 const struct stat &Stat::GetStatBuffer() {
 	return stat_buf_;
+}
+
+bool Stat::IsRegularFile() const {
+	return (stat_buf_.st_mode & S_IFMT) == S_IFREG;
+}
+
+bool Stat::IsDirectory() const {
+	return (stat_buf_.st_mode & S_IFMT) == S_IFDIR;
+}
+
+bool Stat::IsReadableFile() const {
+	return IsRegularFile() && (stat_buf_.st_mode & S_IRUSR);
+}
+
+bool Stat::IsWritableFile() const {
+	return IsRegularFile() && (stat_buf_.st_mode & S_IWUSR);
+}
+
+// for use max_body_size？？
+std::size_t Stat::GetFileSize() const {
+	if (IsDirectory()) {
+		throw std::runtime_error("This path is a directory.");
+	} else {
+		return stat_buf_.st_size;
+	}
 }
 
 } // namespace utils
