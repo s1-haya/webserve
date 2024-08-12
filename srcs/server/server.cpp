@@ -176,7 +176,8 @@ http::HttpResult Server::CreateHttpResponse(int client_fd) const {
 
 void Server::SendResponse(int client_fd) {
 	const http::HttpResult http_result = CreateHttpResponse(client_fd);
-	// check if it's ready to start write/send
+	// Check if it's ready to start write/send.
+	// If not completed, the request will be re-read by the event_monitor.
 	if (!http_result.is_response_complete) {
 		return;
 	}
