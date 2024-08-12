@@ -1,7 +1,7 @@
 #include "server.hpp"
 #include "client_info.hpp"
 #include "event.hpp"
-#include "http.hpp"
+#include "mock_http.hpp"
 #include "server_info.hpp"
 #include "utils.hpp"
 #include "virtual_server.hpp"
@@ -155,7 +155,7 @@ void PrintLocations(const VirtualServer::LocationList &locations) {
 http::HttpResult Server::CreateHttpResponse(int client_fd) const {
 	const std::string &request_buf = buffers_.GetBuffer(client_fd);
 
-	http::Http http(request_buf);
+	http::MockHttp mock_http(request_buf);
 	// todo: parse?
 	// todo: tmp
 	const bool is_cgi = true;
@@ -171,7 +171,7 @@ http::HttpResult Server::CreateHttpResponse(int client_fd) const {
 		PrintLocations(server_infos.locations);
 		// todo: call cgi(client_info, server_info)?
 	}
-	return http.CreateResponse();
+	return mock_http.CreateResponse();
 }
 
 void Server::SendResponse(int client_fd) {

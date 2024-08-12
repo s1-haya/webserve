@@ -1,6 +1,7 @@
-#ifndef HTTP_HPP_
-#define HTTP_HPP_
+#ifndef MOCK_HTTP_HPP_
+#define MOCK_HTTP_HPP_
 
+#include "IHttp.hpp"
 #include <map>
 #include <string>
 
@@ -8,7 +9,7 @@ namespace http {
 
 struct HttpResult;
 
-class Http {
+class MockHttp : public IHttp {
   public:
 	enum MessageType {
 		HTTP_METHOD,
@@ -19,21 +20,21 @@ class Http {
 		HTTP_STATUS_TEXT
 	};
 	typedef std::map<MessageType, std::string> RequestMessage;
-	explicit Http(const std::string &read_buf);
-	~Http();
+	explicit MockHttp(const std::string &read_buf);
+	~MockHttp();
 	HttpResult CreateResponse();
 
   private:
-	Http();
+	MockHttp();
 	// prohibit copy
-	Http(const Http &other);
-	Http &operator=(const Http &other);
-	void  ParseRequest(const std::string &read_buf);
-	void  ReadPathContent();
+	MockHttp(const MockHttp &other);
+	MockHttp &operator=(const MockHttp &other);
+	void      ParseRequest(const std::string &read_buf);
+	void      ReadPathContent();
 	// variable
 	RequestMessage request_;
 };
 
 } // namespace http
 
-#endif /* HTTP_HPP_ */
+#endif /* MOCK_HTTP_HPP_ */
