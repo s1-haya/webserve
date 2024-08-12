@@ -75,7 +75,7 @@ int Test1() {
 	std::cout << "error_page_path: " << result.error_page_path << std::endl;
 	std::cout << std::endl;
 	if (result.status != CheckServerInfoResult::OK &&
-		result.status != CheckServerInfoResult::REDIRECT) {
+		result.status != CheckServerInfoResult::REDIRECT_ON) {
 		return EXIT_FAILURE;
 	}
 	return EXIT_SUCCESS;
@@ -100,7 +100,7 @@ int Test2() {
 	std::cout << "error_page_path: " << result.error_page_path << std::endl;
 	std::cout << std::endl;
 	if (result.status != CheckServerInfoResult::OK &&
-		result.status != CheckServerInfoResult::REDIRECT) {
+		result.status != CheckServerInfoResult::REDIRECT_ON) {
 		return EXIT_FAILURE;
 	}
 	return EXIT_SUCCESS;
@@ -127,7 +127,7 @@ int Test3() {
 	std::cout << "error_page_path: " << result.error_page_path << std::endl;
 	std::cout << std::endl;
 	if (result.status != CheckServerInfoResult::OK &&
-		result.status != CheckServerInfoResult::REDIRECT) {
+		result.status != CheckServerInfoResult::REDIRECT_ON) {
 		return EXIT_FAILURE;
 	}
 	return EXIT_SUCCESS;

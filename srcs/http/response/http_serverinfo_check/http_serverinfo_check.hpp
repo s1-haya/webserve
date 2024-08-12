@@ -44,7 +44,7 @@ struct CheckServerInfoResult {
 		INVALID_HOST,
 		PAYLOAD_TOO_LARGE,
 		LOCATION_NOT_FOUND,
-		REDIRECT
+		REDIRECT_ON
 	}; // rfc + 見やすいように独自で名前をつけた
 	// 呼び出し元でこれをチェックしてstatus codeを付ける用
 
@@ -73,7 +73,7 @@ class HttpServerInfoCheck {
 		const LocationList    &locations,
 		const std::string     &request_target
 	);
-	static MockLocationCon CheckLocation(
+	static const MockLocationCon CheckLocation(
 		CheckServerInfoResult &result,
 		const LocationList    &locations,
 		const std::string     &request_target

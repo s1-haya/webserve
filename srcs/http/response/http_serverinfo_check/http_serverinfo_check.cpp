@@ -38,7 +38,7 @@ void HttpServerInfoCheck::CheckLocationList(
 	if (result.status != CheckServerInfoResult::OK) {
 		return;
 	}
-	MockLocationCon match_location = CheckLocation(result, locations, request_target);
+	const MockLocationCon match_location = CheckLocation(result, locations, request_target);
 	std::cout << match_location.request_uri << std::endl; // for debug
 	CheckIndex(result, match_location);
 	CheckAutoIndex(result, match_location);
@@ -47,7 +47,7 @@ void HttpServerInfoCheck::CheckLocationList(
 	return;
 }
 
-MockLocationCon HttpServerInfoCheck::CheckLocation(
+const MockLocationCon HttpServerInfoCheck::CheckLocation(
 	CheckServerInfoResult &result, const LocationList &locations, const std::string &request_target
 ) {
 	MockLocationCon match_loc;
@@ -65,7 +65,7 @@ MockLocationCon HttpServerInfoCheck::CheckLocation(
 			match_loc = *it;
 		}
 	}
-	if (match_loc.request_uri.length() == 0) {
+	if (match_loc.request_uri.empty()) {
 		result.status = CheckServerInfoResult::LOCATION_NOT_FOUND;
 	}
 	return match_loc;
@@ -112,7 +112,7 @@ void HttpServerInfoCheck::CheckRedirect(
 	// status code: 301
 	result.status_code = location.redirect.first;
 	result.path        = location.redirect.second;
-	result.status      = CheckServerInfoResult::REDIRECT;
+	result.status      = CheckServerInfoResult::REDIRECT_ON;
 }
 
 } // namespace http
