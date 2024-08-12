@@ -87,18 +87,26 @@ int HandleResult(const T &result, const T &expected) {
 int main(void) {
 	int ret_code = EXIT_SUCCESS;
 
-	utils::Stat        test("Makefile");
-	const struct stat &makefile_info = test.GetStatBuffer();
-	PrintStatStructMember(makefile_info);
-
-	ret_code |= HandleResult(test.IsRegularFile(), true);
-	ret_code |= HandleResult(test.IsReadableFile(), true);
-	ret_code |= HandleResult(test.IsWritableFile(), true);
-	ret_code |= HandleResult(test.IsDirectory(), false);
 	try {
+		utils::Stat        test("Makefile");
+		const struct stat &makefile_info = test.GetStatBuffer();
+		PrintStatStructMember(makefile_info);
+
+		ret_code |= HandleResult(test.IsRegularFile(), true);
+		ret_code |= HandleResult(test.IsReadableFile(), true);
+		ret_code |= HandleResult(test.IsWritableFile(), true);
+		ret_code |= HandleResult(test.IsDirectory(), false);
 		std::cout << "Makefile size: " << test.GetFileSize() << std::endl;
-	} catch(const std::runtime_error& e) {
+	} catch (const utils::SystemException &e) {
 		std::cerr << e.what() << std::endl;
+		std::cerr << e.GetErrorNumber() << std::endl;
+	}
+
+	try {
+		utils::Stat test2("no.txt");
+	} catch (const utils::SystemException &e) {
+		std::cerr << e.what() << std::endl;
+		std::cerr << e.GetErrorNumber() << std::endl;
 	}
 	return ret_code;
 }

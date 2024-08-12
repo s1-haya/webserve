@@ -12,11 +12,11 @@ class Stat {
 	~Stat();
 	Stat(const Stat &other);
 	Stat              &operator=(const Stat &other);
-	const struct stat &GetStatBuffer();
 	bool               IsRegularFile() const;
 	bool               IsDirectory() const;
 	bool               IsReadableFile() const;
 	bool               IsWritableFile() const;
+	const struct stat &GetStatBuffer();
 	std::size_t        GetFileSize() const;
 
   private:

@@ -1,12 +1,16 @@
 #include "stat.hpp"
+#include "system_exception.hpp"
+#include <errno.h>
 #include <exception>
 #include <iostream>
 
 namespace utils {
 
 Stat::Stat(const std::string &path) {
-	// todo: error 処理行う
-	stat(path.c_str(), &stat_buf_);
+	if (stat(path.c_str(), &stat_buf_) == -1) {
+		std::string error_message = "Error: stat on path '" + path + "': " + strerror(errno);
+		throw SystemException(error_message, errno);
+	}
 }
 
 Stat::~Stat() {}
@@ -43,7 +47,7 @@ bool Stat::IsWritableFile() const {
 // for use max_body_size？？
 std::size_t Stat::GetFileSize() const {
 	if (IsDirectory()) {
-		throw std::runtime_error("This path is a directory.");
+		throw std::logic_error("This path is a directory.");
 	} else {
 		return stat_buf_.st_size;
 	}
