@@ -13,7 +13,7 @@ namespace config {
 class Config {
   private:
 	Config();
-	Config(const std::string &file_path);
+	explicit Config(const std::string &);
 	Config(const Config &);
 	Config              &operator=(const Config &);
 	static const Config *s_cInstance;
@@ -23,7 +23,7 @@ class Config {
 	~Config();
 
 	static const Config          *GetInstance();
-	static void                   Create(const std::string &file_path);
+	static void                   Create(const std::string &);
 	static void                   Destroy();
 	std::list<context::ServerCon> servers_;
 };

@@ -37,7 +37,7 @@ class Parser {
 	void HandleReturn(std::pair<unsigned int, std::string> &redirect, NodeItr &it);
 
   public:
-	Parser(std::list<node::Node> &);
+	explicit Parser(std::list<node::Node> &);
 	~Parser();
 
 	std::list<context::ServerCon> GetServers() const;
