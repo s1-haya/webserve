@@ -140,43 +140,58 @@ context::LocationCon Parser::CreateLocationContext(NodeItr &it) {
 	return location;
 }
 
+void Parser::HandleAlias(std::string &alias, NodeItr &it) {
+	if ((*it).token_type != node::WORD) {
+		throw std::runtime_error("invalid number of arguments in 'alias' directive");
+	}
+	alias = (*it++).token;
+}
+
+void Parser::HandleIndex(std::string &index, NodeItr &it) {
+	if ((*it).token_type != node::WORD) {
+		throw std::runtime_error("invalid number of arguments in 'index' directive");
+	}
+	index = (*it++).token;
+}
+
+void Parser::HandleAutoIndex(bool &autoindex, NodeItr &it) {
+	if ((*it).token_type != node::WORD || ((*it).token != "on" && (*it).token != "off")) {
+		throw std::runtime_error("invalid arguments in 'autoindex' directive");
+	}
+	autoindex = ((*it++).token == "on");
+}
+
+void Parser::HandleAllowedMethods(std::list<std::string> &allowed_methods, NodeItr &it) {
+	while ((*it).token_type != node::DELIM && (*it).token_type == node::WORD) {
+		allowed_methods.push_back((*it++).token);
+		if (it == tokens_.end()) {
+			throw std::runtime_error("invalid arguments of 'allowed_methods' directive");
+		}
+	}
+}
+
+void Parser::HandleReturn(std::pair<unsigned int, std::string> &redirect, NodeItr &it) {
+	if ((*it).token_type != node::WORD || (*++NodeItr(it)).token_type != node::WORD) {
+		throw std::runtime_error("invalid number of arguments in 'return' directive");
+	}
+	// ex. 302 /index.html, tmp: atoi
+	NodeItr tmp_it = it; // 302
+	it++;                // /index.html
+	redirect = std::make_pair(std::atoi((*tmp_it).token.c_str()), (*it).token);
+	it++;
+}
+
 void Parser::HandleLocationContextDirective(context::LocationCon &location, NodeItr &it) {
 	if ((*it).token == ALIAS) {
-		++it;
-		if ((*it).token_type != node::WORD) {
-			throw std::runtime_error("invalid number of arguments in 'alias' directive");
-		}
-		location.alias = (*it++).token;
+		HandleAlias(location.alias, ++it);
 	} else if ((*it).token == INDEX) {
-		++it;
-		if ((*it).token_type != node::WORD) {
-			throw std::runtime_error("invalid number of arguments in 'index' directive");
-		}
-		location.index = (*it++).token;
+		HandleIndex(location.index, ++it);
 	} else if ((*it).token == AUTO_INDEX) {
-		++it;
-		if ((*it).token_type != node::WORD || ((*it).token != "on" && (*it).token != "off")) {
-			throw std::runtime_error("invalid arguments in 'autoindex' directive");
-		}
-		location.autoindex = ((*it++).token == "on");
+		HandleAutoIndex(location.autoindex, ++it);
 	} else if ((*it).token == ALLOWED_METHODS) {
-		++it;
-		while ((*it).token_type != node::DELIM && (*it).token_type == node::WORD) {
-			location.allowed_methods.push_back((*it++).token);
-			if (it == tokens_.end()) {
-				throw std::runtime_error("invalid arguments of 'allowed_methods' directive");
-			}
-		}
+		HandleAllowedMethods(location.allowed_methods, ++it);
 	} else if ((*it).token == RETURN) {
-		++it;
-		if ((*it).token_type != node::WORD || (*++NodeItr(it)).token_type != node::WORD) {
-			throw std::runtime_error("invalid number of arguments in 'return' directive");
-		}
-		// ex. 302 /index.html, tmp: atoi
-		NodeItr tmp_it = it; // 302
-		it++;                // /index.html
-		location.redirect = std::make_pair(std::atoi((*tmp_it).token.c_str()), (*it).token);
-		it++;
+		HandleReturn(location.redirect, ++it);
 	}
 	if ((*it).token_type != node::DELIM) {
 		throw std::runtime_error("expect ';' after arguments");

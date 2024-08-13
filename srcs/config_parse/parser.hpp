@@ -30,6 +30,12 @@ class Parser {
 	void HandleClientMaxBodySize(std::size_t &client_max_body_size, NodeItr &it);
 	void HandleErrorPage(std::pair<unsigned int, std::string> &error_page, NodeItr &it);
 
+	void HandleAlias(std::string &alias, NodeItr &it);
+	void HandleIndex(std::string &index, NodeItr &it);
+	void HandleAutoIndex(bool &autoindex, NodeItr &it);
+	void HandleAllowedMethods(std::list<std::string> &allowed_methods, NodeItr &it);
+	void HandleReturn(std::pair<unsigned int, std::string> &redirect, NodeItr &it);
+
   public:
 	Parser(std::list<node::Node> &);
 	~Parser();
