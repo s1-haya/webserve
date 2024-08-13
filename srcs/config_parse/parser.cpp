@@ -1,4 +1,5 @@
 #include "parser.hpp"
+#include "directive_names.hpp"
 #include <cstdlib> // atoi
 #include <stdexcept>
 
@@ -6,7 +7,7 @@ namespace config {
 namespace parser {
 
 void Parser::HandleServerContextDirective(context::ServerCon &server, NodeItr &it) {
-	if ((*it).token == "server_name") {
+	if ((*it).token == SERVER_NAME) {
 		++it;
 		while ((*it).token_type != node::DELIM && (*it).token_type == node::WORD) {
 			server.server_names.push_back((*it++).token);
@@ -14,14 +15,14 @@ void Parser::HandleServerContextDirective(context::ServerCon &server, NodeItr &i
 				throw std::runtime_error("invalid arguments of 'server_name' directive");
 			}
 		}
-	} else if ((*it).token == "listen") {
+	} else if ((*it).token == LISTEN) {
 		++it;
 		if ((*it).token_type != node::WORD) {
 			throw std::runtime_error("invalid number of arguments in 'listen' directive");
 		}
 		server.port.push_back(std::atoi((*it++).token.c_str())
 		); // TODO: atoi, validation, 重複チェック
-	} else if ((*it).token == "client_max_body_size") {
+	} else if ((*it).token == CLIENT_MAX_BODY_SIZE) {
 		++it;
 		if ((*it).token_type != node::WORD) {
 			throw std::runtime_error(
@@ -29,7 +30,7 @@ void Parser::HandleServerContextDirective(context::ServerCon &server, NodeItr &i
 			);
 		}
 		server.client_max_body_size = std::atoi((*it++).token.c_str()); // tmp: atoi
-	} else if ((*it).token == "error_page") {
+	} else if ((*it).token == ERROR_PAGE) {
 		++it;
 		if ((*it).token_type != node::WORD || (*++NodeItr(it)).token_type != node::WORD) {
 			throw std::runtime_error("invalid number of arguments in 'error_page' directive");
@@ -46,25 +47,25 @@ void Parser::HandleServerContextDirective(context::ServerCon &server, NodeItr &i
 }
 
 void Parser::HandleLocationContextDirective(context::LocationCon &location, NodeItr &it) {
-	if ((*it).token == "alias") {
+	if ((*it).token == ALIAS) {
 		++it;
 		if ((*it).token_type != node::WORD) {
 			throw std::runtime_error("invalid number of arguments in 'alias' directive");
 		}
 		location.alias = (*it++).token;
-	} else if ((*it).token == "index") {
+	} else if ((*it).token == INDEX) {
 		++it;
 		if ((*it).token_type != node::WORD) {
 			throw std::runtime_error("invalid number of arguments in 'index' directive");
 		}
 		location.index = (*it++).token;
-	} else if ((*it).token == "autoindex") {
+	} else if ((*it).token == AUTO_INDEX) {
 		++it;
 		if ((*it).token_type != node::WORD || ((*it).token != "on" && (*it).token != "off")) {
 			throw std::runtime_error("invalid arguments in 'autoindex' directive");
 		}
 		location.autoindex = ((*it++).token == "on");
-	} else if ((*it).token == "allowed_methods") {
+	} else if ((*it).token == ALLOWED_METHODS) {
 		++it;
 		while ((*it).token_type != node::DELIM && (*it).token_type == node::WORD) {
 			location.allowed_methods.push_back((*it++).token);
@@ -72,7 +73,7 @@ void Parser::HandleLocationContextDirective(context::LocationCon &location, Node
 				throw std::runtime_error("invalid arguments of 'allowed_methods' directive");
 			}
 		}
-	} else if ((*it).token == "return") {
+	} else if ((*it).token == RETURN) {
 		++it;
 		if ((*it).token_type != node::WORD || (*++NodeItr(it)).token_type != node::WORD) {
 			throw std::runtime_error("invalid number of arguments in 'return' directive");
@@ -90,7 +91,7 @@ void Parser::HandleLocationContextDirective(context::LocationCon &location, Node
 
 Parser::Parser(std::list<node::Node> &tokens) : tokens_(tokens) {
 	for (NodeItr it = tokens_.begin(); it != tokens_.end(); ++it) {
-		if ((*it).token_type == node::CONTEXT && (*it).token == "server") {
+		if ((*it).token_type == node::CONTEXT && (*it).token == SERVER) {
 			servers_.push_back(CreateServerContext(++it));
 		} else {
 			throw std::runtime_error("expect server context");
@@ -113,7 +114,7 @@ context::ServerCon Parser::CreateServerContext(NodeItr &it) {
 			HandleServerContextDirective(server, it);
 			break;
 		case node::CONTEXT:
-			if ((*it).token == "location") {
+			if ((*it).token == LOCATION) {
 				server.location_con.push_back(CreateLocationContext(++it));
 			} else {
 				throw std::runtime_error("invalid nest of 'server' directive");
