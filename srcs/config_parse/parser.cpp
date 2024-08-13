@@ -22,6 +22,11 @@ void Parser::ParseNode() {
 	}
 }
 
+/**
+ * @brief Handlers for Server Context
+ * @details Handlers for each Server Directive
+ */
+
 context::ServerCon Parser::CreateServerContext(NodeItr &it) {
 	context::ServerCon server;
 
@@ -105,6 +110,11 @@ void Parser::HandleErrorPage(std::pair<unsigned int, std::string> &error_page, N
 	it++;
 }
 
+/**
+ * @brief Handlers for Location Context
+ * @details Handlers for each Location Directive
+ */
+
 context::LocationCon Parser::CreateLocationContext(NodeItr &it) {
 	context::LocationCon location;
 
@@ -138,6 +148,23 @@ context::LocationCon Parser::CreateLocationContext(NodeItr &it) {
 		throw std::runtime_error("expect }");
 	}
 	return location;
+}
+
+void Parser::HandleLocationContextDirective(context::LocationCon &location, NodeItr &it) {
+	if ((*it).token == ALIAS) {
+		HandleAlias(location.alias, ++it);
+	} else if ((*it).token == INDEX) {
+		HandleIndex(location.index, ++it);
+	} else if ((*it).token == AUTO_INDEX) {
+		HandleAutoIndex(location.autoindex, ++it);
+	} else if ((*it).token == ALLOWED_METHODS) {
+		HandleAllowedMethods(location.allowed_methods, ++it);
+	} else if ((*it).token == RETURN) {
+		HandleReturn(location.redirect, ++it);
+	}
+	if ((*it).token_type != node::DELIM) {
+		throw std::runtime_error("expect ';' after arguments");
+	}
 }
 
 void Parser::HandleAlias(std::string &alias, NodeItr &it) {
@@ -179,23 +206,6 @@ void Parser::HandleReturn(std::pair<unsigned int, std::string> &redirect, NodeIt
 	it++;                // /index.html
 	redirect = std::make_pair(std::atoi((*tmp_it).token.c_str()), (*it).token);
 	it++;
-}
-
-void Parser::HandleLocationContextDirective(context::LocationCon &location, NodeItr &it) {
-	if ((*it).token == ALIAS) {
-		HandleAlias(location.alias, ++it);
-	} else if ((*it).token == INDEX) {
-		HandleIndex(location.index, ++it);
-	} else if ((*it).token == AUTO_INDEX) {
-		HandleAutoIndex(location.autoindex, ++it);
-	} else if ((*it).token == ALLOWED_METHODS) {
-		HandleAllowedMethods(location.allowed_methods, ++it);
-	} else if ((*it).token == RETURN) {
-		HandleReturn(location.redirect, ++it);
-	}
-	if ((*it).token_type != node::DELIM) {
-		throw std::runtime_error("expect ';' after arguments");
-	}
 }
 
 std::list<context::ServerCon> Parser::GetServers() const {
