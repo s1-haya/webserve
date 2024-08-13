@@ -21,8 +21,14 @@ class Parser {
 	context::ServerCon   CreateServerContext(NodeItr &);
 	context::LocationCon CreateLocationContext(NodeItr &);
 
+	void ParseNode();
 	void HandleServerContextDirective(context::ServerCon &server, NodeItr &it);
 	void HandleLocationContextDirective(context::LocationCon &location, NodeItr &it);
+
+	void HandleServerName(std::list<std::string> &server_names, NodeItr &it);
+	void HandleListen(context::PortList &ports, NodeItr &it);
+	void HandleClientMaxBodySize(std::size_t &client_max_body_size, NodeItr &it);
+	void HandleErrorPage(std::pair<unsigned int, std::string> &error_page, NodeItr &it);
 
   public:
 	Parser(std::list<node::Node> &);
