@@ -10,6 +10,21 @@
 
 namespace config {
 
+/**
+ * @brief Singleton Class
+ *
+ * - Initialization:
+ * @li `config::ConfigInstance->Create("config_file_path");`
+ *
+ * - Access the Instance:
+ * @li `const config::Config *configInstance = config::ConfigInstance;`
+ *
+ * - Get Servers:
+ * @li `std::list<context::ServerCon> servers = config::ConfigInstance->servers_;`
+ *
+ * - Destroy the Instance:
+ * @li `config::ConfigInstance->Destroy();`
+ */
 class Config {
   private:
 	Config();
