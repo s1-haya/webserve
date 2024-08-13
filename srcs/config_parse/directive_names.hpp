@@ -5,8 +5,18 @@
 
 namespace config {
 
+/**
+ * @brief Block Directive (Context Directive)
+ * @details Dir_name {}
+ */
+
 extern const std::string SERVER;
 extern const std::string LOCATION;
+
+/**
+ * @brief Directive in Context
+ * @details Dir_name args;
+ */
 
 extern const std::string SERVER_NAME;
 extern const std::string LISTEN;
