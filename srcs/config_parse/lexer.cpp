@@ -28,15 +28,19 @@ void Lexer::InitDefinition() {
 	context_.push_back(SERVER);
 	context_.push_back(LOCATION);
 
-	directive_.push_back(SERVER_NAME);
+	// host 未実装
 	directive_.push_back(LISTEN);
-	directive_.push_back(ALIAS);
-	directive_.push_back(INDEX);
-	directive_.push_back(AUTO_INDEX);
+	directive_.push_back(SERVER_NAME);
 	directive_.push_back(ERROR_PAGE);
 	directive_.push_back(CLIENT_MAX_BODY_SIZE);
+
 	directive_.push_back(ALLOWED_METHODS);
 	directive_.push_back(RETURN);
+	directive_.push_back(ALIAS);
+	directive_.push_back(AUTO_INDEX);
+	directive_.push_back(INDEX);
+
+	// CGI未実装
 }
 
 void Lexer::LexBuffer() {
