@@ -35,6 +35,7 @@ class Server {
 	void HandleNewConnection(int server_fd);
 	void HandleExistingConnection(const event::Event &event);
 	void ReadRequest(const event::Event &event);
+	void RunHttp(const event::Event &event);
 	void SendResponse(int client_fd);
 	// for Server to Http
 	DtoClientInfos GetClientInfos(int client_fd) const;

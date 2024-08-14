@@ -47,6 +47,26 @@ VirtualServer ConvertToVirtualServer(const config::context::ServerCon &config_se
 	return VirtualServer(server_name, locations, ports);
 }
 
+// todo: tmp for debug
+void PrintLocations(const VirtualServer::LocationList &locations) {
+	typedef VirtualServer::LocationList::const_iterator Itr;
+	for (Itr it = locations.begin(); it != locations.end(); ++it) {
+		const server::Location &location = *it;
+		std::cerr << "- location: " << location.location << ", root: " << location.root
+				  << ", index: " << location.index << std::endl;
+	}
+}
+
+// todo: tmp for debug
+void DebugDto(const DtoClientInfos &client_infos, const DtoServerInfos &server_infos) {
+	utils::Debug("server", "ClientInfo - IP: " + client_infos.ip + ", fd", client_infos.fd);
+	utils::Debug("server", "received ServerInfo, fd", server_infos.fd);
+	std::cerr << "server_name: " << server_infos.server_name << ", port: " << server_infos.port
+			  << std::endl;
+	std::cerr << "locations: " << std::endl;
+	PrintLocations(server_infos.locations);
+}
+
 } // namespace
 
 void Server::AddVirtualServers(const ConfigServers &config_servers) {
@@ -102,36 +122,13 @@ void Server::HandleNewConnection(int server_fd) {
 void Server::HandleExistingConnection(const event::Event &event) {
 	if (event.type & event::EVENT_READ) {
 		ReadRequest(event);
+		RunHttp(event);
 	}
 	if (event.type & event::EVENT_WRITE) {
 		SendResponse(event.fd);
 	}
 	// todo: handle other EventType
 }
-
-namespace {
-
-// todo: tmp for debug
-void PrintLocations(const VirtualServer::LocationList &locations) {
-	typedef VirtualServer::LocationList::const_iterator Itr;
-	for (Itr it = locations.begin(); it != locations.end(); ++it) {
-		const server::Location &location = *it;
-		std::cerr << "- location: " << location.location << ", root: " << location.root
-				  << ", index: " << location.index << std::endl;
-	}
-}
-
-// todo: tmp for debug
-void DebugDto(const DtoClientInfos &client_infos, const DtoServerInfos &server_infos) {
-	utils::Debug("server", "ClientInfo - IP: " + client_infos.ip + ", fd", client_infos.fd);
-	utils::Debug("server", "received ServerInfo, fd", server_infos.fd);
-	std::cerr << "server_name: " << server_infos.server_name << ", port: " << server_infos.port
-			  << std::endl;
-	std::cerr << "locations: " << std::endl;
-	PrintLocations(server_infos.locations);
-}
-
-} // namespace
 
 DtoClientInfos Server::GetClientInfos(int client_fd) const {
 	DtoClientInfos client_infos;
@@ -165,6 +162,10 @@ void Server::ReadRequest(const event::Event &event) {
 		// event_monitor_.Delete(client_fd);
 		return;
 	}
+}
+
+void Server::RunHttp(const event::Event &event) {
+	const int client_fd = event.fd;
 
 	// Prepare to http.Run()
 	const DtoClientInfos &client_infos = GetClientInfos(client_fd);
