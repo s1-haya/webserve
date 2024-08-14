@@ -24,6 +24,9 @@ std::string ReadFile(const std::string &file_path) {
 	return FileToString(file);
 }
 
+// bool TryStat(const std::string& path, bool &is_success) {
+// }
+
 } // namespace
 
 // todo: 各メソッドを実行する関数
@@ -38,8 +41,8 @@ void HttpResponse::GetHandler(const std::string &path, std::string &body_message
 	try {
 		Stat info(path);
 		if (info.IsDirectory()) {
-			if (path.back() != '/') {
-				// todo: redirect value
+			if (path[path.size() - 1] != '/') {
+				// todo: return stats_code pathname;
 				body_message = CreateErrorBodyMessage(
 					utils::ToString(http::MOVED_PERMANENTLY),
 					reason_phrase.at(http::MOVED_PERMANENTLY)
@@ -62,11 +65,21 @@ void HttpResponse::GetHandler(const std::string &path, std::string &body_message
 			);
 		}
 	} catch (const utils::SystemException &e) {
-		// todo: error number to http error response
-		// body_message = CreateErrorBodyMessage(
-		// 	utils::ToString(http::INTERNAL_SERVER_ERROR),
-		// reason_phrase.at(http::INTERNAL_SERVER_ERROR)
-		// );
+		int error_number = e.GetErrorNumber();
+		if (error_number == EACCES) {
+			body_message = CreateErrorBodyMessage(
+				utils::ToString(http::FORBIDDEN), reason_phrase.at(http::FORBIDDEN)
+			);
+		} else if (error_number == ENOENT || error_number == ENOTDIR) {
+			body_message = CreateErrorBodyMessage(
+				utils::ToString(http::NOT_FOUND), reason_phrase.at(http::NOT_FOUND)
+			);
+		} else {
+			body_message = CreateErrorBodyMessage(
+				utils::ToString(http::INTERNAL_SERVER_ERROR),
+				reason_phrase.at(http::INTERNAL_SERVER_ERROR)
+			);
+		}
 	}
 }
 
