@@ -24,8 +24,8 @@ ssize_t Buffer::ReadRequest(int client_fd) {
 }
 
 void Buffer::Delete(int client_fd) {
-	requests_[client_fd].erase();
-	responses_[client_fd].erase();
+	requests_.erase(client_fd);
+	responses_.erase(client_fd);
 }
 
 const std::string &Buffer::GetRequest(int client_fd) const {
