@@ -2,6 +2,7 @@
 #define UTILS_HPP_
 
 #include "color.hpp"
+#include "result.hpp"
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -33,7 +34,7 @@ std::string ToString(T value) {
 }
 
 // string
-bool                     ConvertStrToUint(const std::string &str, unsigned int &num);
+Result<unsigned int>     ConvertStrToUint(const std::string &str);
 bool                     ConvertStrToSize(const std::string &str, size_t &num);
 std::string              ConvertUintToStr(unsigned int num);
 std::vector<std::string> SplitStr(const std::string &src, const std::string &substring);
