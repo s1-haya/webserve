@@ -160,15 +160,15 @@ http::HttpResult Server::CreateHttpResponse(int client_fd) const {
 	// todo: tmp
 	const bool is_cgi = true;
 	if (is_cgi) {
-		const std::string    &client_ip    = context_.GetClientInfo(client_fd);
-		const DtoServerInfos &server_infos = context_.GetServerInfo(client_fd);
+		const std::string   &client_ip      = context_.GetClientInfo(client_fd);
+		const ServerContext &server_context = context_.GetServerContext(client_fd);
 
 		utils::Debug("server", "ClientInfo - IP: " + client_ip + ", fd", client_fd);
-		utils::Debug("server", "received ServerInfo, fd", server_infos.server_fd);
-		std::cerr << "server_name: " << server_infos.server_name
-				  << ", port: " << server_infos.server_port << std::endl;
+		utils::Debug("server", "received ServerInfo, fd", server_context.fd);
+		std::cerr << "server_name: " << server_context.server_name
+				  << ", port: " << server_context.port << std::endl;
 		std::cerr << "locations: " << std::endl;
-		PrintLocations(server_infos.locations);
+		PrintLocations(server_context.locations);
 		// todo: call cgi(client_info, server_info)?
 	}
 	return mock_http.Run();
