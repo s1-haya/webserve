@@ -30,7 +30,7 @@ class ContextManager {
 	// getter
 	const VirtualServerStorage::VirtualServerList &GetVirtualServerList() const;
 	ServerContext                                  GetServerContext(int client_fd) const;
-	const std::string                             &GetClientInfo(int client_fd) const;
+	const std::string                             &GetClientIp(int client_fd) const;
 
   private:
 	VirtualServerStorage virtual_servers_;
