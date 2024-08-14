@@ -1,6 +1,7 @@
 #include "buffer.hpp"
-#include <cstdio>   // perror
-#include <unistd.h> // read
+#include <cstdio>    // perror
+#include <stdexcept> // logic_error
+#include <unistd.h>  // read
 
 namespace server {
 
@@ -28,18 +29,27 @@ void Buffer::Delete(int client_fd) {
 }
 
 const std::string &Buffer::GetRequest(int client_fd) const {
-	// todo: fd error handle
-	return requests_.at(client_fd);
+	try {
+		return requests_.at(client_fd);
+	} catch (const std::exception &e) {
+		throw std::logic_error("GetRequest() : client_fd doesn't exists");
+	}
 }
 
 void Buffer::AddResponse(int client_fd, const std::string &response) {
-	// todo: fd error handle
-	responses_[client_fd] = response;
+	typedef std::pair<ResponseMap::const_iterator, bool> InsertResult;
+	InsertResult result = responses_.insert(std::make_pair(client_fd, response));
+	if (result.second == false) {
+		throw std::logic_error("AddResponse() : client_fd is already added");
+	}
 }
 
 const std::string &Buffer::GetResponse(int client_fd) const {
-	// todo: fd error handle
-	return responses_.at(client_fd);
+	try {
+		return responses_.at(client_fd);
+	} catch (const std::exception &e) {
+		throw std::logic_error("GetResponse() : client_fd doesn't exists");
+	}
 }
 
 } // namespace server
