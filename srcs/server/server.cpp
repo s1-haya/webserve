@@ -1,5 +1,6 @@
 #include "server.hpp"
 #include "client_info.hpp"
+#include "dto_server_to_http.hpp"
 #include "event.hpp"
 #include "mock_http.hpp"
 #include "server_info.hpp"
@@ -116,7 +117,28 @@ bool IsRequestReceivedComplete(const std::string &buffer) {
 	return buffer.find("\r\n\r\n") != std::string::npos;
 }
 
+// todo: tmp for debug
+void PrintLocations(const VirtualServer::LocationList &locations) {
+	typedef VirtualServer::LocationList::const_iterator Itr;
+	for (Itr it = locations.begin(); it != locations.end(); ++it) {
+		const server::Location &location = *it;
+		std::cerr << "- location: " << location.location << ", root: " << location.root
+				  << ", index: " << location.index << std::endl;
+	}
+}
+
 } // namespace
+
+DtoServerInfos Server::GetServerInfos(int client_fd) const {
+	const ServerContext &server_context = context_.GetServerContext(client_fd);
+
+	DtoServerInfos server_infos;
+	server_infos.fd          = server_context.fd;
+	server_infos.server_name = server_context.server_name;
+	server_infos.port        = server_context.port;
+	server_infos.locations   = server_context.locations;
+	return server_infos;
+}
 
 void Server::ReadRequest(const event::Event &event) {
 	const int client_fd = event.fd;
@@ -131,26 +153,21 @@ void Server::ReadRequest(const event::Event &event) {
 		// event_monitor_.Delete(client_fd);
 		return;
 	}
+
+	// Prepare to http.Run()
+	const DtoServerInfos &server_infos = GetServerInfos(client_fd);
+	utils::Debug("server", "received ServerInfo, fd", server_infos.fd);
+	std::cerr << "server_name: " << server_infos.server_name << ", port: " << server_infos.port
+			  << std::endl;
+	std::cerr << "locations: " << std::endl;
+	PrintLocations(server_infos.locations);
+
 	if (IsRequestReceivedComplete(buffers_.GetBuffer(client_fd))) {
 		utils::Debug("server", "received all request from client", client_fd);
 		std::cerr << buffers_.GetBuffer(client_fd) << std::endl;
 		event_monitor_.Update(event, event::EVENT_WRITE);
 	}
 }
-
-namespace {
-
-// todo: tmp for debug
-void PrintLocations(const VirtualServer::LocationList &locations) {
-	typedef VirtualServer::LocationList::const_iterator Itr;
-	for (Itr it = locations.begin(); it != locations.end(); ++it) {
-		const server::Location &location = *it;
-		std::cerr << "- location: " << location.location << ", root: " << location.root
-				  << ", index: " << location.index << std::endl;
-	}
-}
-
-} // namespace
 
 http::HttpResult Server::CreateHttpResponse(int client_fd) const {
 	const std::string &request_buf = buffers_.GetBuffer(client_fd);
@@ -160,15 +177,9 @@ http::HttpResult Server::CreateHttpResponse(int client_fd) const {
 	// todo: tmp
 	const bool is_cgi = true;
 	if (is_cgi) {
-		const std::string   &client_ip      = context_.GetClientInfo(client_fd);
-		const ServerContext &server_context = context_.GetServerContext(client_fd);
+		const std::string &client_ip = context_.GetClientInfo(client_fd);
 
 		utils::Debug("server", "ClientInfo - IP: " + client_ip + ", fd", client_fd);
-		utils::Debug("server", "received ServerInfo, fd", server_context.fd);
-		std::cerr << "server_name: " << server_context.server_name
-				  << ", port: " << server_context.port << std::endl;
-		std::cerr << "locations: " << std::endl;
-		PrintLocations(server_context.locations);
 		// todo: call cgi(client_info, server_info)?
 	}
 	return mock_http.Run();

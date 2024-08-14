@@ -12,6 +12,8 @@
 
 namespace server {
 
+struct DtoServerInfos;
+
 class Server {
   public:
 	typedef std::list<config::context::ServerCon> ConfigServers;
@@ -33,6 +35,9 @@ class Server {
 	void             ReadRequest(const event::Event &event);
 	http::HttpResult CreateHttpResponse(int client_fd) const;
 	void             SendResponse(int client_fd);
+	// for Server to Http
+	DtoServerInfos GetServerInfos(int client_fd) const;
+
 	// const
 	static const int SYSTEM_ERROR = -1;
 	// context(virtual server,client)
