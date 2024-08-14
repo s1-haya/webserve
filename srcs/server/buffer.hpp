@@ -9,14 +9,14 @@ namespace server {
 
 class Buffer {
   public:
-	// int: fd, std::string: buffer
-	typedef std::map<int, std::string> Buffers;
+	// int: client_fd, string: request_buf
+	typedef std::map<int, std::string> RequestMap;
 	Buffer();
 	~Buffer();
-	ssize_t Read(int fd);
-	void    Delete(int fd);
+	ssize_t ReadRequest(int client_fd);
+	void    DeleteRequest(int client_fd);
 	// getter
-	const std::string &GetBuffer(int fd) const;
+	const std::string &GetRequest(int client_fd) const;
 
   private:
 	// prohibit copy
@@ -26,7 +26,7 @@ class Buffer {
 	static const int          SYSTEM_ERROR = -1;
 	static const unsigned int BUFFER_SIZE  = 1024;
 	// request buffers
-	Buffers buffers_;
+	RequestMap requests_;
 };
 
 } // namespace server

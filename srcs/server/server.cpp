@@ -132,7 +132,7 @@ void PrintLocations(const VirtualServer::LocationList &locations) {
 DtoClientInfos Server::GetClientInfos(int client_fd) const {
 	DtoClientInfos client_infos;
 	client_infos.fd          = client_fd;
-	client_infos.request_buf = buffers_.GetBuffer(client_fd);
+	client_infos.request_buf = buffers_.GetRequest(client_fd);
 	client_infos.ip          = context_.GetClientIp(client_fd);
 	return client_infos;
 }
@@ -151,7 +151,7 @@ DtoServerInfos Server::GetServerInfos(int client_fd) const {
 void Server::ReadRequest(const event::Event &event) {
 	const int client_fd = event.fd;
 
-	ssize_t read_ret = buffers_.Read(client_fd);
+	ssize_t read_ret = buffers_.ReadRequest(client_fd);
 	if (read_ret <= 0) {
 		if (read_ret == SYSTEM_ERROR) {
 			throw std::runtime_error("read failed");
@@ -173,15 +173,15 @@ void Server::ReadRequest(const event::Event &event) {
 	std::cerr << "locations: " << std::endl;
 	PrintLocations(server_infos.locations);
 
-	if (IsRequestReceivedComplete(buffers_.GetBuffer(client_fd))) {
+	if (IsRequestReceivedComplete(buffers_.GetRequest(client_fd))) {
 		utils::Debug("server", "received all request from client", client_fd);
-		std::cerr << buffers_.GetBuffer(client_fd) << std::endl;
+		std::cerr << buffers_.GetRequest(client_fd) << std::endl;
 		event_monitor_.Update(event, event::EVENT_WRITE);
 	}
 }
 
 http::HttpResult Server::CreateHttpResponse(int client_fd) const {
-	const std::string &request_buf = buffers_.GetBuffer(client_fd);
+	const std::string &request_buf = buffers_.GetRequest(client_fd);
 
 	http::MockHttp mock_http(request_buf);
 	return mock_http.Run();
@@ -200,7 +200,7 @@ void Server::SendResponse(int client_fd) {
 	utils::Debug("server", "send response to client", client_fd);
 
 	// disconnect
-	buffers_.Delete(client_fd);
+	buffers_.DeleteRequest(client_fd);
 	context_.DeleteClientInfo(client_fd);
 	event_monitor_.Delete(client_fd);
 	close(client_fd);

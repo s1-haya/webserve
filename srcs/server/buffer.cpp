@@ -8,27 +8,27 @@ Buffer::Buffer() {}
 
 Buffer::~Buffer() {}
 
-ssize_t Buffer::Read(int fd) {
+ssize_t Buffer::ReadRequest(int client_fd) {
 	char buffer[BUFFER_SIZE];
 
-	ssize_t read_ret = read(fd, buffer, BUFFER_SIZE);
+	ssize_t read_ret = read(client_fd, buffer, BUFFER_SIZE);
 	if (read_ret <= 0) {
 		if (read_ret == SYSTEM_ERROR) {
 			perror("read failed");
 		}
 		return read_ret;
 	}
-	buffers_[fd] += std::string(buffer, read_ret);
+	requests_[client_fd] += std::string(buffer, read_ret);
 	return read_ret;
 }
 
-void Buffer::Delete(int fd) {
-	buffers_[fd].erase();
+void Buffer::DeleteRequest(int client_fd) {
+	requests_[client_fd].erase();
 }
 
-const std::string &Buffer::GetBuffer(int fd) const {
+const std::string &Buffer::GetRequest(int client_fd) const {
 	// todo: fd error handle
-	return buffers_.at(fd);
+	return requests_.at(client_fd);
 }
 
 } // namespace server
