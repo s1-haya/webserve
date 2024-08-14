@@ -2,8 +2,8 @@
 #include "http.hpp"
 #include "stat.hpp"
 #include "system_exception.hpp"
-#include <iostream>
 #include <cstdlib> //EXIT_SUCCESS, EXIT_FAILURE
+#include <iostream>
 
 namespace {
 
