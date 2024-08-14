@@ -121,6 +121,16 @@ void PrintLocations(const VirtualServer::LocationList &locations) {
 	}
 }
 
+// todo: tmp for debug
+void DebugDto(const DtoClientInfos &client_infos, const DtoServerInfos &server_infos) {
+	utils::Debug("server", "ClientInfo - IP: " + client_infos.ip + ", fd", client_infos.fd);
+	utils::Debug("server", "received ServerInfo, fd", server_infos.fd);
+	std::cerr << "server_name: " << server_infos.server_name << ", port: " << server_infos.port
+			  << std::endl;
+	std::cerr << "locations: " << std::endl;
+	PrintLocations(server_infos.locations);
+}
+
 } // namespace
 
 DtoClientInfos Server::GetClientInfos(int client_fd) const {
@@ -159,13 +169,7 @@ void Server::ReadRequest(const event::Event &event) {
 	// Prepare to http.Run()
 	const DtoClientInfos &client_infos = GetClientInfos(client_fd);
 	const DtoServerInfos &server_infos = GetServerInfos(client_fd);
-	// debug ClientInfos,ServerInfos
-	utils::Debug("server", "ClientInfo - IP: " + client_infos.ip + ", fd", client_infos.fd);
-	utils::Debug("server", "received ServerInfo, fd", server_infos.fd);
-	std::cerr << "server_name: " << server_infos.server_name << ", port: " << server_infos.port
-			  << std::endl;
-	std::cerr << "locations: " << std::endl;
-	PrintLocations(server_infos.locations);
+	DebugDto(client_infos, server_infos);
 
 	http::HttpResult http_result = mock_http.Run(client_infos, server_infos);
 	// Check if it's ready to start write/send.
