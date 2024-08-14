@@ -1,6 +1,13 @@
 #ifndef RESULT_HPP_
 #define RESULT_HPP_
 
+/**
+ * @brief Represents the result of an operation, indicating success or failure.
+ *
+ * This class stores the outcome of an operation, which can either be a success or a failure.
+ * If the operation is successful, the `success_value_` is stored.
+ * Otherwise, only `is_success_` flag is set to `false`.
+ */
 template <typename T>
 class Result {
   public:
