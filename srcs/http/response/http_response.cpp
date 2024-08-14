@@ -93,7 +93,7 @@ HttpResponseResult HttpResponse::CreateErrorHttpResponseResult(const HttpRequest
 	HttpResponseResult response;
 	response.status_line.version       = HTTP_VERSION;
 	response.status_line.status_code   = utils::ToString(request_info.status_code);
-	response.status_line.reason_phrase = reason_phrase[request_info.status_code];
+	response.status_line.reason_phrase = reason_phrase.at(request_info.status_code);
 	// todo: StatusCodeをクラスにして、プライベートで保持する。
 	// response.status_line.status_code   = request_info.status_code.GetStrStatusCode();
 	// response.status_line.reason_phrase   = request_info.status_code.GetReasonPhrase();
