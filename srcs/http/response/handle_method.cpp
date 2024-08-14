@@ -1,45 +1,76 @@
+#include "http_response.hpp"
 #include "stat.hpp"
 #include "system_exception.hpp"
+#include "utils.hpp"
+#include <fstream>
 #include <iostream>
+#include <sstream>
+
+namespace {
+
+std::string FileToString(const std::ifstream &file) {
+	std::stringstream ss;
+	ss << file.rdbuf();
+	return ss.str();
+}
+
+std::string ReadFile(const std::string &file_path) {
+	std::ifstream file(file_path.c_str());
+	if (!file) {
+		std::ifstream error_file("html/404.html");
+		utils::Debug("http", "404 file not found");
+		return FileToString(error_file);
+	}
+	return FileToString(file);
+}
+
+} // namespace
 
 // todo: 各メソッドを実行する関数
+// returnがある場合、設定する
 // - メソッドの権限の確認
 //  -> 権限がない場合405 Not Allowed
 // - 各メソッドを実行
 
-// todo: ExecuteGET
-// 1. パス
-// 2. statクラスを作成
-// 3. パスの中身確認
-// ディレクトリの場合
-// 1. indexディレクティブがある場合は確認あればファイル確認へ
-// 2. autoindex確認。onの場合はExecuteAutoindex、なければ403
-// ファイルの場合
-// - 権限確認 なければ403 Forbidden
-// 4. ボディメッセージに格納
-// パスがディレクトリの場合(autoindexはonの場合は表示): 403 Forbidden
-// 存在しないファイルの場合: 404 Not Found
 namespace http {
 
-void GetHandler(const std::string& path) {
+void HttpResponse::GetHandler(const std::string &path, std::string &body_message) {
 	try {
 		Stat info(path);
-	} catch (const utils::SystemException& e) {
-		std::cerr << e.what() << std::endl;
+		if (info.IsDirectory()) {
+			if (path.back() != '/') {
+				// todo: redirect value
+				body_message = CreateErrorBodyMessage(
+					utils::ToString(http::MOVED_PERMANENTLY),
+					reason_phrase.at(http::MOVED_PERMANENTLY)
+				);
+			}
+			// todo: if index directive exists, it is called ReadFile function.
+			// todo: if autoindex directive is on, it is called AutoindexHandler function.
+			// todo: if index and autoindex directive don't exist, it is created 403 forbidden.
+		} else if (info.IsRegularFile()) {
+			if (!info.IsReadableFile()) {
+				body_message = CreateErrorBodyMessage(
+					utils::ToString(http::FORBIDDEN), reason_phrase.at(http::FORBIDDEN)
+				);
+			} else {
+				body_message = ReadFile(path);
+			}
+		} else {
+			body_message = CreateErrorBodyMessage(
+				utils::ToString(http::NOT_FOUND), reason_phrase.at(http::NOT_FOUND)
+			);
+		}
+	} catch (const utils::SystemException &e) {
+		// todo: error number to http error response
+		// body_message = CreateErrorBodyMessage(
+		// 	utils::ToString(http::INTERNAL_SERVER_ERROR),
+		// reason_phrase.at(http::INTERNAL_SERVER_ERROR)
+		// );
 	}
 }
 
-}
-
-	
-
-
-// 301 Moved Permanently
-// - リクエストターゲットのパスがディレクトリかつ末尾に/がない
-// alias, return, index, autoindexでファイルが特定
-
-// 500 Internal Server Error<
-// わからん
+} // namespace http
 
 // todo: ExecutePost: ボディメッセージをリソースに書き込む。ファイルアップロード
 // パスがディレクトリの場合(autoindexはon, off関係なし): 403 Forbidden

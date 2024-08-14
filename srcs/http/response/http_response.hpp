@@ -1,9 +1,9 @@
 #ifndef HTTP_RESPONSE_HPP_
 #define HTTP_RESPONSE_HPP_
 
+#include "status_code.hpp"
 #include <map>
 #include <string>
-#include "status_code.hpp"
 
 namespace http {
 
@@ -43,6 +43,7 @@ class HttpResponse {
   public:
 	typedef std::map<StatusCode, std::string> ReasonPhrase;
 	static std::string                        Run(const HttpRequestResult &request_info);
+	static void               GetHandler(const std::string &path, std::string &body_message);
 
   private:
 	HttpResponse();
