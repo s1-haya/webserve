@@ -13,9 +13,9 @@ class ClientInfo;
 
 class Connection {
   public:
-	typedef struct addrinfo AddrInfo;
-	typedef std::set<int>   FdSet;
-	typedef Result<int>     BindResult;
+	typedef struct addrinfo    AddrInfo;
+	typedef std::set<int>      FdSet;
+	typedef utils::Result<int> BindResult;
 	Connection();
 	~Connection();
 	// function

@@ -1,6 +1,8 @@
 #ifndef RESULT_HPP_
 #define RESULT_HPP_
 
+namespace utils {
+
 /**
  * @brief Represents the result of an operation, indicating success or failure.
  *
@@ -49,5 +51,7 @@ class Result {
 	bool is_success_;
 	T    success_value_;
 };
+
+} // namespace utils
 
 #endif /* RESULT_HPP_ */
