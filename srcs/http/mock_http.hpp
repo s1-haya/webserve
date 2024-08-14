@@ -21,6 +21,7 @@ class MockHttp : public IHttp {
 	typedef std::map<MessageType, std::string> RequestMessage;
 	MockHttp();
 	~MockHttp();
+	// override
 	HttpResult
 	Run(const server::DtoClientInfos &client_infos, const server::DtoServerInfos &server_infos);
 

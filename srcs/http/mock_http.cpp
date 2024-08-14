@@ -68,9 +68,9 @@ void MockHttp::ReadPathContent() {
 
 namespace {
 
-void CreateStatusLine(std::ostream &response_stream, MockHttp::RequestMessage &request) {
-	response_stream << HTTP_VERSION << SP << request[MockHttp::HTTP_STATUS] << SP
-					<< request[MockHttp::HTTP_STATUS_TEXT] << CRLF;
+void CreateStatusLine(std::ostream &response_stream, const MockHttp::RequestMessage &request) {
+	response_stream << HTTP_VERSION << SP << request.at(MockHttp::HTTP_STATUS) << SP
+					<< request.at(MockHttp::HTTP_STATUS_TEXT) << CRLF;
 }
 
 template <typename T>
@@ -87,8 +87,8 @@ void CreateCRLF(std::ostream &response_stream) {
 	response_stream << CRLF;
 }
 
-void CreateBody(std::ostream &response_stream, MockHttp::RequestMessage &request) {
-	response_stream << request[MockHttp::HTTP_CONTENT];
+void CreateBody(std::ostream &response_stream, const MockHttp::RequestMessage &request) {
+	response_stream << request.at(MockHttp::HTTP_CONTENT);
 }
 
 bool IsRequestReceivedComplete(const std::string &buffer) {
