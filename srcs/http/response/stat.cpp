@@ -4,12 +4,12 @@
 #include <exception>
 #include <iostream>
 
-namespace utils {
+namespace http {
 
 Stat::Stat(const std::string &path) {
 	if (stat(path.c_str(), &stat_buf_) == -1) {
 		std::string error_message = "Error: stat on path '" + path + "': " + strerror(errno);
-		throw SystemException(error_message, errno);
+		throw utils::SystemException(error_message, errno);
 	}
 }
 
@@ -51,4 +51,4 @@ std::size_t Stat::GetFileSize() const {
 	}
 }
 
-} // namespace utils
+} // namespace http

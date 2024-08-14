@@ -10,14 +10,19 @@ LOG_FILE_PATH	:=	$(LOG_DIR)/$(LOG_FILE_NAME)
 # 2. Add target webserv files
 WS_SRCS_DIR		:=	../../../srcs
 WS_UTILS_DIR	:=	$(WS_SRCS_DIR)/utils
+WS_HTTP_DIR				:=	$(WS_SRCS_DIR)/http
+WS_HTTP_RESPONSE_DIR	:=	$(WS_HTTP_DIR)/response
+
 SRCS			+=	$(WS_UTILS_DIR)/color.cpp \
-					$(WS_UTILS_DIR)/stat.cpp \
+					$(WS_HTTP_RESPONSE_DIR)/stat.cpp
 
 # 3. Add unit test files
 SRCS	+=	test_stat.cpp
 
 # 4. Add directory for INCLUDE
-SRCS_DIR	:=	$(WS_UTILS_DIR)
+SRCS_DIR	:=	$(WS_UTILS_DIR) \
+				$(WS_HTTP_DIR) \
+				$(WS_HTTP_RESPONSE_DIR)
 
 #--------------------------------------------
 OBJ_DIR		:=	objs

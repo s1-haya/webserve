@@ -1,5 +1,7 @@
+#include "color.hpp"
+#include "http.hpp"
 #include "stat.hpp"
-#include "utils.hpp"
+#include "system_exception.hpp"
 #include <exception>
 #include <iostream>
 
@@ -44,7 +46,7 @@ int main(void) {
 	// PrintStatStructMember(makefile_info);
 
 	try {
-		utils::Stat        test("Makefile");
+		http::Stat test("Makefile");
 		ret_code |= HandleResult(test.IsRegularFile(), true);
 		ret_code |= HandleResult(test.IsReadableFile(), true);
 		ret_code |= HandleResult(test.IsWritableFile(), true);
@@ -56,7 +58,7 @@ int main(void) {
 	}
 
 	try {
-		utils::Stat test2("no.txt");
+		http::Stat test2("no.txt");
 	} catch (const utils::SystemException &e) {
 		std::cerr << e.what() << std::endl;
 		std::cerr << e.GetErrorNumber() << std::endl;
