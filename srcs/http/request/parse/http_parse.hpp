@@ -5,6 +5,7 @@
 #include <stdexcept> //runtime_error
 #include <string>
 #include <vector>
+#include "status_code.hpp"
 
 namespace http {
 
@@ -20,13 +21,6 @@ struct HttpRequest {
 	RequestLine  request_line;
 	HeaderFields header_fields;
 	std::string  body_message;
-};
-
-enum StatusCode {
-	OK              = 200,
-	BAD_REQUEST     = 400,
-	NOT_FOUND       = 404,
-	NOT_IMPLEMENTED = 501
 };
 
 struct HttpRequestResult {

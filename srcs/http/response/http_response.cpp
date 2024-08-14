@@ -1,5 +1,6 @@
 #include "http_response.hpp"
 #include "http_message.hpp"
+#include "http_parse.hpp"
 #include "utils.hpp"
 #include <iostream>
 #include <sstream>

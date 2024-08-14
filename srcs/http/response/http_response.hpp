@@ -1,17 +1,21 @@
 #ifndef HTTP_RESPONSE_HPP_
 #define HTTP_RESPONSE_HPP_
 
-#include "http_parse.hpp"
 #include <map>
 #include <string>
+#include "status_code.hpp"
 
 namespace http {
+
+struct HttpRequestResult;
 
 struct StatusLine {
 	std::string version;
 	std::string status_code;
 	std::string reason_phrase;
 };
+
+typedef std::map<std::string, std::string> HeaderFields;
 
 struct HttpResponseResult {
 	StatusLine   status_line;
