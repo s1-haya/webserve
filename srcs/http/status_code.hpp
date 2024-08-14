@@ -2,6 +2,7 @@
 #define STATUS_CODE_HPP_
 
 #include <map>
+#include <string>
 
 namespace http {
 
