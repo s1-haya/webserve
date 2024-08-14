@@ -3,7 +3,6 @@
 
 #include "IHttp.hpp"
 #include <map>
-#include <string>
 
 namespace http {
 
@@ -20,12 +19,12 @@ class MockHttp : public IHttp {
 		HTTP_STATUS_TEXT
 	};
 	typedef std::map<MessageType, std::string> RequestMessage;
-	explicit MockHttp(const std::string &read_buf);
+	MockHttp();
 	~MockHttp();
-	HttpResult Run();
+	HttpResult
+	Run(const server::DtoClientInfos &client_infos, const server::DtoServerInfos &server_infos);
 
   private:
-	MockHttp();
 	// prohibit copy
 	MockHttp(const MockHttp &other);
 	MockHttp &operator=(const MockHttp &other);

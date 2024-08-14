@@ -8,10 +8,7 @@
 
 namespace http {
 
-MockHttp::MockHttp(const std::string &read_buf) {
-	ParseRequest(read_buf);
-	ReadPathContent();
-}
+MockHttp::MockHttp() {}
 
 MockHttp::~MockHttp() {}
 
@@ -94,9 +91,20 @@ void CreateBody(std::ostream &response_stream, MockHttp::RequestMessage &request
 	response_stream << request[MockHttp::HTTP_CONTENT];
 }
 
+bool IsRequestReceivedComplete(const std::string &buffer) {
+	return buffer.find("\r\n\r\n") != std::string::npos;
+}
+
 } // namespace
 
-HttpResult MockHttp::Run() {
+HttpResult MockHttp::Run(
+	const server::DtoClientInfos &client_infos, const server::DtoServerInfos &server_infos
+) {
+	(void)server_infos;
+
+	ParseRequest(client_infos.request_buf);
+	ReadPathContent();
+
 	std::ostringstream response_stream;
 	CreateStatusLine(response_stream, this->request_);
 	CreateHeaderFields(response_stream, this->request_);
@@ -104,7 +112,7 @@ HttpResult MockHttp::Run() {
 	CreateBody(response_stream, this->request_);
 
 	HttpResult result;
-	result.is_response_complete = true;
+	result.is_response_complete = IsRequestReceivedComplete(client_infos.request_buf);
 	result.response             = response_stream.str();
 	return result;
 }

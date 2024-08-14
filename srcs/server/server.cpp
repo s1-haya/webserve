@@ -2,7 +2,6 @@
 #include "client_info.hpp"
 #include "dto_server_to_http.hpp"
 #include "event.hpp"
-#include "mock_http.hpp"
 #include "server_info.hpp"
 #include "utils.hpp"
 #include "virtual_server.hpp"
@@ -112,11 +111,6 @@ void Server::HandleExistingConnection(const event::Event &event) {
 
 namespace {
 
-// todo: find "Connection: close"?
-bool IsRequestReceivedComplete(const std::string &buffer) {
-	return buffer.find("\r\n\r\n") != std::string::npos;
-}
-
 // todo: tmp for debug
 void PrintLocations(const VirtualServer::LocationList &locations) {
 	typedef VirtualServer::LocationList::const_iterator Itr;
@@ -173,32 +167,25 @@ void Server::ReadRequest(const event::Event &event) {
 	std::cerr << "locations: " << std::endl;
 	PrintLocations(server_infos.locations);
 
-	if (IsRequestReceivedComplete(buffers_.GetRequest(client_fd))) {
-		utils::Debug("server", "received all request from client", client_fd);
-		std::cerr << buffers_.GetRequest(client_fd) << std::endl;
-		event_monitor_.Update(event, event::EVENT_WRITE);
-	}
-}
-
-http::HttpResult Server::CreateHttpResponse(int client_fd) const {
-	const std::string &request_buf = buffers_.GetRequest(client_fd);
-
-	http::MockHttp mock_http(request_buf);
-	return mock_http.Run();
-}
-
-void Server::SendResponse(int client_fd) {
-	// todo: HttpResultを受け取るのはここではなくIsRequestReceivedComplete()のあたりになる予定
-	// 構成の都合で仮にここで呼んでる
-	const http::HttpResult http_result = CreateHttpResponse(client_fd);
+	http::HttpResult http_result = mock_http.Run(client_infos, server_infos);
 	// Check if it's ready to start write/send.
 	// If not completed, the request will be re-read by the event_monitor.
 	if (!http_result.is_response_complete) {
 		return;
 	}
-	send(client_fd, http_result.response.c_str(), http_result.response.size(), 0);
+	utils::Debug("server", "received all request from client", client_fd);
+	std::cerr << buffers_.GetRequest(client_fd) << std::endl;
+	buffers_.AddResponse(client_fd, http_result.response);
+	event_monitor_.Update(event, event::EVENT_WRITE);
+}
+
+void Server::SendResponse(int client_fd) {
+	const std::string &response = buffers_.GetResponse(client_fd);
+
+	send(client_fd, response.c_str(), response.size(), 0);
 	utils::Debug("server", "send response to client", client_fd);
 
+	// todo: connection keep-aliveならdisconnectしない
 	// disconnect
 	buffers_.Delete(client_fd);
 	context_.DeleteClientInfo(client_fd);
