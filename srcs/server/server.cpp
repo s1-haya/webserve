@@ -200,7 +200,7 @@ void Server::SendResponse(int client_fd) {
 	utils::Debug("server", "send response to client", client_fd);
 
 	// disconnect
-	buffers_.DeleteRequest(client_fd);
+	buffers_.Delete(client_fd);
 	context_.DeleteClientInfo(client_fd);
 	event_monitor_.Delete(client_fd);
 	close(client_fd);
