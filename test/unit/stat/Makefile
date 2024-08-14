@@ -14,6 +14,7 @@ WS_HTTP_DIR				:=	$(WS_SRCS_DIR)/http
 WS_HTTP_RESPONSE_DIR	:=	$(WS_HTTP_DIR)/response
 
 SRCS			+=	$(WS_UTILS_DIR)/color.cpp \
+					$(WS_UTILS_DIR)/system_exception.cpp \
 					$(WS_HTTP_RESPONSE_DIR)/stat.cpp
 
 # 3. Add unit test files
