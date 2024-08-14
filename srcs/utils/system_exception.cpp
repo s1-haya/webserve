@@ -2,7 +2,7 @@
 
 namespace utils {
 
-SystemException::StatException(const std::string &error_message, int error_number)
+SystemException::SystemException(const std::string &error_message, int error_number)
 	: runtime_error(error_message), error_number_(error_number) {}
 
 int SystemException::GetErrorNumber() const {

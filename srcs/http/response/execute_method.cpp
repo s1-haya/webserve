@@ -1,11 +1,10 @@
 // todo: 各メソッドを実行する関数
 // - メソッドの権限の確認
 //  -> 権限がない場合405 Not Allowed
-// - 各メソッドを実行 
+// - 各メソッドを実行
 
 // todo: ExecuteGET
-// 1. パスの作成(locationのpath (aliasがある場合は aliasのパス))
-// - aliasがある場合aliasのパス。それ以外はdefault root(/html) + locationのパス
+// 1. パス
 // 2. statクラスを作成
 // 3. パスの中身確認
 // ディレクトリの場合
@@ -17,7 +16,7 @@
 // パスがディレクトリの場合(autoindexはonの場合は表示): 403 Forbidden
 // 存在しないファイルの場合: 404 Not Found
 
-// 301 Moved Permanetly
+// 301 Moved Permanently
 // - リクエストターゲットのパスがディレクトリかつ末尾に/がない
 // alias, return, index, autoindexでファイルが特定
 
@@ -30,7 +29,7 @@
 // 存在しないファイルの場合: 404 Not Found
 // ファイルの書き込みが失敗した場合: 500 Internal Server Error
 
-// todo: ExcuteDelete: リソースの削除
+// todo: ExecuteDelete: リソースの削除
 // 成功した場合、204 No Content
 // -> 詳細を表示しない設定にするため
 // パスがディレクトリの場合(autoindexはon,
