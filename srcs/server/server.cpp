@@ -121,7 +121,7 @@ void Server::HandleNewConnection(int server_fd) {
 
 void Server::HandleExistingConnection(const event::Event &event) {
 	if (event.type & event::EVENT_READ) {
-		ReadRequest(event);
+		ReadRequest(event.fd);
 		RunHttp(event);
 	}
 	if (event.type & event::EVENT_WRITE) {
@@ -149,9 +149,7 @@ DtoServerInfos Server::GetServerInfos(int client_fd) const {
 	return server_infos;
 }
 
-void Server::ReadRequest(const event::Event &event) {
-	const int client_fd = event.fd;
-
+void Server::ReadRequest(int client_fd) {
 	ssize_t read_ret = buffers_.ReadRequest(client_fd);
 	if (read_ret <= 0) {
 		if (read_ret == SYSTEM_ERROR) {
