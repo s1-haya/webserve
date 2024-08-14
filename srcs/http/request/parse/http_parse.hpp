@@ -1,11 +1,11 @@
 #ifndef HTTP_PARSE_HPP_
 #define HTTP_PARSE_HPP_
 
+#include "status_code.hpp"
 #include <map>
 #include <stdexcept> //runtime_error
 #include <string>
 #include <vector>
-#include "status_code.hpp"
 
 namespace http {
 
