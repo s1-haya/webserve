@@ -35,7 +35,7 @@ std::string ToString(T value) {
 
 // string
 Result<unsigned int>     ConvertStrToUint(const std::string &str);
-bool                     ConvertStrToSize(const std::string &str, size_t &num);
+Result<std::size_t>      ConvertStrToSize(const std::string &str);
 std::string              ConvertUintToStr(unsigned int num);
 std::vector<std::string> SplitStr(const std::string &src, const std::string &substring);
 
