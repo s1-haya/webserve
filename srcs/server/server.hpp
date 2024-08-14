@@ -12,6 +12,7 @@
 
 namespace server {
 
+struct DtoClientInfos;
 struct DtoServerInfos;
 
 class Server {
@@ -36,6 +37,7 @@ class Server {
 	http::HttpResult CreateHttpResponse(int client_fd) const;
 	void             SendResponse(int client_fd);
 	// for Server to Http
+	DtoClientInfos GetClientInfos(int client_fd) const;
 	DtoServerInfos GetServerInfos(int client_fd) const;
 
 	// const

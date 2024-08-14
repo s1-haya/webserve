@@ -6,6 +6,12 @@
 
 namespace server {
 
+struct DtoClientInfos {
+	int         fd;
+	std::string request_buf;
+	std::string ip;
+};
+
 struct DtoServerInfos {
 	int                         fd;
 	std::string                 server_name;

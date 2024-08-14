@@ -129,6 +129,14 @@ void PrintLocations(const VirtualServer::LocationList &locations) {
 
 } // namespace
 
+DtoClientInfos Server::GetClientInfos(int client_fd) const {
+	DtoClientInfos client_infos;
+	client_infos.fd          = client_fd;
+	client_infos.request_buf = buffers_.GetBuffer(client_fd);
+	client_infos.ip          = context_.GetClientIp(client_fd);
+	return client_infos;
+}
+
 DtoServerInfos Server::GetServerInfos(int client_fd) const {
 	const ServerContext &server_context = context_.GetServerContext(client_fd);
 
@@ -155,7 +163,10 @@ void Server::ReadRequest(const event::Event &event) {
 	}
 
 	// Prepare to http.Run()
+	const DtoClientInfos &client_infos = GetClientInfos(client_fd);
 	const DtoServerInfos &server_infos = GetServerInfos(client_fd);
+	// debug ClientInfos,ServerInfos
+	utils::Debug("server", "ClientInfo - IP: " + client_infos.ip + ", fd", client_infos.fd);
 	utils::Debug("server", "received ServerInfo, fd", server_infos.fd);
 	std::cerr << "server_name: " << server_infos.server_name << ", port: " << server_infos.port
 			  << std::endl;
@@ -173,15 +184,6 @@ http::HttpResult Server::CreateHttpResponse(int client_fd) const {
 	const std::string &request_buf = buffers_.GetBuffer(client_fd);
 
 	http::MockHttp mock_http(request_buf);
-	// todo: parse?
-	// todo: tmp
-	const bool is_cgi = true;
-	if (is_cgi) {
-		const std::string &client_ip = context_.GetClientInfo(client_fd);
-
-		utils::Debug("server", "ClientInfo - IP: " + client_ip + ", fd", client_fd);
-		// todo: call cgi(client_info, server_info)?
-	}
 	return mock_http.Run();
 }
 
