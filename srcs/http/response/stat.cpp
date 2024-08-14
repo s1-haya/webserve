@@ -1,14 +1,14 @@
 #include "stat.hpp"
 #include "system_exception.hpp"
 #include <errno.h>
-#include <exception>
 #include <iostream>
+#include <cstring>
 
 namespace http {
 
 Stat::Stat(const std::string &path) {
 	if (stat(path.c_str(), &stat_buf_) == -1) {
-		std::string error_message = "Error: stat on path '" + path + "': " + strerror(errno);
+		std::string error_message = "Error: stat on path '" + path + "': " + std::strerror(errno);
 		throw utils::SystemException(error_message, errno);
 	}
 }

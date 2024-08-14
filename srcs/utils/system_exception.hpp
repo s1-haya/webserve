@@ -1,20 +1,15 @@
 #ifndef SYSTEM_EXCEPTION_HPP_
 #define SYSTEM_EXCEPTION_HPP_
 
-#include <exception>
+#include <stdexcept>
 #include <string>
 
 namespace utils {
 
 class SystemException : public std::runtime_error {
   public:
-	explicit SystemException(const std::string &message, int error_number)
-		: std::runtime_error(message), error_number_(error_number) {}
-
-	int GetErrorNumber() const {
-		return error_number_;
-	}
-
+	explicit SystemException(const std::string &message, int error_number);
+	int GetErrorNumber() const;
   private:
 	int error_number_;
 };
