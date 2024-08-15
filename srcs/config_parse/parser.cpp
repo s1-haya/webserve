@@ -38,6 +38,23 @@ bool FindDuplicated(const std::list<T> &list, const T &element) {
 	return false;
 }
 
+template <typename T>
+bool SearchListInArray(const std::list<T> &lst, const T *array, std::size_t array_size) {
+	for (typename std::list<T>::const_iterator it = lst.begin(); it != lst.end(); ++it) {
+		bool found = false;
+		for (size_t i = 0; i < array_size; ++i) {
+			if (*it == array[i]) {
+				found = true;
+				break;
+			}
+		}
+		if (!found) {
+			return false;
+		}
+	}
+	return true;
+}
+
 } // namespace
 
 /**
@@ -229,6 +246,10 @@ void Parser::HandleAllowedMethods(std::list<std::string> &allowed_methods, NodeI
 	while ((*it).token_type != node::DELIM && (*it).token_type == node::WORD) {
 		if (FindDuplicated(allowed_methods, (*it).token)) {
 			throw std::runtime_error("a duplicated parameter in 'allowed_methods' directive");
+		} else if (!SearchListInArray(
+					   allowed_methods, VALID_ALLOWED_METHODS, VALID_ALLOWED_METHODS_SIZE
+				   )) {
+			throw std::runtime_error("an invalid method in 'allowed_methods' directive");
 		}
 		allowed_methods.push_back((*it++).token);
 		if (it == tokens_.end()) {
