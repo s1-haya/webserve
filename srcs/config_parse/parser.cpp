@@ -1,5 +1,7 @@
 #include "parser.hpp"
 #include "directive_names.hpp"
+#include "result.hpp"
+#include "utils.hpp"
 #include <cstdlib> // atoi
 #include <stdexcept>
 
@@ -108,7 +110,14 @@ void Parser::HandleListen(context::PortList &port, NodeItr &it) {
 	if ((*it).token_type != node::WORD) {
 		throw std::runtime_error("invalid number of arguments in 'listen' directive");
 	}
-	port.push_back(std::atoi((*it++).token.c_str())); // TODO: atoi, validation, 重複チェック
+	utils::Result<unsigned int> port_number = utils::ConvertStrToUint((*it).token);
+	if (!port_number.IsOk() || port_number.GetValue() < 1024 || port_number.GetValue() > 65535) {
+		throw std::runtime_error("invalid port number for ports");
+	} else if (FindDuplicated(port, port_number.GetValue())) {
+		throw std::runtime_error("a duplicated parameter in 'listen' directive");
+	}
+	port.push_back(port_number.GetValue());
+	it++;
 }
 
 void Parser::HandleClientMaxBodySize(std::size_t &client_max_body_size, NodeItr &it) {
@@ -122,10 +131,14 @@ void Parser::HandleErrorPage(std::pair<unsigned int, std::string> &error_page, N
 	if ((*it).token_type != node::WORD || (*++NodeItr(it)).token_type != node::WORD) {
 		throw std::runtime_error("invalid number of arguments in 'error_page' directive");
 	}
-	// ex. 404 /404.html, tmp: atoi
+	// ex. 404 /404.html
 	NodeItr tmp_it = it; // 404
 	it++;                // /404.html
-	error_page = std::make_pair(std::atoi((*tmp_it).token.c_str()), (*it).token);
+	utils::Result<unsigned int> status_code = utils::ConvertStrToUint((*tmp_it).token);
+	if (!status_code.IsOk() || status_code.GetValue() < 100 || status_code.GetValue() > 599) {
+		throw std::runtime_error("invalid status code for error_page");
+	}
+	error_page = std::make_pair(status_code.GetValue(), (*it).token);
 	it++;
 }
 
