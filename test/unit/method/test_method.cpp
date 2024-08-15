@@ -69,10 +69,31 @@ int main(void) {
 	// ret_code = HandleResult(forbidden, expected_forbidden);
 
 	// POST test
-	std::string request_body_message = "OK";
-	std::string response_body_message;
+	// 新しいファイルをアップロードする場合
+	std::string test1_request_body_message = "OK";
+	std::string test1_response_body_message;
 	std::string expected_created = LoadFileContent("expected/created.txt");
-	http::HttpResponse::PostHandler("ok.txt", request_body_message, response_body_message);
-	ret_code = HandleResult(response_body_message, expected_created);
+	http::HttpResponse::PostHandler(
+		"ok.txt", test1_request_body_message, test1_response_body_message
+	);
+	ret_code = HandleResult(test1_response_body_message, expected_created);
+
+	// すでにアップロードされたファイルをアップロードする場合
+	std::string test2_request_body_message = "OK";
+	std::string test2_response_body_message;
+	std::string expected_no_content = LoadFileContent("expected/no_content.txt");
+	http::HttpResponse::PostHandler(
+		"ok.txt", test2_request_body_message, test2_response_body_message
+	);
+	ret_code = HandleResult(test2_response_body_message, expected_no_content);
+
+	// リソースがディレクトリの場合
+	std::string test3_request_body_message = "OK";
+	std::string test3_response_body_message;
+	std::string expected_forbidden = LoadFileContent("expected/forbidden.txt");
+	http::HttpResponse::PostHandler(
+		"test/directory", test3_request_body_message, test3_response_body_message
+	);
+	ret_code = HandleResult(test3_response_body_message, expected_forbidden);
 	return ret_code;
 }
