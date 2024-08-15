@@ -18,11 +18,7 @@ Parser::~Parser() {}
 void Parser::ParseNode() {
 	for (NodeItr it(tokens_.begin(), tokens_.end()); it != tokens_.end(); ++it) {
 		if ((*it).token_type == node::CONTEXT && (*it).token == SERVER) {
-			++it;
-			if (it == tokens_.end()) {
-				throw std::runtime_error("unexpected end of server context");
-			}
-			servers_.push_back(CreateServerContext(it));
+			servers_.push_back(CreateServerContext(++it));
 		} else {
 			throw std::runtime_error("expect server context");
 		}

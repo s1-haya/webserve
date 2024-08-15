@@ -6,22 +6,19 @@
 
 namespace config {
 
-enum IncrementMode {
-	THROW_ON_END,
-	ALLOW_END
-};
-
 template <typename T>
 class CustomConstIterator {
   public:
 	CustomConstIterator(
-		typename std::list<T>::const_iterator it, typename std::list<T>::const_iterator end
+		typename std::list<T>::const_iterator it,
+		typename std::list<T>::const_iterator end,
+		bool                                  throw_on_end = true
 	)
-		: it_(it), end_(end), mode_(THROW_ON_END) {};
+		: it_(it), end_(end), throw_on_end_(throw_on_end) {};
 	~CustomConstIterator() {};
 
 	CustomConstIterator &operator++() {
-		if (it_ == end_ && mode_ == THROW_ON_END) {
+		if (it_ == end_ && throw_on_end_) {
 			throw std::runtime_error("unexpected end");
 		} else {
 			++it_;
@@ -53,14 +50,10 @@ class CustomConstIterator {
 		return it_ != other;
 	}
 
-	void SetMode(IncrementMode mode) {
-		mode_ = mode;
-	}
-
   private:
 	typename std::list<T>::const_iterator it_;
 	typename std::list<T>::const_iterator end_;
-	IncrementMode                         mode_;
+	bool                                  throw_on_end_;
 };
 
 } // namespace config
