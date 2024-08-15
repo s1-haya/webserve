@@ -495,6 +495,15 @@ int main() {
 	ret_code |= RunErrorTest(
 		"test_file_error/error_test16.conf", expected, "test_file_error/error_test16.conf"
 	);
+	ret_code |= RunErrorTest(
+		"test_file_error/error_test17.conf", expected, "test_file_error/error_test17.conf"
+	);
+	ret_code |= RunErrorTest(
+		"test_file_error/error_test18.conf", expected, "test_file_error/error_test18.conf"
+	);
+	ret_code |= RunErrorTest(
+		"test_file_error/error_test19.conf", expected, "test_file_error/error_test19.conf"
+	);
 
 	return ret_code;
 }
