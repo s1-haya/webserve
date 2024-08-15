@@ -1,5 +1,4 @@
 #include "color.hpp"
-#include "http.hpp"
 #include "stat.hpp"
 #include "system_exception.hpp"
 #include <cstdlib> //EXIT_SUCCESS, EXIT_FAILURE
