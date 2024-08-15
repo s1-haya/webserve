@@ -1,8 +1,8 @@
 #include "stat.hpp"
 #include "system_exception.hpp"
-#include <errno.h>
-#include <iostream>
+#include <cerrno>
 #include <cstring>
+#include <iostream>
 
 namespace http {
 
