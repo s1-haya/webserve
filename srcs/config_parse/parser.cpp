@@ -97,9 +97,6 @@ void Parser::HandleServerName(std::list<std::string> &server_names, NodeItr &it)
 			throw std::runtime_error("a duplicated parameter in 'server_name' directive");
 		}
 		server_names.push_back((*it++).token);
-		if (it == tokens_.end()) {
-			throw std::runtime_error("invalid arguments of 'server_name' directive");
-		}
 	}
 }
 
@@ -114,7 +111,7 @@ void Parser::HandleListen(context::PortList &port, NodeItr &it) {
 		throw std::runtime_error("a duplicated parameter in 'listen' directive");
 	}
 	port.push_back(port_number.GetValue());
-	it++;
+	++it;
 }
 
 void Parser::HandleClientMaxBodySize(std::size_t &client_max_body_size, NodeItr &it) {
@@ -126,7 +123,7 @@ void Parser::HandleClientMaxBodySize(std::size_t &client_max_body_size, NodeItr 
 		throw std::runtime_error("invalid client_max_body_size");
 	}
 	client_max_body_size = body_max_size.GetValue();
-	it++;
+	++it;
 }
 
 void Parser::HandleErrorPage(std::pair<unsigned int, std::string> &error_page, NodeItr &it) {
@@ -141,7 +138,7 @@ void Parser::HandleErrorPage(std::pair<unsigned int, std::string> &error_page, N
 		throw std::runtime_error("invalid status code for error_page");
 	}
 	error_page = std::make_pair(status_code.GetValue(), (*it).token);
-	it++;
+	++it;
 }
 
 /**
@@ -234,9 +231,8 @@ void Parser::HandleAllowedMethods(std::list<std::string> &allowed_methods, NodeI
 				(*it).token
 			) == VALID_ALLOWED_METHODS + SIZE_OF_VALID_ALLOWED_METHODS) {
 			throw std::runtime_error("an invalid method in 'allowed_methods' directive");
-		} else if (it++ == tokens_.end()) {
-			throw std::runtime_error("invalid arguments of 'allowed_methods' directive");
 		}
+		++it;
 	}
 }
 
@@ -252,7 +248,7 @@ void Parser::HandleReturn(std::pair<unsigned int, std::string> &redirect, NodeIt
 		throw std::runtime_error("invalid status code for return");
 	}
 	redirect = std::make_pair(status_code.GetValue(), (*it).token);
-	it++;
+	++it;
 }
 
 std::list<context::ServerCon> Parser::GetServers() const {
