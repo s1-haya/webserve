@@ -40,6 +40,7 @@ int HandleResult(const T &result, const T &expected) {
 int main(void) {
 	int ret_code = EXIT_SUCCESS;
 
+	// GET test
 	// CF -> success or error_pages directive
 	// CRLF -> default error file
 
@@ -66,5 +67,12 @@ int main(void) {
 	// std::string expected_forbidden = LoadFileContent("expected/forbidden.txt");
 	// http::HttpResponse::GetHandler("test/forbidden_file", forbidden);
 	// ret_code = HandleResult(forbidden, expected_forbidden);
+
+	// POST test
+	std::string request_body_message = "OK";
+	std::string response_body_message;
+	std::string expected_created = LoadFileContent("expected/created.txt");
+	http::HttpResponse::PostHandler("ok.txt", request_body_message, response_body_message);
+	ret_code = HandleResult(response_body_message, expected_created);
 	return ret_code;
 }
