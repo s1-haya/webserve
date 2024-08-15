@@ -16,7 +16,7 @@ Parser::Parser(std::list<node::Node> &tokens) : tokens_(tokens) {
 Parser::~Parser() {}
 
 void Parser::ParseNode() {
-	for (NodeItr it = tokens_.begin(); it != tokens_.end(); ++it) {
+	for (NodeItr it(tokens_.begin(), tokens_.end()); it != tokens_.end(); ++it) {
 		if ((*it).token_type == node::CONTEXT && (*it).token == SERVER) {
 			++it;
 			if (it == tokens_.end()) {

@@ -2,17 +2,18 @@
 #define PARSER_HPP_
 
 #include "context.hpp"
+#include "custom_const_iterator.hpp"
 #include "node.hpp"
 #include <list>
 
 namespace config {
 namespace parser {
 
-typedef std::list<node::Node>::iterator NodeItr;
+typedef CustomConstIterator<node::Node> NodeItr;
 
 class Parser {
   private:
-	std::list<node::Node>        &tokens_;
+	const std::list<node::Node>  &tokens_;
 	std::list<context::ServerCon> servers_;
 	// Prohibit Copy
 	Parser(const Parser &);
