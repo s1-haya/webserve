@@ -26,6 +26,18 @@ void Parser::ParseNode() {
 	}
 }
 
+namespace {
+
+template <typename T>
+bool FindDuplicated(const std::list<T> &list, const T &element) {
+	if (std::find(list.begin(), list.end(), element) != std::end(list)) {
+		return true;
+	}
+	return false;
+}
+
+} // namespace
+
 /**
  * @brief Handlers for Server Context
  * @details Handlers for each Server Directive
@@ -82,6 +94,9 @@ void Parser::HandleServerContextDirective(context::ServerCon &server, NodeItr &i
 
 void Parser::HandleServerName(std::list<std::string> &server_names, NodeItr &it) {
 	while ((*it).token_type != node::DELIM && (*it).token_type == node::WORD) {
+		if (FindDuplicated(server_names, (*it).token)) {
+			throw std::runtime_error("a duplicated parameter in 'server_name' directive");
+		}
 		server_names.push_back((*it++).token);
 		if (it == tokens_.end()) {
 			throw std::runtime_error("invalid arguments of 'server_name' directive");
@@ -194,6 +209,9 @@ void Parser::HandleAutoIndex(bool &autoindex, NodeItr &it) {
 
 void Parser::HandleAllowedMethods(std::list<std::string> &allowed_methods, NodeItr &it) {
 	while ((*it).token_type != node::DELIM && (*it).token_type == node::WORD) {
+		if (FindDuplicated(allowed_methods, (*it).token)) {
+			throw std::runtime_error("a duplicated parameter in 'allowed_methods' directive");
+		}
 		allowed_methods.push_back((*it++).token);
 		if (it == tokens_.end()) {
 			throw std::runtime_error("invalid arguments of 'allowed_methods' directive");
