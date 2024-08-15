@@ -11,7 +11,8 @@ TEST_DIRS	:=	convert_str \
 				config_parse/lexer \
 				config_parse/parser \
 				config_parse \
-				stat
+				stat \
+				method
 
 .PHONY	: run
 run:
