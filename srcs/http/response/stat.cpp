@@ -1,7 +1,7 @@
 #include "stat.hpp"
 #include "system_exception.hpp"
+#include <cerrno>
 #include <cstring>
-#include <errno.h>
 #include <iostream>
 
 namespace http {

@@ -1,5 +1,4 @@
 #include "color.hpp"
-#include "http.hpp"
 #include "stat.hpp"
 #include "system_exception.hpp"
 #include <cstdlib> //EXIT_SUCCESS, EXIT_FAILURE
@@ -55,13 +54,19 @@ int main(void) {
 	} catch (const utils::SystemException &e) {
 		std::cerr << e.what() << std::endl;
 		std::cerr << e.GetErrorNumber() << std::endl;
+		PrintNg();
+		ret_code |= EXIT_FAILURE;
 	}
 
 	try {
 		http::Stat test2("no.txt");
+		PrintNg();
+		ret_code |= EXIT_FAILURE;
 	} catch (const utils::SystemException &e) {
 		std::cerr << e.what() << std::endl;
 		std::cerr << e.GetErrorNumber() << std::endl;
+		PrintOk();
+		ret_code |= EXIT_SUCCESS;
 	}
 	return ret_code;
 }
