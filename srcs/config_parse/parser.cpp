@@ -2,6 +2,7 @@
 #include "directive_names.hpp"
 #include "result.hpp"
 #include "utils.hpp"
+#include <algorithm>
 #include <cstdlib> // atoi
 #include <stdexcept>
 
@@ -32,7 +33,7 @@ namespace {
 
 template <typename T>
 bool FindDuplicated(const std::list<T> &list, const T &element) {
-	if (std::find(list.begin(), list.end(), element) != std::end(list)) {
+	if (std::find(list.begin(), list.end(), element) != list.end()) {
 		return true;
 	}
 	return false;
