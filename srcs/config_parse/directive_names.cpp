@@ -18,7 +18,7 @@ const std::string AUTO_INDEX      = "autoindex";
 const std::string INDEX           = "index";
 
 extern const std::string VALID_ALLOWED_METHODS[] = {"GET", "DELETE", "POST"};
-extern const std::size_t VALID_ALLOWED_METHODS_SIZE =
+extern const std::size_t SIZE_OF_VALID_ALLOWED_METHODS =
 	sizeof(VALID_ALLOWED_METHODS) / sizeof(VALID_ALLOWED_METHODS[0]);
 
 const std::string CGI_EXTENSION = "cgi_extension";
