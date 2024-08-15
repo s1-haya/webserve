@@ -124,7 +124,12 @@ void Parser::HandleClientMaxBodySize(std::size_t &client_max_body_size, NodeItr 
 	if ((*it).token_type != node::WORD) {
 		throw std::runtime_error("invalid number of arguments in 'client_max_body_size' directive");
 	}
-	client_max_body_size = std::atoi((*it++).token.c_str()); // tmp: atoi
+	utils::Result<std::size_t> body_max_size = utils::ConvertStrToSize((*it).token);
+	if (!body_max_size.IsOk()) { // check range?
+		throw std::runtime_error("invalid client_max_body_size");
+	}
+	client_max_body_size = body_max_size.GetValue();
+	it++;
 }
 
 void Parser::HandleErrorPage(std::pair<unsigned int, std::string> &error_page, NodeItr &it) {
@@ -239,7 +244,11 @@ void Parser::HandleReturn(std::pair<unsigned int, std::string> &redirect, NodeIt
 	// ex. 302 /index.html, tmp: atoi
 	NodeItr tmp_it = it; // 302
 	it++;                // /index.html
-	redirect = std::make_pair(std::atoi((*tmp_it).token.c_str()), (*it).token);
+	utils::Result<unsigned int> status_code = utils::ConvertStrToUint((*tmp_it).token);
+	if (!status_code.IsOk() || status_code.GetValue() < 100 || status_code.GetValue() > 599) {
+		throw std::runtime_error("invalid status code for return");
+	}
+	redirect = std::make_pair(status_code.GetValue(), (*it).token);
 	it++;
 }
 
