@@ -21,11 +21,31 @@ class Parser {
 	context::ServerCon   CreateServerContext(NodeItr &);
 	context::LocationCon CreateLocationContext(NodeItr &);
 
-	void HandleServerContextDirective(context::ServerCon &server, NodeItr &it);
-	void HandleLocationContextDirective(context::LocationCon &location, NodeItr &it);
+	void ParseNode();
+	void HandleServerContextDirective(context::ServerCon &, NodeItr &);
+	void HandleLocationContextDirective(context::LocationCon &, NodeItr &);
+
+	/**
+	 * @brief Handlers for each Server Directive
+	 */
+
+	void HandleServerName(std::list<std::string> &server_names, NodeItr &it);
+	void HandleListen(context::PortList &ports, NodeItr &it);
+	void HandleClientMaxBodySize(std::size_t &client_max_body_size, NodeItr &it);
+	void HandleErrorPage(std::pair<unsigned int, std::string> &error_page, NodeItr &it);
+
+	/**
+	 * @brief Handlers for each Location Directive
+	 */
+
+	void HandleAlias(std::string &alias, NodeItr &it);
+	void HandleIndex(std::string &index, NodeItr &it);
+	void HandleAutoIndex(bool &autoindex, NodeItr &it);
+	void HandleAllowedMethods(std::list<std::string> &allowed_methods, NodeItr &it);
+	void HandleReturn(std::pair<unsigned int, std::string> &redirect, NodeItr &it);
 
   public:
-	Parser(std::list<node::Node> &);
+	explicit Parser(std::list<node::Node> &);
 	~Parser();
 
 	std::list<context::ServerCon> GetServers() const;

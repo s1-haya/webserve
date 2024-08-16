@@ -1,27 +1,33 @@
 NAME			:=	a.out
 
 # 1. Set each directory name
-TEST_DIR		:=	config_parse
+TEST_DIR		:=	http_serverinfo_check
 
 LOG_DIR			:=	log
 LOG_FILE_NAME	:=	$(TEST_DIR).log
 LOG_FILE_PATH	:=	$(LOG_DIR)/$(LOG_FILE_NAME)
 
 # 2. Add target webserv files
-WS_SRCS_DIR		:=	../../../srcs
-WS_UTILS_DIR	:=	$(WS_SRCS_DIR)/utils
-WS_CONFIG_PARSE_DIR	:=	$(WS_SRCS_DIR)/config_parse
-SRCS			+=	$(WS_CONFIG_PARSE_DIR)/parser.cpp \
-					$(WS_CONFIG_PARSE_DIR)/lexer.cpp \
-					$(WS_CONFIG_PARSE_DIR)/config.cpp \
-					$(WS_CONFIG_PARSE_DIR)/directive_names.cpp \
-					$(WS_UTILS_DIR)/color.cpp
+WS_SRCS_DIR				:=	../../../srcs
+WS_UTILS_DIR			:= $(WS_SRCS_DIR)/utils
+WS_HTTP_DIR				:=	$(WS_SRCS_DIR)/http
+WS_HTTP_REQUEST_DIR		:=	$(WS_HTTP_DIR)/request
+WS_HTTP_PARSE_DIR		:=	$(WS_HTTP_REQUEST_DIR)/parse
+WS_HTTP_RESPONSE_DIR	:=	$(WS_HTTP_DIR)/response
+WS_HTTP_SERVERINFO_CHECK_DIR	:=	$(WS_HTTP_RESPONSE_DIR)/http_serverinfo_check
+
+SRCS				+=	$(WS_HTTP_SERVERINFO_CHECK_DIR)/http_serverinfo_check.cpp
 
 # 3. Add unit test files
-SRCS	+=	test_config.cpp
+SRCS	+=	main.cpp
 
 # 4. Add directory for INCLUDE
-SRCS_DIR	:=	$(WS_CONFIG_PARSE_DIR) $(WS_UTILS_DIR)
+SRCS_DIR	:=	$(WS_UTILS_DIR) \
+				$(WS_HTTP_DIR) \
+				$(WS_HTTP_REQUEST_DIR) \
+				$(WS_HTTP_PARSE_DIR) \
+				$(WS_HTTP_RESPONSE_DIR) \
+				$(WS_HTTP_SERVERINFO_CHECK_DIR)
 
 #--------------------------------------------
 OBJ_DIR		:=	objs
@@ -60,8 +66,6 @@ re: fclean all
 #--------------------------------------------
 # PIPESTATUSがbash固有のため
 SHELL=/bin/bash
-TEST_FILE_DIR = ./test_file
-ERROR_TEST_FILE_DIR = ./test_file_error
 
 .PHONY	: run
 run: all
@@ -74,6 +78,6 @@ run: all
 .PHONY	: val
 val: all
 	@valgrind ./$(NAME)
-#--------------------------------------------
 
+#--------------------------------------------
 -include $(DEPS)

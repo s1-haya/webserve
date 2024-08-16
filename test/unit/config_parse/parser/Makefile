@@ -13,6 +13,7 @@ WS_UTILS_DIR	:=	$(WS_SRCS_DIR)/utils
 WS_CONFIG_PARSE_DIR	:=	$(WS_SRCS_DIR)/config_parse
 SRCS			+=	$(WS_CONFIG_PARSE_DIR)/parser.cpp \
 					$(WS_CONFIG_PARSE_DIR)/lexer.cpp \
+					$(WS_CONFIG_PARSE_DIR)/directive_names.cpp \
 					$(WS_UTILS_DIR)/color.cpp
 
 # 3. Add unit test files
