@@ -95,5 +95,11 @@ int main(void) {
 		"test/directory", test3_request_body_message, test3_response_body_message
 	);
 	ret_code = HandleResult(test3_response_body_message, expected_forbidden);
+
+	// DELETE test
+	// ファイルが存在するかつ親ディレクトリが書き込み権限あるとき
+	std::string delete_test1_response_body_message;
+	http::HttpResponse::DeleteHandler("ok.txt", delete_test1_response_body_message);
+	ret_code = HandleResult(delete_test1_response_body_message, expected_no_content);
 	return ret_code;
 }
