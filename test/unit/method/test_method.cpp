@@ -48,19 +48,19 @@ int main(void) {
 	std::string makefile;
 	std::string expected_makefile = LoadFileContent("expected/makefile.txt");
 	http::HttpResponse::GetHandler("Makefile", makefile);
-	ret_code = HandleResult(makefile, expected_makefile);
+	ret_code |= HandleResult(makefile, expected_makefile);
 
 	// CRLF
 	std::string not_found;
 	std::string expected_not_found = LoadFileContent("expected/not_found.txt");
 	http::HttpResponse::GetHandler("test/a", not_found);
-	ret_code = HandleResult(not_found, expected_not_found);
+	ret_code |= HandleResult(not_found, expected_not_found);
 
 	// CRLF
 	std::string redirect;
 	std::string expected_redirect = LoadFileContent("expected/redirect.txt");
 	http::HttpResponse::GetHandler("test/directory", redirect);
-	ret_code = HandleResult(redirect, expected_redirect);
+	ret_code |= HandleResult(redirect, expected_redirect);
 
 	// CRLF 権限のないファイルをaddすることができなかったためローカルで各自テストしてください
 	// std::string forbidden;
@@ -76,7 +76,7 @@ int main(void) {
 	http::HttpResponse::PostHandler(
 		"ok.txt", test1_request_body_message, test1_response_body_message
 	);
-	ret_code = HandleResult(test1_response_body_message, expected_created);
+	ret_code |= HandleResult(test1_response_body_message, expected_created);
 
 	// すでにアップロードされたファイルをアップロードする場合
 	std::string test2_request_body_message = "OK";
@@ -85,7 +85,7 @@ int main(void) {
 	http::HttpResponse::PostHandler(
 		"ok.txt", test2_request_body_message, test2_response_body_message
 	);
-	ret_code = HandleResult(test2_response_body_message, expected_no_content);
+	ret_code |= HandleResult(test2_response_body_message, expected_no_content);
 
 	// ディレクトリの場合
 	std::string test3_request_body_message;
@@ -99,28 +99,28 @@ int main(void) {
 	// ファイルが存在するかつ親ディレクトリが書き込み権限あるとき
 	std::string delete_test1_response_body_message;
 	http::HttpResponse::DeleteHandler("ok.txt", delete_test1_response_body_message);
-	ret_code = HandleResult(delete_test1_response_body_message, expected_no_content);
+	ret_code |= HandleResult(delete_test1_response_body_message, expected_no_content);
 
 	// ファイルが存在しない場合
 	std::string delete_test2_response_body_message;
 	http::HttpResponse::DeleteHandler("not_found.txt", delete_test2_response_body_message);
-	ret_code = HandleResult(delete_test2_response_body_message, expected_not_found);
+	ret_code |= HandleResult(delete_test2_response_body_message, expected_not_found);
 
 	// ディレクトリの場合
 	std::string delete_test3_response_body_message;
 	http::HttpResponse::DeleteHandler("test", delete_test3_response_body_message);
-	ret_code = HandleResult(delete_test3_response_body_message, expected_forbidden);
+	ret_code |= HandleResult(delete_test3_response_body_message, expected_forbidden);
 
 	// 存在しないディレクトリの場合
 	std::string delete_test4_response_body_message;
 	http::HttpResponse::DeleteHandler("not_found_directory", delete_test4_response_body_message);
-	ret_code = HandleResult(delete_test4_response_body_message, expected_not_found);
+	ret_code |= HandleResult(delete_test4_response_body_message, expected_not_found);
 
 	// 書き込み権限がないディレクトリの中にあるファイル場合
 	std::string delete_test5_response_body_message;
 	http::HttpResponse::DeleteHandler(
 		"test/no_authority_directory/test.txt", delete_test5_response_body_message
 	);
-	ret_code = HandleResult(delete_test5_response_body_message, expected_forbidden);
+	ret_code |= HandleResult(delete_test5_response_body_message, expected_forbidden);
 	return ret_code;
 }
