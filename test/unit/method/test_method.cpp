@@ -44,29 +44,30 @@ int main(void) {
 	// CF -> success or error_pages directive
 	// CRLF -> default error file
 
-	// CF
+	// ファイルが存在する場合
 	std::string makefile;
 	std::string expected_makefile = LoadFileContent("expected/makefile.txt");
 	http::HttpResponse::GetHandler("Makefile", makefile);
 	ret_code |= HandleResult(makefile, expected_makefile);
 
-	// CRLF
+	// ファイルが存在しない場合
 	std::string not_found;
 	std::string expected_not_found = LoadFileContent("expected/not_found.txt");
 	http::HttpResponse::GetHandler("test/a", not_found);
 	ret_code |= HandleResult(not_found, expected_not_found);
 
-	// CRLF
+	// ディレクトリの場合かつ'/'がない場合
 	std::string redirect;
 	std::string expected_redirect = LoadFileContent("expected/redirect.txt");
 	http::HttpResponse::GetHandler("test/directory", redirect);
 	ret_code |= HandleResult(redirect, expected_redirect);
 
+	// ファイルが権限ない場合
 	// CRLF 権限のないファイルをaddすることができなかったためローカルで各自テストしてください
 	// std::string forbidden;
 	// std::string expected_forbidden = LoadFileContent("expected/forbidden.txt");
 	// http::HttpResponse::GetHandler("test/forbidden_file", forbidden);
-	// ret_code = HandleResult(forbidden, expected_forbidden);
+	// ret_code |= HandleResult(forbidden, expected_forbidden);
 
 	// POST test
 	// 新しいファイルをアップロードする場合
@@ -94,6 +95,7 @@ int main(void) {
 	http::HttpResponse::PostHandler(
 		"test/directory", test3_request_body_message, test3_response_body_message
 	);
+	ret_code |= HandleResult(test3_response_body_message, expected_forbidden);
 
 	// DELETE test
 	// ファイルが存在するかつ親ディレクトリが書き込み権限あるとき
@@ -116,11 +118,11 @@ int main(void) {
 	http::HttpResponse::DeleteHandler("not_found_directory", delete_test4_response_body_message);
 	ret_code |= HandleResult(delete_test4_response_body_message, expected_not_found);
 
-	// 書き込み権限がないディレクトリの中にあるファイル場合
-	std::string delete_test5_response_body_message;
-	http::HttpResponse::DeleteHandler(
-		"test/no_authority_directory/test.txt", delete_test5_response_body_message
-	);
-	ret_code |= HandleResult(delete_test5_response_body_message, expected_forbidden);
+	// 書き込み権限がないディレクトリの中にあるファイル場合(テストするときはローカルで書き込み権限を削除してください)
+	// std::string delete_test5_response_body_message;
+	// http::HttpResponse::DeleteHandler(
+	// 	"test/no_authority_directory/test.txt", delete_test5_response_body_message
+	// );
+	// ret_code |= HandleResult(delete_test5_response_body_message, expected_forbidden);
 	return ret_code;
 }
