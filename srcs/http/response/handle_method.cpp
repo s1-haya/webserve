@@ -43,7 +43,7 @@ void HttpResponse::GetHandler(const std::string &path, std::string &body_message
 		if (info.IsDirectory()) {
 			if (path[path.size() - 1] != '/') {
 				// todo: return stats_code pathname;
-				body_message = CreateErrorBodyMessage(
+				body_message = CreateDefaultBodyMessageFormat(
 					utils::ToString(http::MOVED_PERMANENTLY),
 					reason_phrase.at(http::MOVED_PERMANENTLY)
 				);
@@ -53,29 +53,29 @@ void HttpResponse::GetHandler(const std::string &path, std::string &body_message
 			// todo: if index and autoindex directive don't exist, it is created 403 forbidden.
 		} else if (info.IsRegularFile()) {
 			if (!info.IsReadableFile()) {
-				body_message = CreateErrorBodyMessage(
+				body_message = CreateDefaultBodyMessageFormat(
 					utils::ToString(http::FORBIDDEN), reason_phrase.at(http::FORBIDDEN)
 				);
 			} else {
 				body_message = ReadFile(path);
 			}
 		} else {
-			body_message = CreateErrorBodyMessage(
+			body_message = CreateDefaultBodyMessageFormat(
 				utils::ToString(http::NOT_FOUND), reason_phrase.at(http::NOT_FOUND)
 			);
 		}
 	} catch (const utils::SystemException &e) {
 		int error_number = e.GetErrorNumber();
 		if (error_number == EACCES) {
-			body_message = CreateErrorBodyMessage(
+			body_message = CreateDefaultBodyMessageFormat(
 				utils::ToString(http::FORBIDDEN), reason_phrase.at(http::FORBIDDEN)
 			);
 		} else if (error_number == ENOENT || error_number == ENOTDIR) {
-			body_message = CreateErrorBodyMessage(
+			body_message = CreateDefaultBodyMessageFormat(
 				utils::ToString(http::NOT_FOUND), reason_phrase.at(http::NOT_FOUND)
 			);
 		} else {
-			body_message = CreateErrorBodyMessage(
+			body_message = CreateDefaultBodyMessageFormat(
 				utils::ToString(http::INTERNAL_SERVER_ERROR),
 				reason_phrase.at(http::INTERNAL_SERVER_ERROR)
 			);
@@ -99,11 +99,11 @@ void HttpResponse::PostHandler(
 	try {
 		Stat info(path);
 		if (info.IsDirectory()) {
-			response_body_message = CreateErrorBodyMessage(
+			response_body_message = CreateDefaultBodyMessageFormat(
 				utils::ToString(http::FORBIDDEN), reason_phrase.at(http::FORBIDDEN)
 			);
 		} else if (info.IsRegularFile()) {
-			response_body_message = CreateErrorBodyMessage(
+			response_body_message = CreateDefaultBodyMessageFormat(
 				utils::ToString(http::NO_CONTENT), reason_phrase.at(http::NO_CONTENT)
 			);
 		} else {
@@ -128,12 +128,11 @@ void HttpResponse::PostHandler(
 					reason_phrase.at(http::INTERNAL_SERVER_ERROR)
 				);
 			}
-			file.write(request_body_message.c_str(), request_body_message.length());
 		}
 	} catch (const utils::SystemException &e) {
 		int error_number = e.GetErrorNumber();
 		if (error_number == EACCES) {
-			response_body_message = CreateErrorBodyMessage(
+			response_body_message = CreateDefaultBodyMessageFormat(
 				utils::ToString(http::FORBIDDEN), reason_phrase.at(http::FORBIDDEN)
 			);
 		} else if (error_number == ENOENT || error_number == ENOTDIR) {
@@ -156,9 +155,8 @@ void HttpResponse::PostHandler(
 					reason_phrase.at(http::INTERNAL_SERVER_ERROR)
 				);
 			}
-			file.write(request_body_message.c_str(), request_body_message.length());
 		} else {
-			response_body_message = CreateErrorBodyMessage(
+			response_body_message = CreateDefaultBodyMessageFormat(
 				utils::ToString(http::INTERNAL_SERVER_ERROR),
 				reason_phrase.at(http::INTERNAL_SERVER_ERROR)
 			);

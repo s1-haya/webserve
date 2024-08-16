@@ -40,8 +40,9 @@ class HttpResponse {
 	HttpResponse();
 	~HttpResponse();
 
-	static std::string
-	CreateErrorBodyMessage(const std::string &status_code, const std::string &reason_phrase);
+	static std::string CreateDefaultBodyMessageFormat(
+		const std::string &status_code, const std::string &reason_phrase
+	);
 };
 
 } // namespace http
