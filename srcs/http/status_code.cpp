@@ -11,7 +11,7 @@ ReasonPhrase InitReasonPhrase() {
 	init_reason_phrase[BAD_REQUEST]           = "Bad Request";
 	init_reason_phrase[FORBIDDEN]             = "Forbidden";
 	init_reason_phrase[NOT_FOUND]             = "Not Found";
-	init_reason_phrase[INTERNAL_SERVER_ERROR] = "Internal Server Error",
+	init_reason_phrase[INTERNAL_SERVER_ERROR] = "Internal Server Error";
 	init_reason_phrase[NOT_IMPLEMENTED]       = "Not Implemented";
 	return init_reason_phrase;
 }
