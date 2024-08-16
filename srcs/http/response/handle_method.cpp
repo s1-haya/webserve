@@ -25,18 +25,6 @@ std::string ReadFile(const std::string &file_path) {
 	return FileToString(file);
 }
 
-bool IsWritablePath(const std::string &path) {
-	return access(path.c_str(), W_OK) == 0;
-}
-
-std::string GetParentDirectoryPathName(const std::string &path) {
-	std::size_t pos = path.find_last_of("/");
-	if (pos == std::string::npos) {
-		return ".";
-	}
-	return path.substr(0, pos);
-}
-
 } // namespace
 
 // todo: 各メソッドを実行する関数
@@ -166,49 +154,17 @@ void HttpResponse::PostHandler(
 	}
 }
 
-// todo: ExecuteDelete: リソースの削除
-// 成功した場合、204 No Content
-// -> 詳細を表示しない設定にするため
-// パスがディレクトリの場合(autoindexはon,
-// off関係なし): 403 Forbidden
-// ファイル権限がない場合: 403 Forbidden
-// 存在しないファイルの場合: 404 Not Found
 void HttpResponse::DeleteHandler(const std::string &path, std::string &response_body_message) {
-	try {
-		Stat info(path);
-		if (info.IsDirectory()) {
+	if (unlink(path.c_str()) == 0) {
+		response_body_message = CreateDefaultBodyMessageFormat(
+			utils::ToString(http::NO_CONTENT), reason_phrase.at(http::NO_CONTENT)
+		);
+	} else {
+		if (errno == EACCES || errno == EISDIR || errno == EPERM) {
 			response_body_message = CreateDefaultBodyMessageFormat(
 				utils::ToString(http::FORBIDDEN), reason_phrase.at(http::FORBIDDEN)
 			);
-		} else if (info.IsRegularFile()) {
-			if (!IsWritablePath(GetParentDirectoryPathName(path))) {
-				response_body_message = CreateDefaultBodyMessageFormat(
-					utils::ToString(http::FORBIDDEN), reason_phrase.at(http::FORBIDDEN)
-				);
-				return;
-			}
-			if (std::remove("ok.txt") == 0) {
-				response_body_message = CreateDefaultBodyMessageFormat(
-					utils::ToString(http::NO_CONTENT), reason_phrase.at(http::NO_CONTENT)
-				);
-			} else {
-				response_body_message = CreateDefaultBodyMessageFormat(
-					utils::ToString(http::INTERNAL_SERVER_ERROR),
-					reason_phrase.at(http::INTERNAL_SERVER_ERROR)
-				);
-			}
-		} else {
-			response_body_message = CreateDefaultBodyMessageFormat(
-				utils::ToString(http::NOT_FOUND), reason_phrase.at(http::NOT_FOUND)
-			);
-		}
-	} catch (const utils::SystemException &e) {
-		int error_number = e.GetErrorNumber();
-		if (error_number == EACCES) {
-			response_body_message = CreateDefaultBodyMessageFormat(
-				utils::ToString(http::FORBIDDEN), reason_phrase.at(http::FORBIDDEN)
-			);
-		} else if (error_number == ENOENT || error_number == ENOTDIR) {
+		} else if (errno == ENOENT || errno == ENOTDIR || errno == ENAMETOOLONG) {
 			response_body_message = CreateDefaultBodyMessageFormat(
 				utils::ToString(http::NOT_FOUND), reason_phrase.at(http::NOT_FOUND)
 			);
