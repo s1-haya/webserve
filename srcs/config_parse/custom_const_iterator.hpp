@@ -46,7 +46,7 @@ class CustomConstIterator {
 		return it_ == other.it_;
 	}
 	bool operator!=(const CustomConstIterator &other) const {
-		return it_ != other.it_;
+		return !(*this == other);
 	}
 
 	bool operator==(const typename std::list<T>::const_iterator &other) const {
