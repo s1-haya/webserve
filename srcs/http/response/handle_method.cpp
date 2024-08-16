@@ -107,12 +107,23 @@ void HttpResponse::PostHandler(
 				utils::ToString(http::NO_CONTENT), reason_phrase.at(http::NO_CONTENT)
 			);
 		} else {
-			response_body_message = CreateErrorBodyMessage(
-				utils::ToString(http::CREATED), reason_phrase.at(http::CREATED)
-			);
+			// Location header fields: URI-reference
+			// ex) POST /save/test.txt HTTP/1.1
+			// Location: /save/test.txt;
 			std::ofstream file(path.c_str(), std::ios::binary);
 			if (file.fail()) {
-				response_body_message = CreateErrorBodyMessage(
+				response_body_message = CreateDefaultBodyMessageFormat(
+					utils::ToString(http::INTERNAL_SERVER_ERROR),
+					reason_phrase.at(http::INTERNAL_SERVER_ERROR)
+				);
+				return;
+			}
+			response_body_message = CreateDefaultBodyMessageFormat(
+				utils::ToString(http::CREATED), reason_phrase.at(http::CREATED)
+			);
+			file.write(request_body_message.c_str(), request_body_message.length());
+			if (file.fail()) {
+				response_body_message = CreateDefaultBodyMessageFormat(
 					utils::ToString(http::INTERNAL_SERVER_ERROR),
 					reason_phrase.at(http::INTERNAL_SERVER_ERROR)
 				);
@@ -126,12 +137,21 @@ void HttpResponse::PostHandler(
 				utils::ToString(http::FORBIDDEN), reason_phrase.at(http::FORBIDDEN)
 			);
 		} else if (error_number == ENOENT || error_number == ENOTDIR) {
-			response_body_message = CreateErrorBodyMessage(
-				utils::ToString(http::CREATED), reason_phrase.at(http::CREATED)
-			);
+			// todo: CreateFile();
 			std::ofstream file(path.c_str(), std::ios::binary);
 			if (file.fail()) {
-				response_body_message = CreateErrorBodyMessage(
+				response_body_message = CreateDefaultBodyMessageFormat(
+					utils::ToString(http::INTERNAL_SERVER_ERROR),
+					reason_phrase.at(http::INTERNAL_SERVER_ERROR)
+				);
+				return;
+			}
+			response_body_message = CreateDefaultBodyMessageFormat(
+				utils::ToString(http::CREATED), reason_phrase.at(http::CREATED)
+			);
+			file.write(request_body_message.c_str(), request_body_message.length());
+			if (file.fail()) {
+				response_body_message = CreateDefaultBodyMessageFormat(
 					utils::ToString(http::INTERNAL_SERVER_ERROR),
 					reason_phrase.at(http::INTERNAL_SERVER_ERROR)
 				);
