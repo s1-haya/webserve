@@ -48,25 +48,25 @@ int main(void) {
 	std::string makefile;
 	std::string expected_makefile = LoadFileContent("expected/makefile.txt");
 	http::HttpResponse::GetHandler("Makefile", makefile);
-	ret_code = HandleResult(makefile, expected_makefile);
+	ret_code |= HandleResult(makefile, expected_makefile);
 
 	// ファイルが存在しない場合
 	std::string not_found;
 	std::string expected_not_found = LoadFileContent("expected/not_found.txt");
 	http::HttpResponse::GetHandler("test/a", not_found);
-	ret_code = HandleResult(not_found, expected_not_found);
+	ret_code |= HandleResult(not_found, expected_not_found);
 
 	// ディレクトリの場合かつ'/'がない場合
 	std::string redirect;
 	std::string expected_redirect = LoadFileContent("expected/redirect.txt");
 	http::HttpResponse::GetHandler("test/directory", redirect);
-	ret_code = HandleResult(redirect, expected_redirect);
+	ret_code |= HandleResult(redirect, expected_redirect);
 
 	// ファイルが権限ない場合
 	// CRLF 権限のないファイルをaddすることができなかったためローカルで各自テストしてください
 	// std::string forbidden;
 	// std::string expected_forbidden = LoadFileContent("expected/forbidden.txt");
 	// http::HttpResponse::GetHandler("test/forbidden_file", forbidden);
-	// ret_code = HandleResult(forbidden, expected_forbidden);
+	// ret_code |= HandleResult(forbidden, expected_forbidden);
 	return ret_code;
 }
