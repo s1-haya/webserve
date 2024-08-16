@@ -83,14 +83,6 @@ void HttpResponse::GetHandler(const std::string &path, std::string &body_message
 	}
 }
 
-// todo: ExecutePost: ボディメッセージをリソースに書き込む。ファイルアップロード
-// 成功した場合: 201 Created + Location のheader fieldsを返す
-// ファイルが存在する場合: 204 No Content
-// パスがディレクトリの場合(autoindexはon, off関係なし): 403 Forbidden
-// ファイル権限がない場合: 403 Forbidden
-// 存在しないファイルの場合: 404 Not Found
-// ファイルの書き込みが失敗した場合: 500 Internal Server Error
-
 void HttpResponse::PostHandler(
 	const std::string &path,
 	const std::string &request_body_message,
