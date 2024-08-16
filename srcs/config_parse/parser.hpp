@@ -9,6 +9,9 @@
 namespace config {
 namespace parser {
 
+/**
+ * @brief CustomConstIterator: throw on unexpected end
+ */
 typedef CustomConstIterator<node::Node> NodeItr;
 
 class Parser {

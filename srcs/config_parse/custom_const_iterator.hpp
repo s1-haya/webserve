@@ -6,6 +6,12 @@
 
 namespace config {
 
+/**
+ * @brief Custom Iterator for ConfigParser which can Throw on unexpected end
+ *
+ * @tparam std::list<T>::const_iterator
+ * @note The Iterator is only compatible with a `const std::list<T>`
+ */
 template <typename T>
 class CustomConstIterator {
   public:
