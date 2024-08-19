@@ -96,7 +96,7 @@ void Server::Run() {
 		for (std::size_t i = 0; i < static_cast<std::size_t>(ready); ++i) {
 			HandleEvent(event_monitor_.GetEvent(i));
 		}
-		// todo: list<Message>を先頭から見て,timeoutしてたらtimeoutのresponseセット,epoll.WRITE監視
+		HandleTimeoutMessages();
 	}
 }
 
@@ -205,6 +205,20 @@ void Server::SendResponse(int client_fd) {
 	close(client_fd);
 	utils::Debug("server", "disconnected client", client_fd);
 	utils::Debug("------------------------------------------");
+}
+
+void Server::HandleTimeoutMessages() {
+	// timeoutした全fdを取得
+	const MessageManager::TimeoutFds &timeout_fds = message_manager_.GetTimeoutFds();
+
+	// timeout用のresponseをセットしてevent監視をWRITEに変更
+	typedef MessageManager::TimeoutFds::const_iterator Itr;
+	for (Itr it = timeout_fds.begin(); it != timeout_fds.end(); ++it) {
+		const int          client_fd        = *it;
+		const std::string &timeout_response = mock_http.GetTimeoutResponse(client_fd);
+		buffers_.AddResponse(client_fd, timeout_response);
+		event_monitor_.Update(client_fd, event::EVENT_WRITE);
+	}
 }
 
 void Server::Init() {

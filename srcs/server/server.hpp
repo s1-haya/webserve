@@ -38,6 +38,7 @@ class Server {
 	void ReadRequest(int client_fd);
 	void RunHttp(const event::Event &event);
 	void SendResponse(int client_fd);
+	void HandleTimeoutMessages();
 	// for Server to Http
 	DtoClientInfos GetClientInfos(int client_fd) const;
 	DtoServerInfos GetServerInfos(int client_fd) const;
