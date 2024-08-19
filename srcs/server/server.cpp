@@ -181,7 +181,7 @@ void Server::RunHttp(const event::Event &event) {
 	utils::Debug("server", "received all request from client", client_fd);
 	std::cerr << buffers_.GetRequest(client_fd) << std::endl;
 	buffers_.AddResponse(client_fd, http_result.response);
-	event_monitor_.Update(event, event::EVENT_WRITE);
+	event_monitor_.Update(event.fd, event::EVENT_WRITE);
 }
 
 void Server::SendResponse(int client_fd) {
