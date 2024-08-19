@@ -18,6 +18,12 @@ Message &Message::operator=(const Message &other) {
 	return *this;
 }
 
+bool Message::IsTimeoutExceeded(double timeout_sec) const {
+	const Time   current_time  = GetCurrentTime();
+	const double diff_time_sec = std::difftime(current_time, start_time_);
+	return diff_time_sec >= timeout_sec;
+}
+
 Message::Time Message::GetCurrentTime() {
 	return std::time(NULL);
 }

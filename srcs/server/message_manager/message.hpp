@@ -13,6 +13,8 @@ class Message {
 	~Message();
 	Message(const Message &other);
 	Message &operator=(const Message &other);
+	// function
+	bool IsTimeoutExceeded(double timeout_sec) const;
 
   private:
 	Message();
