@@ -1,6 +1,7 @@
 #include "message.hpp"
 
 namespace server {
+namespace message {
 
 Message::Message(int client_fd) : client_fd_(client_fd), start_time_(GetCurrentTime()) {}
 
@@ -28,4 +29,5 @@ Message::Time Message::GetCurrentTime() {
 	return std::time(NULL);
 }
 
+} // namespace message
 } // namespace server

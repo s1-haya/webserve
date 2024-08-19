@@ -4,6 +4,7 @@
 #include <ctime>
 
 namespace server {
+namespace message {
 
 class Message {
   public:
@@ -25,6 +26,7 @@ class Message {
 	Time start_time_;
 };
 
+} // namespace message
 } // namespace server
 
 #endif /* SERVER_MESSAGE_HPP_ */

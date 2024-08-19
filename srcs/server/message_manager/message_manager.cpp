@@ -12,6 +12,7 @@ MessageManager::MessageManager(const MessageManager &other) {
 
 MessageManager &MessageManager::operator=(const MessageManager &other) {
 	if (this != &other) {
+		messages_ = other.messages_;
 	}
 	return *this;
 }
