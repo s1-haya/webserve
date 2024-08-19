@@ -26,6 +26,10 @@ class Message {
 	// variables
 	int  client_fd_;
 	Time start_time_;
+	// todo: add variables
+	// bool is_connection_keep_;
+	// std::string request_buf;
+	// std::string response;
 };
 
 } // namespace message

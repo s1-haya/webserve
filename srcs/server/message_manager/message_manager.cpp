@@ -38,6 +38,13 @@ void MessageManager::DeleteMessage(int client_fd) {
 	}
 }
 
+// Look from the beginning of the MessageList,
+// delete all messages that have timed out, and return TimeoutFds list.
+// ex)
+//   before: MessageList{3,4,5}
+//   (if timeout fd 3,4)
+//   return: TimeoutFds{3,4}
+//   after : MessageList{5}
 MessageManager::TimeoutFds MessageManager::GetTimeoutFds() {
 	TimeoutFds timeout_fds_;
 
