@@ -2,7 +2,7 @@ name: unit-test-message-manager
 
 on:
   push:
-    branches: [ ab/302-add-unit-test-message_manager ]
+    branches: [ main ]
   pull_request:
     branches: [ main ]
 
