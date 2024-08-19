@@ -25,6 +25,10 @@ bool Message::IsTimeoutExceeded(double timeout_sec) const {
 	return diff_time_sec >= timeout_sec;
 }
 
+int Message::GetFd() const {
+	return client_fd_;
+}
+
 Message::Time Message::GetCurrentTime() {
 	return std::time(NULL);
 }

@@ -16,6 +16,8 @@ class Message {
 	Message &operator=(const Message &other);
 	// function
 	bool IsTimeoutExceeded(double timeout_sec) const;
+	// getter
+	int GetFd() const;
 
   private:
 	Message();
