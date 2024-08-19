@@ -25,10 +25,19 @@ void MessageManager::AddNewMessage(int client_fd) {
 	messages_.push_back(message);
 }
 
-// before: MessageList{3,4,5}
-// (if timeout fd 3,4)
-// return: TimeoutFds{3,4}
-// after : MessageList{5}
+// todo: map併用して高速化する？
+// Remove one message that matches fd from the beginning of MessageList.
+void MessageManager::DeleteMessage(int client_fd) {
+	typedef MessageList::iterator Itr;
+	for (Itr it = messages_.begin(); it != messages_.end(); ++it) {
+		const message::Message &message = *it;
+		if (message.GetFd() == client_fd) {
+			messages_.erase(it);
+			return;
+		}
+	}
+}
+
 MessageManager::TimeoutFds MessageManager::GetTimeoutFds() {
 	TimeoutFds timeout_fds_;
 

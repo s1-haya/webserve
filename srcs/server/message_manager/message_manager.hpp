@@ -18,6 +18,7 @@ class MessageManager {
 	MessageManager &operator=(const MessageManager &other);
 	// functions
 	void       AddNewMessage(int client_fd);
+	void       DeleteMessage(int client_fd);
 	TimeoutFds GetTimeoutFds();
 
   private:

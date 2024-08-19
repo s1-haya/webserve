@@ -197,9 +197,11 @@ void Server::SendResponse(int client_fd) {
 
 	// todo: closeの場合こっち
 	// disconnect
+	// delete buffer, client_info, event, message
 	buffers_.Delete(client_fd);
 	context_.DeleteClientInfo(client_fd);
 	event_monitor_.Delete(client_fd);
+	message_manager_.DeleteMessage(client_fd);
 	close(client_fd);
 	utils::Debug("server", "disconnected client", client_fd);
 	utils::Debug("------------------------------------------");
