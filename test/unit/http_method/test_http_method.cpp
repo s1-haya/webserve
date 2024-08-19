@@ -45,10 +45,10 @@ int main(void) {
 	// CRLF -> default error file
 
 	// ファイルが存在する場合
-	std::string makefile;
-	std::string expected_makefile = LoadFileContent("expected/makefile.txt");
-	http::HttpResponse::GetHandler("Makefile", makefile);
-	ret_code |= HandleResult(makefile, expected_makefile);
+	std::string file;
+	std::string expected_file = LoadFileContent("expected/file.txt");
+	http::HttpResponse::GetHandler("test/file.txt", file);
+	ret_code |= HandleResult(file, expected_file);
 
 	// ファイルが存在しない場合
 	std::string not_found;

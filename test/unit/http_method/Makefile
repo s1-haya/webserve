@@ -21,10 +21,10 @@ SRCS			+=	$(WS_UTILS_DIR)/color.cpp \
 					$(WS_HTTP_DIR)/status_code.cpp \
 					$(WS_HTTP_RESPONSE_DIR)/stat.cpp \
 					$(WS_HTTP_RESPONSE_DIR)/http_response.cpp \
-					$(WS_HTTP_RESPONSE_DIR)/handle_method.cpp
+					$(WS_HTTP_RESPONSE_DIR)/http_handle_method.cpp
 
 # 3. Add unit test files
-SRCS	+=	test_method.cpp
+SRCS	+=	test_http_method.cpp
 
 # 4. Add directory for INCLUDE
 SRCS_DIR	:=	$(WS_UTILS_DIR) \

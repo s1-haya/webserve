@@ -4,6 +4,7 @@ TEST_DIRS	:=	convert_str \
 				http \
 				http_parse \
 				http_storage \
+				http_method \
 				sock_context \
 				split_str \
 				virtual_server \
@@ -12,7 +13,6 @@ TEST_DIRS	:=	convert_str \
 				config_parse/parser \
 				config_parse \
 				stat \
-				method
 
 .PHONY	: run
 run:
