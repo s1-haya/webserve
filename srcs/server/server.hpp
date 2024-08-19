@@ -7,6 +7,7 @@
 #include "context_manager.hpp"
 #include "epoll.hpp"
 #include "http_result.hpp"
+#include "message_manager.hpp"
 #include "mock_http.hpp"
 #include <list>
 #include <string>
@@ -53,6 +54,8 @@ class Server {
 	Buffer buffers_;
 	// http
 	http::MockHttp mock_http;
+	// message manager with time control
+	MessageManager message_manager_;
 };
 
 } // namespace server

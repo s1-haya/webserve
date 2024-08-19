@@ -96,6 +96,7 @@ void Server::Run() {
 		for (std::size_t i = 0; i < static_cast<std::size_t>(ready); ++i) {
 			HandleEvent(event_monitor_.GetEvent(i));
 		}
+		// todo: list<Message>を先頭から見て,timeoutしてたらtimeoutのresponseセット,epoll.WRITE監視
 	}
 }
 
@@ -113,9 +114,10 @@ void Server::HandleNewConnection(int server_fd) {
 	const ClientInfo new_client_info = Connection::Accept(server_fd);
 	const int        client_fd       = new_client_info.GetFd();
 
-	// add to context
+	// add client_info, event, message
 	context_.AddClientInfo(new_client_info, server_fd);
 	event_monitor_.Add(client_fd, event::EVENT_READ);
+	message_manager_.AddNewMessage(client_fd);
 	utils::Debug("server", "add new client", client_fd);
 }
 
@@ -188,7 +190,12 @@ void Server::SendResponse(int client_fd) {
 	send(client_fd, response.c_str(), response.size(), 0);
 	utils::Debug("server", "send response to client", client_fd);
 
-	// todo: connection keep-aliveならdisconnectしない
+	// todo: もしconnection keep-aliveならdisconnectしない
+	// - 前回のrequestの余りだけ残し,responseは削除
+	// - message_manager_.UpdateMessage(client_fd); で新規Message追加+古いMessage削除
+	// - event_monitor_.Update(event.fd, event::EVENT_READ); でevent監視をREADに更新
+
+	// todo: closeの場合こっち
 	// disconnect
 	buffers_.Delete(client_fd);
 	context_.DeleteClientInfo(client_fd);
