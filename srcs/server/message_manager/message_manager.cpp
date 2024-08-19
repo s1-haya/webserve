@@ -58,4 +58,20 @@ MessageManager::TimeoutFds MessageManager::GetTimeoutFds() {
 	return timeout_fds_;
 }
 
+// todo:
+//   connection keep用。残request_bufなど保持するようになったら変更する。
+//   まだServerからは呼ばれていない、unit testだけある
+// Remove one message from the beginning and add a new message to the end.
+void MessageManager::UpdateMessage(int client_fd) {
+	typedef MessageList::iterator Itr;
+	for (Itr it = messages_.begin(); it != messages_.end(); ++it) {
+		const message::Message &message = *it;
+		if (message.GetFd() == client_fd) {
+			messages_.erase(it);
+			AddNewMessage(client_fd);
+			return;
+		}
+	}
+}
+
 } // namespace server

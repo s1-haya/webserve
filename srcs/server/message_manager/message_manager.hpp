@@ -20,6 +20,7 @@ class MessageManager {
 	void       AddNewMessage(int client_fd);
 	void       DeleteMessage(int client_fd);
 	TimeoutFds GetTimeoutFds();
+	void       UpdateMessage(int client_fd);
 
   private:
 	// const
