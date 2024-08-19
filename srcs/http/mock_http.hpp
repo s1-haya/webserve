@@ -24,6 +24,7 @@ class MockHttp : public IHttp {
 	// override
 	HttpResult
 	Run(const server::DtoClientInfos &client_infos, const server::DtoServerInfos &server_infos);
+	std::string GetTimeoutResponse(int client_fd);
 
   private:
 	// prohibit copy
