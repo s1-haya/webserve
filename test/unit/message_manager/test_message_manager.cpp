@@ -53,6 +53,17 @@ int Test(Result result) {
 
 // -----------------------------------------------------------------------------
 template <typename T>
+void DeleteValue(TimeoutFds &lst, const T &value) {
+	typedef typename TimeoutFds::iterator Itr;
+	for (Itr it = lst.begin(); it != lst.end(); ++it) {
+		if (*it == value) {
+			lst.erase(it);
+			return;
+		}
+	}
+}
+
+template <typename T>
 std::ostream &operator<<(std::ostream &os, const std::list<T> &lst) {
 	typedef typename std::list<T>::const_iterator It;
 	for (It it = lst.begin(); it != lst.end(); ++it) {
@@ -128,12 +139,76 @@ int RunTestGetTimeoutFds() {
 	return ret_code;
 }
 
+// -----------------------------------------------------------------------------
+// add fd         : 4 5       6
+// timeout(3s)    :       4 5       6
+// current time   : 0 1 2 3 4 5 6 7 8
+// UpdateMessage():               *
+// -----------------------------------------------------------------------------
+//       ↓ 古い5削除&5新規追加
+// -----------------------------------------------------------------------------
+// add fd         : 4         6   5
+// timeout(3s)    :       4         6   5
+// current time   : 0 1 2 3 4 5 6 7 8 9 10 11
+// GetTimeoutFds():                   *    *
+// -----------------------------------------------------------------------------
+int RunTestUpdateMessage() {
+	int ret_code = EXIT_SUCCESS;
+
+	server::MessageManager manager;
+	TimeoutFds             expected_timeout_fds;
+
+	// time(0), add fd: 4
+	manager.AddNewMessage(4);
+
+	sleep(1);
+	// time(1), add fd: 5
+	manager.AddNewMessage(5);
+
+	sleep(2);
+	// time(3), timeout fd: 4
+	expected_timeout_fds.push_back(4);
+
+	sleep(1);
+	// time(4), timeout fd: 5
+	expected_timeout_fds.push_back(5);
+
+	sleep(1);
+	// time(5), add fd: 6
+	manager.AddNewMessage(6);
+
+	sleep(2);
+	// time(7), delete old fd 5, add new fd 5
+	manager.UpdateMessage(5);
+	DeleteValue(expected_timeout_fds, 5);
+
+	sleep(1);
+	// time(8), timeout fd: 6
+	expected_timeout_fds.push_back(6);
+
+	sleep(1);
+	// time(9), GetTimeoutFds: {4, 6}
+	ret_code |= Test(RunIsSameTimeoutFds(manager, expected_timeout_fds)); // test4
+	expected_timeout_fds.clear();
+
+	sleep(1);
+	// time(10), timeout fd: 5
+	expected_timeout_fds.push_back(5);
+
+	sleep(1);
+	// time(11), GetTimeoutFds: {5}
+	ret_code |= Test(RunIsSameTimeoutFds(manager, expected_timeout_fds)); // test5
+
+	return ret_code;
+}
+
 } // namespace
 
 int main() {
 	int ret_code = EXIT_SUCCESS;
 
 	ret_code |= RunTestGetTimeoutFds();
+	ret_code |= RunTestUpdateMessage();
 
 	return ret_code;
 }
