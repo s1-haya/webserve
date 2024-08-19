@@ -196,15 +196,7 @@ void Server::SendResponse(int client_fd) {
 	// - event_monitor_.Update(event.fd, event::EVENT_READ); でevent監視をREADに更新
 
 	// todo: closeの場合こっち
-	// disconnect
-	// delete buffer, client_info, event, message
-	buffers_.Delete(client_fd);
-	context_.DeleteClientInfo(client_fd);
-	event_monitor_.Delete(client_fd);
-	message_manager_.DeleteMessage(client_fd);
-	close(client_fd);
-	utils::Debug("server", "disconnected client", client_fd);
-	utils::Debug("------------------------------------------");
+	Disconnect(client_fd);
 }
 
 void Server::HandleTimeoutMessages() {
@@ -219,6 +211,17 @@ void Server::HandleTimeoutMessages() {
 		buffers_.AddResponse(client_fd, timeout_response);
 		event_monitor_.Update(client_fd, event::EVENT_WRITE);
 	}
+}
+
+// delete from buffer, client_info, event, message
+void Server::Disconnect(int client_fd) {
+	buffers_.Delete(client_fd);
+	context_.DeleteClientInfo(client_fd);
+	event_monitor_.Delete(client_fd);
+	message_manager_.DeleteMessage(client_fd);
+	close(client_fd);
+	utils::Debug("server", "disconnected client", client_fd);
+	utils::Debug("------------------------------------------");
 }
 
 void Server::Init() {

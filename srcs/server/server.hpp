@@ -39,6 +39,7 @@ class Server {
 	void RunHttp(const event::Event &event);
 	void SendResponse(int client_fd);
 	void HandleTimeoutMessages();
+	void Disconnect(int client_fd);
 	// for Server to Http
 	DtoClientInfos GetClientInfos(int client_fd) const;
 	DtoServerInfos GetServerInfos(int client_fd) const;
