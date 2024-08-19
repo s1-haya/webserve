@@ -118,6 +118,7 @@ void HttpParse::ParseBodyMessage(HttpRequestParsedData &data) {
 }
 
 void HttpParse::TmpRun(HttpRequestParsedData &data) {
+	// todo: 外側でHttpParse::TmpRunを呼ぶため try, catchを削除する
 	try {
 		ParseRequestLine(data);
 		ParseHeaderFields(data);
