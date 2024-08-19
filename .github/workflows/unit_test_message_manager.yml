@@ -1,0 +1,19 @@
+name: unit-test-message-manager
+
+on:
+  push:
+    branches: [ ab/302-add-unit-test-message_manager ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run unit test message_manager
+        run:
+          make -C test/unit/message_manager run
