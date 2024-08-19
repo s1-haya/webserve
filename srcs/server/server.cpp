@@ -172,7 +172,7 @@ void Server::RunHttp(const event::Event &event) {
 	const DtoServerInfos &server_infos = GetServerInfos(client_fd);
 	DebugDto(client_infos, server_infos);
 
-	http::HttpResult http_result = mock_http.Run(client_infos, server_infos);
+	http::HttpResult http_result = mock_http_.Run(client_infos, server_infos);
 	// Check if it's ready to start write/send.
 	// If not completed, the request will be re-read by the event_monitor.
 	if (!http_result.is_response_complete) {
@@ -207,7 +207,7 @@ void Server::HandleTimeoutMessages() {
 	typedef MessageManager::TimeoutFds::const_iterator Itr;
 	for (Itr it = timeout_fds.begin(); it != timeout_fds.end(); ++it) {
 		const int          client_fd        = *it;
-		const std::string &timeout_response = mock_http.GetTimeoutResponse(client_fd);
+		const std::string &timeout_response = mock_http_.GetTimeoutResponse(client_fd);
 		buffers_.AddResponse(client_fd, timeout_response);
 		event_monitor_.Update(client_fd, event::EVENT_WRITE);
 	}

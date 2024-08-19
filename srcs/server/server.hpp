@@ -55,7 +55,7 @@ class Server {
 	// request buffers
 	Buffer buffers_;
 	// http
-	http::MockHttp mock_http;
+	http::MockHttp mock_http_;
 	// message manager with time control
 	MessageManager message_manager_;
 };
