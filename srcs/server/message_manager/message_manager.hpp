@@ -15,6 +15,8 @@ class MessageManager {
 	~MessageManager();
 	MessageManager(const MessageManager &other);
 	MessageManager &operator=(const MessageManager &other);
+	// functions
+	void AddNewMessage(int client_fd);
 
   private:
 	// variable

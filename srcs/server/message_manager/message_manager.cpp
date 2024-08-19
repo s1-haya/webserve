@@ -17,4 +17,9 @@ MessageManager &MessageManager::operator=(const MessageManager &other) {
 	return *this;
 }
 
+void MessageManager::AddNewMessage(int client_fd) {
+	message::Message message(client_fd);
+	messages_.push_back(message);
+}
+
 } // namespace server
