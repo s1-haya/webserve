@@ -7,18 +7,6 @@
 
 namespace http {
 
-// todo: StatusCodeクラスへ
-HttpResponse::ReasonPhrase InitReasonPhrase() {
-	HttpResponse::ReasonPhrase init_reason_phrase;
-	init_reason_phrase[OK]              = "OK";
-	init_reason_phrase[BAD_REQUEST]     = "Bad Request";
-	init_reason_phrase[NOT_FOUND]       = "Not Found";
-	init_reason_phrase[NOT_IMPLEMENTED] = "Not Implemented";
-	return init_reason_phrase;
-}
-
-HttpResponse::ReasonPhrase reason_phrase = InitReasonPhrase();
-
 std::string HttpResponse::Run(const HttpRequestResult &request_info) {
 	HttpResponseResult response = CreateHttpResponseResult(request_info);
 	return CreateHttpResponseFormat(response);
