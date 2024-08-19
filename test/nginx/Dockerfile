@@ -11,6 +11,6 @@ RUN mkdir -p /var/www/save && chmod 777 /var/www/save
 RUN chmod 777 /usr/share/nginx/html
 
 COPY /test/nginx/index.html /var/www/save/index.html
-RUN chmod 000 /var/www/save/index.html
+RUN chmod 777 /var/www/save/index.html
 
 EXPOSE 80

@@ -1,17 +1,21 @@
 #ifndef HTTP_RESPONSE_HPP_
 #define HTTP_RESPONSE_HPP_
 
-#include "http_parse.hpp"
+#include "status_code.hpp"
 #include <map>
 #include <string>
 
 namespace http {
+
+struct HttpRequestResult;
 
 struct StatusLine {
 	std::string version;
 	std::string status_code;
 	std::string reason_phrase;
 };
+
+typedef std::map<std::string, std::string> HeaderFields;
 
 struct HttpResponseResult {
 	StatusLine   status_line;
@@ -21,10 +25,11 @@ struct HttpResponseResult {
 
 class HttpResponse {
   public:
-	typedef std::map<StatusCode, std::string> ReasonPhrase;
-	static std::string        CreateHttpResponse(const HttpResponseResult &response);
+	static std::string CreateHttpResponse(const HttpResponseResult &response);
+	// feature private
 	static HttpResponseResult CreateHttpResponseResult(const HttpRequestResult &request_info);
 	static HttpResponseResult CreateErrorHttpResponseResult(const HttpRequestResult &request_info);
+	static void               GetHandler(const std::string &path, std::string &body_message);
 
   private:
 	HttpResponse();
