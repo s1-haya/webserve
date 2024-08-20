@@ -2,6 +2,7 @@
 #define SERVER_MESSAGE_HPP_
 
 #include <ctime>
+#include <string>
 
 namespace server {
 namespace message {
@@ -17,7 +18,12 @@ class Message {
 	// function
 	bool IsTimeoutExceeded(double timeout_sec) const;
 	// getter
-	int GetFd() const;
+	int                GetFd() const;
+	const std::string &GetRequestBuf() const;
+	const std::string &GetResponse() const;
+	// setter
+	void SetRequestBuf(const std::string &request_buf);
+	void SetResponse(const std::string &response);
 
   private:
 	Message();
@@ -28,8 +34,8 @@ class Message {
 	Time start_time_;
 	// todo: add variables
 	// bool is_connection_keep_;
-	// std::string request_buf;
-	// std::string response;
+	std::string request_buf_;
+	std::string response_;
 };
 
 } // namespace message
