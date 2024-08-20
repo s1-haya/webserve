@@ -22,6 +22,12 @@ class MessageManager {
 	void       DeleteMessage(int client_fd);
 	TimeoutFds GetTimeoutFds(double timeout);
 	void       UpdateMessage(int client_fd);
+	// getter
+	const std::string &GetRequestBuf(int client_fd) const;
+	const std::string &GetResponse(int client_fd) const;
+	// setter
+	void SetRequestBuf(int client_fd, const std::string &request_buf);
+	void SetResponse(int client_fd, const std::string &response);
 
   private:
 	// variable

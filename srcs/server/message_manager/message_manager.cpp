@@ -63,4 +63,24 @@ void MessageManager::UpdateMessage(int client_fd) {
 	AddNewMessage(client_fd);
 }
 
+const std::string &MessageManager::GetRequestBuf(int client_fd) const {
+	const message::Message &message = messages_.at(client_fd);
+	return message.GetRequestBuf();
+}
+
+const std::string &MessageManager::GetResponse(int client_fd) const {
+	const message::Message &message = messages_.at(client_fd);
+	return message.GetResponse();
+}
+
+void MessageManager::SetRequestBuf(int client_fd, const std::string &request_buf) {
+	message::Message &message = messages_.at(client_fd);
+	message.SetRequestBuf(request_buf);
+}
+
+void MessageManager::SetResponse(int client_fd, const std::string &response) {
+	message::Message &message = messages_.at(client_fd);
+	message.SetResponse(response);
+}
+
 } // namespace server
