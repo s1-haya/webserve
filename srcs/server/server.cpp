@@ -179,6 +179,8 @@ void Server::RunHttp(const event::Event &event) {
 	DebugDto(client_infos, server_infos);
 
 	http::HttpResult http_result = mock_http_.Run(client_infos, server_infos);
+	// Set the unused request_buf in Http.
+	message_manager_.SetNewRequestBuf(client_fd, http_result.request_buf);
 	// Check if it's ready to start write/send.
 	// If not completed, the request will be re-read by the event_monitor.
 	if (!http_result.is_response_complete) {

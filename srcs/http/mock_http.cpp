@@ -113,7 +113,9 @@ HttpResult MockHttp::Run(
 
 	HttpResult result;
 	result.is_response_complete = IsRequestReceivedComplete(client_infos.request_buf);
-	result.response             = response_stream.str();
+	// parseで使わなかった余り分のrequest_bufを返す
+	result.request_buf = client_infos.request_buf;
+	result.response    = response_stream.str();
 	return result;
 }
 

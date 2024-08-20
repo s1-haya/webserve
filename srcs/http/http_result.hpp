@@ -9,6 +9,7 @@ struct HttpResult {
 	HttpResult() : is_response_complete(false) {}
 
 	bool        is_response_complete;
+	std::string request_buf;
 	std::string response;
 };
 
