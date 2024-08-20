@@ -8,6 +8,10 @@
 
 namespace {
 
+// このunit testがtimeout 3sであること前提で作られているので、
+// Server::REQUEST_TIMEOUT を直に呼ばない
+static const double REQUEST_TIMEOUT = 3.0;
+
 typedef server::MessageManager::TimeoutFds TimeoutFds;
 
 struct Result {
@@ -77,7 +81,7 @@ RunIsSameTimeoutFds(server::MessageManager &manager, const TimeoutFds &expected_
 	Result             result;
 	std::ostringstream oss;
 
-	const TimeoutFds &timeout_fds = manager.GetTimeoutFds();
+	const TimeoutFds &timeout_fds = manager.GetTimeoutFds(REQUEST_TIMEOUT);
 	if (!IsSame(timeout_fds, expected_timeout_fds)) {
 		result.is_success = false;
 		oss << "timeout_fds" << std::endl;
