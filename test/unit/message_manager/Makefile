@@ -11,15 +11,15 @@ LOG_FILE_PATH	:=	$(LOG_DIR)/$(LOG_FILE_NAME)
 WS_SRCS_DIR		:=	../../../srcs
 WS_UTILS_DIR	:=	$(WS_SRCS_DIR)/utils
 SRCS			+=	$(WS_UTILS_DIR)/color.cpp
-WS_LIFETIME_DIR	:=	../../../srcs/server/message_manager
-SRCS			+=	$(WS_LIFETIME_DIR)/message.cpp \
-					$(WS_LIFETIME_DIR)/message_manager.cpp
+WS_MESSAGE_MANAGER_DIR	:=	../../../srcs/server/message_manager
+SRCS					+=	$(WS_MESSAGE_MANAGER_DIR)/message.cpp \
+							$(WS_MESSAGE_MANAGER_DIR)/message_manager.cpp
 
 # 3. Add unit test files
-SRCS	+=	test_message_manager.cpp
+SRCS		+=	test_message_manager.cpp
 
 # 4. Add directory for INCLUDE
-SRCS_DIR	:=	$(WS_UTILS_DIR) $(WS_LIFETIME_DIR) 
+SRCS_DIR	:=	$(WS_UTILS_DIR) $(WS_MESSAGE_MANAGER_DIR) 
 
 #--------------------------------------------
 OBJ_DIR		:=	objs
