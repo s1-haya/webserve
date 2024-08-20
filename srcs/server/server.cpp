@@ -139,7 +139,7 @@ void Server::HandleExistingConnection(const event::Event &event) {
 DtoClientInfos Server::GetClientInfos(int client_fd) const {
 	DtoClientInfos client_infos;
 	client_infos.fd          = client_fd;
-	client_infos.request_buf = buffers_.GetRequest(client_fd);
+	client_infos.request_buf = message_manager_.GetRequestBuf(client_fd);
 	client_infos.ip          = context_.GetClientIp(client_fd);
 	return client_infos;
 }
@@ -162,10 +162,11 @@ void Server::ReadRequest(int client_fd) {
 	}
 	if (read_result.GetValue().read_size == 0) {
 		// todo: need?
-		// buffers_.Delete(client_fd);
+		// message_manager_.DeleteMessage(client_fd);
 		// event_monitor_.Delete(client_fd);
 		return;
 	}
+	message_manager_.SetRequestBuf(client_fd, read_result.GetValue().read_buf);
 }
 
 void Server::RunHttp(const event::Event &event) {
@@ -183,7 +184,7 @@ void Server::RunHttp(const event::Event &event) {
 		return;
 	}
 	utils::Debug("server", "received all request from client", client_fd);
-	std::cerr << buffers_.GetRequest(client_fd) << std::endl;
+	std::cerr << message_manager_.GetRequestBuf(client_fd) << std::endl;
 	message_manager_.SetResponse(client_fd, http_result.response);
 	event_monitor_.Update(event.fd, event::EVENT_WRITE);
 }
@@ -219,7 +220,6 @@ void Server::HandleTimeoutMessages() {
 
 // delete from buffer, client_info, event, message
 void Server::Disconnect(int client_fd) {
-	buffers_.Delete(client_fd);
 	context_.DeleteClientInfo(client_fd);
 	event_monitor_.Delete(client_fd);
 	message_manager_.DeleteMessage(client_fd);
