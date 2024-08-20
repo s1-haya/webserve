@@ -67,9 +67,9 @@ void MessageManager::UpdateMessage(int client_fd) {
 	AddNewMessage(client_fd, request_buf);
 }
 
-bool MessageManager::GetIsConnectionKeep(int client_fd) const {
+message::ConnectionState MessageManager::GetConnectionState(int client_fd) const {
 	const message::Message &message = messages_.at(client_fd);
-	return message.GetIsConnectionKeep();
+	return message.GetConnectionState();
 }
 
 const std::string &MessageManager::GetRequestBuf(int client_fd) const {
@@ -93,10 +93,10 @@ void MessageManager::SetNewRequestBuf(int client_fd, const std::string &request_
 }
 
 void MessageManager::SetResponse(
-	int client_fd, bool is_connection_keep, const std::string &response
+	int client_fd, message::ConnectionState connection_state, const std::string &response
 ) {
 	message::Message &message = messages_.at(client_fd);
-	message.SetResponse(is_connection_keep, response);
+	message.SetResponse(connection_state, response);
 }
 
 } // namespace server

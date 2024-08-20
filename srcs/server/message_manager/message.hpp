@@ -7,6 +7,11 @@
 namespace server {
 namespace message {
 
+enum ConnectionState {
+	KEEP,
+	CLOSE
+};
+
 class Message {
   public:
 	typedef std::time_t Time;
@@ -21,23 +26,23 @@ class Message {
 	void AddRequestBuf(const std::string &request_buf);
 	// getter
 	int                GetFd() const;
-	bool               GetIsConnectionKeep() const;
+	ConnectionState    GetConnectionState() const;
 	const std::string &GetRequestBuf() const;
 	const std::string &GetResponse() const;
 	// setter
 	void SetNewRequestBuf(const std::string &request_buf);
-	void SetResponse(bool is_connection_keep, const std::string &response);
+	void SetResponse(ConnectionState connection_state, const std::string &response);
 
   private:
 	Message();
 	// functions
 	static Time GetCurrentTime();
 	// variables
-	int         client_fd_;
-	Time        start_time_;
-	bool        is_connection_keep_;
-	std::string request_buf_;
-	std::string response_;
+	int             client_fd_;
+	Time            start_time_;
+	ConnectionState connection_state_;
+	std::string     request_buf_;
+	std::string     response_;
 };
 
 } // namespace message

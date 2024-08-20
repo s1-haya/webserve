@@ -4,12 +4,12 @@ namespace server {
 namespace message {
 
 Message::Message(int client_fd)
-	: client_fd_(client_fd), start_time_(GetCurrentTime()), is_connection_keep_(true) {}
+	: client_fd_(client_fd), start_time_(GetCurrentTime()), connection_state_(KEEP) {}
 
 Message::Message(int client_fd, const std::string &request_buf)
 	: client_fd_(client_fd),
 	  start_time_(GetCurrentTime()),
-	  is_connection_keep_(true),
+	  connection_state_(KEEP),
 	  request_buf_(request_buf) {}
 
 Message::~Message() {}
@@ -38,8 +38,8 @@ int Message::GetFd() const {
 	return client_fd_;
 }
 
-bool Message::GetIsConnectionKeep() const {
-	return is_connection_keep_;
+ConnectionState Message::GetConnectionState() const {
+	return connection_state_;
 }
 
 const std::string &Message::GetRequestBuf() const {
@@ -58,9 +58,9 @@ void Message::SetNewRequestBuf(const std::string &request_buf) {
 	request_buf_ = request_buf;
 }
 
-void Message::SetResponse(bool is_connection_keep, const std::string &response) {
-	is_connection_keep_ = is_connection_keep;
-	response_           = response;
+void Message::SetResponse(ConnectionState connection_state, const std::string &response) {
+	connection_state_ = connection_state;
+	response_         = response;
 }
 
 Message::Time Message::GetCurrentTime() {

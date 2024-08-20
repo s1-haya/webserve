@@ -25,12 +25,14 @@ class MessageManager {
 	void       UpdateMessage(int client_fd);
 	void       AddRequestBuf(int client_fd, const std::string &request_buf);
 	// getter
-	bool               GetIsConnectionKeep(int client_fd) const;
-	const std::string &GetRequestBuf(int client_fd) const;
-	const std::string &GetResponse(int client_fd) const;
+	message::ConnectionState GetConnectionState(int client_fd) const;
+	const std::string       &GetRequestBuf(int client_fd) const;
+	const std::string       &GetResponse(int client_fd) const;
 	// setter
 	void SetNewRequestBuf(int client_fd, const std::string &request_buf);
-	void SetResponse(int client_fd, bool is_connection_keep, const std::string &response);
+	void SetResponse(
+		int client_fd, message::ConnectionState connection_state, const std::string &response
+	);
 
   private:
 	// variable

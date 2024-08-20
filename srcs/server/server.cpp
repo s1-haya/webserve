@@ -188,7 +188,10 @@ void Server::RunHttp(const event::Event &event) {
 	}
 	utils::Debug("server", "received all request from client", client_fd);
 	std::cerr << message_manager_.GetRequestBuf(client_fd) << std::endl;
-	message_manager_.SetResponse(client_fd, http_result.is_connection_keep, http_result.response);
+
+	const message::ConnectionState connection_state =
+		http_result.is_connection_keep ? message::KEEP : message::CLOSE;
+	message_manager_.SetResponse(client_fd, connection_state, http_result.response);
 	event_monitor_.Update(event.fd, event::EVENT_WRITE);
 }
 
@@ -198,13 +201,18 @@ void Server::SendResponse(int client_fd) {
 	send(client_fd, response.c_str(), response.size(), 0);
 	utils::Debug("server", "send response to client", client_fd);
 
-	if (message_manager_.GetIsConnectionKeep(client_fd)) {
+	switch (message_manager_.GetConnectionState(client_fd)) {
+	case message::KEEP:
 		message_manager_.UpdateMessage(client_fd);
 		event_monitor_.Update(client_fd, event::EVENT_READ);
 		utils::Debug("server", "Connection: keep-alive client", client_fd);
-	} else {
+		break;
+	case message::CLOSE:
 		Disconnect(client_fd);
 		utils::Debug("server", "Connection: close, disconnected client", client_fd);
+		break;
+	default:
+		break;
 	}
 	utils::Debug("------------------------------------------");
 }
@@ -218,8 +226,7 @@ void Server::HandleTimeoutMessages() {
 	for (Itr it = timeout_fds.begin(); it != timeout_fds.end(); ++it) {
 		const int          client_fd        = *it;
 		const std::string &timeout_response = mock_http_.GetTimeoutResponse(client_fd);
-		// todo: closeなのでfalse. enumにする
-		message_manager_.SetResponse(client_fd, false, timeout_response);
+		message_manager_.SetResponse(client_fd, message::CLOSE, timeout_response);
 		event_monitor_.Update(client_fd, event::EVENT_WRITE);
 	}
 }
