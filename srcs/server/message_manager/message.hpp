@@ -11,7 +11,7 @@ class Message {
   public:
 	typedef std::time_t Time;
 
-	Message(int client_fd);
+	explicit Message(int client_fd);
 	~Message();
 	Message(const Message &other);
 	Message &operator=(const Message &other);
