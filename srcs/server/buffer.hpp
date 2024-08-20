@@ -15,12 +15,12 @@ class Buffer {
 	};
 	typedef utils::Result<ReadBuf> ReadResult;
 
-	Buffer();
-	~Buffer();
 	// function
-	ReadResult ReadRequest(int client_fd);
+	static ReadResult ReadRequest(int client_fd);
 
   private:
+	Buffer();
+	~Buffer();
 	// prohibit copy
 	Buffer(const Buffer &other);
 	Buffer &operator=(const Buffer &other);
