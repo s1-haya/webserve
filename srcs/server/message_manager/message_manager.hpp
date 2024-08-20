@@ -3,14 +3,15 @@
 
 #include "message.hpp"
 #include <list>
+#include <map>
 
 namespace server {
 
 class MessageManager {
   public:
-	// The order in which requests received
-	typedef std::list<message::Message> MessageList;
-	typedef std::list<int>              TimeoutFds;
+	// Message for each fd
+	typedef std::map<int, message::Message> MessageMap;
+	typedef std::list<int>                  TimeoutFds;
 
 	MessageManager();
 	~MessageManager();
@@ -24,7 +25,7 @@ class MessageManager {
 
   private:
 	// variable
-	MessageList messages_;
+	MessageMap messages_;
 };
 
 } // namespace server
