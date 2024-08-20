@@ -91,6 +91,10 @@ void CreateBody(std::ostream &response_stream, const MockHttp::RequestMessage &r
 	response_stream << request.at(MockHttp::HTTP_CONTENT);
 }
 
+bool IsConnectionKeep(const std::string &buffer) {
+	return buffer.find("Connection: keep-alive\r\n") != std::string::npos;
+}
+
 bool IsRequestReceivedComplete(const std::string &buffer) {
 	return buffer.find("\r\n\r\n") != std::string::npos;
 }
@@ -112,6 +116,7 @@ HttpResult MockHttp::Run(
 	CreateBody(response_stream, this->request_);
 
 	HttpResult result;
+	result.is_connection_keep   = IsConnectionKeep(client_infos.request_buf);
 	result.is_response_complete = IsRequestReceivedComplete(client_infos.request_buf);
 	// parseで使わなかった余り分のrequest_bufを返す
 	result.request_buf = client_infos.request_buf;
