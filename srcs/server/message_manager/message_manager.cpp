@@ -48,19 +48,15 @@ void MessageManager::DeleteMessage(int client_fd) {
 MessageManager::TimeoutFds MessageManager::GetTimeoutFds() {
 	TimeoutFds timeout_fds_;
 
-	typedef MessageList::const_iterator Itr;
-	Itr                                 it = messages_.begin();
+	typedef MessageList::iterator Itr;
+	Itr                           it = messages_.begin();
 	while (it != messages_.end()) {
-		const Itr next = ++Itr(it);
-
 		const message::Message &message = *it;
 		if (!message.IsTimeoutExceeded(TIMEOUT)) {
 			break;
 		}
 		timeout_fds_.push_back(message.GetFd());
-		messages_.pop_front();
-
-		it = next;
+		it = messages_.erase(it);
 	}
 	return timeout_fds_;
 }
