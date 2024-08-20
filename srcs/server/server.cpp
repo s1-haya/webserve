@@ -10,6 +10,10 @@
 #include <unistd.h>     // close
 
 namespace server {
+
+// todo: tmp
+const double Server::REQUEST_TIMEOUT = 3.0;
+
 namespace {
 
 VirtualServer::LocationList ConvertLocations(const config::context::LocationList &config_locations
@@ -201,7 +205,7 @@ void Server::SendResponse(int client_fd) {
 
 void Server::HandleTimeoutMessages() {
 	// timeoutした全fdを取得
-	const MessageManager::TimeoutFds &timeout_fds = message_manager_.GetTimeoutFds();
+	const MessageManager::TimeoutFds &timeout_fds = message_manager_.GetTimeoutFds(REQUEST_TIMEOUT);
 
 	// timeout用のresponseをセットしてevent監視をWRITEに変更
 	typedef MessageManager::TimeoutFds::const_iterator Itr;
