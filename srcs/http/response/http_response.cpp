@@ -16,7 +16,7 @@ HttpResponseResult HttpResponse::CreateHttpResponseResult(const HttpRequestResul
 	response.status_line.reason_phrase   = "OK";
 	response.header_fields["Host"]       = "sawa";
 	response.header_fields["Connection"] = "close";
-	response.body_message = "You can't connect the dots looking forword. You can only connect the "
+	response.body_message = "You can't connect the dots looking forward. You can only connect the "
 							"dots looking backwards";
 	return response;
 }

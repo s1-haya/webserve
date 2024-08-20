@@ -43,7 +43,6 @@ void ClientInfo::SetSockInfo(const struct sockaddr_storage &sock_addr) {
 		NI_NUMERICHOST | NI_NUMERICSERV
 	);
 	if (status != 0) {
-		// todo: tmp
 		throw std::runtime_error("getnameinfo failed: " + std::string(gai_strerror(status)));
 	}
 	ip_ = ip;

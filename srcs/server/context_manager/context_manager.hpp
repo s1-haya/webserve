@@ -8,10 +8,10 @@
 
 namespace server {
 
-struct DtoServerInfos {
-	int                         server_fd;
+struct ServerContext {
+	int                         fd;
 	std::string                 server_name;
-	std::string                 server_port;
+	std::string                 port;
 	VirtualServer::LocationList locations;
 };
 
@@ -29,8 +29,8 @@ class ContextManager {
 	void DeleteClientInfo(int client_fd);
 	// getter
 	const VirtualServerStorage::VirtualServerList &GetVirtualServerList() const;
-	DtoServerInfos                                 GetServerInfo(int client_fd) const;
-	const std::string                             &GetClientInfo(int client_fd) const;
+	ServerContext                                  GetServerContext(int client_fd) const;
+	const std::string                             &GetClientIp(int client_fd) const;
 
   private:
 	VirtualServerStorage virtual_servers_;

@@ -33,9 +33,9 @@ struct TestCase {
 
 // ConvertStrToUint()を実行してexpectedと比較
 int Run(const std::string &src, Expect expected, Result result) {
-	Expect num;
-	bool   is_success = utils::ConvertStrToUint(src, num);
-	if ((is_success && result == SUCCESS && num == expected) || (!is_success && result == FAIL)) {
+	const utils::Result<Expect> convert_result = utils::ConvertStrToUint(src);
+	if ((convert_result.IsOk() && result == SUCCESS && convert_result.GetValue() == expected) ||
+		(!convert_result.IsOk() && result == FAIL)) {
 		std::cout << utils::color::GREEN << GetTestCaseNum() << ".[OK] " << utils::color::RESET
 				  << std::endl;
 		return EXIT_SUCCESS;
@@ -45,7 +45,7 @@ int Run(const std::string &src, Expect expected, Result result) {
 	std::cerr << utils::color::RED << "ConvertStrToUint() failed" << utils::color::RESET
 			  << std::endl;
 	std::cerr << "src     : [" << src << "]" << std::endl;
-	std::cerr << "result  : [" << num << "]" << std::endl;
+	std::cerr << "result  : [" << convert_result.GetValue() << "]" << std::endl;
 	std::cerr << "expected: [" << expected << "]" << std::endl;
 	return EXIT_FAILURE;
 }

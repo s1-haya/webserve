@@ -7,9 +7,7 @@ VirtualServer::VirtualServer() {}
 VirtualServer::VirtualServer(
 	const std::string &server_name, const LocationList &locations, const PortList &ports
 )
-	: server_name_(server_name), locations_(locations), ports_(ports) {
-	// todo: error handling?
-}
+	: server_name_(server_name), locations_(locations), ports_(ports) {}
 
 VirtualServer::~VirtualServer() {}
 

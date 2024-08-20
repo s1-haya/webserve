@@ -1,7 +1,7 @@
 #include "server.hpp"
 #include "client_info.hpp"
+#include "dto_server_to_http.hpp"
 #include "event.hpp"
-#include "http.hpp"
 #include "server_info.hpp"
 #include "utils.hpp"
 #include "virtual_server.hpp"
@@ -22,7 +22,7 @@ VirtualServer::LocationList ConvertLocations(const config::context::LocationList
 		location.location       = it->request_uri;
 		location.root           = it->alias;
 		location.index          = it->index;
-		location.allowed_method = *(it->allowed_methods.begin()); // tmp
+		location.allowed_method = "GET"; // todo: tmp
 		location_list.push_back(location);
 	}
 	return location_list;
@@ -45,6 +45,26 @@ VirtualServer ConvertToVirtualServer(const config::context::ServerCon &config_se
 	VirtualServer::LocationList locations   = ConvertLocations(config_server.location_con);
 	VirtualServer::PortList     ports       = ConvertPorts(config_server.port);
 	return VirtualServer(server_name, locations, ports);
+}
+
+// todo: tmp for debug
+void PrintLocations(const VirtualServer::LocationList &locations) {
+	typedef VirtualServer::LocationList::const_iterator Itr;
+	for (Itr it = locations.begin(); it != locations.end(); ++it) {
+		const server::Location &location = *it;
+		std::cerr << "- location: " << location.location << ", root: " << location.root
+				  << ", index: " << location.index << std::endl;
+	}
+}
+
+// todo: tmp for debug
+void DebugDto(const DtoClientInfos &client_infos, const DtoServerInfos &server_infos) {
+	utils::Debug("server", "ClientInfo - IP: " + client_infos.ip + ", fd", client_infos.fd);
+	utils::Debug("server", "received ServerInfo, fd", server_infos.fd);
+	std::cerr << "server_name: " << server_infos.server_name << ", port: " << server_infos.port
+			  << std::endl;
+	std::cerr << "locations: " << std::endl;
+	PrintLocations(server_infos.locations);
 }
 
 } // namespace
@@ -90,12 +110,8 @@ void Server::HandleEvent(const event::Event &event) {
 
 void Server::HandleNewConnection(int server_fd) {
 	// A new socket that has established a connection with the peer socket.
-	// todo: return accept error like Result
 	const ClientInfo new_client_info = Connection::Accept(server_fd);
 	const int        client_fd       = new_client_info.GetFd();
-	if (client_fd == SYSTEM_ERROR) {
-		throw std::runtime_error("accept failed");
-	}
 
 	// add to context
 	context_.AddClientInfo(new_client_info, server_fd);
@@ -105,7 +121,8 @@ void Server::HandleNewConnection(int server_fd) {
 
 void Server::HandleExistingConnection(const event::Event &event) {
 	if (event.type & event::EVENT_READ) {
-		ReadRequest(event);
+		ReadRequest(event.fd);
+		RunHttp(event);
 	}
 	if (event.type & event::EVENT_WRITE) {
 		SendResponse(event.fd);
@@ -113,19 +130,27 @@ void Server::HandleExistingConnection(const event::Event &event) {
 	// todo: handle other EventType
 }
 
-namespace {
-
-// todo: find "Connection: close"?
-bool IsRequestReceivedComplete(const std::string &buffer) {
-	return buffer.find("\r\n\r\n") != std::string::npos;
+DtoClientInfos Server::GetClientInfos(int client_fd) const {
+	DtoClientInfos client_infos;
+	client_infos.fd          = client_fd;
+	client_infos.request_buf = buffers_.GetRequest(client_fd);
+	client_infos.ip          = context_.GetClientIp(client_fd);
+	return client_infos;
 }
 
-} // namespace
+DtoServerInfos Server::GetServerInfos(int client_fd) const {
+	const ServerContext &server_context = context_.GetServerContext(client_fd);
 
-void Server::ReadRequest(const event::Event &event) {
-	const int client_fd = event.fd;
+	DtoServerInfos server_infos;
+	server_infos.fd          = server_context.fd;
+	server_infos.server_name = server_context.server_name;
+	server_infos.port        = server_context.port;
+	server_infos.locations   = server_context.locations;
+	return server_infos;
+}
 
-	ssize_t read_ret = buffers_.Read(client_fd);
+void Server::ReadRequest(int client_fd) {
+	ssize_t read_ret = buffers_.ReadRequest(client_fd);
 	if (read_ret <= 0) {
 		if (read_ret == SYSTEM_ERROR) {
 			throw std::runtime_error("read failed");
@@ -135,55 +160,35 @@ void Server::ReadRequest(const event::Event &event) {
 		// event_monitor_.Delete(client_fd);
 		return;
 	}
-	if (IsRequestReceivedComplete(buffers_.GetBuffer(client_fd))) {
-		utils::Debug("server", "received all request from client", client_fd);
-		std::cerr << buffers_.GetBuffer(client_fd) << std::endl;
-		event_monitor_.Update(event, event::EVENT_WRITE);
-	}
 }
 
-namespace {
+void Server::RunHttp(const event::Event &event) {
+	const int client_fd = event.fd;
 
-// todo: tmp for debug
-void PrintLocations(const VirtualServer::LocationList &locations) {
-	typedef VirtualServer::LocationList::const_iterator Itr;
-	for (Itr it = locations.begin(); it != locations.end(); ++it) {
-		const server::Location &location = *it;
-		std::cerr << "- location: " << location.location << ", root: " << location.root
-				  << ", index: " << location.index << std::endl;
+	// Prepare to http.Run()
+	const DtoClientInfos &client_infos = GetClientInfos(client_fd);
+	const DtoServerInfos &server_infos = GetServerInfos(client_fd);
+	DebugDto(client_infos, server_infos);
+
+	http::HttpResult http_result = mock_http.Run(client_infos, server_infos);
+	// Check if it's ready to start write/send.
+	// If not completed, the request will be re-read by the event_monitor.
+	if (!http_result.is_response_complete) {
+		return;
 	}
-}
-
-} // namespace
-
-std::string Server::CreateHttpResponse(int client_fd) const {
-	const std::string &request_buf = buffers_.GetBuffer(client_fd);
-
-	http::Http http(request_buf);
-	// todo: parse?
-	// todo: tmp
-	const bool is_cgi = true;
-	if (is_cgi) {
-		const std::string    &client_ip    = context_.GetClientInfo(client_fd);
-		const DtoServerInfos &server_infos = context_.GetServerInfo(client_fd);
-
-		utils::Debug("server", "ClientInfo - IP: " + client_ip + ", fd", client_fd);
-		utils::Debug("server", "recieved ServerInfo, fd", server_infos.server_fd);
-		std::cerr << "server_name: " << server_infos.server_name
-				  << ", port: " << server_infos.server_port << std::endl;
-		std::cerr << "locations: " << std::endl;
-		PrintLocations(server_infos.locations);
-		// todo: call cgi(client_info, server_info)?
-	}
-	return http.CreateResponse();
+	utils::Debug("server", "received all request from client", client_fd);
+	std::cerr << buffers_.GetRequest(client_fd) << std::endl;
+	buffers_.AddResponse(client_fd, http_result.response);
+	event_monitor_.Update(event, event::EVENT_WRITE);
 }
 
 void Server::SendResponse(int client_fd) {
-	// todo: check if it's ready to start write/send
-	const std::string response = CreateHttpResponse(client_fd);
+	const std::string &response = buffers_.GetResponse(client_fd);
+
 	send(client_fd, response.c_str(), response.size(), 0);
 	utils::Debug("server", "send response to client", client_fd);
 
+	// todo: connection keep-aliveならdisconnectしない
 	// disconnect
 	buffers_.Delete(client_fd);
 	context_.DeleteClientInfo(client_fd);
