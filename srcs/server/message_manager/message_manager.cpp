@@ -34,24 +34,14 @@ void MessageManager::DeleteMessage(int client_fd) {
 	messages_.erase(client_fd);
 }
 
-// Delete all messages that have timed out, and return TimeoutFds list.
-// ex)
-//   before: MessageMap{3,4,5}
-//   (if timeout fd 3,5)
-//   return: TimeoutFds{3,5}
-//   after : MessageMap{4}
-MessageManager::TimeoutFds MessageManager::GetTimeoutFds(double timeout) {
+MessageManager::TimeoutFds MessageManager::GetTimeoutFds(double timeout) const {
 	TimeoutFds timeout_fds_;
 
-	typedef MessageMap::iterator Itr;
+	typedef MessageMap::const_iterator Itr;
 	for (Itr it = messages_.begin(); it != messages_.end();) {
 		const message::Message &message = it->second;
 		if (message.IsTimeoutExceeded(timeout)) {
 			timeout_fds_.push_back(message.GetFd());
-			const Itr it_erase = it;
-			++it;
-			messages_.erase(it_erase);
-			continue;
 		}
 		++it;
 	}
