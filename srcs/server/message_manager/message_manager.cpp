@@ -58,8 +58,6 @@ MessageManager::TimeoutFds MessageManager::GetTimeoutFds(double timeout) {
 	return timeout_fds_;
 }
 
-// todo:
-//   まだServerからは呼ばれていない、unit testだけある
 // For Connection: keep-alive
 // Copy only the read_buf from the old message, delete the old message, and add it as a new message.
 void MessageManager::UpdateMessage(int client_fd) {

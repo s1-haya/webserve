@@ -198,13 +198,15 @@ void Server::SendResponse(int client_fd) {
 	send(client_fd, response.c_str(), response.size(), 0);
 	utils::Debug("server", "send response to client", client_fd);
 
-	// todo: もしconnection keep-aliveならdisconnectしない
-	// - 前回のrequestの余りだけ残し,responseは削除
-	// - message_manager_.UpdateMessage(client_fd); で新規Message追加+古いMessage削除
-	// - event_monitor_.Update(event.fd, event::EVENT_READ); でevent監視をREADに更新
-
-	// todo: closeの場合こっち
-	Disconnect(client_fd);
+	if (message_manager_.GetIsConnectionKeep(client_fd)) {
+		message_manager_.UpdateMessage(client_fd);
+		event_monitor_.Update(client_fd, event::EVENT_READ);
+		utils::Debug("server", "Connection: keep-alive client", client_fd);
+	} else {
+		Disconnect(client_fd);
+		utils::Debug("server", "Connection: close, disconnected client", client_fd);
+	}
+	utils::Debug("------------------------------------------");
 }
 
 void Server::HandleTimeoutMessages() {
@@ -228,8 +230,6 @@ void Server::Disconnect(int client_fd) {
 	event_monitor_.Delete(client_fd);
 	message_manager_.DeleteMessage(client_fd);
 	close(client_fd);
-	utils::Debug("server", "disconnected client", client_fd);
-	utils::Debug("------------------------------------------");
 }
 
 void Server::Init() {
