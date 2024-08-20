@@ -184,12 +184,12 @@ void Server::RunHttp(const event::Event &event) {
 	}
 	utils::Debug("server", "received all request from client", client_fd);
 	std::cerr << buffers_.GetRequest(client_fd) << std::endl;
-	buffers_.AddResponse(client_fd, http_result.response);
+	message_manager_.SetResponse(client_fd, http_result.response);
 	event_monitor_.Update(event.fd, event::EVENT_WRITE);
 }
 
 void Server::SendResponse(int client_fd) {
-	const std::string &response = buffers_.GetResponse(client_fd);
+	const std::string &response = message_manager_.GetResponse(client_fd);
 
 	send(client_fd, response.c_str(), response.size(), 0);
 	utils::Debug("server", "send response to client", client_fd);
@@ -212,7 +212,7 @@ void Server::HandleTimeoutMessages() {
 	for (Itr it = timeout_fds.begin(); it != timeout_fds.end(); ++it) {
 		const int          client_fd        = *it;
 		const std::string &timeout_response = mock_http_.GetTimeoutResponse(client_fd);
-		buffers_.AddResponse(client_fd, timeout_response);
+		message_manager_.SetResponse(client_fd, timeout_response);
 		event_monitor_.Update(client_fd, event::EVENT_WRITE);
 	}
 }

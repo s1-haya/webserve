@@ -12,16 +12,13 @@ class Buffer {
   public:
 	// int: client_fd, string: request_buf
 	typedef std::map<int, std::string> RequestMap;
-	typedef std::map<int, std::string> ResponseMap;
 	Buffer();
 	~Buffer();
 	// functions
 	ssize_t ReadRequest(int client_fd);
 	void    Delete(int client_fd);
-	void    AddResponse(int client_fd, const std::string &response);
 	// getter
 	const std::string &GetRequest(int client_fd) const;
-	const std::string &GetResponse(int client_fd) const;
 
   private:
 	// prohibit copy
@@ -31,8 +28,7 @@ class Buffer {
 	static const int          SYSTEM_ERROR = -1;
 	static const unsigned int BUFFER_SIZE  = 1024;
 	// request buffers
-	RequestMap  requests_;
-	ResponseMap responses_;
+	RequestMap requests_;
 };
 
 } // namespace server
