@@ -156,11 +156,11 @@ DtoServerInfos Server::GetServerInfos(int client_fd) const {
 }
 
 void Server::ReadRequest(int client_fd) {
-	ssize_t read_ret = buffers_.ReadRequest(client_fd);
-	if (read_ret <= 0) {
-		if (read_ret == SYSTEM_ERROR) {
-			throw std::runtime_error("read failed");
-		}
+	const Buffer::ReadResult read_result = buffers_.ReadRequest(client_fd);
+	if (!read_result.IsOk()) {
+		throw std::runtime_error("read failed");
+	}
+	if (read_result.GetValue().read_size == 0) {
 		// todo: need?
 		// buffers_.Delete(client_fd);
 		// event_monitor_.Delete(client_fd);

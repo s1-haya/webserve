@@ -9,18 +9,25 @@ Buffer::Buffer() {}
 
 Buffer::~Buffer() {}
 
-ssize_t Buffer::ReadRequest(int client_fd) {
-	char buffer[BUFFER_SIZE];
+Buffer::ReadResult Buffer::ReadRequest(int client_fd) {
+	ReadResult read_result;
 
+	char    buffer[BUFFER_SIZE];
 	ssize_t read_ret = read(client_fd, buffer, BUFFER_SIZE);
 	if (read_ret <= 0) {
 		if (read_ret == SYSTEM_ERROR) {
 			perror("read failed");
+			read_result.Set(false);
 		}
-		return read_ret;
+		const ReadBuf read_buf = {read_ret, ""};
+		read_result.SetValue(read_buf);
+		return read_result;
 	}
 	requests_[client_fd] += std::string(buffer, read_ret);
-	return read_ret;
+
+	const ReadBuf read_buf = {read_ret, std::string(buffer, read_ret)};
+	read_result.SetValue(read_buf);
+	return read_result;
 }
 
 void Buffer::Delete(int client_fd) {
