@@ -30,7 +30,7 @@ class MessageManager {
 	const std::string &GetResponse(int client_fd) const;
 	// setter
 	void SetNewRequestBuf(int client_fd, const std::string &request_buf);
-	void SetResponse(int client_fd, const std::string &response);
+	void SetResponse(int client_fd, bool is_connection_keep, const std::string &response);
 
   private:
 	// variable

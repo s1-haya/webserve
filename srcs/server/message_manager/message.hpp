@@ -26,7 +26,7 @@ class Message {
 	const std::string &GetResponse() const;
 	// setter
 	void SetNewRequestBuf(const std::string &request_buf);
-	void SetResponse(const std::string &response);
+	void SetResponse(bool is_connection_keep, const std::string &response);
 
   private:
 	Message();

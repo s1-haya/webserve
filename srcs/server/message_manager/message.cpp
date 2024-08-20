@@ -58,8 +58,9 @@ void Message::SetNewRequestBuf(const std::string &request_buf) {
 	request_buf_ = request_buf;
 }
 
-void Message::SetResponse(const std::string &response) {
-	response_ = response;
+void Message::SetResponse(bool is_connection_keep, const std::string &response) {
+	is_connection_keep_ = is_connection_keep;
+	response_           = response;
 }
 
 Message::Time Message::GetCurrentTime() {

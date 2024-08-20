@@ -94,9 +94,11 @@ void MessageManager::SetNewRequestBuf(int client_fd, const std::string &request_
 	message.SetNewRequestBuf(request_buf);
 }
 
-void MessageManager::SetResponse(int client_fd, const std::string &response) {
+void MessageManager::SetResponse(
+	int client_fd, bool is_connection_keep, const std::string &response
+) {
 	message::Message &message = messages_.at(client_fd);
-	message.SetResponse(response);
+	message.SetResponse(is_connection_keep, response);
 }
 
 } // namespace server
