@@ -19,12 +19,10 @@ class MessageManager {
 	// functions
 	void       AddNewMessage(int client_fd);
 	void       DeleteMessage(int client_fd);
-	TimeoutFds GetTimeoutFds();
+	TimeoutFds GetTimeoutFds(double timeout);
 	void       UpdateMessage(int client_fd);
 
   private:
-	// const
-	static const double TIMEOUT;
 	// variable
 	MessageList messages_;
 };

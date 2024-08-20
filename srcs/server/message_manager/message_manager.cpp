@@ -2,9 +2,6 @@
 
 namespace server {
 
-// todo: tmp
-const double MessageManager::TIMEOUT = 3.0;
-
 MessageManager::MessageManager() {}
 
 MessageManager::~MessageManager() {}
@@ -45,22 +42,18 @@ void MessageManager::DeleteMessage(int client_fd) {
 //   (if timeout fd 3,4)
 //   return: TimeoutFds{3,4}
 //   after : MessageList{5}
-MessageManager::TimeoutFds MessageManager::GetTimeoutFds() {
+MessageManager::TimeoutFds MessageManager::GetTimeoutFds(double timeout) {
 	TimeoutFds timeout_fds_;
 
-	typedef MessageList::const_iterator Itr;
-	Itr                                 it = messages_.begin();
+	typedef MessageList::iterator Itr;
+	Itr                           it = messages_.begin();
 	while (it != messages_.end()) {
-		const Itr next = ++Itr(it);
-
 		const message::Message &message = *it;
-		if (!message.IsTimeoutExceeded(TIMEOUT)) {
+		if (!message.IsTimeoutExceeded(timeout)) {
 			break;
 		}
 		timeout_fds_.push_back(message.GetFd());
-		messages_.pop_front();
-
-		it = next;
+		it = messages_.erase(it);
 	}
 	return timeout_fds_;
 }

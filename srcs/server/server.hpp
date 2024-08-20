@@ -45,7 +45,8 @@ class Server {
 	DtoServerInfos GetServerInfos(int client_fd) const;
 
 	// const
-	static const int SYSTEM_ERROR = -1;
+	static const int    SYSTEM_ERROR = -1;
+	static const double REQUEST_TIMEOUT;
 	// context(virtual server,client)
 	ContextManager context_;
 	// connection
