@@ -3,10 +3,14 @@
 namespace server {
 namespace message {
 
-Message::Message(int client_fd) : client_fd_(client_fd), start_time_(GetCurrentTime()) {}
+Message::Message(int client_fd)
+	: client_fd_(client_fd), start_time_(GetCurrentTime()), is_connection_keep_(true) {}
 
 Message::Message(int client_fd, const std::string &request_buf)
-	: client_fd_(client_fd), start_time_(GetCurrentTime()), request_buf_(request_buf) {}
+	: client_fd_(client_fd),
+	  start_time_(GetCurrentTime()),
+	  is_connection_keep_(true),
+	  request_buf_(request_buf) {}
 
 Message::~Message() {}
 
@@ -32,6 +36,10 @@ bool Message::IsTimeoutExceeded(double timeout_sec) const {
 
 int Message::GetFd() const {
 	return client_fd_;
+}
+
+bool Message::GetIsConnectionKeep() const {
+	return is_connection_keep_;
 }
 
 const std::string &Message::GetRequestBuf() const {

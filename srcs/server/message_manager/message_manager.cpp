@@ -69,6 +69,11 @@ void MessageManager::UpdateMessage(int client_fd) {
 	AddNewMessage(client_fd, request_buf);
 }
 
+bool MessageManager::GetIsConnectionKeep(int client_fd) const {
+	const message::Message &message = messages_.at(client_fd);
+	return message.GetIsConnectionKeep();
+}
+
 const std::string &MessageManager::GetRequestBuf(int client_fd) const {
 	const message::Message &message = messages_.at(client_fd);
 	return message.GetRequestBuf();

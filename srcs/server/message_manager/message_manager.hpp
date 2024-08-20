@@ -25,6 +25,7 @@ class MessageManager {
 	void       UpdateMessage(int client_fd);
 	void       AddRequestBuf(int client_fd, const std::string &request_buf);
 	// getter
+	bool               GetIsConnectionKeep(int client_fd) const;
 	const std::string &GetRequestBuf(int client_fd) const;
 	const std::string &GetResponse(int client_fd) const;
 	// setter

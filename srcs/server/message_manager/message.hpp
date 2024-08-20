@@ -21,6 +21,7 @@ class Message {
 	void AddRequestBuf(const std::string &request_buf);
 	// getter
 	int                GetFd() const;
+	bool               GetIsConnectionKeep() const;
 	const std::string &GetRequestBuf() const;
 	const std::string &GetResponse() const;
 	// setter
@@ -32,10 +33,9 @@ class Message {
 	// functions
 	static Time GetCurrentTime();
 	// variables
-	int  client_fd_;
-	Time start_time_;
-	// todo: add variables
-	// bool is_connection_keep_;
+	int         client_fd_;
+	Time        start_time_;
+	bool        is_connection_keep_;
 	std::string request_buf_;
 	std::string response_;
 };
