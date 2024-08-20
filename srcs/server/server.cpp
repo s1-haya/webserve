@@ -1,8 +1,8 @@
 #include "server.hpp"
-#include "buffer.hpp"
 #include "client_info.hpp"
 #include "dto_server_to_http.hpp"
 #include "event.hpp"
+#include "read.hpp"
 #include "server_info.hpp"
 #include "utils.hpp"
 #include "virtual_server.hpp"
@@ -157,7 +157,7 @@ DtoServerInfos Server::GetServerInfos(int client_fd) const {
 }
 
 void Server::ReadRequest(int client_fd) {
-	const Buffer::ReadResult read_result = Buffer::ReadRequest(client_fd);
+	const Read::ReadResult read_result = Read::ReadRequest(client_fd);
 	if (!read_result.IsOk()) {
 		throw std::runtime_error("read failed");
 	}

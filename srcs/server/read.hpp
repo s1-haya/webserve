@@ -1,5 +1,5 @@
-#ifndef SERVER_BUFFER_HPP_
-#define SERVER_BUFFER_HPP_
+#ifndef SERVER_READ_HPP_
+#define SERVER_READ_HPP_
 
 #include "utils.hpp"
 #include <string>
@@ -7,7 +7,7 @@
 
 namespace server {
 
-class Buffer {
+class Read {
   public:
 	struct ReadBuf {
 		ssize_t     read_size;
@@ -19,11 +19,11 @@ class Buffer {
 	static ReadResult ReadRequest(int client_fd);
 
   private:
-	Buffer();
-	~Buffer();
+	Read();
+	~Read();
 	// prohibit copy
-	Buffer(const Buffer &other);
-	Buffer &operator=(const Buffer &other);
+	Read(const Read &other);
+	Read &operator=(const Read &other);
 	// const
 	static const int          SYSTEM_ERROR = -1;
 	static const unsigned int BUFFER_SIZE  = 1024;
@@ -31,4 +31,4 @@ class Buffer {
 
 } // namespace server
 
-#endif /* SERVER_BUFFER_HPP_ */
+#endif /* SERVER_READ_HPP_ */

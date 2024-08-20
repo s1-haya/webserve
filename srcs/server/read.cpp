@@ -1,14 +1,14 @@
-#include "buffer.hpp"
+#include "read.hpp"
 #include <cstdio>   // perror
 #include <unistd.h> // read
 
 namespace server {
 
-Buffer::Buffer() {}
+Read::Read() {}
 
-Buffer::~Buffer() {}
+Read::~Read() {}
 
-Buffer::ReadResult Buffer::ReadRequest(int client_fd) {
+Read::ReadResult Read::ReadRequest(int client_fd) {
 	ReadResult read_result;
 
 	char    buffer[BUFFER_SIZE];
