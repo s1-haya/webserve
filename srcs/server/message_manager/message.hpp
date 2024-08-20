@@ -17,12 +17,13 @@ class Message {
 	Message &operator=(const Message &other);
 	// function
 	bool IsTimeoutExceeded(double timeout_sec) const;
+	void AddRequestBuf(const std::string &request_buf);
 	// getter
 	int                GetFd() const;
 	const std::string &GetRequestBuf() const;
 	const std::string &GetResponse() const;
 	// setter
-	void SetRequestBuf(const std::string &request_buf);
+	void SetNewRequestBuf(const std::string &request_buf);
 	void SetResponse(const std::string &response);
 
   private:

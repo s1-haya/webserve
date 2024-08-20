@@ -39,9 +39,12 @@ const std::string &Message::GetResponse() const {
 	return response_;
 }
 
-// todo: Httpと繋がったら += ではなく = になる
-void Message::SetRequestBuf(const std::string &request_buf) {
+void Message::AddRequestBuf(const std::string &request_buf) {
 	request_buf_ += request_buf;
+}
+
+void Message::SetNewRequestBuf(const std::string &request_buf) {
+	request_buf_ = request_buf;
 }
 
 void Message::SetResponse(const std::string &response) {

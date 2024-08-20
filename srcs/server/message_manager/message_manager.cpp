@@ -73,9 +73,14 @@ const std::string &MessageManager::GetResponse(int client_fd) const {
 	return message.GetResponse();
 }
 
-void MessageManager::SetRequestBuf(int client_fd, const std::string &request_buf) {
+void MessageManager::AddRequestBuf(int client_fd, const std::string &request_buf) {
 	message::Message &message = messages_.at(client_fd);
-	message.SetRequestBuf(request_buf);
+	message.AddRequestBuf(request_buf);
+}
+
+void MessageManager::SetNewRequestBuf(int client_fd, const std::string &request_buf) {
+	message::Message &message = messages_.at(client_fd);
+	message.SetNewRequestBuf(request_buf);
 }
 
 void MessageManager::SetResponse(int client_fd, const std::string &response) {

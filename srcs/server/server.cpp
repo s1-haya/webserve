@@ -167,7 +167,7 @@ void Server::ReadRequest(int client_fd) {
 		// event_monitor_.Delete(client_fd);
 		return;
 	}
-	message_manager_.SetRequestBuf(client_fd, read_result.GetValue().read_buf);
+	message_manager_.AddRequestBuf(client_fd, read_result.GetValue().read_buf);
 }
 
 void Server::RunHttp(const event::Event &event) {
