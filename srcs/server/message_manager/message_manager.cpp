@@ -59,14 +59,14 @@ MessageManager::TimeoutFds MessageManager::GetTimeoutFds(double timeout) {
 }
 
 // todo:
-//   connection keep用。残request_bufなど保持するようになったら変更する。
 //   まだServerからは呼ばれていない、unit testだけある
-// Remove one message from the beginning and add a new message to the end.
+// For Connection: keep-alive
+// Copy only the read_buf from the old message, delete the old message, and add it as a new message.
 void MessageManager::UpdateMessage(int client_fd) {
-	// todo: connection keepができたらmessageのstart_time,request_buf更新
-	// todo: 今は削除・新規追加(start_time更新)してるだけ
+	const message::Message &old_message = messages_.at(client_fd);
+	const std::string       request_buf = old_message.GetRequestBuf();
 	DeleteMessage(client_fd);
-	AddNewMessage(client_fd);
+	AddNewMessage(client_fd, request_buf);
 }
 
 const std::string &MessageManager::GetRequestBuf(int client_fd) const {
