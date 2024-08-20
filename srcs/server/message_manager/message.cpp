@@ -5,6 +5,9 @@ namespace message {
 
 Message::Message(int client_fd) : client_fd_(client_fd), start_time_(GetCurrentTime()) {}
 
+Message::Message(int client_fd, const std::string &request_buf)
+	: client_fd_(client_fd), start_time_(GetCurrentTime()), request_buf_(request_buf) {}
+
 Message::~Message() {}
 
 Message::Message(const Message &other) {

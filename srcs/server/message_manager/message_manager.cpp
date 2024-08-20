@@ -23,6 +23,12 @@ void MessageManager::AddNewMessage(int client_fd) {
 	messages_.insert(std::make_pair(client_fd, message));
 }
 
+void MessageManager::AddNewMessage(int client_fd, const std::string &request_buf) {
+	message::Message message(client_fd, request_buf);
+	// todo: add logic_error
+	messages_.insert(std::make_pair(client_fd, message));
+}
+
 // Remove one message that matches fd from the beginning of MessageList.
 void MessageManager::DeleteMessage(int client_fd) {
 	messages_.erase(client_fd);
