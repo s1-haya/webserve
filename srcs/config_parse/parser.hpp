@@ -47,6 +47,8 @@ class Parser {
 	void HandleAutoIndex(bool &autoindex, NodeItr &it);
 	void HandleAllowedMethods(std::list<std::string> &allowed_methods, NodeItr &it);
 	void HandleReturn(std::pair<unsigned int, std::string> &redirect, NodeItr &it);
+	void HandleCgiExtension(std::string &cgi_extension, NodeItr &it);
+	void HandleUploadDirectory(std::string &upload_directory, NodeItr &it);
 
   public:
 	explicit Parser(std::list<node::Node> &);

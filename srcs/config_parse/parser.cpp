@@ -192,7 +192,12 @@ void Parser::HandleLocationContextDirective(context::LocationCon &location, Node
 		HandleAllowedMethods(location.allowed_methods, ++it);
 	} else if ((*it).token == RETURN) {
 		HandleReturn(location.redirect, ++it);
+	} else if ((*it).token == CGI_EXTENSION) {
+		HandleCgiExtension(location.cgi_extension, ++it);
+	} else if ((*it).token == UPLOAD_DIR) {
+		HandleUploadDirectory(location.upload_directory, ++it);
 	}
+
 	if ((*it).token_type != node::DELIM) {
 		throw std::runtime_error("expect ';' after arguments");
 	}
@@ -249,6 +254,20 @@ void Parser::HandleReturn(std::pair<unsigned int, std::string> &redirect, NodeIt
 	}
 	redirect = std::make_pair(status_code.GetValue(), (*it).token);
 	++it;
+}
+
+void Parser::HandleCgiExtension(std::string &cgi_extension, NodeItr &it) {
+	if ((*it).token_type != node::WORD) {
+		throw std::runtime_error("invalid arguments in 'cgi_extension' directive");
+	}
+	cgi_extension = (*it++).token;
+}
+
+void Parser::HandleUploadDirectory(std::string &upload_directory, NodeItr &it) {
+	if ((*it).token_type != node::WORD) {
+		throw std::runtime_error("invalid arguments in 'upload_directory' directive");
+	}
+	upload_directory = (*it++).token;
 }
 
 std::list<context::ServerCon> Parser::GetServers() const {

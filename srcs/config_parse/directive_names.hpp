@@ -43,8 +43,6 @@ extern const std::size_t SIZE_OF_VALID_ALLOWED_METHODS;
 /**
  * @brief Directive in Location Context for CGI
  * @details Dir_name args;
- *
- * @note Not Implemented yet
  */
 
 extern const std::string CGI_EXTENSION;

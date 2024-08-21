@@ -13,9 +13,9 @@ struct LocationCon {
 	std::string                          index;
 	bool                                 autoindex;
 	std::list<std::string>               allowed_methods;
-	std::pair<unsigned int, std::string> redirect;         // cannot use return
-	std::string                          cgi_extension;    // not implement
-	std::string                          upload_directory; // not implement
+	std::pair<unsigned int, std::string> redirect; // cannot use return
+	std::string                          cgi_extension;
+	std::string                          upload_directory;
 	LocationCon() : autoindex(false) {}
 };
 
