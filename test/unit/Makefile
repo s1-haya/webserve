@@ -11,7 +11,8 @@ TEST_DIRS	:=	convert_str \
 				virtual_server_storage \
 				config_parse/lexer \
 				config_parse/parser \
-				config_parse
+				config_parse \
+				custom_const_iterator
 
 .PHONY	: run
 run:
