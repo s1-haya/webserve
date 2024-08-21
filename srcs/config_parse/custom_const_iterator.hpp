@@ -25,7 +25,7 @@ class CustomConstIterator {
 
 	CustomConstIterator &operator++() {
 		if (it_ == end_ && throw_on_end_) {
-			throw std::runtime_error("unexpected end");
+			throw std::out_of_range("unexpected end");
 		} else {
 			++it_;
 		}
