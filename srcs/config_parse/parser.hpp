@@ -34,7 +34,7 @@ class Parser {
 	 */
 
 	void HandleServerName(std::list<std::string> &server_names, NodeItr &it);
-	void HandleListen(context::PortList &ports, NodeItr &it);
+	void HandleListen(std::string &host, context::PortList &port, NodeItr &it);
 	void HandleClientMaxBodySize(std::size_t &client_max_body_size, NodeItr &it);
 	void HandleErrorPage(std::pair<unsigned int, std::string> &error_page, NodeItr &it);
 

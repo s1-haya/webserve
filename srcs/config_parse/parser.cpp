@@ -80,7 +80,7 @@ void Parser::HandleServerContextDirective(context::ServerCon &server, NodeItr &i
 	if ((*it).token == SERVER_NAME) {
 		HandleServerName(server.server_names, ++it);
 	} else if ((*it).token == LISTEN) {
-		HandleListen(server.port, ++it);
+		HandleListen(server.host, server.port, ++it);
 	} else if ((*it).token == CLIENT_MAX_BODY_SIZE) {
 		HandleClientMaxBodySize(server.client_max_body_size, ++it);
 	} else if ((*it).token == ERROR_PAGE) {
@@ -100,17 +100,35 @@ void Parser::HandleServerName(std::list<std::string> &server_names, NodeItr &it)
 	}
 }
 
-void Parser::HandleListen(context::PortList &port, NodeItr &it) {
+void Parser::HandleListen(std::string &host, context::PortList &port, NodeItr &it) {
 	if ((*it).token_type != node::WORD) {
 		throw std::runtime_error("invalid number of arguments in 'listen' directive");
 	}
-	utils::Result<unsigned int> port_number = utils::ConvertStrToUint((*it).token);
-	if (!port_number.IsOk() || port_number.GetValue() < PORT_MIN ||
+	if (((*it).token).find(":") == std::string::npos) { // for listen 4242
+		utils::Result<unsigned int> port_number = utils::ConvertStrToUint((*it).token);
+		if (!port_number.IsOk() || port_number.GetValue() < PORT_MIN ||
+			port_number.GetValue() > PORT_MAX) {
+			throw std::runtime_error("invalid port number for ports");
+		} else if (FindDuplicated(port, port_number.GetValue())) {
+			throw std::runtime_error("a duplicated parameter in 'listen' directive");
+		}
+		port.push_back(port_number.GetValue());
+		++it;
+		return;
+	}
+	// for listen localhost:8080
+	std::vector<std::string> host_port = utils::SplitStr((*it).token, ":");
+	if (host_port.size() != 2) {
+		throw std::runtime_error("invalid number of arguments in 'listen' directive");
+	}
+	utils::Result<unsigned int> port_number = utils::ConvertStrToUint(host_port[1]);
+	if (host_port[0] == "" || !port_number.IsOk() || port_number.GetValue() < PORT_MIN ||
 		port_number.GetValue() > PORT_MAX) {
 		throw std::runtime_error("invalid port number for ports");
 	} else if (FindDuplicated(port, port_number.GetValue())) {
 		throw std::runtime_error("a duplicated parameter in 'listen' directive");
 	}
+	host = host_port[0];
 	port.push_back(port_number.GetValue());
 	++it;
 }
