@@ -50,6 +50,11 @@ class Parser {
 	void HandleCgiExtension(std::string &cgi_extension, NodeItr &it);
 	void HandleUploadDirectory(std::string &upload_directory, NodeItr &it);
 
+	static const int PORT_MIN        = 1024;
+	static const int PORT_MAX        = 65535;
+	static const int STATUS_CODE_MIN = 100;
+	static const int STATUS_CODE_MAX = 599;
+
   public:
 	explicit Parser(std::list<node::Node> &);
 	~Parser();

@@ -105,7 +105,8 @@ void Parser::HandleListen(context::PortList &port, NodeItr &it) {
 		throw std::runtime_error("invalid number of arguments in 'listen' directive");
 	}
 	utils::Result<unsigned int> port_number = utils::ConvertStrToUint((*it).token);
-	if (!port_number.IsOk() || port_number.GetValue() < 1024 || port_number.GetValue() > 65535) {
+	if (!port_number.IsOk() || port_number.GetValue() < PORT_MIN ||
+		port_number.GetValue() > PORT_MAX) {
 		throw std::runtime_error("invalid port number for ports");
 	} else if (FindDuplicated(port, port_number.GetValue())) {
 		throw std::runtime_error("a duplicated parameter in 'listen' directive");
@@ -134,7 +135,8 @@ void Parser::HandleErrorPage(std::pair<unsigned int, std::string> &error_page, N
 	NodeItr tmp_it = it; // 404
 	it++;                // /404.html
 	utils::Result<unsigned int> status_code = utils::ConvertStrToUint((*tmp_it).token);
-	if (!status_code.IsOk() || status_code.GetValue() < 100 || status_code.GetValue() > 599) {
+	if (!status_code.IsOk() || status_code.GetValue() < STATUS_CODE_MIN ||
+		status_code.GetValue() > STATUS_CODE_MAX) {
 		throw std::runtime_error("invalid status code for error_page");
 	}
 	error_page = std::make_pair(status_code.GetValue(), (*it).token);
@@ -249,7 +251,8 @@ void Parser::HandleReturn(std::pair<unsigned int, std::string> &redirect, NodeIt
 	NodeItr tmp_it = it; // 302
 	it++;                // /index.html
 	utils::Result<unsigned int> status_code = utils::ConvertStrToUint((*tmp_it).token);
-	if (!status_code.IsOk() || status_code.GetValue() < 100 || status_code.GetValue() > 599) {
+	if (!status_code.IsOk() || status_code.GetValue() < STATUS_CODE_MIN ||
+		status_code.GetValue() > STATUS_CODE_MAX) {
 		throw std::runtime_error("invalid status code for return");
 	}
 	redirect = std::make_pair(status_code.GetValue(), (*it).token);
