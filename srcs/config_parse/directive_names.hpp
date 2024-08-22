@@ -37,6 +37,9 @@ extern const std::string ALIAS;
 extern const std::string AUTO_INDEX;
 extern const std::string INDEX;
 
+extern const std::string VALID_ALLOWED_METHODS[];
+extern const std::size_t SIZE_OF_VALID_ALLOWED_METHODS;
+
 /**
  * @brief Directive in Location Context for CGI
  * @details Dir_name args;

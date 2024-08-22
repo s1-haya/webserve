@@ -17,9 +17,8 @@ struct LocationCon {
 	LocationCon() : autoindex(false) {}
 };
 
-// todo: PortListをstd::list<unsigned int>で作成？
-typedef std::list<int>         PortList;
-typedef std::list<LocationCon> LocationList;
+typedef std::list<unsigned int> PortList;
+typedef std::list<LocationCon>  LocationList;
 
 struct ServerCon {
 	PortList                             port;
