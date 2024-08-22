@@ -1,6 +1,7 @@
 #ifndef HTTP_PARSE_HPP_
 #define HTTP_PARSE_HPP_
 
+#include "status_code.hpp"
 #include <map>
 #include <stdexcept> //runtime_error
 #include <string>
@@ -20,13 +21,6 @@ struct HttpRequest {
 	RequestLine  request_line;
 	HeaderFields header_fields;
 	std::string  body_message;
-};
-
-enum StatusCode {
-	OK              = 200,
-	BAD_REQUEST     = 400,
-	NOT_FOUND       = 404,
-	NOT_IMPLEMENTED = 501
 };
 
 struct HttpRequestResult {

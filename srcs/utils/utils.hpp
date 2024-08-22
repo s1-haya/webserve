@@ -2,6 +2,7 @@
 #define UTILS_HPP_
 
 #include "color.hpp"
+#include "system_exception.hpp"
 #include "result.hpp"
 #include <iostream>
 #include <sstream>

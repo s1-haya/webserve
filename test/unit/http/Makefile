@@ -19,6 +19,7 @@ SRCS				+=	$(WS_UTILS_DIR)/color.cpp \
 						$(WS_UTILS_DIR)/split_str.cpp \
 						$(WS_UTILS_DIR)/isdigit.cpp \
 						$(WS_UTILS_DIR)/convert_str.cpp \
+						$(WS_HTTP_DIR)/status_code.cpp \
 						$(WS_HTTP_DIR)/http_message.cpp \
 						$(WS_HTTP_DIR)/tmp_http.cpp \
 						$(WS_HTTP_REQUEST_DIR)/http_storage.cpp \

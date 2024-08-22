@@ -8,10 +8,7 @@
 
 namespace http {
 
-MockHttp::MockHttp(const std::string &read_buf) {
-	ParseRequest(read_buf);
-	ReadPathContent();
-}
+MockHttp::MockHttp() {}
 
 MockHttp::~MockHttp() {}
 
@@ -71,9 +68,9 @@ void MockHttp::ReadPathContent() {
 
 namespace {
 
-void CreateStatusLine(std::ostream &response_stream, MockHttp::RequestMessage &request) {
-	response_stream << HTTP_VERSION << SP << request[MockHttp::HTTP_STATUS] << SP
-					<< request[MockHttp::HTTP_STATUS_TEXT] << CRLF;
+void CreateStatusLine(std::ostream &response_stream, const MockHttp::RequestMessage &request) {
+	response_stream << HTTP_VERSION << SP << request.at(MockHttp::HTTP_STATUS) << SP
+					<< request.at(MockHttp::HTTP_STATUS_TEXT) << CRLF;
 }
 
 template <typename T>
@@ -90,13 +87,24 @@ void CreateCRLF(std::ostream &response_stream) {
 	response_stream << CRLF;
 }
 
-void CreateBody(std::ostream &response_stream, MockHttp::RequestMessage &request) {
-	response_stream << request[MockHttp::HTTP_CONTENT];
+void CreateBody(std::ostream &response_stream, const MockHttp::RequestMessage &request) {
+	response_stream << request.at(MockHttp::HTTP_CONTENT);
+}
+
+bool IsRequestReceivedComplete(const std::string &buffer) {
+	return buffer.find("\r\n\r\n") != std::string::npos;
 }
 
 } // namespace
 
-HttpResult MockHttp::Run() {
+HttpResult MockHttp::Run(
+	const server::DtoClientInfos &client_infos, const server::DtoServerInfos &server_infos
+) {
+	(void)server_infos;
+
+	ParseRequest(client_infos.request_buf);
+	ReadPathContent();
+
 	std::ostringstream response_stream;
 	CreateStatusLine(response_stream, this->request_);
 	CreateHeaderFields(response_stream, this->request_);
@@ -104,9 +112,21 @@ HttpResult MockHttp::Run() {
 	CreateBody(response_stream, this->request_);
 
 	HttpResult result;
-	result.is_response_complete = true;
+	result.is_response_complete = IsRequestReceivedComplete(client_infos.request_buf);
 	result.response             = response_stream.str();
 	return result;
+}
+
+std::string MockHttp::GetTimeoutResponse(int client_fd) {
+	(void)client_fd;
+
+	std::ostringstream oss;
+	oss << "HTTP/1.1 408 Request Timeout" << CRLF << "Content-Type: text/html" << SP << CRLF
+		<< "Connection: close" << SP << CRLF << "Content-Length: " << 170 << SP << CRLF << CRLF
+		<< "<html><head><title>408 Request Timeout</title></head><body><h1>Request "
+		   "Timeout</h1><p>Server timeout waiting for the HTTP request from the "
+		   "client.</p></body></html>";
+	return oss.str();
 }
 
 } // namespace http
