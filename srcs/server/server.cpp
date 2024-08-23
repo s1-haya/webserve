@@ -198,6 +198,7 @@ void Server::RunHttp(const event::Event &event) {
 void Server::SendResponse(int client_fd) {
 	const std::string &response = message_manager_.GetResponse(client_fd);
 
+	// todo: handle return size
 	send(client_fd, response.c_str(), response.size(), 0);
 	utils::Debug("server", "send response to client", client_fd);
 
@@ -228,6 +229,7 @@ void Server::HandleTimeoutMessages() {
 		const std::string &timeout_response = mock_http_.GetTimeoutResponse(client_fd);
 		message_manager_.SetResponse(client_fd, message::CLOSE, timeout_response);
 		event_monitor_.Update(client_fd, event::EVENT_WRITE);
+		utils::Debug("server", "timeout client", client_fd);
 	}
 }
 
