@@ -1,7 +1,5 @@
 from setuptools import setup, Extension
 from setuptools.command.build_ext import build_ext
-import sys
-import setuptools
 
 class get_pybind_include(object):
     """Helper class to determine the pybind11 include path
