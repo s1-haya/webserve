@@ -26,7 +26,7 @@ ext_modules = [
 setup(
     name='client',
     version='1.0',
-    description='Webserv integration test using pybind11',
+    description='Client module for Webserv integration test',
     ext_modules=ext_modules,
     install_requires=['pybind11>=2.5.0'],
     cmdclass={'build_ext': build_ext},

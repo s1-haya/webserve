@@ -9,7 +9,6 @@ class Client {
 	explicit Client(unsigned int port);
 	~Client();
 	std::string SendRequestAndReceiveResponse(const std::string &message);
-	int         test();
 
   private:
 	Client();

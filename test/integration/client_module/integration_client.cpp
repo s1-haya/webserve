@@ -4,7 +4,7 @@
 #include <iostream>
 #include <sys/socket.h> // socket,connect
 #include <sys/types.h>
-#include <unistd.h> // read,close
+#include <unistd.h> // recv,close
 
 Client::Client(unsigned int port) : port_(port) {
 	Init();
