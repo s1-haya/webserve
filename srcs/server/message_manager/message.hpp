@@ -30,6 +30,7 @@ class Message {
 	const std::string &GetRequestBuf() const;
 	const std::string &GetResponse() const;
 	// setter
+	void SetTimeout();
 	void SetNewRequestBuf(const std::string &request_buf);
 	void SetResponse(ConnectionState connection_state, const std::string &response);
 
@@ -40,6 +41,7 @@ class Message {
 	// variables
 	int             client_fd_;
 	Time            start_time_;
+	bool            is_timeout_;
 	ConnectionState connection_state_;
 	std::string     request_buf_;
 	std::string     response_;

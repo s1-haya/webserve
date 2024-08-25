@@ -4,11 +4,15 @@ namespace server {
 namespace message {
 
 Message::Message(int client_fd)
-	: client_fd_(client_fd), start_time_(GetCurrentTime()), connection_state_(KEEP) {}
+	: client_fd_(client_fd),
+	  start_time_(GetCurrentTime()),
+	  is_timeout_(false),
+	  connection_state_(KEEP) {}
 
 Message::Message(int client_fd, const std::string &request_buf)
 	: client_fd_(client_fd),
 	  start_time_(GetCurrentTime()),
+	  is_timeout_(false),
 	  connection_state_(KEEP),
 	  request_buf_(request_buf) {}
 
@@ -22,6 +26,7 @@ Message &Message::operator=(const Message &other) {
 	if (this != &other) {
 		client_fd_   = other.client_fd_;
 		start_time_  = other.start_time_;
+		is_timeout_  = other.is_timeout_;
 		request_buf_ = other.request_buf_;
 		response_    = other.response_;
 	}
@@ -52,6 +57,10 @@ const std::string &Message::GetResponse() const {
 
 void Message::AddRequestBuf(const std::string &request_buf) {
 	request_buf_ += request_buf;
+}
+
+void Message::SetTimeout() {
+	is_timeout_ = true;
 }
 
 void Message::SetNewRequestBuf(const std::string &request_buf) {
