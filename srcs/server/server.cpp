@@ -220,7 +220,8 @@ void Server::SendResponse(int client_fd) {
 
 void Server::HandleTimeoutMessages() {
 	// timeoutした全fdを取得
-	const MessageManager::TimeoutFds &timeout_fds = message_manager_.GetTimeoutFds(REQUEST_TIMEOUT);
+	const MessageManager::TimeoutFds &timeout_fds =
+		message_manager_.GetNewTimeoutFds(REQUEST_TIMEOUT);
 
 	// timeout用のresponseをセットしてevent監視をWRITEに変更
 	typedef MessageManager::TimeoutFds::const_iterator Itr;

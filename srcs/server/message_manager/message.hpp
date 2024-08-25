@@ -22,7 +22,7 @@ class Message {
 	Message(const Message &other);
 	Message &operator=(const Message &other);
 	// function
-	bool IsTimeoutExceeded(double timeout_sec) const;
+	bool IsNewTimeoutExceeded(double timeout_sec) const;
 	void AddRequestBuf(const std::string &request_buf);
 	// getter
 	int                GetFd() const;
