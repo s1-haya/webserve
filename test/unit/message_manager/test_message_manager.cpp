@@ -206,6 +206,37 @@ int RunTestUpdateMessage() {
 	return ret_code;
 }
 
+int RunTestDeleteMessage() {
+	int ret_code = EXIT_SUCCESS;
+
+	server::MessageManager manager;
+	TimeoutFds             expected_timeout_fds;
+
+	// time(0), add fd: 4,5
+	manager.AddNewMessage(4);
+	manager.AddNewMessage(5);
+
+	// time(0), delete fd: 5
+	manager.DeleteMessage(5);
+
+	// time(0), GetNewTimeoutFds: {}
+	ret_code |= Test(RunIsSameTimeoutFds(manager, expected_timeout_fds)); // test6
+
+	sleep(3);
+	// time(3), timeout fd: 4
+	expected_timeout_fds.push_back(4);
+
+	sleep(1);
+	// time(4), GetNewTimeoutFds: {4}
+	ret_code |= Test(RunIsSameTimeoutFds(manager, expected_timeout_fds)); // test7
+	expected_timeout_fds.clear();
+
+	// time(4), GetNewTimeoutFds: {}
+	ret_code |= Test(RunIsSameTimeoutFds(manager, expected_timeout_fds)); // test8
+
+	return ret_code;
+}
+
 } // namespace
 
 int main() {
@@ -213,6 +244,7 @@ int main() {
 
 	ret_code |= RunTestGetTimeoutFds();
 	ret_code |= RunTestUpdateMessage();
+	ret_code |= RunTestDeleteMessage();
 
 	return ret_code;
 }
