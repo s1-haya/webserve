@@ -81,7 +81,7 @@ RunIsSameTimeoutFds(server::MessageManager &manager, const TimeoutFds &expected_
 	Result             result;
 	std::ostringstream oss;
 
-	const TimeoutFds &timeout_fds = manager.GetTimeoutFds(REQUEST_TIMEOUT);
+	const TimeoutFds &timeout_fds = manager.GetNewTimeoutFds(REQUEST_TIMEOUT);
 	if (!IsSame(timeout_fds, expected_timeout_fds)) {
 		result.is_success = false;
 		oss << "timeout_fds" << std::endl;
@@ -93,10 +93,10 @@ RunIsSameTimeoutFds(server::MessageManager &manager, const TimeoutFds &expected_
 }
 
 // -----------------------------------------------------------------------------
-// add fd         : 4 5         6
-// timeout(3s)    :       4 5         6
-// current time   : 0 1 2 3 4 5 6 7 8 9 10
-// GetTimeoutFds():           *   *     *
+// add fd            : 4 5         6
+// timeout(3s)       :       4 5         6
+// current time      : 0 1 2 3 4 5 6 7 8 9 10
+// GetNewTimeoutFds():           *   *     *
 // -----------------------------------------------------------------------------
 int RunTestGetTimeoutFds() {
 	int ret_code = EXIT_SUCCESS;
@@ -120,7 +120,7 @@ int RunTestGetTimeoutFds() {
 	expected_timeout_fds.push_back(5);
 
 	sleep(1);
-	// time(5), GetTimeoutFds: {4, 5}
+	// time(5), GetNewTimeoutFds: {4, 5}
 	ret_code |= Test(RunIsSameTimeoutFds(manager, expected_timeout_fds)); // test1
 	expected_timeout_fds.clear();
 
@@ -129,7 +129,7 @@ int RunTestGetTimeoutFds() {
 	manager.AddNewMessage(6);
 
 	sleep(1);
-	// time(7), GetTimeoutFds: {}
+	// time(7), GetNewTimeoutFds: {}
 	ret_code |= Test(RunIsSameTimeoutFds(manager, expected_timeout_fds)); // test2
 
 	sleep(3);
@@ -137,24 +137,24 @@ int RunTestGetTimeoutFds() {
 	expected_timeout_fds.push_back(6);
 
 	sleep(1);
-	// time(10), GetTimeoutFds: {6}
+	// time(10), GetNewTimeoutFds: {6}
 	ret_code |= Test(RunIsSameTimeoutFds(manager, expected_timeout_fds)); // test3
 
 	return ret_code;
 }
 
 // -----------------------------------------------------------------------------
-// add fd         : 4 5       6
-// timeout(3s)    :       4 5       6
-// current time   : 0 1 2 3 4 5 6 7 8
-// UpdateMessage():               *
+// add fd            : 4 5       6
+// timeout(3s)       :       4 5       6
+// current time      : 0 1 2 3 4 5 6 7 8
+// UpdateMessage()   :               *
 // -----------------------------------------------------------------------------
 //       ↓ 古い5削除&5新規追加
 // -----------------------------------------------------------------------------
-// add fd         : 4         6   5
-// timeout(3s)    :       4         6   5
-// current time   : 0 1 2 3 4 5 6 7 8 9 10 11
-// GetTimeoutFds():                   *    *
+// add fd            : 4         6   5
+// timeout(3s)       :       4         6   5
+// current time      : 0 1 2 3 4 5 6 7 8 9 10 11
+// GetNewTimeoutFds():                   *    *
 // -----------------------------------------------------------------------------
 int RunTestUpdateMessage() {
 	int ret_code = EXIT_SUCCESS;
@@ -191,7 +191,7 @@ int RunTestUpdateMessage() {
 	expected_timeout_fds.push_back(6);
 
 	sleep(1);
-	// time(9), GetTimeoutFds: {4, 6}
+	// time(9), GetNewTimeoutFds: {4, 6}
 	ret_code |= Test(RunIsSameTimeoutFds(manager, expected_timeout_fds)); // test4
 	expected_timeout_fds.clear();
 
@@ -200,7 +200,7 @@ int RunTestUpdateMessage() {
 	expected_timeout_fds.push_back(5);
 
 	sleep(1);
-	// time(11), GetTimeoutFds: {5}
+	// time(11), GetNewTimeoutFds: {5}
 	ret_code |= Test(RunIsSameTimeoutFds(manager, expected_timeout_fds)); // test5
 
 	return ret_code;
