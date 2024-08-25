@@ -118,9 +118,7 @@ void Parser::HandleListen(std::string &host, context::PortList &port, NodeItr &i
 	}
 	// for listen localhost:8080
 	std::vector<std::string> host_port = utils::SplitStr((*it).token, ":");
-	if (host_port.size() != 2) {
-		throw std::runtime_error("invalid number of arguments in 'listen' directive");
-	}
+	// 2個ないときは他の部分で例外が投げられる
 	utils::Result<unsigned int> port_number = utils::ConvertStrToUint(host_port[1]);
 	if (host_port[0] == "" || !port_number.IsOk() || port_number.GetValue() < PORT_MIN ||
 		port_number.GetValue() > PORT_MAX) {
