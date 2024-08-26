@@ -2,9 +2,9 @@
 #include <arpa/inet.h> // inet_pton,htons
 #include <cstring>     // strerror
 #include <iostream>
-#include <sys/socket.h> // socket,connect
+#include <sys/socket.h> // socket,connect,send,recv
 #include <sys/types.h>
-#include <unistd.h> // recv,close
+#include <unistd.h> // close
 
 Client::Client(unsigned int port) : port_(port) {
 	Init();
