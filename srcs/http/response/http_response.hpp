@@ -2,6 +2,7 @@
 #define HTTP_RESPONSE_HPP_
 
 #include "status_code.hpp"
+#include "utils.hpp"
 #include <map>
 #include <string>
 
@@ -44,6 +45,8 @@ class HttpResponse {
 	static std::string CreateDefaultBodyMessageFormat(
 		const std::string &status_code, const std::string &reason_phrase
 	);
+	static void
+	HandleSystemException(const utils::SystemException &e, std::string &response_body_message);
 };
 
 } // namespace http
