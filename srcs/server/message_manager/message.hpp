@@ -45,8 +45,8 @@ class Message {
 	const Response    &GetResponse() const;
 	// setter
 	void SetTimeout();
-	void SetNormalResponse(ConnectionState connection_state, const std::string &response_str);
-	void SetPrimaryResponse(ConnectionState connection_state, const std::string &response_str);
+	void AddBackResponse(ConnectionState connection_state, const std::string &response_str);
+	void AddFrontResponse(ConnectionState connection_state, const std::string &response_str);
 
   private:
 	Message();

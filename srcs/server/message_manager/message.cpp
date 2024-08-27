@@ -77,14 +77,12 @@ void Message::SetTimeout() {
 	is_timeout_ = true;
 }
 
-void Message::SetNormalResponse(ConnectionState connection_state, const std::string &response_str) {
+void Message::AddBackResponse(ConnectionState connection_state, const std::string &response_str) {
 	const Response response(connection_state, response_str);
 	responses_.push_back(response);
 }
 
-void Message::SetPrimaryResponse(
-	ConnectionState connection_state, const std::string &response_str
-) {
+void Message::AddFrontResponse(ConnectionState connection_state, const std::string &response_str) {
 	const Response response(connection_state, response_str);
 	responses_.push_front(response);
 }

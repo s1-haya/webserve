@@ -21,17 +21,17 @@ class MessageManager {
 	void       AddNewMessage(int client_fd);
 	void       DeleteMessage(int client_fd);
 	TimeoutFds GetNewTimeoutFds(double timeout);
-	void       UpdateMessage(int client_fd);
+	void       DeleteSentResponseAndResetTime(int client_fd);
 	void       AddRequestBuf(int client_fd, const std::string &request_buf);
 	// getter
 	const std::string       &GetRequestBuf(int client_fd) const;
 	const message::Response &GetResponse(int client_fd) const;
 	// setter
 	void SetNewRequestBuf(int client_fd, const std::string &request_buf);
-	void SetNormalResponse(
+	void AddNormalResponse(
 		int client_fd, message::ConnectionState connection_state, const std::string &response
 	);
-	void SetPrimaryResponse(
+	void AddPrimaryResponse(
 		int client_fd, message::ConnectionState connection_state, const std::string &response
 	);
 
