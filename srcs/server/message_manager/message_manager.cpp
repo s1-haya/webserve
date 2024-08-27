@@ -23,12 +23,6 @@ void MessageManager::AddNewMessage(int client_fd) {
 	messages_.insert(std::make_pair(client_fd, message));
 }
 
-void MessageManager::AddNewMessage(int client_fd, const std::string &request_buf) {
-	message::Message message(client_fd, request_buf);
-	// todo: add logic_error
-	messages_.insert(std::make_pair(client_fd, message));
-}
-
 // Remove one message that matches fd from the beginning of MessageList.
 void MessageManager::DeleteMessage(int client_fd) {
 	messages_.erase(client_fd);
@@ -49,13 +43,13 @@ MessageManager::TimeoutFds MessageManager::GetNewTimeoutFds(double timeout) {
 	return timeout_fds_;
 }
 
+// todo: 全てのresponse_strをsend()できた場合かつkeep-aliveの場合に呼ばれる想定
 // For Connection: keep-alive
 // Copy only the read_buf from the old message, delete the old message, and add it as a new message.
 void MessageManager::UpdateMessage(int client_fd) {
-	const message::Message &old_message = messages_.at(client_fd);
-	const std::string       request_buf = old_message.GetRequestBuf();
-	DeleteMessage(client_fd);
-	AddNewMessage(client_fd, request_buf);
+	message::Message &message = messages_.at(client_fd);
+	message.UpdateTime();
+	message.InitResponse();
 }
 
 const std::string &MessageManager::GetRequestBuf(int client_fd) const {

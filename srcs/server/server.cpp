@@ -203,6 +203,7 @@ void Server::SendResponse(int client_fd) {
 	// todo: handle return size
 	send(client_fd, response_str.c_str(), response_str.size(), 0);
 	utils::Debug("server", "send response to client", client_fd);
+	// todo: 全てのresponse_strをsend()できなかった場合はsend_size分だけeraseして早期return
 
 	switch (connection_state) {
 	case message::KEEP:

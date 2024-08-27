@@ -38,12 +38,22 @@ bool Message::IsNewTimeoutExceeded(double timeout_sec) const {
 	return diff_time_sec >= timeout_sec;
 }
 
+void Message::UpdateTime() {
+	start_time_ = GetCurrentTime();
+}
+
 void Message::AddRequestBuf(const std::string &request_buf) {
 	request_buf_ += request_buf;
 }
 
 void Message::DeleteRequestBuf() {
 	request_buf_.clear();
+}
+
+// todo: tmp
+void Message::InitResponse() {
+	response_.connection_state = KEEP;
+	response_.response_str.clear();
 }
 
 int Message::GetFd() const {

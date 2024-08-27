@@ -30,8 +30,10 @@ class Message {
 	Message &operator=(const Message &other);
 	// function
 	bool IsNewTimeoutExceeded(double timeout_sec) const;
+	void UpdateTime();
 	void AddRequestBuf(const std::string &request_buf);
 	void DeleteRequestBuf();
+	void InitResponse();
 	// getter
 	int                GetFd() const;
 	const std::string &GetRequestBuf() const;

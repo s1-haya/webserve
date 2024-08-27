@@ -19,7 +19,6 @@ class MessageManager {
 	MessageManager &operator=(const MessageManager &other);
 	// functions
 	void       AddNewMessage(int client_fd);
-	void       AddNewMessage(int client_fd, const std::string &request_buf);
 	void       DeleteMessage(int client_fd);
 	TimeoutFds GetNewTimeoutFds(double timeout);
 	void       UpdateMessage(int client_fd);
