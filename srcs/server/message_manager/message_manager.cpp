@@ -68,7 +68,7 @@ const std::string &MessageManager::GetRequestBuf(int client_fd) const {
 	return message.GetRequestBuf();
 }
 
-const std::string &MessageManager::GetResponse(int client_fd) const {
+const message::Response &MessageManager::GetResponse(int client_fd) const {
 	const message::Message &message = messages_.at(client_fd);
 	return message.GetResponse();
 }

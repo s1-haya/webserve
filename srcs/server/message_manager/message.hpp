@@ -12,6 +12,13 @@ enum ConnectionState {
 	CLOSE
 };
 
+// todo: tmp
+struct Response {
+	Response() : connection_state(KEEP) {};
+	ConnectionState connection_state;
+	std::string     response_str;
+};
+
 class Message {
   public:
 	typedef std::time_t Time;
@@ -29,22 +36,21 @@ class Message {
 	int                GetFd() const;
 	ConnectionState    GetConnectionState() const;
 	const std::string &GetRequestBuf() const;
-	const std::string &GetResponse() const;
+	const Response    &GetResponse() const;
 	// setter
 	void SetTimeout();
-	void SetResponse(ConnectionState connection_state, const std::string &response);
+	void SetResponse(ConnectionState connection_state, const std::string &response_str);
 
   private:
 	Message();
 	// functions
 	static Time GetCurrentTime();
 	// variables
-	int             client_fd_;
-	Time            start_time_;
-	bool            is_timeout_;
-	ConnectionState connection_state_;
-	std::string     request_buf_;
-	std::string     response_;
+	int         client_fd_;
+	Time        start_time_;
+	bool        is_timeout_;
+	std::string request_buf_;
+	Response    response_;
 };
 
 } // namespace message
