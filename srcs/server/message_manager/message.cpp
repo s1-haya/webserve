@@ -42,6 +42,10 @@ bool Message::IsNewTimeoutExceeded(double timeout_sec) const {
 	return diff_time_sec >= timeout_sec;
 }
 
+void Message::AddRequestBuf(const std::string &request_buf) {
+	request_buf_ += request_buf;
+}
+
 int Message::GetFd() const {
 	return client_fd_;
 }
@@ -56,10 +60,6 @@ const std::string &Message::GetRequestBuf() const {
 
 const std::string &Message::GetResponse() const {
 	return response_;
-}
-
-void Message::AddRequestBuf(const std::string &request_buf) {
-	request_buf_ += request_buf;
 }
 
 void Message::SetTimeout() {
