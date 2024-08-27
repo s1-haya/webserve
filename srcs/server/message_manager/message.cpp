@@ -51,6 +51,16 @@ void Message::DeleteRequestBuf() {
 	request_buf_.clear();
 }
 
+void Message::AddBackResponse(ConnectionState connection_state, const std::string &response_str) {
+	const Response response(connection_state, response_str);
+	responses_.push_back(response);
+}
+
+void Message::AddFrontResponse(ConnectionState connection_state, const std::string &response_str) {
+	const Response response(connection_state, response_str);
+	responses_.push_front(response);
+}
+
 void Message::DeleteOldestResponse() {
 	if (responses_.size() == 0) {
 		throw std::logic_error("DeleteOldestResponse(): no response");
@@ -75,16 +85,6 @@ const Response &Message::GetResponse() const {
 
 void Message::SetTimeout() {
 	is_timeout_ = true;
-}
-
-void Message::AddBackResponse(ConnectionState connection_state, const std::string &response_str) {
-	const Response response(connection_state, response_str);
-	responses_.push_back(response);
-}
-
-void Message::AddFrontResponse(ConnectionState connection_state, const std::string &response_str) {
-	const Response response(connection_state, response_str);
-	responses_.push_front(response);
 }
 
 Message::Time Message::GetCurrentTime() {

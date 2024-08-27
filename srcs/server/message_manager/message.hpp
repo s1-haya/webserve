@@ -33,24 +33,28 @@ class Message {
 	~Message();
 	Message(const Message &other);
 	Message &operator=(const Message &other);
-	// function
+
+	// functions
 	bool IsNewTimeoutExceeded(double timeout_sec) const;
 	void UpdateTime();
+	// request_buf
 	void AddRequestBuf(const std::string &request_buf);
 	void DeleteRequestBuf();
+	// response
+	void AddBackResponse(ConnectionState connection_state, const std::string &response_str);
+	void AddFrontResponse(ConnectionState connection_state, const std::string &response_str);
 	void DeleteOldestResponse();
+
 	// getter
 	int                GetFd() const;
 	const std::string &GetRequestBuf() const;
 	const Response    &GetResponse() const;
 	// setter
 	void SetTimeout();
-	void AddBackResponse(ConnectionState connection_state, const std::string &response_str);
-	void AddFrontResponse(ConnectionState connection_state, const std::string &response_str);
 
   private:
 	Message();
-	// functions
+	// function
 	static Time GetCurrentTime();
 	// variables
 	int           client_fd_;
