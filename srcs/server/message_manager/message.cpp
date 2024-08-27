@@ -46,6 +46,10 @@ void Message::AddRequestBuf(const std::string &request_buf) {
 	request_buf_ += request_buf;
 }
 
+void Message::DeleteRequestBuf() {
+	request_buf_.clear();
+}
+
 int Message::GetFd() const {
 	return client_fd_;
 }
@@ -64,10 +68,6 @@ const std::string &Message::GetResponse() const {
 
 void Message::SetTimeout() {
 	is_timeout_ = true;
-}
-
-void Message::SetNewRequestBuf(const std::string &request_buf) {
-	request_buf_ = request_buf;
 }
 
 void Message::SetResponse(ConnectionState connection_state, const std::string &response) {

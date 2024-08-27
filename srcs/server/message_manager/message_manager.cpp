@@ -80,7 +80,8 @@ void MessageManager::AddRequestBuf(int client_fd, const std::string &request_buf
 
 void MessageManager::SetNewRequestBuf(int client_fd, const std::string &request_buf) {
 	message::Message &message = messages_.at(client_fd);
-	message.SetNewRequestBuf(request_buf);
+	message.DeleteRequestBuf();
+	message.AddRequestBuf(request_buf);
 }
 
 void MessageManager::SetResponse(

@@ -24,6 +24,7 @@ class Message {
 	// function
 	bool IsNewTimeoutExceeded(double timeout_sec) const;
 	void AddRequestBuf(const std::string &request_buf);
+	void DeleteRequestBuf();
 	// getter
 	int                GetFd() const;
 	ConnectionState    GetConnectionState() const;
@@ -31,7 +32,6 @@ class Message {
 	const std::string &GetResponse() const;
 	// setter
 	void SetTimeout();
-	void SetNewRequestBuf(const std::string &request_buf);
 	void SetResponse(ConnectionState connection_state, const std::string &response);
 
   private:
