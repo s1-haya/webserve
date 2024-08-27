@@ -196,15 +196,15 @@ void Server::RunHttp(const event::Event &event) {
 }
 
 void Server::SendResponse(int client_fd) {
-	const message::Response &response = message_manager_.GetResponse(client_fd);
-	// const message::ConnectionState connection_state = response.connection_state;
-	const std::string &response_str = response.response_str;
+	const message::Response       &response         = message_manager_.GetResponse(client_fd);
+	const message::ConnectionState connection_state = response.connection_state;
+	const std::string             &response_str     = response.response_str;
 
 	// todo: handle return size
 	send(client_fd, response_str.c_str(), response_str.size(), 0);
 	utils::Debug("server", "send response to client", client_fd);
 
-	switch (message_manager_.GetConnectionState(client_fd)) {
+	switch (connection_state) {
 	case message::KEEP:
 		message_manager_.UpdateMessage(client_fd);
 		event_monitor_.Update(client_fd, event::EVENT_READ);

@@ -58,11 +58,6 @@ void MessageManager::UpdateMessage(int client_fd) {
 	AddNewMessage(client_fd, request_buf);
 }
 
-message::ConnectionState MessageManager::GetConnectionState(int client_fd) const {
-	const message::Message &message = messages_.at(client_fd);
-	return message.GetConnectionState();
-}
-
 const std::string &MessageManager::GetRequestBuf(int client_fd) const {
 	const message::Message &message = messages_.at(client_fd);
 	return message.GetRequestBuf();

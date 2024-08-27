@@ -34,7 +34,6 @@ class Message {
 	void DeleteRequestBuf();
 	// getter
 	int                GetFd() const;
-	ConnectionState    GetConnectionState() const;
 	const std::string &GetRequestBuf() const;
 	const Response    &GetResponse() const;
 	// setter

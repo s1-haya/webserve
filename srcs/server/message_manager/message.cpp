@@ -50,10 +50,6 @@ int Message::GetFd() const {
 	return client_fd_;
 }
 
-ConnectionState Message::GetConnectionState() const {
-	return response_.connection_state;
-}
-
 const std::string &Message::GetRequestBuf() const {
 	return request_buf_;
 }
