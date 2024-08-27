@@ -47,6 +47,11 @@ class HttpResponse {
 	);
 	static void
 	HandleSystemException(const utils::SystemException &e, std::string &response_body_message);
+	static void FileCreationHandler(
+		const std::string &path,
+		const std::string &request_body_message,
+		std::string       &response_body_message
+	);
 };
 
 } // namespace http

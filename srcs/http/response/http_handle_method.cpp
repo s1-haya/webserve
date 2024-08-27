@@ -87,56 +87,14 @@ void HttpResponse::PostHandler(
 			// Location header fields: URI-reference
 			// ex) POST /save/test.txt HTTP/1.1
 			// Location: /save/test.txt;
-			std::ofstream file(path.c_str(), std::ios::binary);
-			if (file.fail()) {
-				response_body_message = CreateDefaultBodyMessageFormat(
-					utils::ToString(http::INTERNAL_SERVER_ERROR),
-					reason_phrase.at(http::INTERNAL_SERVER_ERROR)
-				);
-				return;
-			}
-			response_body_message = CreateDefaultBodyMessageFormat(
-				utils::ToString(http::CREATED), reason_phrase.at(http::CREATED)
-			);
-			file.write(request_body_message.c_str(), request_body_message.length());
-			if (file.fail()) {
-				response_body_message = CreateDefaultBodyMessageFormat(
-					utils::ToString(http::INTERNAL_SERVER_ERROR),
-					reason_phrase.at(http::INTERNAL_SERVER_ERROR)
-				);
-			}
+			FileCreationHandler(path, request_body_message, response_body_message);
 		}
 	} catch (const utils::SystemException &e) {
 		int error_number = e.GetErrorNumber();
-		if (error_number == EACCES) {
-			response_body_message = CreateDefaultBodyMessageFormat(
-				utils::ToString(http::FORBIDDEN), reason_phrase.at(http::FORBIDDEN)
-			);
-		} else if (error_number == ENOENT || error_number == ENOTDIR) {
-			// todo: CreateFile();
-			std::ofstream file(path.c_str(), std::ios::binary);
-			if (file.fail()) {
-				response_body_message = CreateDefaultBodyMessageFormat(
-					utils::ToString(http::INTERNAL_SERVER_ERROR),
-					reason_phrase.at(http::INTERNAL_SERVER_ERROR)
-				);
-				return;
-			}
-			response_body_message = CreateDefaultBodyMessageFormat(
-				utils::ToString(http::CREATED), reason_phrase.at(http::CREATED)
-			);
-			file.write(request_body_message.c_str(), request_body_message.length());
-			if (file.fail()) {
-				response_body_message = CreateDefaultBodyMessageFormat(
-					utils::ToString(http::INTERNAL_SERVER_ERROR),
-					reason_phrase.at(http::INTERNAL_SERVER_ERROR)
-				);
-			}
+		if (error_number == ENOENT) {
+			FileCreationHandler(path, request_body_message, response_body_message);
 		} else {
-			response_body_message = CreateDefaultBodyMessageFormat(
-				utils::ToString(http::INTERNAL_SERVER_ERROR),
-				reason_phrase.at(http::INTERNAL_SERVER_ERROR)
-			);
+			HandleSystemException(e, response_body_message);
 		}
 	}
 }
@@ -182,6 +140,30 @@ void HttpResponse::HandleSystemException(
 			reason_phrase.at(http::INTERNAL_SERVER_ERROR)
 		);
 	}
+}
+
+void HttpResponse::FileCreationHandler(
+	const std::string &path,
+	const std::string &request_body_message,
+	std::string       &response_body_message
+) {
+	std::ofstream file(path.c_str(), std::ios::binary);
+	if (file.fail()) {
+		response_body_message = CreateDefaultBodyMessageFormat(
+			utils::ToString(http::FORBIDDEN), reason_phrase.at(http::FORBIDDEN)
+		);
+		return;
+	}
+	file.write(request_body_message.c_str(), request_body_message.length());
+	if (file.fail()) {
+		response_body_message = CreateDefaultBodyMessageFormat(
+			utils::ToString(http::FORBIDDEN), reason_phrase.at(http::FORBIDDEN)
+		);
+		return;
+	}
+	response_body_message = CreateDefaultBodyMessageFormat(
+		utils::ToString(http::CREATED), reason_phrase.at(http::CREATED)
+	);
 }
 
 } // namespace http
