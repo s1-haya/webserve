@@ -77,9 +77,16 @@ void Message::SetTimeout() {
 	is_timeout_ = true;
 }
 
-void Message::SetResponse(ConnectionState connection_state, const std::string &response_str) {
+void Message::SetNormalResponse(ConnectionState connection_state, const std::string &response_str) {
 	const Response response(connection_state, response_str);
 	responses_.push_back(response);
+}
+
+void Message::SetPrimaryResponse(
+	ConnectionState connection_state, const std::string &response_str
+) {
+	const Response response(connection_state, response_str);
+	responses_.push_front(response);
 }
 
 Message::Time Message::GetCurrentTime() {

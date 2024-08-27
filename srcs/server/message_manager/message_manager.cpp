@@ -73,11 +73,18 @@ void MessageManager::SetNewRequestBuf(int client_fd, const std::string &request_
 	message.AddRequestBuf(request_buf);
 }
 
-void MessageManager::SetResponse(
+void MessageManager::SetNormalResponse(
 	int client_fd, message::ConnectionState connection_state, const std::string &response
 ) {
 	message::Message &message = messages_.at(client_fd);
-	message.SetResponse(connection_state, response);
+	message.SetNormalResponse(connection_state, response);
+}
+
+void MessageManager::SetPrimaryResponse(
+	int client_fd, message::ConnectionState connection_state, const std::string &response
+) {
+	message::Message &message = messages_.at(client_fd);
+	message.SetPrimaryResponse(connection_state, response);
 }
 
 } // namespace server

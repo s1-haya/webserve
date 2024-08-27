@@ -191,7 +191,7 @@ void Server::RunHttp(const event::Event &event) {
 
 	const message::ConnectionState connection_state =
 		http_result.is_connection_keep ? message::KEEP : message::CLOSE;
-	message_manager_.SetResponse(client_fd, connection_state, http_result.response);
+	message_manager_.SetNormalResponse(client_fd, connection_state, http_result.response);
 	event_monitor_.Update(event.fd, event::EVENT_WRITE);
 }
 
@@ -231,7 +231,7 @@ void Server::HandleTimeoutMessages() {
 	for (Itr it = timeout_fds.begin(); it != timeout_fds.end(); ++it) {
 		const int          client_fd        = *it;
 		const std::string &timeout_response = mock_http_.GetTimeoutResponse(client_fd);
-		message_manager_.SetResponse(client_fd, message::CLOSE, timeout_response);
+		message_manager_.SetPrimaryResponse(client_fd, message::CLOSE, timeout_response);
 		event_monitor_.Update(client_fd, event::EVENT_WRITE);
 		utils::Debug("server", "timeout client", client_fd);
 	}

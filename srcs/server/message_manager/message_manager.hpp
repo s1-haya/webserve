@@ -28,7 +28,10 @@ class MessageManager {
 	const message::Response &GetResponse(int client_fd) const;
 	// setter
 	void SetNewRequestBuf(int client_fd, const std::string &request_buf);
-	void SetResponse(
+	void SetNormalResponse(
+		int client_fd, message::ConnectionState connection_state, const std::string &response
+	);
+	void SetPrimaryResponse(
 		int client_fd, message::ConnectionState connection_state, const std::string &response
 	);
 
