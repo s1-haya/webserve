@@ -1,4 +1,5 @@
 #include "message.hpp"
+#include <stdexcept> // logic_error
 
 namespace server {
 namespace message {
@@ -24,7 +25,7 @@ Message &Message::operator=(const Message &other) {
 		start_time_  = other.start_time_;
 		is_timeout_  = other.is_timeout_;
 		request_buf_ = other.request_buf_;
-		response_    = other.response_;
+		responses_   = other.responses_;
 	}
 	return *this;
 }
@@ -50,10 +51,11 @@ void Message::DeleteRequestBuf() {
 	request_buf_.clear();
 }
 
-// todo: tmp
-void Message::InitResponse() {
-	response_.connection_state = KEEP;
-	response_.response_str.clear();
+void Message::DeleteOldestResponse() {
+	if (responses_.size() == 0) {
+		throw std::logic_error("DeleteOldestResponse(): no response");
+	}
+	responses_.pop_front();
 }
 
 int Message::GetFd() const {
@@ -65,7 +67,10 @@ const std::string &Message::GetRequestBuf() const {
 }
 
 const Response &Message::GetResponse() const {
-	return response_;
+	if (responses_.size() == 0) {
+		throw std::logic_error("GetResponse(): no response");
+	}
+	return responses_.front();
 }
 
 void Message::SetTimeout() {
@@ -73,8 +78,8 @@ void Message::SetTimeout() {
 }
 
 void Message::SetResponse(ConnectionState connection_state, const std::string &response_str) {
-	response_.connection_state = connection_state;
-	response_.response_str     = response_str;
+	const Response response(connection_state, response_str);
+	responses_.push_back(response);
 }
 
 Message::Time Message::GetCurrentTime() {

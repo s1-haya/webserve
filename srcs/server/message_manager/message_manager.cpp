@@ -49,7 +49,7 @@ MessageManager::TimeoutFds MessageManager::GetNewTimeoutFds(double timeout) {
 void MessageManager::UpdateMessage(int client_fd) {
 	message::Message &message = messages_.at(client_fd);
 	message.UpdateTime();
-	message.InitResponse();
+	message.DeleteOldestResponse();
 }
 
 const std::string &MessageManager::GetRequestBuf(int client_fd) const {
