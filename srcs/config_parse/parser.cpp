@@ -1,5 +1,8 @@
 #include "parser.hpp"
 #include "directive_names.hpp"
+#include "result.hpp"
+#include "utils.hpp"
+#include <algorithm>
 #include <cstdlib> // atoi
 #include <stdexcept>
 
@@ -13,18 +16,26 @@ Parser::Parser(std::list<node::Node> &tokens) : tokens_(tokens) {
 Parser::~Parser() {}
 
 void Parser::ParseNode() {
-	for (NodeItr it = tokens_.begin(); it != tokens_.end(); ++it) {
+	for (NodeItr it(tokens_.begin(), tokens_.end()); it != tokens_.end(); ++it) {
 		if ((*it).token_type == node::CONTEXT && (*it).token == SERVER) {
-			++it;
-			if (it == tokens_.end()) {
-				throw std::runtime_error("unexpected end of server context");
-			}
-			servers_.push_back(CreateServerContext(it));
+			servers_.push_back(CreateServerContext(++it));
 		} else {
 			throw std::runtime_error("expect server context");
 		}
 	}
 }
+
+namespace {
+
+template <typename T>
+bool FindDuplicated(const std::list<T> &list, const T &element) {
+	if (std::find(list.begin(), list.end(), element) != list.end()) {
+		return true;
+	}
+	return false;
+}
+
+} // namespace
 
 /**
  * @brief Handlers for Server Context
@@ -38,7 +49,7 @@ context::ServerCon Parser::CreateServerContext(NodeItr &it) {
 		throw std::runtime_error("expect { after server");
 	}
 	++it; // skip L_BRACKET
-	while (it != tokens_.end() && (*it).token_type != node::R_BRACKET) {
+	while ((*it).token_type != node::R_BRACKET) {
 		switch ((*it).token_type) {
 		case node::DIRECTIVE:
 			HandleServerContextDirective(server, it);
@@ -82,10 +93,10 @@ void Parser::HandleServerContextDirective(context::ServerCon &server, NodeItr &i
 
 void Parser::HandleServerName(std::list<std::string> &server_names, NodeItr &it) {
 	while ((*it).token_type != node::DELIM && (*it).token_type == node::WORD) {
-		server_names.push_back((*it++).token);
-		if (it == tokens_.end()) {
-			throw std::runtime_error("invalid arguments of 'server_name' directive");
+		if (FindDuplicated(server_names, (*it).token)) {
+			throw std::runtime_error("a duplicated parameter in 'server_name' directive");
 		}
+		server_names.push_back((*it++).token);
 	}
 }
 
@@ -93,25 +104,41 @@ void Parser::HandleListen(context::PortList &port, NodeItr &it) {
 	if ((*it).token_type != node::WORD) {
 		throw std::runtime_error("invalid number of arguments in 'listen' directive");
 	}
-	port.push_back(std::atoi((*it++).token.c_str())); // TODO: atoi, validation, 重複チェック
+	utils::Result<unsigned int> port_number = utils::ConvertStrToUint((*it).token);
+	if (!port_number.IsOk() || port_number.GetValue() < 1024 || port_number.GetValue() > 65535) {
+		throw std::runtime_error("invalid port number for ports");
+	} else if (FindDuplicated(port, port_number.GetValue())) {
+		throw std::runtime_error("a duplicated parameter in 'listen' directive");
+	}
+	port.push_back(port_number.GetValue());
+	++it;
 }
 
 void Parser::HandleClientMaxBodySize(std::size_t &client_max_body_size, NodeItr &it) {
 	if ((*it).token_type != node::WORD) {
 		throw std::runtime_error("invalid number of arguments in 'client_max_body_size' directive");
 	}
-	client_max_body_size = std::atoi((*it++).token.c_str()); // tmp: atoi
+	utils::Result<std::size_t> body_max_size = utils::ConvertStrToSize((*it).token);
+	if (!body_max_size.IsOk()) { // check range?
+		throw std::runtime_error("invalid client_max_body_size");
+	}
+	client_max_body_size = body_max_size.GetValue();
+	++it;
 }
 
 void Parser::HandleErrorPage(std::pair<unsigned int, std::string> &error_page, NodeItr &it) {
 	if ((*it).token_type != node::WORD || (*++NodeItr(it)).token_type != node::WORD) {
 		throw std::runtime_error("invalid number of arguments in 'error_page' directive");
 	}
-	// ex. 404 /404.html, tmp: atoi
+	// ex. 404 /404.html
 	NodeItr tmp_it = it; // 404
 	it++;                // /404.html
-	error_page = std::make_pair(std::atoi((*tmp_it).token.c_str()), (*it).token);
-	it++;
+	utils::Result<unsigned int> status_code = utils::ConvertStrToUint((*tmp_it).token);
+	if (!status_code.IsOk() || status_code.GetValue() < 100 || status_code.GetValue() > 599) {
+		throw std::runtime_error("invalid status code for error_page");
+	}
+	error_page = std::make_pair(status_code.GetValue(), (*it).token);
+	++it;
 }
 
 /**
@@ -131,7 +158,7 @@ context::LocationCon Parser::CreateLocationContext(NodeItr &it) {
 		throw std::runtime_error("expect { after location argument");
 	}
 	++it; // skip L_BRACKET
-	while (it != tokens_.end() && (*it).token_type != node::R_BRACKET) {
+	while ((*it).token_type != node::R_BRACKET) {
 		switch ((*it).token_type) {
 		case node::DIRECTIVE:
 			HandleLocationContextDirective(location, it);
@@ -194,10 +221,18 @@ void Parser::HandleAutoIndex(bool &autoindex, NodeItr &it) {
 
 void Parser::HandleAllowedMethods(std::list<std::string> &allowed_methods, NodeItr &it) {
 	while ((*it).token_type != node::DELIM && (*it).token_type == node::WORD) {
-		allowed_methods.push_back((*it++).token);
-		if (it == tokens_.end()) {
-			throw std::runtime_error("invalid arguments of 'allowed_methods' directive");
+		if (FindDuplicated(allowed_methods, (*it).token)) {
+			throw std::runtime_error("a duplicated parameter in 'allowed_methods' directive");
 		}
+		allowed_methods.push_back((*it).token);
+		if (std::find(
+				VALID_ALLOWED_METHODS,
+				VALID_ALLOWED_METHODS + SIZE_OF_VALID_ALLOWED_METHODS,
+				(*it).token
+			) == VALID_ALLOWED_METHODS + SIZE_OF_VALID_ALLOWED_METHODS) {
+			throw std::runtime_error("an invalid method in 'allowed_methods' directive");
+		}
+		++it;
 	}
 }
 
@@ -208,8 +243,12 @@ void Parser::HandleReturn(std::pair<unsigned int, std::string> &redirect, NodeIt
 	// ex. 302 /index.html, tmp: atoi
 	NodeItr tmp_it = it; // 302
 	it++;                // /index.html
-	redirect = std::make_pair(std::atoi((*tmp_it).token.c_str()), (*it).token);
-	it++;
+	utils::Result<unsigned int> status_code = utils::ConvertStrToUint((*tmp_it).token);
+	if (!status_code.IsOk() || status_code.GetValue() < 100 || status_code.GetValue() > 599) {
+		throw std::runtime_error("invalid status code for return");
+	}
+	redirect = std::make_pair(status_code.GetValue(), (*it).token);
+	++it;
 }
 
 std::list<context::ServerCon> Parser::GetServers() const {

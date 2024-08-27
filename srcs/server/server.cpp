@@ -10,6 +10,10 @@
 #include <unistd.h>     // close
 
 namespace server {
+
+// todo: tmp
+const double Server::REQUEST_TIMEOUT = 3.0;
+
 namespace {
 
 VirtualServer::LocationList ConvertLocations(const config::context::LocationList &config_locations
@@ -96,6 +100,7 @@ void Server::Run() {
 		for (std::size_t i = 0; i < static_cast<std::size_t>(ready); ++i) {
 			HandleEvent(event_monitor_.GetEvent(i));
 		}
+		HandleTimeoutMessages();
 	}
 }
 
@@ -113,9 +118,10 @@ void Server::HandleNewConnection(int server_fd) {
 	const ClientInfo new_client_info = Connection::Accept(server_fd);
 	const int        client_fd       = new_client_info.GetFd();
 
-	// add to context
+	// add client_info, event, message
 	context_.AddClientInfo(new_client_info, server_fd);
 	event_monitor_.Add(client_fd, event::EVENT_READ);
+	message_manager_.AddNewMessage(client_fd);
 	utils::Debug("server", "add new client", client_fd);
 }
 
@@ -170,7 +176,7 @@ void Server::RunHttp(const event::Event &event) {
 	const DtoServerInfos &server_infos = GetServerInfos(client_fd);
 	DebugDto(client_infos, server_infos);
 
-	http::HttpResult http_result = mock_http.Run(client_infos, server_infos);
+	http::HttpResult http_result = mock_http_.Run(client_infos, server_infos);
 	// Check if it's ready to start write/send.
 	// If not completed, the request will be re-read by the event_monitor.
 	if (!http_result.is_response_complete) {
@@ -179,7 +185,7 @@ void Server::RunHttp(const event::Event &event) {
 	utils::Debug("server", "received all request from client", client_fd);
 	std::cerr << buffers_.GetRequest(client_fd) << std::endl;
 	buffers_.AddResponse(client_fd, http_result.response);
-	event_monitor_.Update(event, event::EVENT_WRITE);
+	event_monitor_.Update(event.fd, event::EVENT_WRITE);
 }
 
 void Server::SendResponse(int client_fd) {
@@ -188,11 +194,35 @@ void Server::SendResponse(int client_fd) {
 	send(client_fd, response.c_str(), response.size(), 0);
 	utils::Debug("server", "send response to client", client_fd);
 
-	// todo: connection keep-aliveならdisconnectしない
-	// disconnect
+	// todo: もしconnection keep-aliveならdisconnectしない
+	// - 前回のrequestの余りだけ残し,responseは削除
+	// - message_manager_.UpdateMessage(client_fd); で新規Message追加+古いMessage削除
+	// - event_monitor_.Update(event.fd, event::EVENT_READ); でevent監視をREADに更新
+
+	// todo: closeの場合こっち
+	Disconnect(client_fd);
+}
+
+void Server::HandleTimeoutMessages() {
+	// timeoutした全fdを取得
+	const MessageManager::TimeoutFds &timeout_fds = message_manager_.GetTimeoutFds(REQUEST_TIMEOUT);
+
+	// timeout用のresponseをセットしてevent監視をWRITEに変更
+	typedef MessageManager::TimeoutFds::const_iterator Itr;
+	for (Itr it = timeout_fds.begin(); it != timeout_fds.end(); ++it) {
+		const int          client_fd        = *it;
+		const std::string &timeout_response = mock_http_.GetTimeoutResponse(client_fd);
+		buffers_.AddResponse(client_fd, timeout_response);
+		event_monitor_.Update(client_fd, event::EVENT_WRITE);
+	}
+}
+
+// delete from buffer, client_info, event, message
+void Server::Disconnect(int client_fd) {
 	buffers_.Delete(client_fd);
 	context_.DeleteClientInfo(client_fd);
 	event_monitor_.Delete(client_fd);
+	message_manager_.DeleteMessage(client_fd);
 	close(client_fd);
 	utils::Debug("server", "disconnected client", client_fd);
 	utils::Debug("------------------------------------------");

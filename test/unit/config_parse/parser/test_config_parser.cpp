@@ -111,7 +111,7 @@ context::LocationCon BuildLocationCon(
 
 // 引数付きのFactory Function: 引数ありコンストラクタはここでしか使わないため
 context::ServerCon BuildServerCon(
-	const std::list<int>                       &port,
+	const std::list<unsigned int>              &port,
 	const std::list<std::string>               &server_names,
 	const LocationList                         &location_con,
 	std::size_t                                 client_max_body_size,
@@ -140,8 +140,8 @@ std::ostream &operator<<(std::ostream &os, const std::list<std::string> &str_lis
 }
 
 /* For ports */
-std::ostream &operator<<(std::ostream &os, const std::list<int> &int_list) {
-	std::list<int>::const_iterator it = int_list.begin();
+std::ostream &operator<<(std::ostream &os, const std::list<unsigned int> &int_list) {
+	std::list<unsigned int>::const_iterator it = int_list.begin();
 	while (it != int_list.end()) {
 		os << *it;
 		++it;
@@ -262,7 +262,7 @@ int RunErrorTests(const TestCase test_cases[], std::size_t num_test_cases) {
 /* Test1 One Server */
 ServerList MakeExpectedTest1() {
 	ServerList                           expected_result;
-	std::list<int>                       expected_ports_1;
+	std::list<unsigned int>              expected_ports_1;
 	std::list<std::string>               server_names_1;
 	LocationList                         expected_locationlist_1;
 	std::pair<unsigned int, std::string> error_page_1;
@@ -277,7 +277,7 @@ ServerList MakeExpectedTest1() {
 /* Test2 One Server, One Location */
 ServerList MakeExpectedTest2() {
 	ServerList                           expected_result;
-	std::list<int>                       expected_ports_1;
+	std::list<unsigned int>              expected_ports_1;
 	std::list<std::string>               server_names_1;
 	LocationList                         expected_locationlist_1;
 	std::list<std::string>               allowed_methods_1;
@@ -296,8 +296,8 @@ ServerList MakeExpectedTest2() {
 
 /* Test3 Server, Location Directive */
 ServerList MakeExpectedTest3() {
-	ServerList     expected_result;
-	std::list<int> expected_ports_1;
+	ServerList              expected_result;
+	std::list<unsigned int> expected_ports_1;
 	expected_ports_1.push_back(8080);
 	std::list<std::string> server_names_1;
 	server_names_1.push_back("localhost");
@@ -322,10 +322,9 @@ ServerList MakeExpectedTest4() {
 	std::list<std::string> server_names_1;
 	server_names_1.push_back("server_name");
 	server_names_1.push_back("server");
-	std::list<int> expected_ports_1;
+	std::list<unsigned int> expected_ports_1;
 	expected_ports_1.push_back(8080);
 	expected_ports_1.push_back(8000);
-	expected_ports_1.push_back(80);
 	LocationList                         expected_locationlist_1;
 	std::pair<unsigned int, std::string> error_page_1;
 	context::ServerCon                   expected_server_1 = BuildServerCon(
@@ -338,9 +337,9 @@ ServerList MakeExpectedTest4() {
 
 /* Test5 Multiple Locations */
 ServerList MakeExpectedTest5() {
-	ServerList             expected_result;
-	std::list<int>         expected_ports_1;
-	std::list<std::string> server_names_1;
+	ServerList              expected_result;
+	std::list<unsigned int> expected_ports_1;
+	std::list<std::string>  server_names_1;
 	server_names_1.push_back("test.serv");
 	LocationList                         expected_locationlist_1;
 	std::list<std::string>               allowed_methods_1_1;
@@ -367,7 +366,7 @@ ServerList MakeExpectedTest6() {
 	ServerList             expected_result;
 	std::list<std::string> server_names_1;
 	server_names_1.push_back("comment.serv");
-	std::list<int>                       expected_ports_1;
+	std::list<unsigned int>              expected_ports_1;
 	LocationList                         expected_locationlist_1;
 	std::list<std::string>               allowed_methods_1;
 	std::pair<unsigned int, std::string> redirect_1;
@@ -387,7 +386,7 @@ ServerList MakeExpectedTest6() {
 ServerList MakeExpectedTest7() {
 	ServerList expected_result;
 
-	std::list<int> expected_ports_1;
+	std::list<unsigned int> expected_ports_1;
 	expected_ports_1.push_back(8080);
 	std::list<std::string> server_names_1;
 	server_names_1.push_back("localhost");
@@ -398,7 +397,7 @@ ServerList MakeExpectedTest7() {
     );
 	expected_result.push_back(expected_server_1);
 
-	std::list<int> expected_ports_2;
+	std::list<unsigned int> expected_ports_2;
 	expected_ports_2.push_back(12345);
 	std::list<std::string> server_names_2;
 	server_names_2.push_back("test.www");
@@ -453,7 +452,6 @@ int main() {
 			"server {\n \
 					listen 8080;\n \
 					listen 8000;\n \
-					listen 80;\n \
 					server_name server_name server;\n \
 				}\n",
 			expected_result_test_4

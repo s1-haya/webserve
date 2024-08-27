@@ -7,6 +7,7 @@
 #include "context_manager.hpp"
 #include "epoll.hpp"
 #include "http_result.hpp"
+#include "message_manager.hpp"
 #include "mock_http.hpp"
 #include <list>
 #include <string>
@@ -37,12 +38,15 @@ class Server {
 	void ReadRequest(int client_fd);
 	void RunHttp(const event::Event &event);
 	void SendResponse(int client_fd);
+	void HandleTimeoutMessages();
+	void Disconnect(int client_fd);
 	// for Server to Http
 	DtoClientInfos GetClientInfos(int client_fd) const;
 	DtoServerInfos GetServerInfos(int client_fd) const;
 
 	// const
-	static const int SYSTEM_ERROR = -1;
+	static const int    SYSTEM_ERROR = -1;
+	static const double REQUEST_TIMEOUT;
 	// context(virtual server,client)
 	ContextManager context_;
 	// connection
@@ -52,7 +56,9 @@ class Server {
 	// request buffers
 	Buffer buffers_;
 	// http
-	http::MockHttp mock_http;
+	http::MockHttp mock_http_;
+	// message manager with time control
+	MessageManager message_manager_;
 };
 
 } // namespace server
