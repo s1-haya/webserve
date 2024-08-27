@@ -156,7 +156,7 @@ int RunTestGetTimeoutFds() {
 // current time      : 0 1 2 3 4 5 6 7 8 9 10 11
 // GetNewTimeoutFds():                   *    *
 // -----------------------------------------------------------------------------
-int RunTestUpdateMessage() {
+int RunTestDeleteSentResponseAndResetTime() {
 	int ret_code = EXIT_SUCCESS;
 
 	server::MessageManager manager;
@@ -171,10 +171,12 @@ int RunTestUpdateMessage() {
 
 	sleep(2);
 	// time(3), timeout fd: 4
+	manager.AddPrimaryResponse(4, server::message::CLOSE, "test response");
 	expected_timeout_fds.push_back(4);
 
 	sleep(1);
 	// time(4), timeout fd: 5
+	manager.AddPrimaryResponse(5, server::message::CLOSE, "test response");
 	expected_timeout_fds.push_back(5);
 
 	sleep(1);
@@ -182,8 +184,8 @@ int RunTestUpdateMessage() {
 	manager.AddNewMessage(6);
 
 	sleep(2);
-	// time(7), delete old fd 5, add new fd 5
-	manager.UpdateMessage(5);
+	// time(7), update start_time, delete oldest response.
+	manager.DeleteSentResponseAndResetTime(5);
 	DeleteValue(expected_timeout_fds, 5);
 
 	sleep(1);
@@ -243,7 +245,7 @@ int main() {
 	int ret_code = EXIT_SUCCESS;
 
 	ret_code |= RunTestGetTimeoutFds();
-	ret_code |= RunTestUpdateMessage();
+	ret_code |= RunTestDeleteSentResponseAndResetTime();
 	ret_code |= RunTestDeleteMessage();
 
 	return ret_code;
