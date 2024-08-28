@@ -43,7 +43,12 @@ class HttpResponse {
   public:
 	typedef std::map<StatusCode, std::string> ReasonPhrase;
 	static std::string                        Run(const HttpRequestResult &request_info);
-	static void               GetHandler(const std::string &path, std::string &body_message);
+	static void GetHandler(const std::string &path, std::string &body_message);
+	static void PostHandler(
+		const std::string &path,
+		const std::string &request_body_message,
+		std::string       &response_body_message
+	);
 
   private:
 	HttpResponse();
@@ -54,8 +59,9 @@ class HttpResponse {
 	static HttpResponseResult CreateSuccessHttpResponseResult(const HttpRequestResult &request_info
 	);
 	static HttpResponseResult CreateErrorHttpResponseResult(const HttpRequestResult &request_info);
-	static std::string
-	CreateErrorBodyMessage(const std::string &status_code, const std::string &reason_phrase);
+	static std::string        CreateDefaultBodyMessageFormat(
+			   const std::string &status_code, const std::string &reason_phrase
+		   );
 };
 
 } // namespace http

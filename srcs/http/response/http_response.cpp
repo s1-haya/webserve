@@ -64,7 +64,7 @@ HttpResponse::CreateSuccessHttpResponseResult(const HttpRequestResult &request_i
 	return response;
 }
 
-std::string HttpResponse::CreateErrorBodyMessage(
+std::string HttpResponse::CreateDefaultBodyMessageFormat(
 	const std::string &status_code, const std::string &reason_phrase
 ) {
 	std::ostringstream body_message;
@@ -88,7 +88,7 @@ HttpResponseResult HttpResponse::CreateErrorHttpResponseResult(const HttpRequest
 	response.header_fields[CONTENT_TYPE] = "text/html";
 	response.header_fields[SERVER]       = SERVER_VERSION;
 	response.header_fields[CONNECTION]   = "close";
-	response.body_message                = CreateErrorBodyMessage(
+	response.body_message                = CreateDefaultBodyMessageFormat(
         response.status_line.status_code, response.status_line.reason_phrase
     );
 	response.header_fields[CONTENT_LENGTH] = utils::ToString(response.body_message.length());
