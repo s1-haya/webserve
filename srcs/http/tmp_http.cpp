@@ -40,16 +40,28 @@ TmpHttp::~TmpHttp() {}
 // return HttpParsedRequestResult;
 // }
 
-// std::string CreateTimeoutRequest(client_fd) {
-// 	HttpRequestParsedData data = storage_.GetClientSaveData(client_fd);
-// 	storage_.DeleteClientSaveData(client_fd);
-// 	return HttpResponse::CreateTimeoutRequest(data.request_result);
+// HttpResult CreateTimeoutRequest(client_fd) {
+// HttpResult result;
+// HttpRequestParsedData data = storage_.GetClientSaveData(client_fd);
+// result.is_response_complete = true;
+// result.response = HttpResponse::CreateTimeoutRequest(data.request_result);
+// result.request_buf = data.request_buf;
+// todo: HttpResponse::IsConnectionKeep
+// result.is_connection_keep = ;
+// storage_.DeleteClientSaveData(client_fd);
+// return result;
 // }
 
-// std::string CreateInternalServerError(client_fd)
-// 	HttpRequestParsedData data = storage_.GetClientSaveData(client_fd);
-// 	storage_.DeleteClientSaveData(client_fd);
-// 	return HttpResponse::CreateInternalServerError(data.request_result);
+// HttpResult CreateInternalServerError(client_fd)
+// HttpResult result;
+// HttpRequestParsedData data = storage_.GetClientSaveData(client_fd);
+// result.is_response_complete = true;
+// result.response = HttpResponse::CreateInternalServerError(data.request_result);;
+// result.request_buf = data.request_buf;
+// todo: HttpResponse::IsConnectionKeep
+// result.is_connection_keep = ;
+// storage_.DeleteClientSaveData(client_fd);
+// return result;
 // }
 
 // todo: クライアントのリクエスト情報を読み込む
