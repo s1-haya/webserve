@@ -52,6 +52,11 @@ struct CheckServerInfoResult {
 	std::string index;
 	bool        autoindex;
 
+	// メソッドの処理で使用
+	std::list<std::string> allowed_methods;
+	std::string            cgi_extension;
+	std::string            upload_directory;
+
 	int                                  redirect_status_code;
 	std::pair<unsigned int, std::string> error_page;
 	CheckStatus                          status;
