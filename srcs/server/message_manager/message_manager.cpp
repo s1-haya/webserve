@@ -1,4 +1,5 @@
 #include "message_manager.hpp"
+#include <stdexcept> // logic_error
 
 namespace server {
 
@@ -18,9 +19,13 @@ MessageManager &MessageManager::operator=(const MessageManager &other) {
 }
 
 void MessageManager::AddNewMessage(int client_fd) {
+	typedef std::pair<MessageMap::const_iterator, bool> InsertResult;
+
 	message::Message message(client_fd);
-	// todo: add logic_error
-	messages_.insert(std::make_pair(client_fd, message));
+	InsertResult     result = messages_.insert(std::make_pair(client_fd, message));
+	if (result.second == false) {
+		throw std::logic_error("AddNewMessage(): message is already exist");
+	}
 }
 
 // Remove one message that matches fd from the beginning of MessageList.
