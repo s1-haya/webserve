@@ -64,7 +64,7 @@ void HttpResponse::GetHandler(const std::string &path, std::string &response_bod
 			);
 		}
 	} catch (const utils::SystemException &e) {
-		HandleSystemException(e, response_body_message);
+		SystemExceptionHandler(e, response_body_message);
 	}
 }
 
@@ -94,7 +94,7 @@ void HttpResponse::PostHandler(
 		if (error_number == ENOENT) {
 			FileCreationHandler(path, request_body_message, response_body_message);
 		} else {
-			HandleSystemException(e, response_body_message);
+			SystemExceptionHandler(e, response_body_message);
 		}
 	}
 }
@@ -114,11 +114,11 @@ void HttpResponse::DeleteHandler(const std::string &path, std::string &response_
 			throw utils::SystemException(std::strerror(errno), errno);
 		}
 	} catch (const utils::SystemException &e) {
-		HandleSystemException(e, response_body_message);
+		SystemExceptionHandler(e, response_body_message);
 	}
 }
 
-void HttpResponse::HandleSystemException(
+void HttpResponse::SystemExceptionHandler(
 	const utils::SystemException &e, std::string &response_body_message
 ) {
 	int error_number = e.GetErrorNumber();

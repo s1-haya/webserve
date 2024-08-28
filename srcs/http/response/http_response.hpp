@@ -46,7 +46,7 @@ class HttpResponse {
 		const std::string &status_code, const std::string &reason_phrase
 	);
 	static void
-	HandleSystemException(const utils::SystemException &e, std::string &response_body_message);
+	SystemExceptionHandler(const utils::SystemException &e, std::string &response_body_message);
 	static void FileCreationHandler(
 		const std::string &path,
 		const std::string &request_body_message,
