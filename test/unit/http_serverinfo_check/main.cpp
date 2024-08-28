@@ -66,7 +66,7 @@ int Test1() {
 
 	MockDtoServerInfos    server_info = BuildMockDtoServerInfos();
 	CheckServerInfoResult result      = HttpServerInfoCheck::Check(server_info, request);
-	std::cout << "status: " << std::boolalpha << result.status << std::endl;
+	std::cout << "status: " << result.status << std::endl;
 	std::cout << "path: " << result.path << std::endl;
 	std::cout << "redirect_status_code: " << result.redirect_status_code << std::endl;
 	std::cout << "index: " << result.index << std::endl;
@@ -91,7 +91,7 @@ int Test2() {
 
 	MockDtoServerInfos    server_info = BuildMockDtoServerInfos();
 	CheckServerInfoResult result      = HttpServerInfoCheck::Check(server_info, request);
-	std::cout << "status: " << std::boolalpha << result.status << std::endl;
+	std::cout << "status: " << result.status << std::endl;
 	std::cout << "path: " << result.path << std::endl;
 	std::cout << "redirect_status_code: " << result.redirect_status_code << std::endl;
 	std::cout << "index: " << result.index << std::endl;
@@ -118,7 +118,7 @@ int Test3() {
 
 	MockDtoServerInfos    server_info = BuildMockDtoServerInfos();
 	CheckServerInfoResult result      = HttpServerInfoCheck::Check(server_info, request);
-	std::cout << "status: " << std::boolalpha << result.status << std::endl;
+	std::cout << "status: " << result.status << std::endl;
 	std::cout << "path: " << result.path << std::endl;
 	std::cout << "redirect_status_code: " << result.redirect_status_code << std::endl;
 	std::cout << "index: " << result.index << std::endl;
