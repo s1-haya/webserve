@@ -40,22 +40,22 @@ namespace http {
 
 struct CheckServerInfoResult {
 	enum CheckStatus {
-		OK,
+		CONTINUE,
+		REDIRECT_ON,
 		INVALID_HOST,
 		PAYLOAD_TOO_LARGE,
-		LOCATION_NOT_FOUND,
-		REDIRECT_ON
+		LOCATION_NOT_FOUND
 	}; // rfc + 見やすいように独自で名前をつけた
 	// 呼び出し元でこれをチェックしてstatus codeを付ける用
 
 	std::string path; // alias, index, redirectを見る
 	std::string index;
 	bool        autoindex;
-	int         status_code; // redirectで指定
-	std::string error_page_path;
-	int         error_status_code; // error_pageで指定 まとめる？
-	CheckStatus status;
-	CheckServerInfoResult() : autoindex(false), status_code(0), error_status_code(0), status(OK){};
+
+	int                                  redirect_status_code;
+	std::pair<unsigned int, std::string> error_page;
+	CheckStatus                          status;
+	CheckServerInfoResult() : autoindex(false), redirect_status_code(0), status(CONTINUE) {};
 };
 
 class HttpServerInfoCheck {

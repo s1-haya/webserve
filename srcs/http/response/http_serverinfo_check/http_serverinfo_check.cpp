@@ -21,11 +21,11 @@ void HttpServerInfoCheck::CheckDTOServerInfo(
 ) {
 	if (server_info.host != header_fields["Host"]) { // Check host_name
 		result.status = CheckServerInfoResult::INVALID_HOST;
-	} else if (static_cast<size_t>(std::atoi(header_fields["Content-Length"].c_str())) > server_info.client_max_body_size) { // Check content_length
+	} else if (static_cast<size_t>(std::atoi(header_fields["Content-Length"].c_str())) >
+			   server_info.client_max_body_size) { // Check content_length
 		result.status = CheckServerInfoResult::PAYLOAD_TOO_LARGE;
 	} else if (!server_info.error_page.second.empty()) { // Check error_page
-		result.error_status_code = server_info.error_page.first;
-		result.error_page_path   = server_info.error_page.second;
+		result.error_page = server_info.error_page;
 	}
 	return;
 }
@@ -34,7 +34,7 @@ void HttpServerInfoCheck::CheckDTOServerInfo(
 void HttpServerInfoCheck::CheckLocationList(
 	CheckServerInfoResult &result, const LocationList &locations, const std::string &request_target
 ) {
-	if (result.status != CheckServerInfoResult::OK) {
+	if (result.status != CheckServerInfoResult::CONTINUE) {
 		return;
 	}
 	const MockLocationCon &match_location = CheckLocation(result, locations, request_target);
@@ -109,9 +109,9 @@ void HttpServerInfoCheck::CheckRedirect(
 	// ex. return 301 /var/data/index.html
 	// /www/target.html -> /var/data/index.html
 	// status code: 301
-	result.status_code = location.redirect.first;
-	result.path        = location.redirect.second;
-	result.status      = CheckServerInfoResult::REDIRECT_ON;
+	result.redirect_status_code = location.redirect.first;
+	result.path                 = location.redirect.second;
+	result.status               = CheckServerInfoResult::REDIRECT_ON;
 }
 
 } // namespace http
