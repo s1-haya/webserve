@@ -19,15 +19,20 @@ class MessageManager {
 	MessageManager &operator=(const MessageManager &other);
 	// functions
 	void       AddNewMessage(int client_fd);
+	void       AddNewMessage(int client_fd, const std::string &request_buf);
 	void       DeleteMessage(int client_fd);
-	TimeoutFds GetTimeoutFds(double timeout);
+	TimeoutFds GetNewTimeoutFds(double timeout);
 	void       UpdateMessage(int client_fd);
+	void       AddRequestBuf(int client_fd, const std::string &request_buf);
 	// getter
-	const std::string &GetRequestBuf(int client_fd) const;
-	const std::string &GetResponse(int client_fd) const;
+	message::ConnectionState GetConnectionState(int client_fd) const;
+	const std::string       &GetRequestBuf(int client_fd) const;
+	const std::string       &GetResponse(int client_fd) const;
 	// setter
-	void SetRequestBuf(int client_fd, const std::string &request_buf);
-	void SetResponse(int client_fd, const std::string &response);
+	void SetNewRequestBuf(int client_fd, const std::string &request_buf);
+	void SetResponse(
+		int client_fd, message::ConnectionState connection_state, const std::string &response
+	);
 
   private:
 	// variable

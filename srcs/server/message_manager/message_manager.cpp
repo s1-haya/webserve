@@ -23,44 +23,44 @@ void MessageManager::AddNewMessage(int client_fd) {
 	messages_.insert(std::make_pair(client_fd, message));
 }
 
+void MessageManager::AddNewMessage(int client_fd, const std::string &request_buf) {
+	message::Message message(client_fd, request_buf);
+	// todo: add logic_error
+	messages_.insert(std::make_pair(client_fd, message));
+}
+
 // Remove one message that matches fd from the beginning of MessageList.
 void MessageManager::DeleteMessage(int client_fd) {
 	messages_.erase(client_fd);
 }
 
-// Delete all messages that have timed out, and return TimeoutFds list.
-// ex)
-//   before: MessageMap{3,4,5}
-//   (if timeout fd 3,5)
-//   return: TimeoutFds{3,5}
-//   after : MessageMap{4}
-MessageManager::TimeoutFds MessageManager::GetTimeoutFds(double timeout) {
+MessageManager::TimeoutFds MessageManager::GetNewTimeoutFds(double timeout) {
 	TimeoutFds timeout_fds_;
 
 	typedef MessageMap::iterator Itr;
 	for (Itr it = messages_.begin(); it != messages_.end();) {
-		const message::Message &message = it->second;
-		if (message.IsTimeoutExceeded(timeout)) {
+		message::Message &message = it->second;
+		if (message.IsNewTimeoutExceeded(timeout)) {
 			timeout_fds_.push_back(message.GetFd());
-			const Itr it_erase = it;
-			++it;
-			messages_.erase(it_erase);
-			continue;
+			message.SetTimeout();
 		}
 		++it;
 	}
 	return timeout_fds_;
 }
 
-// todo:
-//   connection keep用。残request_bufなど保持するようになったら変更する。
-//   まだServerからは呼ばれていない、unit testだけある
-// Remove one message from the beginning and add a new message to the end.
+// For Connection: keep-alive
+// Copy only the read_buf from the old message, delete the old message, and add it as a new message.
 void MessageManager::UpdateMessage(int client_fd) {
-	// todo: connection keepができたらmessageのstart_time,request_buf更新
-	// todo: 今は削除・新規追加(start_time更新)してるだけ
+	const message::Message &old_message = messages_.at(client_fd);
+	const std::string       request_buf = old_message.GetRequestBuf();
 	DeleteMessage(client_fd);
-	AddNewMessage(client_fd);
+	AddNewMessage(client_fd, request_buf);
+}
+
+message::ConnectionState MessageManager::GetConnectionState(int client_fd) const {
+	const message::Message &message = messages_.at(client_fd);
+	return message.GetConnectionState();
 }
 
 const std::string &MessageManager::GetRequestBuf(int client_fd) const {
@@ -73,14 +73,21 @@ const std::string &MessageManager::GetResponse(int client_fd) const {
 	return message.GetResponse();
 }
 
-void MessageManager::SetRequestBuf(int client_fd, const std::string &request_buf) {
+void MessageManager::AddRequestBuf(int client_fd, const std::string &request_buf) {
 	message::Message &message = messages_.at(client_fd);
-	message.SetRequestBuf(request_buf);
+	message.AddRequestBuf(request_buf);
 }
 
-void MessageManager::SetResponse(int client_fd, const std::string &response) {
+void MessageManager::SetNewRequestBuf(int client_fd, const std::string &request_buf) {
 	message::Message &message = messages_.at(client_fd);
-	message.SetResponse(response);
+	message.SetNewRequestBuf(request_buf);
+}
+
+void MessageManager::SetResponse(
+	int client_fd, message::ConnectionState connection_state, const std::string &response
+) {
+	message::Message &message = messages_.at(client_fd);
+	message.SetResponse(connection_state, response);
 }
 
 } // namespace server
