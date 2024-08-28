@@ -11,15 +11,19 @@ MockLocationCon BuildLocationCon(
 	const std::string                          &index,
 	bool                                        autoindex,
 	const std::list<std::string>               &allowed_methods,
-	const std::pair<unsigned int, std::string> &redirect
+	const std::pair<unsigned int, std::string> &redirect,
+	const std::string                          &cgi_extension    = "",
+	const std::string                          &upload_directory = ""
 ) {
 	MockLocationCon loc;
-	loc.request_uri     = request_uri;
-	loc.alias           = alias;
-	loc.index           = index;
-	loc.autoindex       = autoindex;
-	loc.allowed_methods = allowed_methods;
-	loc.redirect        = redirect;
+	loc.request_uri      = request_uri;
+	loc.alias            = alias;
+	loc.index            = index;
+	loc.autoindex        = autoindex;
+	loc.allowed_methods  = allowed_methods;
+	loc.redirect         = redirect;
+	loc.cgi_extension    = cgi_extension;
+	loc.upload_directory = upload_directory;
 	return loc;
 }
 
@@ -37,9 +41,14 @@ MockDtoServerInfos BuildMockDtoServerInfos() {
 		BuildLocationCon("/www/", "", "index.html", true, allowed_methods, redirect_on);
 	MockLocationCon location3 = // alias_on
 		BuildLocationCon("/www/data/", "/var/www/", "index.html", true, allowed_methods, redirect);
+	MockLocationCon location4 = // cgi, upload_directory
+		BuildLocationCon(
+			"/web/", "", "index.htm", false, allowed_methods, redirect, ".php", "/data/"
+		);
 	locationlist.push_back(location1);
 	locationlist.push_back(location2);
 	locationlist.push_back(location3);
+	locationlist.push_back(location4);
 
 	// DTO server_info
 	MockDtoServerInfos     server_info;
@@ -72,15 +81,19 @@ void PrintNg() {
 }
 
 template <typename T>
-bool IsSame(const T &result, const T &expected) {
-	return result == expected;
+void IsSame(const T &a, const T &b, const char *file, int line) {
+	if (a != b) {
+		throw std::logic_error(std::string("Error at ") + file + ":" + std::to_string(line));
+	}
 }
+
+#define COMPARE(a, b) IsSame(a, b, __FILE__, __LINE__)
 
 using namespace http;
 
 int Test1() {
 	// request
-	const RequestLine request_line = {"GET", "/", "HTTP/1.1"}; // location1
+	const RequestLine request_line = {"GET", "/", "HTTP/1.1"};
 	HttpRequest       request;
 	request.request_line                = request_line;
 	request.header_fields["Host"]       = "localhost";
@@ -88,24 +101,25 @@ int Test1() {
 
 	MockDtoServerInfos    server_info = BuildMockDtoServerInfos();
 	CheckServerInfoResult result      = HttpServerInfoCheck::Check(server_info, request);
+	MockLocationCon       location    = *server_info.locations.begin(); // location1
 
-	bool is_same = true;
-	is_same &= IsSame(result.path, std::string("/"));
-	is_same &= IsSame(result.index, std::string("index.html"));
-	is_same &= IsSame(result.autoindex, false);
-	is_same &= IsSame(result.allowed_methods, result.allowed_methods);
-	is_same &= IsSame(result.cgi_extension, std::string(""));
-	is_same &= IsSame(result.upload_directory, std::string(""));
-	is_same &= IsSame(result.redirect_status_code, 0);
-	is_same &= IsSame(result.error_page.first, unsigned(404));
-	is_same &= IsSame(result.error_page.second, std::string("/404.html"));
-	is_same &= IsSame(result.status, CheckServerInfoResult::CONTINUE);
-	if (is_same) {
-		PrintOk();
-		return EXIT_FAILURE;
+	try {
+		COMPARE(result.path, location.request_uri);
+		COMPARE(result.index, location.index);
+		COMPARE(result.autoindex, location.autoindex);
+		COMPARE(result.allowed_methods, location.allowed_methods);
+		COMPARE(result.cgi_extension, location.cgi_extension);
+		COMPARE(result.upload_directory, location.upload_directory);
+		COMPARE(result.redirect_status_code, location.redirect.first);
+		COMPARE(result.error_page, server_info.error_page);
+		COMPARE(result.status, CheckServerInfoResult::CONTINUE);
+	} catch (const std::exception &e) {
+		PrintNg();
+		std::cerr << e.what() << '\n';
+		return EXIT_SUCCESS;
 	}
-	PrintNg();
-	return EXIT_SUCCESS;
+	PrintOk();
+	return EXIT_FAILURE;
 }
 
 int Test2() {
@@ -118,20 +132,22 @@ int Test2() {
 
 	MockDtoServerInfos    server_info = BuildMockDtoServerInfos();
 	CheckServerInfoResult result      = HttpServerInfoCheck::Check(server_info, request);
+	MockLocationCon       location =
+		*(std::next(server_info.locations.begin(), 1)); // location2(redirect)
 
-	bool is_same = true;
-	is_same &= IsSame(result.path, std::string("/www/"));
-	is_same &= IsSame(result.index, std::string("index.html"));
-	is_same &= IsSame(result.autoindex, true);
-	is_same &= IsSame(result.allowed_methods, result.allowed_methods);
-	is_same &= IsSame(result.cgi_extension, std::string(""));
-	is_same &= IsSame(result.upload_directory, std::string(""));
-	is_same &= IsSame(result.redirect_status_code, 301);
-	is_same &= IsSame(result.error_page.first, unsigned(404));
-	is_same &= IsSame(result.error_page.second, std::string("/404.html"));
-	is_same &= IsSame(result.status, CheckServerInfoResult::REDIRECT_ON);
-	if (is_same) {
+	try {
+		COMPARE(result.path, location.redirect.second);
+		COMPARE(result.index, location.index);
+		COMPARE(result.autoindex, location.autoindex);
+		COMPARE(result.allowed_methods, location.allowed_methods);
+		COMPARE(result.cgi_extension, location.cgi_extension);
+		COMPARE(result.upload_directory, location.upload_directory);
+		COMPARE(result.redirect_status_code, location.redirect.first);
+		COMPARE(result.error_page, server_info.error_page);
+		COMPARE(result.status, CheckServerInfoResult::REDIRECT_ON);
+	} catch (const std::exception &e) {
 		PrintNg();
+		std::cerr << e.what() << '\n';
 		return EXIT_FAILURE;
 	}
 	PrintOk();
@@ -140,30 +156,29 @@ int Test2() {
 
 int Test3() {
 	// request
-	const RequestLine request_line = {
-		"GET", "/www/data/test.html", "HTTP/1.1"
-	}; // location3 (alias)
-	HttpRequest request;
+	const RequestLine request_line = {"GET", "/www/data/test.html", "HTTP/1.1"};
+	HttpRequest       request;
 	request.request_line                = request_line;
 	request.header_fields["Host"]       = "localhost";
 	request.header_fields["Connection"] = "keep-alive";
 
 	MockDtoServerInfos    server_info = BuildMockDtoServerInfos();
 	CheckServerInfoResult result      = HttpServerInfoCheck::Check(server_info, request);
+	MockLocationCon location = *(std::next(server_info.locations.begin(), 2)); // location3 (alias)
 
-	bool is_same = true;
-	is_same &= IsSame(result.path, std::string("/var/www/"));
-	is_same &= IsSame(result.index, std::string("index.html"));
-	is_same &= IsSame(result.autoindex, true);
-	is_same &= IsSame(result.allowed_methods, result.allowed_methods);
-	is_same &= IsSame(result.cgi_extension, std::string(""));
-	is_same &= IsSame(result.upload_directory, std::string(""));
-	is_same &= IsSame(result.redirect_status_code, 0);
-	is_same &= IsSame(result.error_page.first, unsigned(404));
-	is_same &= IsSame(result.error_page.second, std::string("/404.html"));
-	is_same &= IsSame(result.status, CheckServerInfoResult::CONTINUE);
-	if (is_same) {
+	try {
+		COMPARE(result.path, location.alias + "test.html");
+		COMPARE(result.index, location.index);
+		COMPARE(result.autoindex, location.autoindex);
+		COMPARE(result.allowed_methods, location.allowed_methods);
+		COMPARE(result.cgi_extension, location.cgi_extension);
+		COMPARE(result.upload_directory, location.upload_directory);
+		COMPARE(result.redirect_status_code, location.redirect.first);
+		COMPARE(result.error_page, server_info.error_page);
+		COMPARE(result.status, CheckServerInfoResult::CONTINUE);
+	} catch (const std::exception &e) {
 		PrintNg();
+		std::cerr << e.what() << '\n';
 		return EXIT_FAILURE;
 	}
 	PrintOk();
