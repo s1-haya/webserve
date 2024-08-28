@@ -13,8 +13,10 @@ Message::Message(const Message &other) {
 
 Message &Message::operator=(const Message &other) {
 	if (this != &other) {
-		client_fd_  = other.client_fd_;
-		start_time_ = other.start_time_;
+		client_fd_   = other.client_fd_;
+		start_time_  = other.start_time_;
+		request_buf_ = other.request_buf_;
+		response_    = other.response_;
 	}
 	return *this;
 }
@@ -27,6 +29,23 @@ bool Message::IsTimeoutExceeded(double timeout_sec) const {
 
 int Message::GetFd() const {
 	return client_fd_;
+}
+
+const std::string &Message::GetRequestBuf() const {
+	return request_buf_;
+}
+
+const std::string &Message::GetResponse() const {
+	return response_;
+}
+
+// todo: Httpと繋がったら += ではなく = になる
+void Message::SetRequestBuf(const std::string &request_buf) {
+	request_buf_ += request_buf;
+}
+
+void Message::SetResponse(const std::string &response) {
+	response_ = response;
 }
 
 Message::Time Message::GetCurrentTime() {
