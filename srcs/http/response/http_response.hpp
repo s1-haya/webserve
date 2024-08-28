@@ -49,6 +49,7 @@ class HttpResponse {
 		const std::string &request_body_message,
 		std::string       &response_body_message
 	);
+	static void DeleteHandler(const std::string &path, std::string &response_body_message);
 
   private:
 	HttpResponse();

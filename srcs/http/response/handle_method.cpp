@@ -5,6 +5,7 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <unistd.h>
 
 namespace {
 
@@ -24,9 +25,6 @@ std::string ReadFile(const std::string &file_path) {
 	return FileToString(file);
 }
 
-// bool TryStat(const std::string& path, bool &is_success) {
-// }
-
 } // namespace
 
 // todo: 各メソッドを実行する関数
@@ -37,13 +35,13 @@ std::string ReadFile(const std::string &file_path) {
 
 namespace http {
 
-void HttpResponse::GetHandler(const std::string &path, std::string &body_message) {
+void HttpResponse::GetHandler(const std::string &path, std::string &response_body_message) {
 	try {
 		Stat info(path);
 		if (info.IsDirectory()) {
 			if (path[path.size() - 1] != '/') {
 				// todo: return stats_code pathname;
-				body_message = CreateDefaultBodyMessageFormat(
+				response_body_message = CreateDefaultBodyMessageFormat(
 					utils::ToString(http::MOVED_PERMANENTLY),
 					reason_phrase.at(http::MOVED_PERMANENTLY)
 				);
@@ -53,29 +51,29 @@ void HttpResponse::GetHandler(const std::string &path, std::string &body_message
 			// todo: if index and autoindex directive don't exist, it is created 403 forbidden.
 		} else if (info.IsRegularFile()) {
 			if (!info.IsReadableFile()) {
-				body_message = CreateDefaultBodyMessageFormat(
+				response_body_message = CreateDefaultBodyMessageFormat(
 					utils::ToString(http::FORBIDDEN), reason_phrase.at(http::FORBIDDEN)
 				);
 			} else {
-				body_message = ReadFile(path);
+				response_body_message = ReadFile(path);
 			}
 		} else {
-			body_message = CreateDefaultBodyMessageFormat(
+			response_body_message = CreateDefaultBodyMessageFormat(
 				utils::ToString(http::NOT_FOUND), reason_phrase.at(http::NOT_FOUND)
 			);
 		}
 	} catch (const utils::SystemException &e) {
 		int error_number = e.GetErrorNumber();
 		if (error_number == EACCES) {
-			body_message = CreateDefaultBodyMessageFormat(
+			response_body_message = CreateDefaultBodyMessageFormat(
 				utils::ToString(http::FORBIDDEN), reason_phrase.at(http::FORBIDDEN)
 			);
 		} else if (error_number == ENOENT || error_number == ENOTDIR) {
-			body_message = CreateDefaultBodyMessageFormat(
+			response_body_message = CreateDefaultBodyMessageFormat(
 				utils::ToString(http::NOT_FOUND), reason_phrase.at(http::NOT_FOUND)
 			);
 		} else {
-			body_message = CreateDefaultBodyMessageFormat(
+			response_body_message = CreateDefaultBodyMessageFormat(
 				utils::ToString(http::INTERNAL_SERVER_ERROR),
 				reason_phrase.at(http::INTERNAL_SERVER_ERROR)
 			);
@@ -156,12 +154,27 @@ void HttpResponse::PostHandler(
 	}
 }
 
-} // namespace http
+void HttpResponse::DeleteHandler(const std::string &path, std::string &response_body_message) {
+	if (unlink(path.c_str()) == 0) {
+		response_body_message = CreateDefaultBodyMessageFormat(
+			utils::ToString(http::NO_CONTENT), reason_phrase.at(http::NO_CONTENT)
+		);
+	} else {
+		if (errno == EACCES || errno == EISDIR || errno == EPERM) {
+			response_body_message = CreateDefaultBodyMessageFormat(
+				utils::ToString(http::FORBIDDEN), reason_phrase.at(http::FORBIDDEN)
+			);
+		} else if (errno == ENOENT || errno == ENOTDIR || errno == ENAMETOOLONG) {
+			response_body_message = CreateDefaultBodyMessageFormat(
+				utils::ToString(http::NOT_FOUND), reason_phrase.at(http::NOT_FOUND)
+			);
+		} else {
+			response_body_message = CreateDefaultBodyMessageFormat(
+				utils::ToString(http::INTERNAL_SERVER_ERROR),
+				reason_phrase.at(http::INTERNAL_SERVER_ERROR)
+			);
+		}
+	}
+}
 
-// todo: ExecuteDelete: リソースの削除
-// 成功した場合、204 No Content
-// -> 詳細を表示しない設定にするため
-// パスがディレクトリの場合(autoindexはon,
-// off関係なし): 403 Forbidden
-// ファイル権限がない場合: 403 Forbidden
-// 存在しないファイルの場合: 404 Not Found
+} // namespace http
