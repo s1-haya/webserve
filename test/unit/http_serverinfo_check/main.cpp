@@ -185,6 +185,38 @@ int Test3() {
 	return EXIT_SUCCESS;
 }
 
+int Test4() {
+	// request
+	const RequestLine request_line = {"GET", "/web/", "HTTP/1.1"};
+	HttpRequest       request;
+	request.request_line                = request_line;
+	request.header_fields["Host"]       = "localhost";
+	request.header_fields["Connection"] = "keep-alive";
+
+	MockDtoServerInfos    server_info = BuildMockDtoServerInfos();
+	CheckServerInfoResult result      = HttpServerInfoCheck::Check(server_info, request);
+	MockLocationCon       location =
+		*(std::next(server_info.locations.begin(), 3)); // location4 (cgi, upload_directory)
+
+	try {
+		COMPARE(result.path, location.request_uri);
+		COMPARE(result.index, location.index);
+		COMPARE(result.autoindex, location.autoindex);
+		COMPARE(result.allowed_methods, location.allowed_methods);
+		COMPARE(result.cgi_extension, location.cgi_extension);
+		COMPARE(result.upload_directory, location.upload_directory);
+		COMPARE(result.redirect_status_code, location.redirect.first);
+		COMPARE(result.error_page, server_info.error_page);
+		COMPARE(result.status, CheckServerInfoResult::CONTINUE);
+	} catch (const std::exception &e) {
+		PrintNg();
+		std::cerr << e.what() << '\n';
+		return EXIT_FAILURE;
+	}
+	PrintOk();
+	return EXIT_SUCCESS;
+}
+
 } // namespace
 
 int main() {
@@ -193,5 +225,6 @@ int main() {
 	ret |= Test1();
 	ret |= Test2();
 	ret |= Test3();
+	ret |= Test4();
 	return ret;
 }
