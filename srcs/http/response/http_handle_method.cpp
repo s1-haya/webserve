@@ -1,10 +1,10 @@
 #include "http_response.hpp"
 #include "stat.hpp"
 #include "system_exception.hpp"
-#include "utils.hpp"
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <cstring>
 
 namespace {
 
@@ -39,7 +39,7 @@ void HttpResponse::GetHandler(const std::string &path, std::string &response_bod
 		Stat info(path);
 		if (info.IsDirectory()) {
 			// No empty string because the path has '/'
-			if (path.back() != '/') {
+			if (path[path.size() - 1] != '/') {
 				response_body_message = CreateDefaultBodyMessageFormat(
 					utils::ToString(http::MOVED_PERMANENTLY),
 					reason_phrase.at(http::MOVED_PERMANENTLY)
