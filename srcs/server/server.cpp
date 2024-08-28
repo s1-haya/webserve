@@ -2,6 +2,7 @@
 #include "client_info.hpp"
 #include "dto_server_to_http.hpp"
 #include "event.hpp"
+#include "read.hpp"
 #include "server_info.hpp"
 #include "utils.hpp"
 #include "virtual_server.hpp"
@@ -139,7 +140,7 @@ void Server::HandleExistingConnection(const event::Event &event) {
 DtoClientInfos Server::GetClientInfos(int client_fd) const {
 	DtoClientInfos client_infos;
 	client_infos.fd          = client_fd;
-	client_infos.request_buf = buffers_.GetRequest(client_fd);
+	client_infos.request_buf = message_manager_.GetRequestBuf(client_fd);
 	client_infos.ip          = context_.GetClientIp(client_fd);
 	return client_infos;
 }
@@ -156,16 +157,17 @@ DtoServerInfos Server::GetServerInfos(int client_fd) const {
 }
 
 void Server::ReadRequest(int client_fd) {
-	ssize_t read_ret = buffers_.ReadRequest(client_fd);
-	if (read_ret <= 0) {
-		if (read_ret == SYSTEM_ERROR) {
-			throw std::runtime_error("read failed");
-		}
+	const Read::ReadResult read_result = Read::ReadRequest(client_fd);
+	if (!read_result.IsOk()) {
+		throw std::runtime_error("read failed");
+	}
+	if (read_result.GetValue().read_size == 0) {
 		// todo: need?
-		// buffers_.Delete(client_fd);
+		// message_manager_.DeleteMessage(client_fd);
 		// event_monitor_.Delete(client_fd);
 		return;
 	}
+	message_manager_.SetRequestBuf(client_fd, read_result.GetValue().read_buf);
 }
 
 void Server::RunHttp(const event::Event &event) {
@@ -183,13 +185,13 @@ void Server::RunHttp(const event::Event &event) {
 		return;
 	}
 	utils::Debug("server", "received all request from client", client_fd);
-	std::cerr << buffers_.GetRequest(client_fd) << std::endl;
-	buffers_.AddResponse(client_fd, http_result.response);
+	std::cerr << message_manager_.GetRequestBuf(client_fd) << std::endl;
+	message_manager_.SetResponse(client_fd, http_result.response);
 	event_monitor_.Update(event.fd, event::EVENT_WRITE);
 }
 
 void Server::SendResponse(int client_fd) {
-	const std::string &response = buffers_.GetResponse(client_fd);
+	const std::string &response = message_manager_.GetResponse(client_fd);
 
 	send(client_fd, response.c_str(), response.size(), 0);
 	utils::Debug("server", "send response to client", client_fd);
@@ -212,14 +214,13 @@ void Server::HandleTimeoutMessages() {
 	for (Itr it = timeout_fds.begin(); it != timeout_fds.end(); ++it) {
 		const int          client_fd        = *it;
 		const std::string &timeout_response = mock_http_.GetTimeoutResponse(client_fd);
-		buffers_.AddResponse(client_fd, timeout_response);
+		message_manager_.SetResponse(client_fd, timeout_response);
 		event_monitor_.Update(client_fd, event::EVENT_WRITE);
 	}
 }
 
 // delete from buffer, client_info, event, message
 void Server::Disconnect(int client_fd) {
-	buffers_.Delete(client_fd);
 	context_.DeleteClientInfo(client_fd);
 	event_monitor_.Delete(client_fd);
 	message_manager_.DeleteMessage(client_fd);
