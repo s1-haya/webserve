@@ -65,6 +65,8 @@ MockDtoServerInfos BuildMockDtoServerInfos() {
 	return server_info;
 }
 
+// ==================== Test汎用 ==================== //
+
 int GetTestCaseNum() {
 	static int test_case_num = 0;
 	++test_case_num;
@@ -90,6 +92,9 @@ void IsSame(const T &a, const T &b, const char *file, int line) {
 	}
 }
 
+/**
+ * @brief Output where is the error
+ */
 #define COMPARE(a, b) IsSame(a, b, __FILE__, __LINE__)
 
 template <class InputIt>
@@ -97,6 +102,8 @@ InputIt Next(InputIt it, typename std::iterator_traits<InputIt>::difference_type
 	std::advance(it, n);
 	return it;
 } // std::next for c++98
+
+// ================================================= //
 
 using namespace http;
 
