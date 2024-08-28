@@ -1,7 +1,6 @@
 #ifndef SERVER_SERVER_HPP_
 #define SERVER_SERVER_HPP_
 
-#include "buffer.hpp"
 #include "config_parse/context.hpp"
 #include "connection.hpp"
 #include "context_manager.hpp"
@@ -53,8 +52,6 @@ class Server {
 	Connection connection_;
 	// event poll
 	epoll::Epoll event_monitor_;
-	// request buffers
-	Buffer buffers_;
 	// http
 	http::MockHttp mock_http_;
 	// message manager with time control

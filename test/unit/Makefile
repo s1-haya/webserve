@@ -12,6 +12,7 @@ TEST_DIRS	:=	convert_str \
 				config_parse/lexer \
 				config_parse/parser \
 				config_parse \
+				custom_const_iterator \
 				stat \
 				method
 

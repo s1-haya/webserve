@@ -72,8 +72,9 @@ void Epoll::Delete(int socket_fd) {
 }
 
 int Epoll::CreateReadyList() {
-	errno           = 0;
-	const int ready = epoll_wait(epoll_fd_, evlist_, MAX_EVENTS, -1);
+	errno = 0;
+	// todo: set timeout(ms)
+	const int ready = epoll_wait(epoll_fd_, evlist_, MAX_EVENTS, 500);
 
 	if (ready == SYSTEM_ERROR) {
 		if (errno == EINTR) {
