@@ -2,6 +2,7 @@
 #include "utils.hpp"
 #include <cstdlib>
 #include <iostream>
+#include <sstream>
 
 namespace {
 
@@ -83,11 +84,19 @@ void PrintNg() {
 template <typename T>
 void IsSame(const T &a, const T &b, const char *file, int line) {
 	if (a != b) {
-		throw std::logic_error(std::string("Error at ") + file + ":" + std::to_string(line));
+		std::stringstream ss;
+		ss << line;
+		throw std::logic_error(std::string("Error at ") + file + ":" + ss.str());
 	}
 }
 
 #define COMPARE(a, b) IsSame(a, b, __FILE__, __LINE__)
+
+template <class InputIt>
+InputIt Next(InputIt it, typename std::iterator_traits<InputIt>::difference_type n = 1) {
+	std::advance(it, n);
+	return it;
+} // std::next for c++98
 
 using namespace http;
 
@@ -132,8 +141,7 @@ int Test2() {
 
 	MockDtoServerInfos    server_info = BuildMockDtoServerInfos();
 	CheckServerInfoResult result      = HttpServerInfoCheck::Check(server_info, request);
-	MockLocationCon       location =
-		*(std::next(server_info.locations.begin(), 1)); // location2(redirect)
+	MockLocationCon location = *(Next(server_info.locations.begin(), 1)); // location2(redirect)
 
 	try {
 		COMPARE(result.path, location.redirect.second);
@@ -164,7 +172,7 @@ int Test3() {
 
 	MockDtoServerInfos    server_info = BuildMockDtoServerInfos();
 	CheckServerInfoResult result      = HttpServerInfoCheck::Check(server_info, request);
-	MockLocationCon location = *(std::next(server_info.locations.begin(), 2)); // location3 (alias)
+	MockLocationCon       location = *(Next(server_info.locations.begin(), 2)); // location3 (alias)
 
 	try {
 		COMPARE(result.path, location.alias + "test.html");
@@ -196,7 +204,7 @@ int Test4() {
 	MockDtoServerInfos    server_info = BuildMockDtoServerInfos();
 	CheckServerInfoResult result      = HttpServerInfoCheck::Check(server_info, request);
 	MockLocationCon       location =
-		*(std::next(server_info.locations.begin(), 3)); // location4 (cgi, upload_directory)
+		*(Next(server_info.locations.begin(), 3)); // location4 (cgi, upload_directory)
 
 	try {
 		COMPARE(result.path, location.request_uri);
