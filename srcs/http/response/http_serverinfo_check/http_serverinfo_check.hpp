@@ -59,7 +59,7 @@ struct CheckServerInfoResult {
 	std::string            cgi_extension;
 	std::string            upload_directory;
 
-	int                                  redirect_status_code;
+	unsigned int                         redirect_status_code;
 	std::pair<unsigned int, std::string> error_page;
 	CheckStatus                          status;
 	CheckServerInfoResult() : autoindex(false), redirect_status_code(0), status(CONTINUE) {};
