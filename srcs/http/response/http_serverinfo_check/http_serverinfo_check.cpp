@@ -43,6 +43,9 @@ void HttpServerInfoCheck::CheckLocationList(
 	CheckAutoIndex(result, match_location);
 	CheckAlias(result, match_location);
 	CheckRedirect(result, match_location);
+	CheckAllowedMethods(result, match_location);
+	CheckCgiExtension(result, match_location);
+	CheckUploadDirectory(result, match_location);
 	return;
 }
 
