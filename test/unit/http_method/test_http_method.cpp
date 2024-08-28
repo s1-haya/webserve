@@ -108,15 +108,20 @@ int main(void) {
 	http::HttpResponse::DeleteHandler("not_found.txt", delete_test2_response_body_message);
 	ret_code |= HandleResult(delete_test2_response_body_message, expected_not_found);
 
-	// ディレクトリの場合
+	// ディレクトリ内にファイルが存在してる場合
 	std::string delete_test3_response_body_message;
 	http::HttpResponse::DeleteHandler("test", delete_test3_response_body_message);
 	ret_code |= HandleResult(delete_test3_response_body_message, expected_forbidden);
 
-	// 存在しないディレクトリの場合
+	// 　ディレクトリ内にファイルが存在してない場合
 	std::string delete_test4_response_body_message;
-	http::HttpResponse::DeleteHandler("not_found_directory", delete_test4_response_body_message);
-	ret_code |= HandleResult(delete_test4_response_body_message, expected_not_found);
+	http::HttpResponse::DeleteHandler("s", delete_test4_response_body_message);
+	ret_code |= HandleResult(delete_test4_response_body_message, expected_forbidden);
+
+	// 存在しないディレクトリの場合
+	std::string delete_test5_response_body_message;
+	http::HttpResponse::DeleteHandler("not_found_directory", delete_test5_response_body_message);
+	ret_code |= HandleResult(delete_test5_response_body_message, expected_not_found);
 
 	// 書き込み権限がないディレクトリの中にあるファイル場合(テストするときはローカルで書き込み権限を削除してください)
 	// std::string delete_test5_response_body_message;

@@ -100,25 +100,34 @@ void HttpResponse::PostHandler(
 }
 
 void HttpResponse::DeleteHandler(const std::string &path, std::string &response_body_message) {
-	if (unlink(path.c_str()) == 0) {
-		response_body_message = CreateDefaultBodyMessageFormat(
-			utils::ToString(http::NO_CONTENT), reason_phrase.at(http::NO_CONTENT)
-		);
-	} else {
-		if (errno == EACCES || errno == EISDIR || errno == EPERM) {
+	try {
+		Stat info(path);
+		if (info.IsDirectory()) {
 			response_body_message = CreateDefaultBodyMessageFormat(
 				utils::ToString(http::FORBIDDEN), reason_phrase.at(http::FORBIDDEN)
 			);
-		} else if (errno == ENOENT || errno == ENOTDIR || errno == ENAMETOOLONG) {
-			response_body_message = CreateDefaultBodyMessageFormat(
-				utils::ToString(http::NOT_FOUND), reason_phrase.at(http::NOT_FOUND)
-			);
+		} else if (std::remove(path.c_str()) != 0) {
+			if (errno == EACCES || errno == EPERM) {
+				response_body_message = CreateDefaultBodyMessageFormat(
+					utils::ToString(http::FORBIDDEN), reason_phrase.at(http::FORBIDDEN)
+				);
+			} else if (errno == ENOENT || errno == ENOTDIR || errno == ELOOP || errno == ENAMETOOLONG) {
+				response_body_message = CreateDefaultBodyMessageFormat(
+					utils::ToString(http::NOT_FOUND), reason_phrase.at(http::NOT_FOUND)
+				);
+			} else {
+				response_body_message = CreateDefaultBodyMessageFormat(
+					utils::ToString(http::INTERNAL_SERVER_ERROR),
+					reason_phrase.at(http::INTERNAL_SERVER_ERROR)
+				);
+			}
 		} else {
 			response_body_message = CreateDefaultBodyMessageFormat(
-				utils::ToString(http::INTERNAL_SERVER_ERROR),
-				reason_phrase.at(http::INTERNAL_SERVER_ERROR)
+				utils::ToString(http::NO_CONTENT), reason_phrase.at(http::NO_CONTENT)
 			);
 		}
+	} catch (const utils::SystemException &e) {
+		HandleSystemException(e, response_body_message);
 	}
 }
 
