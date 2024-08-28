@@ -114,4 +114,22 @@ void HttpServerInfoCheck::CheckRedirect(
 	result.status               = CheckServerInfoResult::REDIRECT_ON;
 }
 
+void HttpServerInfoCheck::CheckAllowedMethods(
+	CheckServerInfoResult &result, const MockLocationCon &location
+) {
+	result.allowed_methods = location.allowed_methods;
+}
+
+void HttpServerInfoCheck::CheckCgiExtension(
+	CheckServerInfoResult &result, const MockLocationCon &location
+) {
+	result.cgi_extension = location.cgi_extension;
+}
+
+void HttpServerInfoCheck::CheckUploadDirectory(
+	CheckServerInfoResult &result, const MockLocationCon &location
+) {
+	result.cgi_extension = location.cgi_extension;
+}
+
 } // namespace http

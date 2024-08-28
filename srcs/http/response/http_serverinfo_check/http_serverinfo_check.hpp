@@ -16,6 +16,8 @@ struct MockLocationCon { /*一部serverで未実装*/
 	bool                                 autoindex;
 	std::list<std::string>               allowed_methods;
 	std::pair<unsigned int, std::string> redirect; // cannot use return
+	std::string                          cgi_extension;
+	std::string                          upload_directory;
 	MockLocationCon() : autoindex(false) {}
 };
 
@@ -87,6 +89,10 @@ class HttpServerInfoCheck {
 	static void CheckAutoIndex(CheckServerInfoResult &result, const MockLocationCon &location);
 	static void CheckAlias(CheckServerInfoResult &result, const MockLocationCon &location);
 	static void CheckRedirect(CheckServerInfoResult &result, const MockLocationCon &location);
+	static void CheckAllowedMethods(CheckServerInfoResult &result, const MockLocationCon &location);
+	static void CheckCgiExtension(CheckServerInfoResult &result, const MockLocationCon &location);
+	static void
+	CheckUploadDirectory(CheckServerInfoResult &result, const MockLocationCon &location);
 
   public:
 	static CheckServerInfoResult Check(const MockDtoServerInfos &server_info, HttpRequest &request);
