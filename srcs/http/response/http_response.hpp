@@ -23,20 +23,45 @@ struct HttpResponseResult {
 	std::string  body_message;
 };
 
+// HttpResponse {
+// public:
+//   static std::string Run(HttpRequestResult)
+//   static std::string CreateTimeoutRequestResponse(HttpRequestResult)
+//   static std::string CreateInternalServerErrorResponse(HttpRequestResult)
+//  private:
+//   static std::string        CreateHttpResponseFormat(const HttpResponseResult &response);
+//   static HttpResponseResult CreateHttpResponseResult(const HttpRequestResult &request_info);
+//   static HttpResponseResult CreateSuccessHttpResponseResult(const HttpRequestResult
+//   &request_info);
+//   static HttpResponseResult CreateErrorHttpResponseResult(const HttpRequestResult
+//   &request_info);
+//    GetTimeoutRequestBodyMessage();
+//    GetInternalServerErrorBodyMessage();
+// };
+
 class HttpResponse {
   public:
-	static std::string CreateHttpResponse(const HttpResponseResult &response);
-	// feature private
-	static HttpResponseResult CreateHttpResponseResult(const HttpRequestResult &request_info);
-	static HttpResponseResult CreateErrorHttpResponseResult(const HttpRequestResult &request_info);
-	static void               GetHandler(const std::string &path, std::string &body_message);
+	typedef std::map<StatusCode, std::string> ReasonPhrase;
+	static std::string                        Run(const HttpRequestResult &request_info);
+	static void GetHandler(const std::string &path, std::string &body_message);
+	static void PostHandler(
+		const std::string &path,
+		const std::string &request_body_message,
+		std::string       &response_body_message
+	);
 
   private:
 	HttpResponse();
 	~HttpResponse();
 
-	static std::string
-	CreateErrorBodyMessage(const std::string &status_code, const std::string &reason_phrase);
+	static std::string        CreateHttpResponseFormat(const HttpResponseResult &response);
+	static HttpResponseResult CreateHttpResponseResult(const HttpRequestResult &request_info);
+	static HttpResponseResult CreateSuccessHttpResponseResult(const HttpRequestResult &request_info
+	);
+	static HttpResponseResult CreateErrorHttpResponseResult(const HttpRequestResult &request_info);
+	static std::string        CreateDefaultBodyMessageFormat(
+			   const std::string &status_code, const std::string &reason_phrase
+		   );
 };
 
 } // namespace http

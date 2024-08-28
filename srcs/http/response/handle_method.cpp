@@ -43,7 +43,7 @@ void HttpResponse::GetHandler(const std::string &path, std::string &body_message
 		if (info.IsDirectory()) {
 			if (path[path.size() - 1] != '/') {
 				// todo: return stats_code pathname;
-				body_message = CreateErrorBodyMessage(
+				body_message = CreateDefaultBodyMessageFormat(
 					utils::ToString(http::MOVED_PERMANENTLY),
 					reason_phrase.at(http::MOVED_PERMANENTLY)
 				);
@@ -53,29 +53,102 @@ void HttpResponse::GetHandler(const std::string &path, std::string &body_message
 			// todo: if index and autoindex directive don't exist, it is created 403 forbidden.
 		} else if (info.IsRegularFile()) {
 			if (!info.IsReadableFile()) {
-				body_message = CreateErrorBodyMessage(
+				body_message = CreateDefaultBodyMessageFormat(
 					utils::ToString(http::FORBIDDEN), reason_phrase.at(http::FORBIDDEN)
 				);
 			} else {
 				body_message = ReadFile(path);
 			}
 		} else {
-			body_message = CreateErrorBodyMessage(
+			body_message = CreateDefaultBodyMessageFormat(
 				utils::ToString(http::NOT_FOUND), reason_phrase.at(http::NOT_FOUND)
 			);
 		}
 	} catch (const utils::SystemException &e) {
 		int error_number = e.GetErrorNumber();
 		if (error_number == EACCES) {
-			body_message = CreateErrorBodyMessage(
+			body_message = CreateDefaultBodyMessageFormat(
 				utils::ToString(http::FORBIDDEN), reason_phrase.at(http::FORBIDDEN)
 			);
 		} else if (error_number == ENOENT || error_number == ENOTDIR) {
-			body_message = CreateErrorBodyMessage(
+			body_message = CreateDefaultBodyMessageFormat(
 				utils::ToString(http::NOT_FOUND), reason_phrase.at(http::NOT_FOUND)
 			);
 		} else {
-			body_message = CreateErrorBodyMessage(
+			body_message = CreateDefaultBodyMessageFormat(
+				utils::ToString(http::INTERNAL_SERVER_ERROR),
+				reason_phrase.at(http::INTERNAL_SERVER_ERROR)
+			);
+		}
+	}
+}
+
+void HttpResponse::PostHandler(
+	const std::string &path,
+	const std::string &request_body_message,
+	std::string       &response_body_message
+) {
+	try {
+		Stat info(path);
+		if (info.IsDirectory()) {
+			response_body_message = CreateDefaultBodyMessageFormat(
+				utils::ToString(http::FORBIDDEN), reason_phrase.at(http::FORBIDDEN)
+			);
+		} else if (info.IsRegularFile()) {
+			response_body_message = CreateDefaultBodyMessageFormat(
+				utils::ToString(http::NO_CONTENT), reason_phrase.at(http::NO_CONTENT)
+			);
+		} else {
+			// Location header fields: URI-reference
+			// ex) POST /save/test.txt HTTP/1.1
+			// Location: /save/test.txt;
+			std::ofstream file(path.c_str(), std::ios::binary);
+			if (file.fail()) {
+				response_body_message = CreateDefaultBodyMessageFormat(
+					utils::ToString(http::INTERNAL_SERVER_ERROR),
+					reason_phrase.at(http::INTERNAL_SERVER_ERROR)
+				);
+				return;
+			}
+			response_body_message = CreateDefaultBodyMessageFormat(
+				utils::ToString(http::CREATED), reason_phrase.at(http::CREATED)
+			);
+			file.write(request_body_message.c_str(), request_body_message.length());
+			if (file.fail()) {
+				response_body_message = CreateDefaultBodyMessageFormat(
+					utils::ToString(http::INTERNAL_SERVER_ERROR),
+					reason_phrase.at(http::INTERNAL_SERVER_ERROR)
+				);
+			}
+		}
+	} catch (const utils::SystemException &e) {
+		int error_number = e.GetErrorNumber();
+		if (error_number == EACCES) {
+			response_body_message = CreateDefaultBodyMessageFormat(
+				utils::ToString(http::FORBIDDEN), reason_phrase.at(http::FORBIDDEN)
+			);
+		} else if (error_number == ENOENT || error_number == ENOTDIR) {
+			// todo: CreateFile();
+			std::ofstream file(path.c_str(), std::ios::binary);
+			if (file.fail()) {
+				response_body_message = CreateDefaultBodyMessageFormat(
+					utils::ToString(http::INTERNAL_SERVER_ERROR),
+					reason_phrase.at(http::INTERNAL_SERVER_ERROR)
+				);
+				return;
+			}
+			response_body_message = CreateDefaultBodyMessageFormat(
+				utils::ToString(http::CREATED), reason_phrase.at(http::CREATED)
+			);
+			file.write(request_body_message.c_str(), request_body_message.length());
+			if (file.fail()) {
+				response_body_message = CreateDefaultBodyMessageFormat(
+					utils::ToString(http::INTERNAL_SERVER_ERROR),
+					reason_phrase.at(http::INTERNAL_SERVER_ERROR)
+				);
+			}
+		} else {
+			response_body_message = CreateDefaultBodyMessageFormat(
 				utils::ToString(http::INTERNAL_SERVER_ERROR),
 				reason_phrase.at(http::INTERNAL_SERVER_ERROR)
 			);
@@ -84,12 +157,6 @@ void HttpResponse::GetHandler(const std::string &path, std::string &body_message
 }
 
 } // namespace http
-
-// todo: ExecutePost: ボディメッセージをリソースに書き込む。ファイルアップロード
-// パスがディレクトリの場合(autoindexはon, off関係なし): 403 Forbidden
-// ファイル権限がない場合: 403 Forbidden
-// 存在しないファイルの場合: 404 Not Found
-// ファイルの書き込みが失敗した場合: 500 Internal Server Error
 
 // todo: ExecuteDelete: リソースの削除
 // 成功した場合、204 No Content

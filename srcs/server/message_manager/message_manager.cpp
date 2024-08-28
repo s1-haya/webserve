@@ -19,59 +19,75 @@ MessageManager &MessageManager::operator=(const MessageManager &other) {
 
 void MessageManager::AddNewMessage(int client_fd) {
 	message::Message message(client_fd);
-	messages_.push_back(message);
+	// todo: add logic_error
+	messages_.insert(std::make_pair(client_fd, message));
 }
 
-// todo: map併用して高速化する？
+void MessageManager::AddNewMessage(int client_fd, const std::string &request_buf) {
+	message::Message message(client_fd, request_buf);
+	// todo: add logic_error
+	messages_.insert(std::make_pair(client_fd, message));
+}
+
 // Remove one message that matches fd from the beginning of MessageList.
 void MessageManager::DeleteMessage(int client_fd) {
-	typedef MessageList::iterator Itr;
-	for (Itr it = messages_.begin(); it != messages_.end(); ++it) {
-		const message::Message &message = *it;
-		if (message.GetFd() == client_fd) {
-			messages_.erase(it);
-			return;
-		}
-	}
+	messages_.erase(client_fd);
 }
 
-// Look from the beginning of the MessageList,
-// delete all messages that have timed out, and return TimeoutFds list.
-// ex)
-//   before: MessageList{3,4,5}
-//   (if timeout fd 3,4)
-//   return: TimeoutFds{3,4}
-//   after : MessageList{5}
-MessageManager::TimeoutFds MessageManager::GetTimeoutFds(double timeout) {
+MessageManager::TimeoutFds MessageManager::GetNewTimeoutFds(double timeout) {
 	TimeoutFds timeout_fds_;
 
-	typedef MessageList::iterator Itr;
-	Itr                           it = messages_.begin();
-	while (it != messages_.end()) {
-		const message::Message &message = *it;
-		if (!message.IsTimeoutExceeded(timeout)) {
-			break;
+	typedef MessageMap::iterator Itr;
+	for (Itr it = messages_.begin(); it != messages_.end();) {
+		message::Message &message = it->second;
+		if (message.IsNewTimeoutExceeded(timeout)) {
+			timeout_fds_.push_back(message.GetFd());
+			message.SetTimeout();
 		}
-		timeout_fds_.push_back(message.GetFd());
-		it = messages_.erase(it);
+		++it;
 	}
 	return timeout_fds_;
 }
 
-// todo:
-//   connection keep用。残request_bufなど保持するようになったら変更する。
-//   まだServerからは呼ばれていない、unit testだけある
-// Remove one message from the beginning and add a new message to the end.
+// For Connection: keep-alive
+// Copy only the read_buf from the old message, delete the old message, and add it as a new message.
 void MessageManager::UpdateMessage(int client_fd) {
-	typedef MessageList::iterator Itr;
-	for (Itr it = messages_.begin(); it != messages_.end(); ++it) {
-		const message::Message &message = *it;
-		if (message.GetFd() == client_fd) {
-			messages_.erase(it);
-			AddNewMessage(client_fd);
-			return;
-		}
-	}
+	const message::Message &old_message = messages_.at(client_fd);
+	const std::string       request_buf = old_message.GetRequestBuf();
+	DeleteMessage(client_fd);
+	AddNewMessage(client_fd, request_buf);
+}
+
+message::ConnectionState MessageManager::GetConnectionState(int client_fd) const {
+	const message::Message &message = messages_.at(client_fd);
+	return message.GetConnectionState();
+}
+
+const std::string &MessageManager::GetRequestBuf(int client_fd) const {
+	const message::Message &message = messages_.at(client_fd);
+	return message.GetRequestBuf();
+}
+
+const std::string &MessageManager::GetResponse(int client_fd) const {
+	const message::Message &message = messages_.at(client_fd);
+	return message.GetResponse();
+}
+
+void MessageManager::AddRequestBuf(int client_fd, const std::string &request_buf) {
+	message::Message &message = messages_.at(client_fd);
+	message.AddRequestBuf(request_buf);
+}
+
+void MessageManager::SetNewRequestBuf(int client_fd, const std::string &request_buf) {
+	message::Message &message = messages_.at(client_fd);
+	message.SetNewRequestBuf(request_buf);
+}
+
+void MessageManager::SetResponse(
+	int client_fd, message::ConnectionState connection_state, const std::string &response
+) {
+	message::Message &message = messages_.at(client_fd);
+	message.SetResponse(connection_state, response);
 }
 
 } // namespace server

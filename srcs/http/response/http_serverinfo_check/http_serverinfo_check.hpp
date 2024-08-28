@@ -55,7 +55,7 @@ struct CheckServerInfoResult {
 	std::string error_page_path;
 	int         error_status_code; // error_pageで指定 まとめる？
 	CheckStatus status;
-	CheckServerInfoResult() : autoindex(false), status_code(0), error_status_code(0), status(OK) {};
+	CheckServerInfoResult() : autoindex(false), status_code(0), error_status_code(0), status(OK){};
 };
 
 class HttpServerInfoCheck {

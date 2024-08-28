@@ -30,9 +30,9 @@ void Client::SendRequestAndReceiveResponse(const std::string &message) {
 	send(sock_fd_, message.c_str(), message.size(), 0);
 	DebugPrint("Message sent.");
 
+	DebugPrint("Response from server:");
 	// receive response
-	char        buffer[BUFFER_SIZE];
-	std::string response;
+	char buffer[BUFFER_SIZE];
 	while (true) {
 		ssize_t read_ret = read(sock_fd_, buffer, BUFFER_SIZE);
 		if (read_ret == SYSTEM_ERROR) {
@@ -41,10 +41,9 @@ void Client::SendRequestAndReceiveResponse(const std::string &message) {
 		if (read_ret == 0) {
 			break;
 		}
-		response.append(std::string(buffer, read_ret));
+		const std::string response = std::string(buffer, read_ret);
+		std::cout << response << std::endl;
 	}
-	DebugPrint("Response from server:");
-	std::cout << response << std::endl;
 }
 
 void Client::Init() {
