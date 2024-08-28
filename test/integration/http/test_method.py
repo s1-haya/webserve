@@ -14,7 +14,7 @@ def test_ok() -> None:
         assert_body(response, "./html/index.html")
         con.close()
     except HTTPException as e:
-        print(f"Request faild: {e}")
+        print(f"Request failed: {e}")
 
 
 def test_ok_in_sub_directory() -> None:
@@ -27,7 +27,7 @@ def test_ok_in_sub_directory() -> None:
         assert_body(response, "./html/sub/index.html")
         con.close()
     except HTTPException as e:
-        print(f"Request faild: {e}")
+        print(f"Request failed: {e}")
 
 
 def test_not_found() -> None:
@@ -40,4 +40,4 @@ def test_not_found() -> None:
         assert_body(response, "./html/404.html")
         con.close()
     except HTTPException as e:
-        print(f"Request faild: {e}")
+        print(f"Request failed: {e}")
