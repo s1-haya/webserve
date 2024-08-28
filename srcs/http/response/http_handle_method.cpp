@@ -1,10 +1,10 @@
 #include "http_response.hpp"
 #include "stat.hpp"
 #include "system_exception.hpp"
+#include <cstring>
 #include <fstream>
 #include <iostream>
 #include <sstream>
-#include <cstring>
 
 namespace {
 

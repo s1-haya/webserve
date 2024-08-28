@@ -115,7 +115,7 @@ int main(void) {
 
 	// 　ディレクトリ内にファイルが存在してない場合
 	std::string delete_test4_response_body_message;
-	http::HttpResponse::DeleteHandler("s", delete_test4_response_body_message);
+	http::HttpResponse::DeleteHandler("test/s", delete_test4_response_body_message);
 	ret_code |= HandleResult(delete_test4_response_body_message, expected_forbidden);
 
 	// 存在しないディレクトリの場合
