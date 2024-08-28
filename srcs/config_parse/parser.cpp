@@ -3,7 +3,6 @@
 #include "result.hpp"
 #include "utils.hpp"
 #include <algorithm>
-#include <cstdlib> // atoi
 #include <stdexcept>
 
 namespace config {
