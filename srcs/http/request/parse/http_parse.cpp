@@ -98,13 +98,13 @@ void HttpParse::ParseBodyMessage(HttpRequestParsedData &data) {
 	}
 	// todo: HttpRequestParsedDataクラスでcontent_lengthを保持？
 	// why: ParseBodyMessageが呼ばれるたびにcontent_lengthを変換するのを避けるため
-	size_t content_length;
-	if (!utils::ConvertStrToSize(
-			data.request_result.request.header_fields[CONTENT_LENGTH], content_length
-		)) {
+	const utils::Result<std::size_t> convert_result =
+		utils::ConvertStrToSize(data.request_result.request.header_fields[CONTENT_LENGTH]);
+	if (!convert_result.IsOk()) {
 		throw HttpParseException("Error: wrong Content-Length number", BAD_REQUEST);
 	}
-	size_t readable_content_length =
+	const size_t content_length = convert_result.GetValue();
+	size_t       readable_content_length =
 		content_length - data.request_result.request.body_message.size();
 	if (data.current_buf.size() >= readable_content_length) {
 		data.request_result.request.body_message +=
@@ -118,6 +118,7 @@ void HttpParse::ParseBodyMessage(HttpRequestParsedData &data) {
 }
 
 void HttpParse::TmpRun(HttpRequestParsedData &data) {
+	// todo: 外側でHttpParse::TmpRunを呼ぶため try, catchを削除する
 	try {
 		ParseRequestLine(data);
 		ParseHeaderFields(data);
@@ -130,7 +131,7 @@ void HttpParse::TmpRun(HttpRequestParsedData &data) {
 // todo: tmp request_
 HttpRequestResult HttpParse::Run(const std::string &read_buf) {
 	HttpRequestResult result;
-	// a: [request_line ＋ header_fields, messagebody]
+	// a: [request_line ＋ header_fields, message-body]
 	// b: [request_line, header_fields]
 	std::vector<std::string> a = utils::SplitStr(read_buf, HEADER_FIELDS_END);
 	std::vector<std::string> b = utils::SplitStr(a[0], CRLF);
@@ -200,9 +201,9 @@ void HttpParse::CheckValidMethod(const std::string &method) {
 	}
 }
 
-void HttpParse::CheckValidRequestTarget(const std::string &reqest_target) {
+void HttpParse::CheckValidRequestTarget(const std::string &request_target) {
 	// /が先頭になかったら場合 -> 400
-	if (reqest_target.empty() || reqest_target[0] != '/') {
+	if (request_target.empty() || request_target[0] != '/') {
 		throw HttpParseException(
 			"Error: the request target is missing the '/' character at the beginning", BAD_REQUEST
 		);
@@ -238,6 +239,6 @@ StatusCode HttpParse::HttpParseException::GetStatusCode() const {
 }
 
 // status_line && header
-// messagebody
+// message-body
 
 } // namespace http

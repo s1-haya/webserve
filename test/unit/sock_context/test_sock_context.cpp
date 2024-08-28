@@ -165,7 +165,7 @@ void AddClientInfoForTest(
 }
 
 // test用にcontextとexpectedから同じclientを削除する
-void DeleteClinetInfoForTest(
+void DeleteClientInfoForTest(
 	server::SockContext                    &context,
 	server::SockContext::ClientInfoMap     &expected_client_info,
 	server::SockContext::HostServerInfoMap &expected_host_server_info,
@@ -277,7 +277,7 @@ int RunTestSockContext() {
 	// - ServerInfoMap     = {{4, ServerInfo1}, {5, ServerInfo2}}
 	// - ClientInfoMap     = {{7, ClientInfo2}}
 	// - HostServerInfoMap = {{7, ServerInfo2*}}
-	DeleteClinetInfoForTest(context, expected_client_info, expected_host_server_info, client_fd1);
+	DeleteClientInfoForTest(context, expected_client_info, expected_host_server_info, client_fd1);
 	// 削除後にgetterを使用し,期待通りthrowされるか確認 (todo: getterがthrowするなら必要なテスト)
 	ret_code |= TestThrow(&server::SockContext::GetClientInfo, context, client_fd1);
 	ret_code |= TestThrow(&server::SockContext::GetConnectedServerInfo, context, client_fd1);

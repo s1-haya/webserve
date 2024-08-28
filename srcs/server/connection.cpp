@@ -40,14 +40,13 @@ Connection::AddrInfo *Connection::GetAddrInfoList(const ServerInfo &server_info)
 	return result;
 }
 
-// todo: return Result<int, err>?
-int Connection::TryBind(AddrInfo *addrinfo) const {
-	// todo: init 0?
-	int server_fd = -1;
+Connection::BindResult Connection::TryBind(AddrInfo *addrinfo) const {
+	BindResult bind_result(false, -1);
 
 	for (; addrinfo != NULL; addrinfo = addrinfo->ai_next) {
 		// socket
-		server_fd = socket(addrinfo->ai_family, addrinfo->ai_socktype, addrinfo->ai_protocol);
+		const int server_fd =
+			socket(addrinfo->ai_family, addrinfo->ai_socktype, addrinfo->ai_protocol);
 		if (server_fd == SYSTEM_ERROR) {
 			continue;
 		}
@@ -66,19 +65,20 @@ int Connection::TryBind(AddrInfo *addrinfo) const {
 			continue;
 		}
 		// bind success
-		return server_fd;
+		bind_result.Set(true, server_fd);
+		break;
 	}
-	// failed
-	return SYSTEM_ERROR;
+	return bind_result;
 }
 
 int Connection::Connect(ServerInfo &server_info) {
-	AddrInfo *addrinfo_list = GetAddrInfoList(server_info);
-	const int server_fd     = TryBind(addrinfo_list);
+	AddrInfo        *addrinfo_list = GetAddrInfoList(server_info);
+	const BindResult bind_result   = TryBind(addrinfo_list);
 	freeaddrinfo(addrinfo_list);
-	if (server_fd == SYSTEM_ERROR) {
+	if (!bind_result.IsOk()) {
 		throw std::runtime_error("bind failed");
 	}
+	const int server_fd = bind_result.GetValue();
 
 	// todo / listen() : set an appropriate backlog value
 	// listen
@@ -96,17 +96,15 @@ ClientInfo Connection::Accept(int server_fd) {
 	struct sockaddr_storage client_sock_addr;
 	socklen_t               addrlen = sizeof(client_sock_addr);
 	const int client_fd = accept(server_fd, (struct sockaddr *)&client_sock_addr, &addrlen);
+	if (client_fd == SYSTEM_ERROR) {
+		throw std::runtime_error("accept failed");
+	}
 
 	// create new client struct
 	ClientInfo client_info(client_fd, client_sock_addr);
 	utils::Debug(
 		"server", "new ClientInfo created. IP: " + client_info.GetIp() + ", fd", client_fd
 	);
-
-	// todo: need?
-	// if (client_fd == SYSTEM_ERROR) {
-	// 	throw std::runtime_error("accept failed");
-	// }
 	return client_info;
 }
 

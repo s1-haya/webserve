@@ -8,6 +8,50 @@ TmpHttp::TmpHttp() {}
 
 TmpHttp::~TmpHttp() {}
 
+// HttpResult Run(client_info, server_info) {
+// 	// todo: ParseHttpRequestFormat
+// 	// 	return HttpParsedRequestResult
+// 	// - パースしたデータ
+// 	// - 成功したかどうか
+// 	ParseHttpRequestFormat(int client_fd, const std::string &read_buf);
+// 	// todo: check is_parse
+// 	if (!(HttpParsedRequestResult.is_success)) {
+// 		HttpResult.result = CreateErrorHttpResponse(fd);
+// 		HttpResult.is_complete = true;
+// 		return HttpResult;
+// 	}
+// 	// private IsComplete;
+// 	if (IsComplete(fd)) {
+// 		HttpResult.result = CreateHttpResponse(fd);
+// 		HttpResult.is_complete = true;
+// 	}
+// 	return HttpResult;
+// }
+
+// todo:
+// HttpParsedRequestResult TmpHttp::ParseHttpRequestFormat(int client_fd, const std::string
+// &read_buf) {
+// HttpParsedRequestResult result;
+// try {
+// result = HttpParse::TmpRun(save_data);
+// } catch () {
+// result.is_success = false;
+// }
+// return HttpParsedRequestResult;
+// }
+
+// std::string CreateTimeoutRequest(client_fd) {
+// 	HttpRequestParsedData data = storage_.GetClientSaveData(client_fd);
+// 	storage_.DeleteClientSaveData(client_fd);
+// 	return HttpResponse::CreateTimeoutRequest(data.request_result);
+// }
+
+// std::string CreateInternalServerError(client_fd)
+// 	HttpRequestParsedData data = storage_.GetClientSaveData(client_fd);
+// 	storage_.DeleteClientSaveData(client_fd);
+// 	return HttpResponse::CreateInternalServerError(data.request_result);
+// }
+
 // todo: クライアントのリクエスト情報を読み込む
 void TmpHttp::ParseHttpRequestFormat(int client_fd, const std::string &read_buf) {
 	HttpRequestParsedData save_data = storage_.GetClientSaveData(client_fd);
@@ -19,20 +63,17 @@ void TmpHttp::ParseHttpRequestFormat(int client_fd, const std::string &read_buf)
 // todo: レスポンスを作成する
 std::string TmpHttp::CreateHttpResponse(int client_fd) {
 	HttpRequestParsedData data = storage_.GetClientSaveData(client_fd);
-	HttpResponseResult    response;
-	if (data.request_result.status_code == OK) {
-		// todo: リクエスト情報が正しいかどうかを確認する。
-		// HttpResponseParsedData data = HttpResponseParse(const HttpRequestParsedData& data,
-		// VirtualServer server);
-		// todo: 引数はHttpResponseParsedDataになる。
-		response = HttpResponse::CreateHttpResponseResult(data.request_result);
-	} else {
-		// todo: ステータスコードがOK以外の場合はCreateErrorResponseResult(data.request_result)
-		response = HttpResponse::CreateErrorHttpResponseResult(data.request_result);
-	}
 	storage_.DeleteClientSaveData(client_fd);
-	return HttpResponse::CreateHttpResponse(response);
+	return HttpResponse::Run(data.request_result);
 }
+
+// todo: パースで失敗した時
+// std::string TmpHttp::CreateRequestParsedErrorHttpResponse(int client_fd) {
+// 	HttpRequestParsedData data = storage_.GetClientSaveData(client_fd);
+// 	storage_.DeleteClientSaveData(client_fd);
+// ? Runではなくリクエストパースが失敗したようのレスポンスの方が良き？？
+// 	return HttpResponse::Run(data.request_result);
+// }
 
 // todo: HTTPRequestの書式が完全かどうか(どのように取得するかは要検討)
 bool TmpHttp::GetIsHttpRequestFormatComplete(int client_fd) {

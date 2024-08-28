@@ -7,6 +7,18 @@
 
 namespace http {
 
+// todo: server
+// Http class {
+// public
+// - Run: リクエスト受信からクライアント作成まで
+// - TimeOut: クライアントのリクエストが一定時間送信されない時
+// - InternalServer: システムコール等が失敗した場合
+
+// private
+// - HttpRequest
+// - HttpResponse
+// }
+
 class TmpHttp {
   public:
 	TmpHttp();

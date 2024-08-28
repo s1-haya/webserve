@@ -4,6 +4,7 @@ TEST_DIRS	:=	convert_str \
 				http \
 				http_parse \
 				http_storage \
+				http_serverinfo_check \
 				sock_context \
 				split_str \
 				virtual_server \
@@ -11,6 +12,7 @@ TEST_DIRS	:=	convert_str \
 				config_parse/lexer \
 				config_parse/parser \
 				config_parse \
+				custom_const_iterator \
 				stat \
 				method
 
