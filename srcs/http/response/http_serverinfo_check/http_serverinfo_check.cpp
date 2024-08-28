@@ -130,7 +130,7 @@ void HttpServerInfoCheck::CheckCgiExtension(
 void HttpServerInfoCheck::CheckUploadDirectory(
 	CheckServerInfoResult &result, const MockLocationCon &location
 ) {
-	result.cgi_extension = location.cgi_extension;
+	result.upload_directory = location.upload_directory;
 }
 
 } // namespace http
