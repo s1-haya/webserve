@@ -52,7 +52,7 @@ class Parser {
 
 	static const int PORT_MIN        = 1024;
 	static const int PORT_MAX        = 65535;
-	static const int STATUS_CODE_MIN = 100;
+	static const int STATUS_CODE_MIN = 300;
 	static const int STATUS_CODE_MAX = 599;
 
 	/* For duplicated parameter */
