@@ -68,13 +68,13 @@ int Test1() {
 	CheckServerInfoResult result      = HttpServerInfoCheck::Check(server_info, request);
 	std::cout << "status: " << std::boolalpha << result.status << std::endl;
 	std::cout << "path: " << result.path << std::endl;
-	std::cout << "status_code: " << result.status_code << std::endl;
+	std::cout << "redirect_status_code: " << result.redirect_status_code << std::endl;
 	std::cout << "index: " << result.index << std::endl;
 	std::cout << "autoindex: " << std::boolalpha << result.autoindex << std::endl;
-	std::cout << "error_page_code: " << result.error_status_code << std::endl;
-	std::cout << "error_page_path: " << result.error_page_path << std::endl;
+	std::cout << "error_page_code: " << result.error_page.first << std::endl;
+	std::cout << "error_page_path: " << result.error_page.second << std::endl;
 	std::cout << std::endl;
-	if (result.status != CheckServerInfoResult::OK &&
+	if (result.status != CheckServerInfoResult::CONTINUE &&
 		result.status != CheckServerInfoResult::REDIRECT_ON) {
 		return EXIT_FAILURE;
 	}
@@ -93,13 +93,13 @@ int Test2() {
 	CheckServerInfoResult result      = HttpServerInfoCheck::Check(server_info, request);
 	std::cout << "status: " << std::boolalpha << result.status << std::endl;
 	std::cout << "path: " << result.path << std::endl;
-	std::cout << "status_code: " << result.status_code << std::endl;
+	std::cout << "redirect_status_code: " << result.redirect_status_code << std::endl;
 	std::cout << "index: " << result.index << std::endl;
 	std::cout << "autoindex: " << std::boolalpha << result.autoindex << std::endl;
-	std::cout << "error_page_code: " << result.error_status_code << std::endl;
-	std::cout << "error_page_path: " << result.error_page_path << std::endl;
+	std::cout << "error_page_code: " << result.error_page.first << std::endl;
+	std::cout << "error_page_path: " << result.error_page.second << std::endl;
 	std::cout << std::endl;
-	if (result.status != CheckServerInfoResult::OK &&
+	if (result.status != CheckServerInfoResult::CONTINUE &&
 		result.status != CheckServerInfoResult::REDIRECT_ON) {
 		return EXIT_FAILURE;
 	}
@@ -120,13 +120,13 @@ int Test3() {
 	CheckServerInfoResult result      = HttpServerInfoCheck::Check(server_info, request);
 	std::cout << "status: " << std::boolalpha << result.status << std::endl;
 	std::cout << "path: " << result.path << std::endl;
-	std::cout << "status_code: " << result.status_code << std::endl;
+	std::cout << "redirect_status_code: " << result.redirect_status_code << std::endl;
 	std::cout << "index: " << result.index << std::endl;
 	std::cout << "autoindex: " << std::boolalpha << result.autoindex << std::endl;
-	std::cout << "error_page_code: " << result.error_status_code << std::endl;
-	std::cout << "error_page_path: " << result.error_page_path << std::endl;
+	std::cout << "error_page_code: " << result.error_page.first << std::endl;
+	std::cout << "error_page_path: " << result.error_page.second << std::endl;
 	std::cout << std::endl;
-	if (result.status != CheckServerInfoResult::OK &&
+	if (result.status != CheckServerInfoResult::CONTINUE &&
 		result.status != CheckServerInfoResult::REDIRECT_ON) {
 		return EXIT_FAILURE;
 	}
