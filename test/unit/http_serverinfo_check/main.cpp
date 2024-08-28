@@ -1,4 +1,5 @@
 #include "http_serverinfo_check.hpp"
+#include "utils.hpp"
 #include <cstdlib>
 #include <iostream>
 
@@ -31,7 +32,7 @@ MockDtoServerInfos BuildMockDtoServerInfos() {
 	std::pair<unsigned int, std::string> redirect;
 	std::pair<unsigned int, std::string> redirect_on(301, "/");
 	MockLocationCon                      location1 =
-		BuildLocationCon("/", "", "index.html", true, allowed_methods, redirect);
+		BuildLocationCon("/", "", "index.html", false, allowed_methods, redirect);
 	MockLocationCon location2 = // redirect_on
 		BuildLocationCon("/www/", "", "index.html", true, allowed_methods, redirect_on);
 	MockLocationCon location3 = // alias_on
@@ -54,6 +55,27 @@ MockDtoServerInfos BuildMockDtoServerInfos() {
 	return server_info;
 }
 
+int GetTestCaseNum() {
+	static int test_case_num = 0;
+	++test_case_num;
+	return test_case_num;
+}
+
+void PrintOk() {
+	std::cout << utils::color::GREEN << GetTestCaseNum() << ".[OK]" << utils::color::RESET
+			  << std::endl;
+}
+
+void PrintNg() {
+	std::cerr << utils::color::RED << GetTestCaseNum() << ".[NG] " << utils::color::RESET
+			  << std::endl;
+}
+
+template <typename T>
+bool IsSame(const T &result, const T &expected) {
+	return result == expected;
+}
+
 using namespace http;
 
 int Test1() {
@@ -66,18 +88,23 @@ int Test1() {
 
 	MockDtoServerInfos    server_info = BuildMockDtoServerInfos();
 	CheckServerInfoResult result      = HttpServerInfoCheck::Check(server_info, request);
-	std::cout << "status: " << result.status << std::endl;
-	std::cout << "path: " << result.path << std::endl;
-	std::cout << "redirect_status_code: " << result.redirect_status_code << std::endl;
-	std::cout << "index: " << result.index << std::endl;
-	std::cout << "autoindex: " << std::boolalpha << result.autoindex << std::endl;
-	std::cout << "error_page_code: " << result.error_page.first << std::endl;
-	std::cout << "error_page_path: " << result.error_page.second << std::endl;
-	std::cout << std::endl;
-	if (result.status != CheckServerInfoResult::CONTINUE &&
-		result.status != CheckServerInfoResult::REDIRECT_ON) {
+
+	bool is_same = true;
+	is_same &= IsSame(result.path, std::string("/"));
+	is_same &= IsSame(result.index, std::string("index.html"));
+	is_same &= IsSame(result.autoindex, false);
+	is_same &= IsSame(result.allowed_methods, result.allowed_methods);
+	is_same &= IsSame(result.cgi_extension, std::string(""));
+	is_same &= IsSame(result.upload_directory, std::string(""));
+	is_same &= IsSame(result.redirect_status_code, 0);
+	is_same &= IsSame(result.error_page.first, unsigned(404));
+	is_same &= IsSame(result.error_page.second, std::string("/404.html"));
+	is_same &= IsSame(result.status, CheckServerInfoResult::CONTINUE);
+	if (is_same) {
+		PrintOk();
 		return EXIT_FAILURE;
 	}
+	PrintNg();
 	return EXIT_SUCCESS;
 }
 
@@ -91,18 +118,23 @@ int Test2() {
 
 	MockDtoServerInfos    server_info = BuildMockDtoServerInfos();
 	CheckServerInfoResult result      = HttpServerInfoCheck::Check(server_info, request);
-	std::cout << "status: " << result.status << std::endl;
-	std::cout << "path: " << result.path << std::endl;
-	std::cout << "redirect_status_code: " << result.redirect_status_code << std::endl;
-	std::cout << "index: " << result.index << std::endl;
-	std::cout << "autoindex: " << std::boolalpha << result.autoindex << std::endl;
-	std::cout << "error_page_code: " << result.error_page.first << std::endl;
-	std::cout << "error_page_path: " << result.error_page.second << std::endl;
-	std::cout << std::endl;
-	if (result.status != CheckServerInfoResult::CONTINUE &&
-		result.status != CheckServerInfoResult::REDIRECT_ON) {
+
+	bool is_same = true;
+	is_same &= IsSame(result.path, std::string("/www/"));
+	is_same &= IsSame(result.index, std::string("index.html"));
+	is_same &= IsSame(result.autoindex, true);
+	is_same &= IsSame(result.allowed_methods, result.allowed_methods);
+	is_same &= IsSame(result.cgi_extension, std::string(""));
+	is_same &= IsSame(result.upload_directory, std::string(""));
+	is_same &= IsSame(result.redirect_status_code, 301);
+	is_same &= IsSame(result.error_page.first, unsigned(404));
+	is_same &= IsSame(result.error_page.second, std::string("/404.html"));
+	is_same &= IsSame(result.status, CheckServerInfoResult::REDIRECT_ON);
+	if (is_same) {
+		PrintNg();
 		return EXIT_FAILURE;
 	}
+	PrintOk();
 	return EXIT_SUCCESS;
 }
 
@@ -118,18 +150,23 @@ int Test3() {
 
 	MockDtoServerInfos    server_info = BuildMockDtoServerInfos();
 	CheckServerInfoResult result      = HttpServerInfoCheck::Check(server_info, request);
-	std::cout << "status: " << result.status << std::endl;
-	std::cout << "path: " << result.path << std::endl;
-	std::cout << "redirect_status_code: " << result.redirect_status_code << std::endl;
-	std::cout << "index: " << result.index << std::endl;
-	std::cout << "autoindex: " << std::boolalpha << result.autoindex << std::endl;
-	std::cout << "error_page_code: " << result.error_page.first << std::endl;
-	std::cout << "error_page_path: " << result.error_page.second << std::endl;
-	std::cout << std::endl;
-	if (result.status != CheckServerInfoResult::CONTINUE &&
-		result.status != CheckServerInfoResult::REDIRECT_ON) {
+
+	bool is_same = true;
+	is_same &= IsSame(result.path, std::string("/var/www/"));
+	is_same &= IsSame(result.index, std::string("index.html"));
+	is_same &= IsSame(result.autoindex, true);
+	is_same &= IsSame(result.allowed_methods, result.allowed_methods);
+	is_same &= IsSame(result.cgi_extension, std::string(""));
+	is_same &= IsSame(result.upload_directory, std::string(""));
+	is_same &= IsSame(result.redirect_status_code, 0);
+	is_same &= IsSame(result.error_page.first, unsigned(404));
+	is_same &= IsSame(result.error_page.second, std::string("/404.html"));
+	is_same &= IsSame(result.status, CheckServerInfoResult::CONTINUE);
+	if (is_same) {
+		PrintNg();
 		return EXIT_FAILURE;
 	}
+	PrintOk();
 	return EXIT_SUCCESS;
 }
 
