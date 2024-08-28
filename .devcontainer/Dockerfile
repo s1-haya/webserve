@@ -16,6 +16,9 @@ RUN apt-get update && \
     cppcheck=1.90-4build1 \
     tzdata=2024a-0ubuntu0.20.04 --no-install-recommends
 
+# ここでないとできない
+RUN apt-get update && apt-get install -y python3.8-dev
+
 WORKDIR /workspaces/webserv
 
 COPY / /workspaces/webserv/
