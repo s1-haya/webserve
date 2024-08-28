@@ -55,6 +55,10 @@ class Parser {
 	static const int STATUS_CODE_MIN = 100;
 	static const int STATUS_CODE_MAX = 599;
 
+	/* For duplicated parameter */
+	bool client_max_body_size_set;
+	bool autoindex_set;
+
   public:
 	explicit Parser(std::list<node::Node> &);
 	~Parser();

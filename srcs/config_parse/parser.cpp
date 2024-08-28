@@ -8,7 +8,8 @@
 namespace config {
 namespace parser {
 
-Parser::Parser(std::list<node::Node> &tokens) : tokens_(tokens) {
+Parser::Parser(std::list<node::Node> &tokens)
+	: tokens_(tokens), client_max_body_size_set(false), autoindex_set(false) {
 	ParseNode();
 }
 
@@ -125,16 +126,15 @@ void Parser::HandleListen(std::string &host, context::PortList &port, NodeItr &i
 	} else if (FindDuplicated(port, port_number.GetValue())) {
 		throw std::runtime_error("a duplicated parameter in 'listen' directive");
 	}
-    if (host != "") {
-        throw std::runtime_error("'host' directive is duplicated");
-    }
+	if (host != "") {
+		throw std::runtime_error("'host' directive is duplicated");
+	}
 	host = host_port[0];
 	port.push_back(port_number.GetValue());
 	++it;
 }
 
 void Parser::HandleClientMaxBodySize(std::size_t &client_max_body_size, NodeItr &it) {
-    static int count = 0; // こうするしかない？
 	if ((*it).token_type != node::WORD) {
 		throw std::runtime_error("invalid number of arguments in 'client_max_body_size' directive");
 	}
@@ -142,12 +142,12 @@ void Parser::HandleClientMaxBodySize(std::size_t &client_max_body_size, NodeItr 
 	if (!body_max_size.IsOk()) { // check range?
 		throw std::runtime_error("invalid client_max_body_size");
 	}
-    if (count != 0) {
-        throw std::runtime_error("'client_max_body_size' directive is duplicated");
-    }
-	client_max_body_size = body_max_size.GetValue();
+	if (client_max_body_size_set) {
+		throw std::runtime_error("'client_max_body_size' directive is duplicated");
+	}
+	client_max_body_size     = body_max_size.GetValue();
+	client_max_body_size_set = true;
 	++it;
-    ++count;
 }
 
 void Parser::HandleErrorPage(std::pair<unsigned int, std::string> &error_page, NodeItr &it) {
@@ -162,9 +162,9 @@ void Parser::HandleErrorPage(std::pair<unsigned int, std::string> &error_page, N
 		status_code.GetValue() > STATUS_CODE_MAX) {
 		throw std::runtime_error("invalid status code for error_page");
 	}
-    if (error_page.second != "") {
-        throw std::runtime_error("'error_page' directive is duplicated");
-    }
+	if (error_page.second != "") {
+		throw std::runtime_error("'error_page' directive is duplicated");
+	}
 	error_page = std::make_pair(status_code.GetValue(), (*it).token);
 	++it;
 }
@@ -235,9 +235,9 @@ void Parser::HandleAlias(std::string &alias, NodeItr &it) {
 	if ((*it).token_type != node::WORD) {
 		throw std::runtime_error("invalid number of arguments in 'alias' directive");
 	}
-    if (alias != "") {
-        throw std::runtime_error("'alias' directive is duplicated");
-    }
+	if (alias != "") {
+		throw std::runtime_error("'alias' directive is duplicated");
+	}
 	alias = (*it++).token;
 }
 
@@ -245,28 +245,27 @@ void Parser::HandleIndex(std::string &index, NodeItr &it) {
 	if ((*it).token_type != node::WORD) {
 		throw std::runtime_error("invalid number of arguments in 'index' directive");
 	}
-    if (index != "") {
-        throw std::runtime_error("'index' directive is duplicated");
-    }
+	if (index != "") {
+		throw std::runtime_error("'index' directive is duplicated");
+	}
 	index = (*it++).token;
 }
 
 void Parser::HandleAutoIndex(bool &autoindex, NodeItr &it) {
-    static int count = 0; // こうするしかない？
 	if ((*it).token_type != node::WORD || ((*it).token != "on" && (*it).token != "off")) {
 		throw std::runtime_error("invalid arguments in 'autoindex' directive");
 	}
-    if (count != 0) {
-        throw std::runtime_error("'autoindex' directive is duplicated");
-    }
-	autoindex = ((*it++).token == "on");
-    ++count;
+	if (autoindex_set) {
+		throw std::runtime_error("'autoindex' directive is duplicated");
+	}
+	autoindex     = ((*it++).token == "on");
+	autoindex_set = true;
 }
 
 void Parser::HandleAllowedMethods(std::list<std::string> &allowed_methods, NodeItr &it) {
-    if (allowed_methods.size() != 0) {
-        throw std::runtime_error("'allowed_methods' directive is duplicated");
-    }
+	if (allowed_methods.size() != 0) {
+		throw std::runtime_error("'allowed_methods' directive is duplicated");
+	}
 	while ((*it).token_type != node::DELIM && (*it).token_type == node::WORD) {
 		if (FindDuplicated(allowed_methods, (*it).token)) {
 			throw std::runtime_error("a duplicated parameter in 'allowed_methods' directive");
@@ -287,9 +286,9 @@ void Parser::HandleReturn(std::pair<unsigned int, std::string> &redirect, NodeIt
 	if ((*it).token_type != node::WORD || (*++NodeItr(it)).token_type != node::WORD) {
 		throw std::runtime_error("invalid number of arguments in 'return' directive");
 	}
-    if (redirect.second != "") {
-        throw std::runtime_error("'return' directive is duplicated");
-    }
+	if (redirect.second != "") {
+		throw std::runtime_error("'return' directive is duplicated");
+	}
 	// ex. 302 /index.html, tmp: atoi
 	NodeItr tmp_it = it; // 302
 	it++;                // /index.html
@@ -306,9 +305,9 @@ void Parser::HandleCgiExtension(std::string &cgi_extension, NodeItr &it) {
 	if ((*it).token_type != node::WORD) {
 		throw std::runtime_error("invalid arguments in 'cgi_extension' directive");
 	}
-    if (cgi_extension != "") {
-        throw std::runtime_error("'cgi_extension' directive is duplicated");
-    }
+	if (cgi_extension != "") {
+		throw std::runtime_error("'cgi_extension' directive is duplicated");
+	}
 	cgi_extension = (*it++).token;
 }
 
@@ -316,9 +315,9 @@ void Parser::HandleUploadDirectory(std::string &upload_directory, NodeItr &it) {
 	if ((*it).token_type != node::WORD) {
 		throw std::runtime_error("invalid arguments in 'upload_directory' directive");
 	}
-    if (upload_directory != "") {
-        throw std::runtime_error("'upload_directory' directive is duplicated");
-    }
+	if (upload_directory != "") {
+		throw std::runtime_error("'upload_directory' directive is duplicated");
+	}
 	upload_directory = (*it++).token;
 }
 
