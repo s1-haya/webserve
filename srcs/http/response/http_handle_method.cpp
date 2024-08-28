@@ -106,25 +106,12 @@ void HttpResponse::DeleteHandler(const std::string &path, std::string &response_
 			response_body_message = CreateDefaultBodyMessageFormat(
 				utils::ToString(http::FORBIDDEN), reason_phrase.at(http::FORBIDDEN)
 			);
-		} else if (std::remove(path.c_str()) != 0) {
-			if (errno == EACCES || errno == EPERM) {
-				response_body_message = CreateDefaultBodyMessageFormat(
-					utils::ToString(http::FORBIDDEN), reason_phrase.at(http::FORBIDDEN)
-				);
-			} else if (errno == ENOENT || errno == ENOTDIR || errno == ELOOP || errno == ENAMETOOLONG) {
-				response_body_message = CreateDefaultBodyMessageFormat(
-					utils::ToString(http::NOT_FOUND), reason_phrase.at(http::NOT_FOUND)
-				);
-			} else {
-				response_body_message = CreateDefaultBodyMessageFormat(
-					utils::ToString(http::INTERNAL_SERVER_ERROR),
-					reason_phrase.at(http::INTERNAL_SERVER_ERROR)
-				);
-			}
-		} else {
+		} else if (std::remove(path.c_str()) == 0) {
 			response_body_message = CreateDefaultBodyMessageFormat(
 				utils::ToString(http::NO_CONTENT), reason_phrase.at(http::NO_CONTENT)
 			);
+		} else {
+			throw utils::SystemException(std::strerror(errno), errno);
 		}
 	} catch (const utils::SystemException &e) {
 		HandleSystemException(e, response_body_message);
@@ -135,7 +122,7 @@ void HttpResponse::HandleSystemException(
 	const utils::SystemException &e, std::string &response_body_message
 ) {
 	int error_number = e.GetErrorNumber();
-	if (error_number == EACCES) {
+	if (error_number == EACCES || error_number == EPERM) {
 		response_body_message = CreateDefaultBodyMessageFormat(
 			utils::ToString(http::FORBIDDEN), reason_phrase.at(http::FORBIDDEN)
 		);
