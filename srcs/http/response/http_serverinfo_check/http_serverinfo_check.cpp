@@ -73,9 +73,7 @@ const MockLocationCon HttpServerInfoCheck::CheckLocation(
 void HttpServerInfoCheck::CheckIndex(
 	CheckServerInfoResult &result, const MockLocationCon &location
 ) {
-	if (!location.index.empty()) {
-		result.index = location.index;
-	}
+	result.index = location.index;
 }
 
 void HttpServerInfoCheck::CheckAutoIndex(
