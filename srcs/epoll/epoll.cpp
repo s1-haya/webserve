@@ -72,8 +72,9 @@ void Epoll::Delete(int socket_fd) {
 }
 
 int Epoll::CreateReadyList() {
-	errno           = 0;
-	const int ready = epoll_wait(epoll_fd_, evlist_, MAX_EVENTS, -1);
+	errno = 0;
+	// todo: set timeout(ms)
+	const int ready = epoll_wait(epoll_fd_, evlist_, MAX_EVENTS, 500);
 
 	if (ready == SYSTEM_ERROR) {
 		if (errno == EINTR) {
@@ -85,9 +86,7 @@ int Epoll::CreateReadyList() {
 }
 
 // update epoll's interest list with new_type
-void Epoll::Update(const event::Event &event, const event::Type new_type) {
-	const int socket_fd = event.fd;
-
+void Epoll::Update(int socket_fd, const event::Type new_type) {
 	struct epoll_event ev = {};
 	ev.events             = ConvertToEpollEventType(new_type);
 	ev.data.fd            = socket_fd;

@@ -46,7 +46,7 @@ const VirtualServerStorage::VirtualServerList &ContextManager::GetVirtualServerL
 	return virtual_servers_.GetAllVirtualServerList();
 }
 
-DtoServerInfos ContextManager::GetServerInfo(int client_fd) const {
+ServerContext ContextManager::GetServerContext(int client_fd) const {
 	// from sock_context
 	const ServerInfo &server_info = sock_context_.GetConnectedServerInfo(client_fd);
 	const int         server_fd   = server_info.GetFd();
@@ -54,17 +54,18 @@ DtoServerInfos ContextManager::GetServerInfo(int client_fd) const {
 	// from virtual_servers
 	const VirtualServer &virtual_server = virtual_servers_.GetVirtualServer(server_fd);
 
-	// create DTO
-	DtoServerInfos server_infos;
-	server_infos.server_fd   = server_fd;
+	// create ServerContext
+	ServerContext server_infos;
+	server_infos.fd          = server_fd;
 	server_infos.server_name = virtual_server.GetServerName();
-	server_infos.server_port = utils::ConvertUintToStr(server_info.GetPort());
-	server_infos.locations   = virtual_server.GetLocations();
+	// todo: uintのままで良いかも？
+	server_infos.port      = utils::ConvertUintToStr(server_info.GetPort());
+	server_infos.locations = virtual_server.GetLocations();
 	return server_infos;
 }
 
-// todo: IP以外も必要ならDTO作って詰めて返す
-const std::string &ContextManager::GetClientInfo(int client_fd) const {
+// todo: IP以外も必要ならClientContext作って詰めて返す
+const std::string &ContextManager::GetClientIp(int client_fd) const {
 	const ClientInfo &client_info = sock_context_.GetClientInfo(client_fd);
 	return client_info.GetIp();
 }

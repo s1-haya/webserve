@@ -6,8 +6,51 @@
 
 namespace http {
 
-// todo:　HttpResponseParsedDataを元にHttpResponseResultを作成する
+std::string HttpResponse::Run(const HttpRequestResult &request_info) {
+	HttpResponseResult response = CreateHttpResponseResult(request_info);
+	return CreateHttpResponseFormat(response);
+}
+
+// todo: HttpResponseResult HttpResponse::CreateHttpResponseResult(const HttpRequestResult
+// &request_info) 作成
+// HttpResponseResult response; -> response header fieldの初期値を渡す
+// try {
+//  CheckLocation();
+// 	// todo: IsCgi()
+// 	// - path
+// 	// - cgi_extension
+// 	// - method allowed
+// 	if (is_cgi)
+// 		// todo: cgi実行
+// 		// try {
+// 		// 	cgi::Run()
+// 		// } catch {
+// 		// 	cgi::Exception
+// 		//     このthrowはCreateHttpResponseResult内でcatchする
+// 		// 	// throw Httpのエラー用に
+// 		// }
+// 		// return cgi -> webserv用
+// 	MethodHandler();
+// 	return CreateSuccessResponseResult();
+// } catch ()
+// 	// 必要があればヘッダフィールドを追加する
+// 	return  CreateErrorResponseResult(data.request_result);
+// }
+
+// mock
 HttpResponseResult HttpResponse::CreateHttpResponseResult(const HttpRequestResult &request_info) {
+	HttpResponseResult response;
+	if (request_info.status_code != http::OK) {
+		response = CreateErrorHttpResponseResult(request_info);
+	} else {
+		response = CreateSuccessHttpResponseResult(request_info);
+	}
+	return response;
+}
+
+// mock
+HttpResponseResult
+HttpResponse::CreateSuccessHttpResponseResult(const HttpRequestResult &request_info) {
 	(void)request_info;
 	HttpResponseResult response;
 	response.status_line.version         = HTTP_VERSION;
@@ -15,7 +58,7 @@ HttpResponseResult HttpResponse::CreateHttpResponseResult(const HttpRequestResul
 	response.status_line.reason_phrase   = "OK";
 	response.header_fields["Host"]       = "sawa";
 	response.header_fields["Connection"] = "close";
-	response.body_message = "You can't connect the dots looking forword. You can only connect the "
+	response.body_message = "You can't connect the dots looking forward. You can only connect the "
 							"dots looking backwards";
 	return response;
 }
@@ -31,6 +74,7 @@ std::string HttpResponse::CreateDefaultBodyMessageFormat(
 	return body_message.str();
 }
 
+// mock
 HttpResponseResult HttpResponse::CreateErrorHttpResponseResult(const HttpRequestResult &request_info
 ) {
 	HttpResponseResult response;
@@ -50,20 +94,7 @@ HttpResponseResult HttpResponse::CreateErrorHttpResponseResult(const HttpRequest
 	return response;
 }
 
-// todo: CheckValidRequest:仮想サーバーとロケーションのディレクトリからリクエストの有効性を確認する
-// HttpResponseParsedData HttpResponse::CheckValidRequest(const HttpRequestResult &request_info,
-// const SeverConfig& server_config_info) {
-// - リソースがサーバー上に存在しない
-// - ファイルのアクセス権限ない
-// - メソッドが許可されてない
-// todo: cgiをリクエストしている場合は実行する。条件は以下だ。
-// - サーバーのディレクトリにcgi拡張子ファイルを許可するディレクティブがある場合
-// - リソースが上記のサーバーのディレクトリの場合
-// - メソッドがGET, POSTかつそれらが許可されてる場合
-// }
-
-// HttpResponseResult構造体をHttpResponseのフォーマットを文字列に出力する
-std::string HttpResponse::CreateHttpResponse(const HttpResponseResult &response) {
+std::string HttpResponse::CreateHttpResponseFormat(const HttpResponseResult &response) {
 	std::ostringstream response_stream;
 	response_stream << response.status_line.version << SP << response.status_line.status_code << SP
 					<< response.status_line.reason_phrase << CRLF;

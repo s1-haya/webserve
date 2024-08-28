@@ -1,15 +1,20 @@
 #ifndef SERVER_SERVER_HPP_
 #define SERVER_SERVER_HPP_
 
-#include "buffer.hpp"
 #include "config_parse/context.hpp"
 #include "connection.hpp"
 #include "context_manager.hpp"
 #include "epoll.hpp"
+#include "http_result.hpp"
+#include "message_manager.hpp"
+#include "mock_http.hpp"
 #include <list>
 #include <string>
 
 namespace server {
+
+struct DtoClientInfos;
+struct DtoServerInfos;
 
 class Server {
   public:
@@ -25,23 +30,32 @@ class Server {
 	Server(const Server &other);
 	Server &operator=(const Server &other);
 	// functions
-	void        AddVirtualServers(const ConfigServers &config_servers);
-	void        HandleEvent(const event::Event &event);
-	void        HandleNewConnection(int server_fd);
-	void        HandleExistingConnection(const event::Event &event);
-	void        ReadRequest(const event::Event &event);
-	std::string CreateHttpResponse(int client_fd) const;
-	void        SendResponse(int client_fd);
+	void AddVirtualServers(const ConfigServers &config_servers);
+	void HandleEvent(const event::Event &event);
+	void HandleNewConnection(int server_fd);
+	void HandleExistingConnection(const event::Event &event);
+	void ReadRequest(int client_fd);
+	void RunHttp(const event::Event &event);
+	void SendResponse(int client_fd);
+	void HandleTimeoutMessages();
+	void Disconnect(int client_fd);
+	// for Server to Http
+	DtoClientInfos GetClientInfos(int client_fd) const;
+	DtoServerInfos GetServerInfos(int client_fd) const;
+
 	// const
-	static const int SYSTEM_ERROR = -1;
+	static const int    SYSTEM_ERROR = -1;
+	static const double REQUEST_TIMEOUT;
 	// context(virtual server,client)
 	ContextManager context_;
 	// connection
 	Connection connection_;
 	// event poll
 	epoll::Epoll event_monitor_;
-	// request buffers
-	Buffer buffers_;
+	// http
+	http::MockHttp mock_http_;
+	// message manager with time control
+	MessageManager message_manager_;
 };
 
 } // namespace server

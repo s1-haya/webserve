@@ -1,4 +1,5 @@
 #include "lexer.hpp"
+#include "directive_names.hpp"
 #include <algorithm>
 #include <iostream>
 
@@ -24,19 +25,22 @@ Lexer::Lexer(const std::string &buffer, std::list<node::Node> &tokens)
 Lexer::~Lexer() {}
 
 void Lexer::InitDefinition() {
-	context_.push_back("server");
-	context_.push_back("location");
+	context_.push_back(SERVER);
+	context_.push_back(LOCATION);
 
-	directive_.push_back("server_name");
-	directive_.push_back("listen");
-	directive_.push_back("rewrite");
-	directive_.push_back("alias");
-	directive_.push_back("index");
-	directive_.push_back("autoindex");
-	directive_.push_back("error_page");
-	directive_.push_back("client_max_body_size");
-	directive_.push_back("allowed_methods");
-	directive_.push_back("return");
+	// host 未実装
+	directive_.push_back(LISTEN);
+	directive_.push_back(SERVER_NAME);
+	directive_.push_back(ERROR_PAGE);
+	directive_.push_back(CLIENT_MAX_BODY_SIZE);
+
+	directive_.push_back(ALIAS);
+	directive_.push_back(INDEX);
+	directive_.push_back(AUTO_INDEX);
+	directive_.push_back(ALLOWED_METHODS);
+	directive_.push_back(RETURN);
+	directive_.push_back(CGI_EXTENSION);
+	directive_.push_back(UPLOAD_DIR);
 }
 
 void Lexer::LexBuffer() {

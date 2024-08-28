@@ -11,16 +11,21 @@ void PrintError(const std::string &s) {
 	std::cerr << utils::color::RED << "Error: " << s << utils::color::RESET << std::endl;
 }
 
+static void PrintUsage() {
+	std::cerr << "Usage:" << std::endl;
+	std::cerr << "  ./webserv" << std::endl;
+	std::cerr << "  ./webserv [configuration file]" << std::endl;
+}
+
 } // namespace
 
-// ./webserv [configuration file]
 int main(int argc, char **argv) {
 	if (argc > 2) {
 		PrintError("invalid arguments");
+		PrintUsage();
 		return EXIT_FAILURE;
 	}
 
-	// todo: handle parse error
 	std::string path_config;
 	if (argc == 1) {
 		path_config = "config/default.conf";
