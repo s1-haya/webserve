@@ -116,10 +116,10 @@ int Test1() {
 	} catch (const std::exception &e) {
 		PrintNg();
 		std::cerr << e.what() << '\n';
-		return EXIT_SUCCESS;
+		return EXIT_FAILURE;
 	}
 	PrintOk();
-	return EXIT_FAILURE;
+	return EXIT_SUCCESS;
 }
 
 int Test2() {
