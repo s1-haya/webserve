@@ -21,7 +21,7 @@ Epoll::~Epoll() {
 
 namespace {
 
-uint32_t ConvertToEpollEventType(event::Type type) {
+uint32_t ConvertToEpollEventType(uint32_t type) {
 	uint32_t ret_type = 0;
 
 	if (type & event::EVENT_READ) {
