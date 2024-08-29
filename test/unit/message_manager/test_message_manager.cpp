@@ -185,7 +185,7 @@ int RunTestDeleteSentResponseAndResetTime() {
 
 	sleep(2);
 	// time(7), update start_time, delete oldest response.
-	manager.DeleteSentResponseAndResetTime(5);
+	manager.UpdateTime(5);
 	DeleteValue(expected_timeout_fds, 5);
 
 	sleep(1);
