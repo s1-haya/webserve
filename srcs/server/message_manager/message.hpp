@@ -60,6 +60,7 @@ class Message {
 	int           client_fd_;
 	Time          start_time_;
 	bool          is_timeout_;
+	bool          is_complete_request_message_;
 	std::string   request_buf_;
 	ResponseDeque responses_;
 };
