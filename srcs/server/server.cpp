@@ -237,7 +237,11 @@ void Server::HandleTimeoutMessages() {
 	// timeout用のresponseをセットしてevent監視をWRITEに変更
 	typedef MessageManager::TimeoutFds::const_iterator Itr;
 	for (Itr it = timeout_fds.begin(); it != timeout_fds.end(); ++it) {
-		const int          client_fd        = *it;
+		const int client_fd = *it;
+		if (message_manager_.GetIsCompleteRequest(client_fd)) {
+			Disconnect(client_fd);
+			continue;
+		}
 		const std::string &timeout_response = mock_http_.GetTimeoutResponse(client_fd);
 		message_manager_.AddPrimaryResponse(client_fd, message::CLOSE, timeout_response);
 		event_monitor_.Replace(client_fd, event::EVENT_WRITE);
