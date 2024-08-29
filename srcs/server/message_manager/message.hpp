@@ -41,9 +41,9 @@ class Message {
 	void AddRequestBuf(const std::string &request_buf);
 	void DeleteRequestBuf();
 	// response
-	void AddBackResponse(ConnectionState connection_state, const std::string &response_str);
-	void AddFrontResponse(ConnectionState connection_state, const std::string &response_str);
-	void DeleteOldestResponse();
+	void     AddBackResponse(ConnectionState connection_state, const std::string &response_str);
+	void     AddFrontResponse(ConnectionState connection_state, const std::string &response_str);
+	Response DeleteOldestResponse();
 
 	// getter
 	int                GetFd() const;

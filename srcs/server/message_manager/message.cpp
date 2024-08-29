@@ -62,11 +62,13 @@ void Message::AddFrontResponse(ConnectionState connection_state, const std::stri
 }
 
 // deque.pop_front(): If there are no elements in the container, the behavior is undefined.
-void Message::DeleteOldestResponse() {
+Response Message::DeleteOldestResponse() {
 	if (responses_.size() == 0) {
 		throw std::logic_error("DeleteOldestResponse(): no response");
 	}
+	const Response response = responses_.front();
 	responses_.pop_front();
+	return response;
 }
 
 int Message::GetFd() const {

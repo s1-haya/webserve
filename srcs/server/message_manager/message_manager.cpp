@@ -54,7 +54,6 @@ MessageManager::TimeoutFds MessageManager::GetNewTimeoutFds(double timeout) {
 void MessageManager::DeleteSentResponseAndResetTime(int client_fd) {
 	message::Message &message = messages_.at(client_fd);
 	message.UpdateTime();
-	message.DeleteOldestResponse();
 }
 
 void MessageManager::AddRequestBuf(int client_fd, const std::string &request_buf) {
@@ -82,14 +81,14 @@ void MessageManager::AddPrimaryResponse(
 	message.AddFrontResponse(connection_state, response);
 }
 
+message::Response MessageManager::GetResponse(int client_fd) {
+	message::Message &message = messages_.at(client_fd);
+	return message.DeleteOldestResponse();
+}
+
 const std::string &MessageManager::GetRequestBuf(int client_fd) const {
 	const message::Message &message = messages_.at(client_fd);
 	return message.GetRequestBuf();
-}
-
-const message::Response &MessageManager::GetResponse(int client_fd) const {
-	const message::Message &message = messages_.at(client_fd);
-	return message.GetResponse();
 }
 
 } // namespace server

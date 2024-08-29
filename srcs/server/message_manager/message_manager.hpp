@@ -33,10 +33,10 @@ class MessageManager {
 	void AddPrimaryResponse(
 		int client_fd, message::ConnectionState connection_state, const std::string &response
 	);
+	message::Response GetResponse(int client_fd);
 
 	// getter
-	const std::string       &GetRequestBuf(int client_fd) const;
-	const message::Response &GetResponse(int client_fd) const;
+	const std::string &GetRequestBuf(int client_fd) const;
 
   private:
 	// variable

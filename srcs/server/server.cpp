@@ -196,14 +196,18 @@ void Server::RunHttp(const event::Event &event) {
 }
 
 void Server::SendResponse(int client_fd) {
-	const message::Response       &response         = message_manager_.GetResponse(client_fd);
+	message::Response              response         = message_manager_.GetResponse(client_fd);
 	const message::ConnectionState connection_state = response.connection_state;
 	const std::string             &response_str     = response.response_str;
 
 	// todo: handle return size
 	send(client_fd, response_str.c_str(), response_str.size(), 0);
 	utils::Debug("server", "send response to client", client_fd);
-	// todo: 全てのresponse_strをsend()できなかった場合はsend_size分だけeraseして早期return
+	// todo:
+	//   全てのresponse_strをsend()できなかった場合はsend_size分だけeraseして
+	//   Response dequeの先頭にAdd()し直して↓
+	//   message_manager_.AddPrimaryResponse(client_fd, response)
+	//   早期return
 
 	switch (connection_state) {
 	case message::KEEP:
