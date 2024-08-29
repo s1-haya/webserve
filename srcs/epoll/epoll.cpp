@@ -33,13 +33,13 @@ uint32_t ConvertToEpollEventType(uint32_t type) {
 	return ret_type;
 }
 
-uint32_t ConvertToEventType(uint32_t event) {
+uint32_t ConvertToEventType(uint32_t type) {
 	uint32_t ret_type = event::EVENT_NONE;
 
-	if (event & EPOLLIN) {
+	if (type & EPOLLIN) {
 		ret_type |= event::EVENT_READ;
 	}
-	if (event & EPOLLOUT) {
+	if (type & EPOLLOUT) {
 		ret_type |= event::EVENT_WRITE;
 	}
 	// todo: tmp
@@ -55,7 +55,7 @@ event::Event ConvertToEventDto(const struct epoll_event &event) {
 
 } // namespace
 
-// add socket_fd to epoll's interest list
+// add new socket_fd to epoll's interest list
 void Epoll::Add(int socket_fd, event::Type type) {
 	struct epoll_event ev = {};
 	ev.events             = ConvertToEpollEventType(type);
