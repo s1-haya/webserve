@@ -477,12 +477,14 @@ int main() {
 	std::cout << "Error Tests" << std::endl;
 	ServerList expected;
 	ret_code |= RunErrorTest(
-		"test_file_error/server_no_end_bracket.conf",
+		"test_file_error/server/server_no_end_bracket.conf",
 		expected,
 		"test_file_error/server_no_end_bracket.conf"
 	);
 	ret_code |= RunErrorTest(
-		"test_file_error/server_in_server.conf", expected, "test_file_error/server_in_server.conf"
+		"test_file_error/server/server_in_server.conf",
+		expected,
+		"test_file_error/server/server_in_server.conf"
 	);
 	ret_code |= RunErrorTest(
 		"test_file_error/listen/listen_no_param.conf",
@@ -532,9 +534,9 @@ int main() {
 		"test_file_error/no_context.conf", expected, "test_file_error/no_context.conf"
 	);
 	ret_code |= RunErrorTest(
-		"test_file_error/server_multi_start_bracket.conf",
+		"test_file_error/server/server_multi_start_bracket.conf",
 		expected,
-		"test_file_error/server_multi_start_bracket.conf"
+		"test_file_error/server/server_multi_start_bracket.conf"
 	);
 	ret_code |= RunErrorTest(
 		"test_file_error/multi_delimiters.conf", expected, "test_file_error/multi_delimiters.conf"
