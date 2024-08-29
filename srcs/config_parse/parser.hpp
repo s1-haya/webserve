@@ -2,17 +2,21 @@
 #define PARSER_HPP_
 
 #include "context.hpp"
+#include "custom_const_iterator.hpp"
 #include "node.hpp"
 #include <list>
 
 namespace config {
 namespace parser {
 
-typedef std::list<node::Node>::iterator NodeItr;
+/**
+ * @brief CustomConstIterator: throw on unexpected end
+ */
+typedef CustomConstIterator<node::Node> NodeItr;
 
 class Parser {
   private:
-	std::list<node::Node>        &tokens_;
+	const std::list<node::Node>  &tokens_;
 	std::list<context::ServerCon> servers_;
 	// Prohibit Copy
 	Parser(const Parser &);
@@ -30,7 +34,7 @@ class Parser {
 	 */
 
 	void HandleServerName(std::list<std::string> &server_names, NodeItr &it);
-	void HandleListen(context::PortList &ports, NodeItr &it);
+	void HandleListen(std::string &host, context::PortList &port, NodeItr &it);
 	void HandleClientMaxBodySize(std::size_t &client_max_body_size, NodeItr &it);
 	void HandleErrorPage(std::pair<unsigned int, std::string> &error_page, NodeItr &it);
 
@@ -43,6 +47,13 @@ class Parser {
 	void HandleAutoIndex(bool &autoindex, NodeItr &it);
 	void HandleAllowedMethods(std::list<std::string> &allowed_methods, NodeItr &it);
 	void HandleReturn(std::pair<unsigned int, std::string> &redirect, NodeItr &it);
+	void HandleCgiExtension(std::string &cgi_extension, NodeItr &it);
+	void HandleUploadDirectory(std::string &upload_directory, NodeItr &it);
+
+	static const int PORT_MIN        = 1024;
+	static const int PORT_MAX        = 65535;
+	static const int STATUS_CODE_MIN = 100;
+	static const int STATUS_CODE_MAX = 599;
 
   public:
 	explicit Parser(std::list<node::Node> &);

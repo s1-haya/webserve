@@ -16,6 +16,8 @@ struct MockLocationCon { /*一部serverで未実装*/
 	bool                                 autoindex;
 	std::list<std::string>               allowed_methods;
 	std::pair<unsigned int, std::string> redirect; // cannot use return
+	std::string                          cgi_extension;
+	std::string                          upload_directory;
 	MockLocationCon() : autoindex(false) {}
 };
 
@@ -40,22 +42,27 @@ namespace http {
 
 struct CheckServerInfoResult {
 	enum CheckStatus {
-		OK,
+		CONTINUE,
+		REDIRECT_ON,
 		INVALID_HOST,
 		PAYLOAD_TOO_LARGE,
-		LOCATION_NOT_FOUND,
-		REDIRECT_ON
+		LOCATION_NOT_FOUND
 	}; // rfc + 見やすいように独自で名前をつけた
 	// 呼び出し元でこれをチェックしてstatus codeを付ける用
 
 	std::string path; // alias, index, redirectを見る
 	std::string index;
 	bool        autoindex;
-	int         status_code; // redirectで指定
-	std::string error_page_path;
-	int         error_status_code; // error_pageで指定 まとめる？
-	CheckStatus status;
-	CheckServerInfoResult() : autoindex(false), status_code(0), error_status_code(0), status(OK) {};
+
+	// メソッドの処理で使用
+	std::list<std::string> allowed_methods;
+	std::string            cgi_extension;
+	std::string            upload_directory;
+
+	unsigned int                         redirect_status_code;
+	std::pair<unsigned int, std::string> error_page;
+	CheckStatus                          status;
+	CheckServerInfoResult() : autoindex(false), redirect_status_code(0), status(CONTINUE) {};
 };
 
 class HttpServerInfoCheck {
@@ -82,6 +89,10 @@ class HttpServerInfoCheck {
 	static void CheckAutoIndex(CheckServerInfoResult &result, const MockLocationCon &location);
 	static void CheckAlias(CheckServerInfoResult &result, const MockLocationCon &location);
 	static void CheckRedirect(CheckServerInfoResult &result, const MockLocationCon &location);
+	static void CheckAllowedMethods(CheckServerInfoResult &result, const MockLocationCon &location);
+	static void CheckCgiExtension(CheckServerInfoResult &result, const MockLocationCon &location);
+	static void
+	CheckUploadDirectory(CheckServerInfoResult &result, const MockLocationCon &location);
 
   public:
 	static CheckServerInfoResult Check(const MockDtoServerInfos &server_info, HttpRequest &request);

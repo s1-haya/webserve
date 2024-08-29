@@ -34,13 +34,13 @@ void Lexer::InitDefinition() {
 	directive_.push_back(ERROR_PAGE);
 	directive_.push_back(CLIENT_MAX_BODY_SIZE);
 
+	directive_.push_back(ALIAS);
+	directive_.push_back(INDEX);
+	directive_.push_back(AUTO_INDEX);
 	directive_.push_back(ALLOWED_METHODS);
 	directive_.push_back(RETURN);
-	directive_.push_back(ALIAS);
-	directive_.push_back(AUTO_INDEX);
-	directive_.push_back(INDEX);
-
-	// CGI未実装
+	directive_.push_back(CGI_EXTENSION);
+	directive_.push_back(UPLOAD_DIR);
 }
 
 void Lexer::LexBuffer() {

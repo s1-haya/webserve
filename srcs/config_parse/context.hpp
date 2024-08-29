@@ -14,6 +14,8 @@ struct LocationCon {
 	bool                                 autoindex;
 	std::list<std::string>               allowed_methods;
 	std::pair<unsigned int, std::string> redirect; // cannot use return
+	std::string                          cgi_extension;
+	std::string                          upload_directory;
 	LocationCon() : autoindex(false) {}
 };
 
@@ -21,6 +23,7 @@ typedef std::list<unsigned int> PortList;
 typedef std::list<LocationCon>  LocationList;
 
 struct ServerCon {
+	std::string                          host; // not implement
 	PortList                             port;
 	std::list<std::string>               server_names;
 	LocationList                         location_con;
