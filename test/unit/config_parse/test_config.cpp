@@ -514,14 +514,14 @@ int main() {
 		"test_file_error/empty_with_nl.conf", expected, "test_file_error/empty_with_nl.conf"
 	);
 	ret_code |= RunErrorTest(
-		"test_file_error/location_multi_params.conf",
+		"test_file_error/location/location_multi_params.conf",
 		expected,
-		"test_file_error/location_multi_params.conf"
+		"test_file_error/location/location_multi_params.conf"
 	);
 	ret_code |= RunErrorTest(
-		"test_file_error/location_no_end_bracket.conf",
+		"test_file_error/location/location_no_end_bracket.conf",
 		expected,
-		"test_file_error/location_no_end_bracket.conf"
+		"test_file_error/location/location_no_end_bracket.conf"
 	);
 	ret_code |= RunErrorTest(
 		"test_file_error/root_no_param.conf", expected, "test_file_error/root_no_param.conf"
@@ -576,7 +576,9 @@ int main() {
 		"test_file_error/alias/alias_duplicated.conf"
 	);
 	ret_code |= RunErrorTest(
-		"test_file_error/index_duplicated.conf", expected, "test_file_error/index_duplicated.conf"
+		"test_file_error/index/index_duplicated.conf",
+		expected,
+		"test_file_error/index/index_duplicated.conf"
 	);
 	ret_code |= RunErrorTest(
 		"test_file_error/autoindex/autoindex_duplicated.conf",
