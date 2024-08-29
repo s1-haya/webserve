@@ -557,9 +557,9 @@ int main() {
 		"test_file_error/error_page/error_page_invalid_status_code.conf"
 	);
 	ret_code |= RunErrorTest(
-		"test_file_error/allowed_methods_invalid_method.conf",
+		"test_file_error/allowed_methods/allowed_methods_invalid_method.conf",
 		expected,
-		"test_file_error/allowed_methods_invalid_method.conf"
+		"test_file_error/allowed_methods/allowed_methods_invalid_method.conf"
 	);
 	ret_code |= RunErrorTest(
 		"test_file_error/listen/listen_multi_hosts.conf",
@@ -597,7 +597,9 @@ int main() {
 		"test_file_error/allowed_methods/allowed_methods_duplicated.conf"
 	);
 	ret_code |= RunErrorTest(
-		"test_file_error/return_duplicated.conf", expected, "test_file_error/return_duplicated.conf"
+		"test_file_error/return/return_duplicated.conf",
+		expected,
+		"test_file_error/return/return_duplicated.conf"
 	);
 	ret_code |= RunErrorTest(
 		"test_file_error/cgi_extension/cgi_extension_duplicated.conf",
