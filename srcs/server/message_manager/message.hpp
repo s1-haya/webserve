@@ -48,9 +48,11 @@ class Message {
 
 	// getter
 	int                GetFd() const;
+	bool               GetIsCompleteRequest() const;
 	const std::string &GetRequestBuf() const;
 	// setter
 	void SetTimeout();
+	void SetIsCompleteRequest(bool is_complete_request_message);
 
   private:
 	Message();

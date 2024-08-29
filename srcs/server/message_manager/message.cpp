@@ -85,12 +85,20 @@ int Message::GetFd() const {
 	return client_fd_;
 }
 
+bool Message::GetIsCompleteRequest() const {
+	return is_complete_request_message_;
+}
+
 const std::string &Message::GetRequestBuf() const {
 	return request_buf_;
 }
 
 void Message::SetTimeout() {
 	is_timeout_ = true;
+}
+
+void Message::SetIsCompleteRequest(bool is_complete_request_message) {
+	is_complete_request_message_ = is_complete_request_message;
 }
 
 Message::Time Message::GetCurrentTime() {
