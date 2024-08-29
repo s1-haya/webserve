@@ -196,6 +196,9 @@ void Server::RunHttp(const event::Event &event) {
 }
 
 void Server::SendResponse(int client_fd) {
+	if (!message_manager_.IsResponseExist(client_fd)) {
+		return;
+	}
 	message::Response              response         = message_manager_.PopHeadResponse(client_fd);
 	const message::ConnectionState connection_state = response.connection_state;
 	const std::string             &response_str     = response.response_str;
@@ -212,7 +215,6 @@ void Server::SendResponse(int client_fd) {
 	switch (connection_state) {
 	case message::KEEP:
 		message_manager_.UpdateTime(client_fd);
-		event_monitor_.Replace(client_fd, event::EVENT_READ);
 		utils::Debug("server", "Connection: keep-alive client", client_fd);
 		break;
 	case message::CLOSE:
