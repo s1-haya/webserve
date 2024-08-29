@@ -184,8 +184,10 @@ void Server::RunHttp(const event::Event &event) {
 	// Check if it's ready to start write/send.
 	// If not completed, the request will be re-read by the event_monitor.
 	if (!http_result.is_response_complete) {
+		message_manager_.SetIsCompleteRequest(client_fd, false);
 		return;
 	}
+	message_manager_.SetIsCompleteRequest(client_fd, true);
 	utils::Debug("server", "received all request from client", client_fd);
 	std::cerr << message_manager_.GetRequestBuf(client_fd) << std::endl;
 
