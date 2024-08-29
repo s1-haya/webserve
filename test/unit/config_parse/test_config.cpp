@@ -477,91 +477,125 @@ int main() {
 	std::cout << "Error Tests" << std::endl;
 	ServerList expected;
 	ret_code |= RunErrorTest(
-		"test_file_error/error_test1.conf", expected, "test_file_error/error_test1.conf"
+		"test_file_error/server_no_end_bracket.conf",
+		expected,
+		"test_file_error/server_no_end_bracket.conf"
 	);
 	ret_code |= RunErrorTest(
-		"test_file_error/error_test2.conf", expected, "test_file_error/error_test2.conf"
+		"test_file_error/server_in_server.conf", expected, "test_file_error/server_in_server.conf"
 	);
 	ret_code |= RunErrorTest(
-		"test_file_error/error_test3.conf", expected, "test_file_error/error_test3.conf"
+		"test_file_error/listen_no_param.conf", expected, "test_file_error/listen_no_param.conf"
 	);
 	ret_code |= RunErrorTest(
-		"test_file_error/error_test4.conf", expected, "test_file_error/error_test4.conf"
+		"test_file_error/server_name_no_delimiter.conf",
+		expected,
+		"test_file_error/server_name_no_delimiter.conf"
 	);
 	ret_code |= RunErrorTest(
-		"test_file_error/error_test5.conf", expected, "test_file_error/error_test5.conf"
+		"test_file_error/listen_no_delimiter.conf",
+		expected,
+		"test_file_error/listen_no_delimiter.conf"
 	);
 	ret_code |= RunErrorTest(
-		"test_file_error/error_test6.conf", expected, "test_file_error/error_test6.conf"
+		"test_file_error/listen_multi_params.conf",
+		expected,
+		"test_file_error/listen_multi_params.conf"
 	);
 	ret_code |= RunErrorTest(
-		"test_file_error/error_test7.conf", expected, "test_file_error/error_test7.conf"
+		"test_file_error/invalid_context.conf", expected, "test_file_error/invalid_context.conf"
 	);
 	ret_code |= RunErrorTest(
-		"test_file_error/error_test8.conf", expected, "test_file_error/error_test8.conf"
+		"test_file_error/empty_file.conf", expected, "test_file_error/empty_file.conf"
 	);
 	ret_code |= RunErrorTest(
-		"test_file_error/error_test9.conf", expected, "test_file_error/error_test9.conf"
+		"test_file_error/empty_with_nl.conf", expected, "test_file_error/empty_with_nl.conf"
 	);
 	ret_code |= RunErrorTest(
-		"test_file_error/error_test10.conf", expected, "test_file_error/error_test10.conf"
+		"test_file_error/location_multi_params.conf",
+		expected,
+		"test_file_error/location_multi_params.conf"
 	);
 	ret_code |= RunErrorTest(
-		"test_file_error/error_test11.conf", expected, "test_file_error/error_test11.conf"
+		"test_file_error/location_no_end_bracket.conf",
+		expected,
+		"test_file_error/location_no_end_bracket.conf"
 	);
 	ret_code |= RunErrorTest(
-		"test_file_error/error_test12.conf", expected, "test_file_error/error_test12.conf"
+		"test_file_error/root_no_param.conf", expected, "test_file_error/root_no_param.conf"
 	);
 	ret_code |= RunErrorTest(
-		"test_file_error/error_test13.conf", expected, "test_file_error/error_test13.conf"
+		"test_file_error/no_context.conf", expected, "test_file_error/no_context.conf"
 	);
 	ret_code |= RunErrorTest(
-		"test_file_error/error_test14.conf", expected, "test_file_error/error_test14.conf"
+		"test_file_error/server_multi_start_bracket.conf",
+		expected,
+		"test_file_error/server_multi_start_bracket.conf"
 	);
 	ret_code |= RunErrorTest(
-		"test_file_error/error_test15.conf", expected, "test_file_error/error_test15.conf"
+		"test_file_error/multi_delimiters.conf", expected, "test_file_error/multi_delimiters.conf"
 	);
 	ret_code |= RunErrorTest(
-		"test_file_error/error_test16.conf", expected, "test_file_error/error_test16.conf"
+		"test_file_error/invalid_directive.conf", expected, "test_file_error/invalid_directive.conf"
 	);
 	ret_code |= RunErrorTest(
-		"test_file_error/error_test17.conf", expected, "test_file_error/error_test17.conf"
+		"test_file_error/listen_duplicated_port.conf",
+		expected,
+		"test_file_error/listen_duplicated_port.conf"
 	);
 	ret_code |= RunErrorTest(
-		"test_file_error/error_test18.conf", expected, "test_file_error/error_test18.conf"
+		"test_file_error/error_page_invalid_status_code.conf",
+		expected,
+		"test_file_error/error_page_invalid_status_code.conf"
 	);
 	ret_code |= RunErrorTest(
-		"test_file_error/error_test19.conf", expected, "test_file_error/error_test19.conf"
+		"test_file_error/allowed_methods_invalid_method.conf",
+		expected,
+		"test_file_error/allowed_methods_invalid_method.conf"
 	);
 	ret_code |= RunErrorTest(
-		"test_file_error/error_test20.conf", expected, "test_file_error/error_test20.conf"
+		"test_file_error/listen_multi_hosts.conf",
+		expected,
+		"test_file_error/listen_multi_hosts.conf"
 	);
 	ret_code |= RunErrorTest(
-		"test_file_error/error_test21.conf", expected, "test_file_error/error_test21.conf"
+		"test_file_error/client_max_body_size_duplicated.conf",
+		expected,
+		"test_file_error/client_max_body_size_duplicated.conf"
 	);
 	ret_code |= RunErrorTest(
-		"test_file_error/error_test22.conf", expected, "test_file_error/error_test22.conf"
+		"test_file_error/error_page_duplicated.conf",
+		expected,
+		"test_file_error/error_page_duplicated.conf"
 	);
 	ret_code |= RunErrorTest(
-		"test_file_error/error_test23.conf", expected, "test_file_error/error_test23.conf"
+		"test_file_error/alias_duplicated.conf", expected, "test_file_error/alias_duplicated.conf"
 	);
 	ret_code |= RunErrorTest(
-		"test_file_error/error_test24.conf", expected, "test_file_error/error_test24.conf"
+		"test_file_error/index_duplicated.conf", expected, "test_file_error/index_duplicated.conf"
 	);
 	ret_code |= RunErrorTest(
-		"test_file_error/error_test25.conf", expected, "test_file_error/error_test25.conf"
+		"test_file_error/autoindex_duplicated.conf",
+		expected,
+		"test_file_error/autoindex_duplicated.conf"
 	);
 	ret_code |= RunErrorTest(
-		"test_file_error/error_test26.conf", expected, "test_file_error/error_test26.conf"
+		"test_file_error/allowed_methods_duplicated.conf",
+		expected,
+		"test_file_error/allowed_methods_duplicated.conf"
 	);
 	ret_code |= RunErrorTest(
-		"test_file_error/error_test27.conf", expected, "test_file_error/error_test27.conf"
+		"test_file_error/return_duplicated.conf", expected, "test_file_error/return_duplicated.conf"
 	);
 	ret_code |= RunErrorTest(
-		"test_file_error/error_test28.conf", expected, "test_file_error/error_test28.conf"
+		"test_file_error/cgi_extension_duplicated.conf",
+		expected,
+		"test_file_error/cgi_extension_duplicated.conf"
 	);
 	ret_code |= RunErrorTest(
-		"test_file_error/error_test29.conf", expected, "test_file_error/error_test29.conf"
+		"test_file_error/upload_dir_duplicated.conf",
+		expected,
+		"test_file_error/upload_dir_duplicated.conf"
 	);
 
 	return ret_code;
