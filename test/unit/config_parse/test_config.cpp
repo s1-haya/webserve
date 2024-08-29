@@ -485,7 +485,9 @@ int main() {
 		"test_file_error/server_in_server.conf", expected, "test_file_error/server_in_server.conf"
 	);
 	ret_code |= RunErrorTest(
-		"test_file_error/listen_no_param.conf", expected, "test_file_error/listen_no_param.conf"
+		"test_file_error/listen/listen_no_param.conf",
+		expected,
+		"test_file_error/listen/listen_no_param.conf"
 	);
 	ret_code |= RunErrorTest(
 		"test_file_error/server_name_no_delimiter.conf",
@@ -493,14 +495,14 @@ int main() {
 		"test_file_error/server_name_no_delimiter.conf"
 	);
 	ret_code |= RunErrorTest(
-		"test_file_error/listen_no_delimiter.conf",
+		"test_file_error/listen/listen_no_delimiter.conf",
 		expected,
-		"test_file_error/listen_no_delimiter.conf"
+		"test_file_error/listen/listen_no_delimiter.conf"
 	);
 	ret_code |= RunErrorTest(
-		"test_file_error/listen_multi_params.conf",
+		"test_file_error/listen/listen_multi_params.conf",
 		expected,
-		"test_file_error/listen_multi_params.conf"
+		"test_file_error/listen/listen_multi_params.conf"
 	);
 	ret_code |= RunErrorTest(
 		"test_file_error/invalid_context.conf", expected, "test_file_error/invalid_context.conf"
@@ -539,9 +541,9 @@ int main() {
 		"test_file_error/invalid_directive.conf", expected, "test_file_error/invalid_directive.conf"
 	);
 	ret_code |= RunErrorTest(
-		"test_file_error/listen_duplicated_port.conf",
+		"test_file_error/listen/listen_duplicated_port.conf",
 		expected,
-		"test_file_error/listen_duplicated_port.conf"
+		"test_file_error/listen/listen_duplicated_port.conf"
 	);
 	ret_code |= RunErrorTest(
 		"test_file_error/error_page_invalid_status_code.conf",
@@ -554,9 +556,9 @@ int main() {
 		"test_file_error/allowed_methods_invalid_method.conf"
 	);
 	ret_code |= RunErrorTest(
-		"test_file_error/listen_multi_hosts.conf",
+		"test_file_error/listen/listen_multi_hosts.conf",
 		expected,
-		"test_file_error/listen_multi_hosts.conf"
+		"test_file_error/listen/listen_multi_hosts.conf"
 	);
 	ret_code |= RunErrorTest(
 		"test_file_error/client_max_body_size_duplicated.conf",
