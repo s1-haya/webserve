@@ -571,20 +571,22 @@ int main() {
 		"test_file_error/error_page_duplicated.conf"
 	);
 	ret_code |= RunErrorTest(
-		"test_file_error/alias_duplicated.conf", expected, "test_file_error/alias_duplicated.conf"
+		"test_file_error/alias/alias_duplicated.conf",
+		expected,
+		"test_file_error/alias/alias_duplicated.conf"
 	);
 	ret_code |= RunErrorTest(
 		"test_file_error/index_duplicated.conf", expected, "test_file_error/index_duplicated.conf"
 	);
 	ret_code |= RunErrorTest(
-		"test_file_error/autoindex_duplicated.conf",
+		"test_file_error/autoindex/autoindex_duplicated.conf",
 		expected,
-		"test_file_error/autoindex_duplicated.conf"
+		"test_file_error/autoindex/autoindex_duplicated.conf"
 	);
 	ret_code |= RunErrorTest(
-		"test_file_error/allowed_methods_duplicated.conf",
+		"test_file_error/allowed_methods/allowed_methods_duplicated.conf",
 		expected,
-		"test_file_error/allowed_methods_duplicated.conf"
+		"test_file_error/allowed_methods/allowed_methods_duplicated.conf"
 	);
 	ret_code |= RunErrorTest(
 		"test_file_error/return_duplicated.conf", expected, "test_file_error/return_duplicated.conf"
