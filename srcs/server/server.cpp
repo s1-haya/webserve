@@ -216,17 +216,14 @@ void Server::SendResponse(int client_fd) {
 
 	switch (connection_state) {
 	case message::KEEP:
-		message_manager_.UpdateTime(client_fd);
-		utils::Debug("server", "Connection: keep-alive client", client_fd);
+		KeepConnection(client_fd);
 		break;
 	case message::CLOSE:
 		Disconnect(client_fd);
-		utils::Debug("server", "Connection: close, disconnected client", client_fd);
 		break;
 	default:
 		break;
 	}
-	utils::Debug("------------------------------------------");
 }
 
 void Server::HandleTimeoutMessages() {
@@ -249,12 +246,19 @@ void Server::HandleTimeoutMessages() {
 	}
 }
 
+void Server::KeepConnection(int client_fd) {
+	message_manager_.UpdateTime(client_fd);
+	utils::Debug("server", "Connection: keep-alive client", client_fd);
+}
+
 // delete from buffer, client_info, event, message
 void Server::Disconnect(int client_fd) {
 	context_.DeleteClientInfo(client_fd);
 	event_monitor_.Delete(client_fd);
 	message_manager_.DeleteMessage(client_fd);
 	close(client_fd);
+	utils::Debug("server", "Connection: close, disconnected client", client_fd);
+	utils::Debug("------------------------------------------");
 }
 
 void Server::UpdateEventInResponseComplete(
