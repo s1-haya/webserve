@@ -50,8 +50,7 @@ MessageManager::TimeoutFds MessageManager::GetNewTimeoutFds(double timeout) {
 
 // todo: 全てのresponse_strをsend()できた場合かつkeep-aliveの場合に呼ばれる想定
 // For Connection: keep-alive
-// Copy only the read_buf from the old message, delete the old message, and add it as a new message.
-void MessageManager::DeleteSentResponseAndResetTime(int client_fd) {
+void MessageManager::UpdateTime(int client_fd) {
 	message::Message &message = messages_.at(client_fd);
 	message.UpdateTime();
 }
@@ -81,7 +80,7 @@ void MessageManager::AddPrimaryResponse(
 	message.AddFrontResponse(connection_state, response);
 }
 
-message::Response MessageManager::GetResponse(int client_fd) {
+message::Response MessageManager::PopHeadResponse(int client_fd) {
 	message::Message &message = messages_.at(client_fd);
 	return message.PopFrontResponse();
 }

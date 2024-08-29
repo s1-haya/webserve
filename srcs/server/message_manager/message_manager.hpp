@@ -22,7 +22,7 @@ class MessageManager {
 	void       AddNewMessage(int client_fd);
 	void       DeleteMessage(int client_fd);
 	TimeoutFds GetNewTimeoutFds(double timeout);
-	void       DeleteSentResponseAndResetTime(int client_fd);
+	void       UpdateTime(int client_fd);
 	// request_buf
 	void AddRequestBuf(int client_fd, const std::string &request_buf);
 	void SetNewRequestBuf(int client_fd, const std::string &request_buf);
@@ -33,7 +33,7 @@ class MessageManager {
 	void AddPrimaryResponse(
 		int client_fd, message::ConnectionState connection_state, const std::string &response
 	);
-	message::Response GetResponse(int client_fd);
+	message::Response PopHeadResponse(int client_fd);
 
 	// getter
 	const std::string &GetRequestBuf(int client_fd) const;
