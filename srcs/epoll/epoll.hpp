@@ -13,7 +13,7 @@ class Epoll {
 	~Epoll();
 	void Add(int socket_fd, event::Type type);
 	void Delete(int socket_fd);
-	void Update(int socket_fd, event::Type new_type);
+	void Replace(int socket_fd, event::Type new_type);
 	int  CreateReadyList();
 	// getter
 	event::Event GetEvent(std::size_t index) const;

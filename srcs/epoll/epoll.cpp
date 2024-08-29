@@ -85,8 +85,8 @@ int Epoll::CreateReadyList() {
 	return ready;
 }
 
-// update epoll's interest list with new_type
-void Epoll::Update(int socket_fd, const event::Type new_type) {
+// replace old_type with new_type
+void Epoll::Replace(int socket_fd, const event::Type new_type) {
 	struct epoll_event ev = {};
 	ev.events             = ConvertToEpollEventType(new_type);
 	ev.data.fd            = socket_fd;

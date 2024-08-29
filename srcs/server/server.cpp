@@ -192,7 +192,7 @@ void Server::RunHttp(const event::Event &event) {
 	const message::ConnectionState connection_state =
 		http_result.is_connection_keep ? message::KEEP : message::CLOSE;
 	message_manager_.AddNormalResponse(client_fd, connection_state, http_result.response);
-	event_monitor_.Update(event.fd, event::EVENT_WRITE);
+	event_monitor_.Replace(event.fd, event::EVENT_WRITE);
 }
 
 void Server::SendResponse(int client_fd) {
@@ -212,7 +212,7 @@ void Server::SendResponse(int client_fd) {
 	switch (connection_state) {
 	case message::KEEP:
 		message_manager_.UpdateTime(client_fd);
-		event_monitor_.Update(client_fd, event::EVENT_READ);
+		event_monitor_.Replace(client_fd, event::EVENT_READ);
 		utils::Debug("server", "Connection: keep-alive client", client_fd);
 		break;
 	case message::CLOSE:
@@ -236,7 +236,7 @@ void Server::HandleTimeoutMessages() {
 		const int          client_fd        = *it;
 		const std::string &timeout_response = mock_http_.GetTimeoutResponse(client_fd);
 		message_manager_.AddPrimaryResponse(client_fd, message::CLOSE, timeout_response);
-		event_monitor_.Update(client_fd, event::EVENT_WRITE);
+		event_monitor_.Replace(client_fd, event::EVENT_WRITE);
 		utils::Debug("server", "timeout client", client_fd);
 	}
 }
