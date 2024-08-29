@@ -49,23 +49,25 @@ namespace context {
 bool operator==(const LocationCon &lhs, const LocationCon &rhs) {
 	return lhs.request_uri == rhs.request_uri && lhs.alias == rhs.alias && lhs.index == rhs.index &&
 		   lhs.autoindex == rhs.autoindex && lhs.allowed_methods == rhs.allowed_methods &&
-		   lhs.redirect == rhs.redirect;
+		   lhs.redirect == rhs.redirect && lhs.cgi_extension == rhs.cgi_extension &&
+		   lhs.upload_directory == rhs.upload_directory;
 }
 
 bool operator!=(const LocationCon &lhs, const LocationCon &rhs) {
 	return lhs.request_uri != rhs.request_uri || lhs.alias != rhs.alias || lhs.index != rhs.index ||
 		   lhs.autoindex != rhs.autoindex || lhs.allowed_methods != rhs.allowed_methods ||
-		   lhs.redirect != rhs.redirect;
+		   lhs.redirect != rhs.redirect || lhs.cgi_extension != rhs.cgi_extension ||
+		   lhs.upload_directory != rhs.upload_directory;
 }
 
 bool operator==(const ServerCon &lhs, const ServerCon &rhs) {
-	return lhs.port == rhs.port && lhs.server_names == rhs.server_names &&
+	return lhs.host == rhs.host && lhs.port == rhs.port && lhs.server_names == rhs.server_names &&
 		   lhs.location_con == rhs.location_con &&
 		   lhs.client_max_body_size == rhs.client_max_body_size && lhs.error_page == rhs.error_page;
 }
 
 bool operator!=(const ServerCon &lhs, const ServerCon &rhs) {
-	return lhs.port != rhs.port || lhs.server_names != rhs.server_names ||
+	return lhs.host != rhs.host || lhs.port != rhs.port || lhs.server_names != rhs.server_names ||
 		   lhs.location_con != rhs.location_con ||
 		   lhs.client_max_body_size != rhs.client_max_body_size || lhs.error_page != rhs.error_page;
 }
