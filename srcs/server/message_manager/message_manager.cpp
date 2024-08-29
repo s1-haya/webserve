@@ -83,7 +83,7 @@ void MessageManager::AddPrimaryResponse(
 
 message::Response MessageManager::GetResponse(int client_fd) {
 	message::Message &message = messages_.at(client_fd);
-	return message.DeleteOldestResponse();
+	return message.PopFrontResponse();
 }
 
 const std::string &MessageManager::GetRequestBuf(int client_fd) const {

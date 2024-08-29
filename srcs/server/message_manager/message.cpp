@@ -61,10 +61,11 @@ void Message::AddFrontResponse(ConnectionState connection_state, const std::stri
 	responses_.push_front(response);
 }
 
+// deque.front()    : Calling front on an empty container causes undefined behavior.
 // deque.pop_front(): If there are no elements in the container, the behavior is undefined.
-Response Message::DeleteOldestResponse() {
+Response Message::PopFrontResponse() {
 	if (responses_.size() == 0) {
-		throw std::logic_error("DeleteOldestResponse(): no response");
+		throw std::logic_error("PopFrontResponse(): no response");
 	}
 	const Response response = responses_.front();
 	responses_.pop_front();
@@ -77,14 +78,6 @@ int Message::GetFd() const {
 
 const std::string &Message::GetRequestBuf() const {
 	return request_buf_;
-}
-
-// deque.front(): Calling front on an empty container causes undefined behavior.
-const Response &Message::GetResponse() const {
-	if (responses_.size() == 0) {
-		throw std::logic_error("GetResponse(): no response");
-	}
-	return responses_.front();
 }
 
 void Message::SetTimeout() {

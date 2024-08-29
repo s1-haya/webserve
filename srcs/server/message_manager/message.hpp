@@ -43,12 +43,11 @@ class Message {
 	// response
 	void     AddBackResponse(ConnectionState connection_state, const std::string &response_str);
 	void     AddFrontResponse(ConnectionState connection_state, const std::string &response_str);
-	Response DeleteOldestResponse();
+	Response PopFrontResponse();
 
 	// getter
 	int                GetFd() const;
 	const std::string &GetRequestBuf() const;
-	const Response    &GetResponse() const;
 	// setter
 	void SetTimeout();
 
