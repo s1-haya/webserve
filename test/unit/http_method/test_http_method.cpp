@@ -35,14 +35,15 @@ int HandleResult(const T &result, const T &expected) {
 		return EXIT_FAILURE;
 	}
 }
+
 } // namespace
 
 int main(void) {
 	int ret_code = EXIT_SUCCESS;
 
-	// GET test
-	// CF -> success or error_pages directive
-	// CRLF -> default error file
+	// http_method/expected
+	// CF:   exist target resourse file
+	// CRLF: use default status code file
 
 	// ファイルが存在する場合
 	std::string file;
