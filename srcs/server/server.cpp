@@ -192,7 +192,7 @@ void Server::RunHttp(const event::Event &event) {
 	const message::ConnectionState connection_state =
 		http_result.is_connection_keep ? message::KEEP : message::CLOSE;
 	message_manager_.AddNormalResponse(client_fd, connection_state, http_result.response);
-	event_monitor_.Replace(event.fd, event::EVENT_WRITE);
+	UpdateEventInResponseComplete(connection_state, event);
 }
 
 void Server::SendResponse(int client_fd) {
@@ -247,6 +247,21 @@ void Server::Disconnect(int client_fd) {
 	event_monitor_.Delete(client_fd);
 	message_manager_.DeleteMessage(client_fd);
 	close(client_fd);
+}
+
+void Server::UpdateEventInResponseComplete(
+	const message::ConnectionState connection_state, const event::Event &event
+) {
+	switch (connection_state) {
+	case message::KEEP:
+		event_monitor_.Append(event, event::EVENT_WRITE);
+		break;
+	case message::CLOSE:
+		event_monitor_.Replace(event.fd, event::EVENT_WRITE);
+		break;
+	default:
+		break;
+	}
 }
 
 void Server::Init() {
