@@ -95,6 +95,18 @@ void Epoll::Replace(int socket_fd, const event::Type new_type) {
 	}
 }
 
+// append old_type to new_type
+void Epoll::Append(const event::Event &event, const event::Type new_type) {
+	int socket_fd = event.fd;
+
+	struct epoll_event ev = {};
+	ev.events             = ConvertToEpollEventType(event.type) | ConvertToEpollEventType(new_type);
+	ev.data.fd            = socket_fd;
+	if (epoll_ctl(epoll_fd_, EPOLL_CTL_MOD, socket_fd, &ev) == SYSTEM_ERROR) {
+		throw std::runtime_error("epoll_ctl failed");
+	}
+}
+
 event::Event Epoll::GetEvent(std::size_t index) const {
 	if (index >= MAX_EVENTS) {
 		throw std::out_of_range("evlist index out of range");
