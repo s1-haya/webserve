@@ -546,9 +546,9 @@ int main() {
 		"test_file_error/listen/listen_duplicated_port.conf"
 	);
 	ret_code |= RunErrorTest(
-		"test_file_error/error_page_invalid_status_code.conf",
+		"test_file_error/error_page/error_page_invalid_status_code.conf",
 		expected,
-		"test_file_error/error_page_invalid_status_code.conf"
+		"test_file_error/error_page/error_page_invalid_status_code.conf"
 	);
 	ret_code |= RunErrorTest(
 		"test_file_error/allowed_methods_invalid_method.conf",
@@ -561,14 +561,14 @@ int main() {
 		"test_file_error/listen/listen_multi_hosts.conf"
 	);
 	ret_code |= RunErrorTest(
-		"test_file_error/client_max_body_size_duplicated.conf",
+		"test_file_error/client_max_body_size/client_max_body_size_duplicated.conf",
 		expected,
-		"test_file_error/client_max_body_size_duplicated.conf"
+		"test_file_error/client_max_body_size/client_max_body_size_duplicated.conf"
 	);
 	ret_code |= RunErrorTest(
-		"test_file_error/error_page_duplicated.conf",
+		"test_file_error/error_page/error_page_duplicated.conf",
 		expected,
-		"test_file_error/error_page_duplicated.conf"
+		"test_file_error/error_page/error_page_duplicated.conf"
 	);
 	ret_code |= RunErrorTest(
 		"test_file_error/alias/alias_duplicated.conf",
@@ -592,9 +592,9 @@ int main() {
 		"test_file_error/return_duplicated.conf", expected, "test_file_error/return_duplicated.conf"
 	);
 	ret_code |= RunErrorTest(
-		"test_file_error/cgi_extension_duplicated.conf",
+		"test_file_error/cgi_extension/cgi_extension_duplicated.conf",
 		expected,
-		"test_file_error/cgi_extension_duplicated.conf"
+		"test_file_error/cgi_extension/cgi_extension_duplicated.conf"
 	);
 	ret_code |= RunErrorTest(
 		"test_file_error/upload_dir_duplicated.conf",
