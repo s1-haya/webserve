@@ -490,9 +490,9 @@ int main() {
 		"test_file_error/listen/listen_no_param.conf"
 	);
 	ret_code |= RunErrorTest(
-		"test_file_error/server_name_no_delimiter.conf",
+		"test_file_error/server_name/server_name_no_delimiter.conf",
 		expected,
-		"test_file_error/server_name_no_delimiter.conf"
+		"test_file_error/server_name/server_name_no_delimiter.conf"
 	);
 	ret_code |= RunErrorTest(
 		"test_file_error/listen/listen_no_delimiter.conf",
@@ -524,7 +524,9 @@ int main() {
 		"test_file_error/location/location_no_end_bracket.conf"
 	);
 	ret_code |= RunErrorTest(
-		"test_file_error/root_no_param.conf", expected, "test_file_error/root_no_param.conf"
+		"test_file_error/root/root_no_param.conf",
+		expected,
+		"test_file_error/root/root_no_param.conf"
 	);
 	ret_code |= RunErrorTest(
 		"test_file_error/no_context.conf", expected, "test_file_error/no_context.conf"
@@ -599,9 +601,9 @@ int main() {
 		"test_file_error/cgi_extension/cgi_extension_duplicated.conf"
 	);
 	ret_code |= RunErrorTest(
-		"test_file_error/upload_dir_duplicated.conf",
+		"test_file_error/upload_dir/upload_dir_duplicated.conf",
 		expected,
-		"test_file_error/upload_dir_duplicated.conf"
+		"test_file_error/upload_dir/upload_dir_duplicated.conf"
 	);
 
 	return ret_code;
