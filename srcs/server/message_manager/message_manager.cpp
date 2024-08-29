@@ -85,6 +85,11 @@ message::Response MessageManager::PopHeadResponse(int client_fd) {
 	return message.PopFrontResponse();
 }
 
+bool MessageManager::IsResponseExist(int client_fd) const {
+	const message::Message &message = messages_.at(client_fd);
+	return message.IsResponseExist();
+}
+
 const std::string &MessageManager::GetRequestBuf(int client_fd) const {
 	const message::Message &message = messages_.at(client_fd);
 	return message.GetRequestBuf();

@@ -72,6 +72,10 @@ Response Message::PopFrontResponse() {
 	return response;
 }
 
+bool Message::IsResponseExist() const {
+	return !responses_.empty();
+}
+
 int Message::GetFd() const {
 	return client_fd_;
 }

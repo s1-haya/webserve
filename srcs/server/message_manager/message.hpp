@@ -44,6 +44,7 @@ class Message {
 	void     AddBackResponse(ConnectionState connection_state, const std::string &response_str);
 	void     AddFrontResponse(ConnectionState connection_state, const std::string &response_str);
 	Response PopFrontResponse();
+	bool     IsResponseExist() const;
 
 	// getter
 	int                GetFd() const;
