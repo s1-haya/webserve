@@ -7,6 +7,13 @@
 
 namespace server {
 
+/**
+ * @brief Sends an response to the client and returns the result.
+ *
+ * Sends the given response to the client using the provided file descriptor.
+ * The result is `false` if an error occurs, otherwise `true`.
+ * If any part of the response is not sent, it is stored in the result value.
+ */
 class Send {
   public:
 	typedef std::string             Response;
