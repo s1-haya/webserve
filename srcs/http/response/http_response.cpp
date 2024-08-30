@@ -12,8 +12,30 @@ std::string HttpResponse::Run(const HttpRequestResult &request_info) {
 	return CreateHttpResponseFormat(response);
 }
 
+std::string HttpResponse::TmpRun(
+	const server::ClientInfo &client_info,
+	const server::ServerInfo &server_info,
+	const HttpRequestResult  &request_info
+) {
+	HttpResponseResult response =
+		TmpCreateHttpResponseResult(client_info, server_info, request_info);
+	return CreateHttpResponseFormat(response);
+}
+
 // todo: HttpResponseResult HttpResponse::CreateHttpResponseResult(const HttpRequestResult
 // &request_info) 作成
+HttpResponseResult HttpResponse::TmpCreateHttpResponseResult(
+	const server::ClientInfo &client_info,
+	const server::ServerInfo &server_info,
+	const HttpRequestResult  &request_info
+) {
+	HttpResponseResult result;
+	(void)client_info;
+	(void)server_info;
+	(void)request_info;
+	return result;
+}
+
 // HttpResponseResult response; -> response header fieldの初期値を渡す
 // try {
 // todo:
