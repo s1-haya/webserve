@@ -1,19 +1,16 @@
 #include "message.hpp"
+#include <stdexcept> // logic_error
 
 namespace server {
 namespace message {
 
 Message::Message(int client_fd)
-	: client_fd_(client_fd),
-	  start_time_(GetCurrentTime()),
-	  is_timeout_(false),
-	  connection_state_(KEEP) {}
+	: client_fd_(client_fd), start_time_(GetCurrentTime()), is_timeout_(false) {}
 
 Message::Message(int client_fd, const std::string &request_buf)
 	: client_fd_(client_fd),
 	  start_time_(GetCurrentTime()),
 	  is_timeout_(false),
-	  connection_state_(KEEP),
 	  request_buf_(request_buf) {}
 
 Message::~Message() {}
@@ -28,7 +25,7 @@ Message &Message::operator=(const Message &other) {
 		start_time_  = other.start_time_;
 		is_timeout_  = other.is_timeout_;
 		request_buf_ = other.request_buf_;
-		response_    = other.response_;
+		responses_   = other.responses_;
 	}
 	return *this;
 }
@@ -42,37 +39,49 @@ bool Message::IsNewTimeoutExceeded(double timeout_sec) const {
 	return diff_time_sec >= timeout_sec;
 }
 
-int Message::GetFd() const {
-	return client_fd_;
-}
-
-ConnectionState Message::GetConnectionState() const {
-	return connection_state_;
-}
-
-const std::string &Message::GetRequestBuf() const {
-	return request_buf_;
-}
-
-const std::string &Message::GetResponse() const {
-	return response_;
+void Message::UpdateTime() {
+	start_time_ = GetCurrentTime();
 }
 
 void Message::AddRequestBuf(const std::string &request_buf) {
 	request_buf_ += request_buf;
 }
 
+void Message::DeleteRequestBuf() {
+	request_buf_.clear();
+}
+
+void Message::AddBackResponse(ConnectionState connection_state, const std::string &response_str) {
+	const Response response(connection_state, response_str);
+	responses_.push_back(response);
+}
+
+void Message::AddFrontResponse(ConnectionState connection_state, const std::string &response_str) {
+	const Response response(connection_state, response_str);
+	responses_.push_front(response);
+}
+
+// deque.front()    : Calling front on an empty container causes undefined behavior.
+// deque.pop_front(): If there are no elements in the container, the behavior is undefined.
+Response Message::PopFrontResponse() {
+	if (responses_.size() == 0) {
+		throw std::logic_error("PopFrontResponse(): no response");
+	}
+	const Response response = responses_.front();
+	responses_.pop_front();
+	return response;
+}
+
+int Message::GetFd() const {
+	return client_fd_;
+}
+
+const std::string &Message::GetRequestBuf() const {
+	return request_buf_;
+}
+
 void Message::SetTimeout() {
 	is_timeout_ = true;
-}
-
-void Message::SetNewRequestBuf(const std::string &request_buf) {
-	request_buf_ = request_buf;
-}
-
-void Message::SetResponse(ConnectionState connection_state, const std::string &response) {
-	connection_state_ = connection_state;
-	response_         = response;
 }
 
 Message::Time Message::GetCurrentTime() {
