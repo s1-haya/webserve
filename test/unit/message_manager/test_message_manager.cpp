@@ -169,6 +169,10 @@ Result RunIsSameRequestBuf(
 }
 
 // -----------------------------------------------------------------------------
+// MessageManager classの主なテスト対象関数
+// - AddNewMessage()
+// - GetNewTimeoutFds()
+// -----------------------------------------------------------------------------
 // add fd            : 4 5         6
 // timeout(3s)       :       4 5         6
 // current time      : 0 1 2 3 4 5 6 7 8 9 10
@@ -219,6 +223,9 @@ int RunTestGetTimeoutFds() {
 	return ret_code;
 }
 
+// -----------------------------------------------------------------------------
+// MessageManager classの主なテスト対象関数
+// - UpdateTime()
 // -----------------------------------------------------------------------------
 // add fd            : 4 5       6
 // timeout(3s)       :       4 5       6
@@ -284,6 +291,10 @@ int RunTestUpdateTime() {
 	return ret_code;
 }
 
+// -----------------------------------------------------------------------------
+// MessageManager classの主なテスト対象関数
+// - DeleteMessage()
+// -----------------------------------------------------------------------------
 int RunTestDeleteMessage() {
 	int ret_code = EXIT_SUCCESS;
 
@@ -315,6 +326,13 @@ int RunTestDeleteMessage() {
 	return ret_code;
 }
 
+// -----------------------------------------------------------------------------
+// MessageManager classの主なテスト対象関数
+// - AddNormalResponse()
+// - AddPrimaryResponse()
+// - PopHeadResponse()
+// - IsResponseExist()
+// -----------------------------------------------------------------------------
 void PushBackResponse(
 	server::MessageManager &manager,
 	ResponseDeque          &expected_responses,
@@ -335,13 +353,6 @@ void PushFrontResponse(
 	expected_responses.push_front(response);
 }
 
-/*
-MessageManager class主な使用関数
-- AddNormalResponse()
-- AddPrimaryResponse()
-- PopHeadResponse()
-- IsResponseExist()
-*/
 int RunTestResponseDeque() {
 	int ret_code = EXIT_SUCCESS;
 
@@ -364,11 +375,11 @@ int RunTestResponseDeque() {
 	return ret_code;
 }
 
-/*
-MessageManager class主な使用関数
-- SetIsCompleteRequest()
-- IsCompleteRequest()
-*/
+// -----------------------------------------------------------------------------
+// MessageManager classの主なテスト対象関数
+// - SetIsCompleteRequest()
+// - IsCompleteRequest()
+// -----------------------------------------------------------------------------
 int RunTestIsCompleteRequest() {
 	int ret_code = EXIT_SUCCESS;
 
@@ -388,6 +399,12 @@ int RunTestIsCompleteRequest() {
 	return ret_code;
 }
 
+// -----------------------------------------------------------------------------
+// MessageManager classの主なテスト対象関数
+// - AddRequestBuf()
+// - SetNewRequestBuf()
+// - GetRequestBuf()
+// -----------------------------------------------------------------------------
 void AddRequestBuf(
 	server::MessageManager &manager,
 	std::string            &expected_request_buf,
@@ -408,12 +425,6 @@ void SetNewRequestBuf(
 	expected_request_buf = request_buf;
 }
 
-/*
-MessageManager class主な使用関数
-- AddRequestBuf()
-- SetNewRequestBuf()
-- GetRequestBuf()
-*/
 int RunTestRequestBuf() {
 	int ret_code = EXIT_SUCCESS;
 
