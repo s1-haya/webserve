@@ -43,6 +43,9 @@ class Server {
 	void UpdateEventInResponseComplete(
 		const message::ConnectionState connection_state, const event::Event &event
 	);
+	void UpdateConnectionAfterSendResponse(
+		int client_fd, const message::ConnectionState connection_state
+	);
 	// for Server to Http
 	DtoClientInfos GetClientInfos(int client_fd) const;
 	DtoServerInfos GetServerInfos(int client_fd) const;

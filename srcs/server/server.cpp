@@ -214,16 +214,7 @@ void Server::SendResponse(int client_fd) {
 	if (!message_manager_.IsResponseExist(client_fd)) {
 		event_monitor_.Replace(client_fd, event::EVENT_READ);
 	}
-	switch (connection_state) {
-	case message::KEEP:
-		KeepConnection(client_fd);
-		break;
-	case message::CLOSE:
-		Disconnect(client_fd);
-		break;
-	default:
-		break;
-	}
+	UpdateConnectionAfterSendResponse(client_fd, connection_state);
 }
 
 void Server::HandleTimeoutMessages() {
@@ -270,6 +261,21 @@ void Server::UpdateEventInResponseComplete(
 		break;
 	case message::CLOSE:
 		event_monitor_.Replace(event.fd, event::EVENT_WRITE);
+		break;
+	default:
+		break;
+	}
+}
+
+void Server::UpdateConnectionAfterSendResponse(
+	int client_fd, const message::ConnectionState connection_state
+) {
+	switch (connection_state) {
+	case message::KEEP:
+		KeepConnection(client_fd);
+		break;
+	case message::CLOSE:
+		Disconnect(client_fd);
 		break;
 	default:
 		break;
