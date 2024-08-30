@@ -55,9 +55,9 @@ $(NAME): $(OBJS)
 
 # create test file and directory
 .PHONY	: init
-init: $(TEST_CASE_DIR)/forbidden_file $(TEST_CASE_DIR)/no_authority_directory
+init: $(TEST_CASE_DIR)/no_authority_file $(TEST_CASE_DIR)/no_authority_directory
 
-$(TEST_CASE_DIR)/forbidden_file:
+$(TEST_CASE_DIR)/no_authority_file:
 	-(mkdir -p $(TEST_CASE_DIR) && touch $@ && chmod 000 $@)
 
 $(TEST_CASE_DIR)/no_authority_directory:
@@ -70,7 +70,14 @@ $(OBJ_DIR)/%.o: %.cpp
 
 .PHONY	: clean
 clean:
+	-@clean-test
 	$(RM) -r $(OBJ_DIR)
+
+.PHONY	: clean-test
+clean-test:
+	$(RM) $(TEST_CASE_DIR)/no_authority_file
+	@chmod 700 $(TEST_CASE_DIR)/no_authority_directory
+	$(RM) -r $(TEST_CASE_DIR)/no_authority_directory
 
 .PHONY	: fclean
 fclean: clean

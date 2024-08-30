@@ -66,7 +66,7 @@ int main(void) {
 	// ファイルが権限ない場合
 	std::string forbidden;
 	std::string expected_forbidden = LoadFileContent("expected/forbidden.txt");
-	http::HttpResponse::GetHandler("test/forbidden_file", forbidden);
+	http::HttpResponse::GetHandler("test/no_authority_file", forbidden);
 	ret_code |= HandleResult(forbidden, expected_forbidden);
 
 	// POST test
