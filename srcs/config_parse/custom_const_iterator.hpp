@@ -20,8 +20,8 @@ class CustomConstIterator {
 		typename std::list<T>::const_iterator end,
 		bool                                  throw_on_end = true
 	)
-		: it_(it), end_(end), throw_on_end_(throw_on_end){};
-	~CustomConstIterator(){};
+		: it_(it), end_(end), throw_on_end_(throw_on_end) {};
+	~CustomConstIterator() {};
 
 	CustomConstIterator &operator++() {
 		if (it_ == end_ && throw_on_end_) {
