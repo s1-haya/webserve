@@ -6,6 +6,7 @@
 #include "http_response.hpp"
 #include "http_storage.hpp"
 #include "server_info.hpp"
+#include "result.hpp"
 
 namespace http {
 
@@ -31,7 +32,8 @@ class TmpHttp {
 					const server::ServerInfo &server_info,
 					const std::string        &read_buf);
 	void        ParseHttpRequestFormat(int client_fd, const std::string &read_buf);
-	void        TmpParseHttpRequestFormat(int client_fd, const std::string &read_buf);
+	utils::Result<int>      TmpParseHttpRequestFormat(
+        int client_fd, const std::string &read_buf);
 	std::string CreateHttpResponse(int client_fd);
 	bool        GetIsHttpRequestFormatComplete(int client_fd);
 	// todo: 408のtimeoutのレスポンス
