@@ -92,6 +92,9 @@ void Parser::HandleServerContextDirective(context::ServerCon &server, NodeItr &i
 }
 
 void Parser::HandleServerName(std::list<std::string> &server_names, NodeItr &it) {
+	if ((*it).token_type != node::WORD) {
+		throw std::runtime_error("invalid number of arguments in 'server_name' directive");
+	}
 	while ((*it).token_type != node::DELIM && (*it).token_type == node::WORD) {
 		if (FindDuplicated(server_names, (*it).token)) {
 			throw std::runtime_error("a duplicated parameter in 'server_name' directive");
@@ -263,6 +266,9 @@ void Parser::HandleAutoIndex(bool &autoindex, NodeItr &it) {
 }
 
 void Parser::HandleAllowedMethods(std::list<std::string> &allowed_methods, NodeItr &it) {
+	if ((*it).token_type != node::WORD) {
+		throw std::runtime_error("invalid number of arguments in 'allowed_methods' directive");
+	}
 	if (allowed_methods.size() != 0) {
 		throw std::runtime_error("'allowed_methods' directive is duplicated");
 	}
