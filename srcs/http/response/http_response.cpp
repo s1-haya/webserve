@@ -15,7 +15,7 @@ std::string HttpResponse::Run(const HttpRequestResult &request_info) {
 std::string HttpResponse::TmpRun(
 	const server::ClientInfo &client_info,
 	const server::ServerInfo &server_info,
-	const HttpRequestResult  &request_info
+	HttpRequestResult  &request_info
 ) {
 	HttpResponseResult response =
 		TmpCreateHttpResponseResult(client_info, server_info, request_info);
@@ -27,10 +27,9 @@ std::string HttpResponse::TmpRun(
 HttpResponseResult HttpResponse::TmpCreateHttpResponseResult(
 	const server::ClientInfo &client_info,
 	const server::ServerInfo &server_info,
-	const HttpRequestResult  &request_info
+	HttpRequestResult  &request_info
 ) {
-	HttpResponseResult result;
-	// try {
+	try {
 	// todo:
 	// CheckServerInfoResult config_info = HttpServerInfoCheck::Check(server_info,
 	// request_info.request);
@@ -51,14 +50,15 @@ HttpResponseResult HttpResponse::TmpCreateHttpResponseResult(
 	//.    else
 	//       response = MethodHandler();
 	//     return CreateSuccessResponseResult();
-	// } catch (const HttpException& e) {
-	// 	request_info.status_code = e.GetStatusCode();
-	//  return CreateErrorHttpResponseResult(request_info);
-	// }
-	(void)client_info;
-	(void)server_info;
-	(void)request_info;
-	return result;
+		HttpResponseResult result;
+		(void)client_info;
+		(void)server_info;
+		(void)request_info;
+		return result;
+	} catch (const HttpException& e) {
+		request_info.status_code = e.GetStatusCode();
+		return CreateErrorHttpResponseResult(request_info);
+	}
 }
 
 // mock

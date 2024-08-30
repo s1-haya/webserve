@@ -48,7 +48,7 @@ class HttpResponse {
 	static std::string                        TmpRun(
 							   const server::ClientInfo &client_info,
 							   const server::ServerInfo &server_info,
-							   const HttpRequestResult  &request_info
+							   HttpRequestResult  &request_info
 						   );
 	static void GetHandler(const std::string &path, std::string &body_message);
 	static void PostHandler(
@@ -66,7 +66,7 @@ class HttpResponse {
 	static HttpResponseResult TmpCreateHttpResponseResult(
 		const server::ClientInfo &client_info,
 		const server::ServerInfo &server_info,
-		const HttpRequestResult  &request_info
+		HttpRequestResult  &request_info
 	);
 	static HttpResponseResult CreateSuccessHttpResponseResult(const HttpRequestResult &request_info
 	);

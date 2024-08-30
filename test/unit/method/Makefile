@@ -20,6 +20,7 @@ SRCS			+=	$(WS_UTILS_DIR)/color.cpp \
 					$(WS_UTILS_DIR)/system_exception.cpp \
 					$(WS_HTTP_DIR)/http_message.cpp \
 					$(WS_HTTP_DIR)/status_code.cpp \
+					$(WS_HTTP_DIR)/http_exception.cpp \
 					$(WS_HTTP_RESPONSE_DIR)/stat.cpp \
 					$(WS_HTTP_RESPONSE_DIR)/http_response.cpp \
 					$(WS_HTTP_RESPONSE_DIR)/handle_method.cpp \
