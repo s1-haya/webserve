@@ -34,6 +34,7 @@ class MessageManager {
 		int client_fd, message::ConnectionState connection_state, const std::string &response
 	);
 	message::Response PopHeadResponse(int client_fd);
+	bool              IsResponseExist(int client_fd) const;
 
 	// getter
 	const std::string &GetRequestBuf(int client_fd) const;
