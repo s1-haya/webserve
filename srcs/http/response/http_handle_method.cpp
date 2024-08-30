@@ -150,7 +150,11 @@ void HttpResponse::FileCreationHandler(
 		return;
 	}
 	file.write(request_body_message.c_str(), request_body_message.length());
+	file.close();
 	if (file.fail()) {
+		if (std::remove(path.c_str()) != 0) {
+			throw utils::SystemException(std::strerror(errno), errno);
+		}
 		response_body_message = CreateDefaultBodyMessageFormat(
 			utils::ToString(http::FORBIDDEN), reason_phrase.at(http::FORBIDDEN)
 		);
