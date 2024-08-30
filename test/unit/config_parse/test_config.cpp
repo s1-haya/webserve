@@ -520,6 +520,10 @@ int ClientMaxBodySizeDirectiveErrorTests() {
 		"client_max_body_size/"
 		"client_max_body_size_no_param.conf"
 	);
+	ret_code |= RunErrorTest("multi_delimiters.conf", "multi_delimiters.conf");
+	ret_code |= RunErrorTest("invalid_directive.conf", "invalid_directive.conf");
+	ret_code |=
+		RunErrorTest("listen/listen_duplicated_port.conf", "listen/listen_duplicated_port.conf");
 	ret_code |= RunErrorTest(
 		"client_max_body_size/"
 		"client_max_body_size_duplicated.conf",
@@ -537,6 +541,7 @@ int ErrorPageDirectiveErrorTests() {
 	ret_code |= RunErrorTest(
 		"error_page/error_page_duplicated.conf", "error_page/error_page_duplicated.conf"
 	);
+	ret_code |= RunErrorTest("listen/listen_multi_hosts.conf", "listen/listen_multi_hosts.conf");
 	ret_code |= RunErrorTest(
 		"error_page/error_page_invalid_status_code.conf",
 		"error_page/error_page_invalid_status_code.conf"
