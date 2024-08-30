@@ -57,9 +57,9 @@ class HttpParse {
 	static std::string CheckVersion(const std::string &version);
 
 	static std::string CheckHeaderFieldValue(const std::string &header_field_value);
-	class HttpParseException {
+	class HttpException {
 	  public:
-		explicit HttpParseException(StatusCode status_code);
+		explicit HttpException(StatusCode status_code);
 		StatusCode GetStatusCode() const;
 
 	  private:
