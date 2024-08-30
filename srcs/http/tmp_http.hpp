@@ -1,9 +1,11 @@
 #ifndef TMP_HTTP_HPP_
 #define TMP_HTTP_HPP_
 
+#include "client_info.hpp"
 #include "http_parse.hpp"
 #include "http_response.hpp"
 #include "http_storage.hpp"
+#include "server_info.hpp"
 
 namespace http {
 
@@ -18,12 +20,18 @@ namespace http {
 // - HttpRequest
 // - HttpResponse
 // }
+struct HttpResult;
 
 class TmpHttp {
   public:
 	TmpHttp();
 	~TmpHttp();
+	HttpResult
+				Run(const server::ClientInfo &client_info,
+					const server::ServerInfo &server_info,
+					const std::string        &read_buf);
 	void        ParseHttpRequestFormat(int client_fd, const std::string &read_buf);
+	void        TmpParseHttpRequestFormat(int client_fd, const std::string &read_buf);
 	std::string CreateHttpResponse(int client_fd);
 	bool        GetIsHttpRequestFormatComplete(int client_fd);
 	// todo: 408のtimeoutのレスポンス

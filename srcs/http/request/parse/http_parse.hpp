@@ -50,6 +50,15 @@ class HttpParse {
   public:
 	static HttpRequestResult Run(const std::string &read_buf);
 	static void              TmpRun(HttpRequestParsedData &data);
+	static void              TmpRunHttpResultVersion(HttpRequestParsedData &data);
+	class HttpParseException : public std::runtime_error {
+      public:
+		explicit HttpParseException(const std::string &error_message, StatusCode status_code);
+		StatusCode GetStatusCode() const;
+
+	  private:
+		StatusCode status_code_;
+	};
 
   private:
 	HttpParse();
@@ -67,14 +76,6 @@ class HttpParse {
 
 	static void CheckValidHeaderFieldName(const std::string &header_field_value);
 
-	class HttpParseException : public std::runtime_error {
-	  public:
-		explicit HttpParseException(const std::string &error_message, StatusCode status_code);
-		StatusCode GetStatusCode() const;
-
-	  private:
-		StatusCode status_code_;
-	};
 };
 
 } // namespace http

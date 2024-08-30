@@ -14,6 +14,7 @@ WS_HTTP_DIR				:=	$(WS_SRCS_DIR)/http
 WS_HTTP_REQUEST_DIR		:=	$(WS_HTTP_DIR)/request
 WS_HTTP_RESPONSE_DIR	:=	$(WS_HTTP_DIR)/response
 WS_HTTP_PARSE_DIR		:=	$(WS_HTTP_REQUEST_DIR)/parse
+WS_SOCK_CONTEXT_DIR	:=	$(WS_SRCS_DIR)/server/context_manager/sock_context
 
 SRCS				+=	$(WS_UTILS_DIR)/color.cpp \
 						$(WS_UTILS_DIR)/split_str.cpp \
@@ -24,7 +25,10 @@ SRCS				+=	$(WS_UTILS_DIR)/color.cpp \
 						$(WS_HTTP_DIR)/tmp_http.cpp \
 						$(WS_HTTP_REQUEST_DIR)/http_storage.cpp \
 						$(WS_HTTP_RESPONSE_DIR)/http_response.cpp \
-						$(WS_HTTP_PARSE_DIR)/http_parse.cpp
+						$(WS_HTTP_PARSE_DIR)/http_parse.cpp \
+						$(WS_SOCK_CONTEXT_DIR)/client_info.cpp \
+						$(WS_SOCK_CONTEXT_DIR)/server_info.cpp \
+						$(WS_SOCK_CONTEXT_DIR)/sock_context.cpp
 
 # 3. Add unit test files
 SRCS	+=	test_http.cpp
@@ -34,7 +38,8 @@ SRCS_DIR	:=	$(WS_UTILS_DIR) \
 				$(WS_HTTP_DIR) \
 				$(WS_HTTP_REQUEST_DIR) \
 				$(WS_HTTP_RESPONSE_DIR) \
-				$(WS_HTTP_PARSE_DIR)
+				$(WS_HTTP_PARSE_DIR) \
+				$(WS_SOCK_CONTEXT_DIR)
 
 #--------------------------------------------
 OBJ_DIR		:=	objs

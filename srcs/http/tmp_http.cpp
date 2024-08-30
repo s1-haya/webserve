@@ -1,5 +1,7 @@
 #include "tmp_http.hpp"
 #include "http_message.hpp"
+#include "http_result.hpp"
+#include "http_storage.hpp"
 #include <iostream>
 
 namespace http {
@@ -8,37 +10,39 @@ TmpHttp::TmpHttp() {}
 
 TmpHttp::~TmpHttp() {}
 
-// HttpResult Run(client_info, server_info) {
-// 	// todo: ParseHttpRequestFormat
-// 	// 	return HttpParsedRequestResult
-// 	// - パースしたデータ
-// 	// - 成功したかどうか
-// 	ParseHttpRequestFormat(int client_fd, const std::string &read_buf);
-// 	// todo: check is_parse
-// 	if (!(HttpParsedRequestResult.is_success)) {
-// 		HttpResult.result = CreateErrorHttpResponse(fd);
-// 		HttpResult.is_complete = true;
-// 		return HttpResult;
-// 	}
-// 	// private IsComplete;
-// 	if (IsComplete(fd)) {
-// 		HttpResult.result = CreateHttpResponse(fd);
-// 		HttpResult.is_complete = true;
-// 	}
-// 	return HttpResult;
-// }
+HttpResult TmpHttp::Run(
+	const server::ClientInfo &client_info,
+	const server::ServerInfo &server_info,
+	const std::string        &read_buf
+) {
+	(void)server_info;
+	HttpResult result;
+	TmpParseHttpRequestFormat(client_info.GetFd(), read_buf);
+	// todo: check is_parse
+	// if (!(HttpRequestParsedResult.is_success)) {
+	// 	HttpResult.result      = CreateErrorHttpResponse(fd);
+	// 	HttpResult.is_complete = true;
+	// 	return HttpResult;
+	// }
+	// private IsComplete;
+	// if (IsComplete(fd)) {
+	// 	HttpResult.result      = CreateHttpResponse(fd);
+	// 	HttpResult.is_complete = true;
+	// }
+	return result;
+}
 
-// todo:
-// HttpParsedRequestResult TmpHttp::ParseHttpRequestFormat(int client_fd, const std::string
-// &read_buf) {
-// HttpParsedRequestResult result;
-// try {
-// result = HttpParse::TmpRun(save_data);
-// } catch () {
-// result.is_success = false;
-// }
-// return HttpParsedRequestResult;
-// }
+void TmpHttp::TmpParseHttpRequestFormat(int client_fd, const std::string &read_buf) {
+	HttpRequestParsedData save_data = storage_.GetClientSaveData(client_fd);
+	save_data.current_buf += read_buf;
+	try {
+		HttpParse::TmpRunHttpResultVersion(save_data);
+	} catch (const HttpParse::HttpParseException &e) {
+		save_data.request_result.status_code = e.GetStatusCode();
+		// is_success = false;
+	}
+	storage_.UpdateClientSaveData(client_fd, save_data);
+}
 
 // HttpResult CreateTimeoutRequest(client_fd) {
 // HttpResult result;
