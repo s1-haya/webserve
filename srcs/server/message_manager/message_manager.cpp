@@ -90,7 +90,7 @@ bool MessageManager::IsResponseExist(int client_fd) const {
 	return message.IsResponseExist();
 }
 
-bool MessageManager::GetIsCompleteRequest(int client_fd) const {
+bool MessageManager::IsCompleteRequest(int client_fd) const {
 	const message::Message &message = messages_.at(client_fd);
 	return message.GetIsCompleteRequest();
 }

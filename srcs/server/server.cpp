@@ -235,7 +235,7 @@ void Server::HandleTimeoutMessages() {
 	typedef MessageManager::TimeoutFds::const_iterator Itr;
 	for (Itr it = timeout_fds.begin(); it != timeout_fds.end(); ++it) {
 		const int client_fd = *it;
-		if (message_manager_.GetIsCompleteRequest(client_fd)) {
+		if (message_manager_.IsCompleteRequest(client_fd)) {
 			Disconnect(client_fd);
 			continue;
 		}
