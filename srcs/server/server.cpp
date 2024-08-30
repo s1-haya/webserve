@@ -198,9 +198,6 @@ void Server::RunHttp(const event::Event &event) {
 }
 
 void Server::SendResponse(int client_fd) {
-	if (!message_manager_.IsResponseExist(client_fd)) {
-		return;
-	}
 	message::Response              response         = message_manager_.PopHeadResponse(client_fd);
 	const message::ConnectionState connection_state = response.connection_state;
 	const std::string             &response_str     = response.response_str;
@@ -214,6 +211,9 @@ void Server::SendResponse(int client_fd) {
 	//   message_manager_.AddPrimaryResponse(client_fd, response)
 	//   早期return
 
+	if (!message_manager_.IsResponseExist(client_fd)) {
+		event_monitor_.Replace(client_fd, event::EVENT_READ);
+	}
 	switch (connection_state) {
 	case message::KEEP:
 		KeepConnection(client_fd);
