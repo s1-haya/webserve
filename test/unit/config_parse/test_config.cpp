@@ -517,7 +517,7 @@ int main() {
 	ret_code |= RunErrorTest(
 		"location/location_no_end_bracket.conf", "location/location_no_end_bracket.conf"
 	);
-	ret_code |= RunErrorTest("root/root_no_param.conf", "root/root_no_param.conf"); // to alias
+	ret_code |= RunErrorTest("alias/alias_no_param.conf", "alias/alias_no_param.conf"); // to alias
 	ret_code |= RunErrorTest("alias/alias_duplicated.conf", "alias/alias_duplicated.conf");
 	ret_code |= RunErrorTest("index/index_duplicated.conf", "index/index_duplicated.conf");
 	ret_code |=
