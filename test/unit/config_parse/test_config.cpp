@@ -592,6 +592,9 @@ int AutoIndexDirectiveErrorTests() {
 	PrintTest("autoindex");
 	ret_code |=
 		RunErrorTest("autoindex/autoindex_no_param.conf", "autoindex/autoindex_no_param.conf");
+	ret_code |= RunErrorTest(
+		"autoindex/autoindex_invalid_param.conf", "autoindex/autoindex_invalid_param.conf"
+	);
 	ret_code |=
 		RunErrorTest("autoindex/autoindex_duplicated.conf", "autoindex/autoindex_duplicated.conf");
 
