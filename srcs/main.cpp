@@ -1,6 +1,8 @@
 #include "color.hpp"
 #include "config.hpp"
 #include "server.hpp"
+#include "utils.hpp"
+#include <csignal>
 #include <cstdlib> // EXIT_
 #include <iostream>
 #include <string>
@@ -17,12 +19,27 @@ static void PrintUsage() {
 	std::cerr << "  ./webserv [configuration file]" << std::endl;
 }
 
+typedef utils::Result<void> SignalResult;
+
+SignalResult SetSignalHandler() {
+	SignalResult result;
+	if (std::signal(SIGPIPE, SIG_IGN) == SIG_ERR) {
+		result.Set(false);
+	}
+	return result;
+}
+
 } // namespace
 
 int main(int argc, char **argv) {
 	if (argc > 2) {
 		PrintError("invalid arguments");
 		PrintUsage();
+		return EXIT_FAILURE;
+	}
+	const SignalResult result = SetSignalHandler();
+	if (!result.IsOk()) {
+		PrintError("signal failed");
 		return EXIT_FAILURE;
 	}
 
