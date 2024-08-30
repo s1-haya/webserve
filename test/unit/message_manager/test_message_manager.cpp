@@ -151,6 +151,23 @@ Result RunIsSameIsCompleteRequest(
 	return result;
 }
 
+Result RunIsSameRequestBuf(
+	const server::MessageManager &manager, const std::string &expected_request_buf, int client_fd
+) {
+	Result             result;
+	std::ostringstream oss;
+
+	const std::string &request_buf = manager.GetRequestBuf(client_fd);
+	if (!IsSame(request_buf, expected_request_buf)) {
+		result.is_success = false;
+		oss << "request_buf" << std::endl;
+		oss << "- result  : " << request_buf << std::endl;
+		oss << "- expected: " << expected_request_buf << std::endl;
+	}
+	result.error_log = oss.str();
+	return result;
+}
+
 // -----------------------------------------------------------------------------
 // add fd            : 4 5         6
 // timeout(3s)       :       4 5         6
@@ -371,6 +388,59 @@ int RunTestIsCompleteRequest() {
 	return ret_code;
 }
 
+void AddRequestBuf(
+	server::MessageManager &manager,
+	std::string            &expected_request_buf,
+	int                     client_fd,
+	const std::string      &request_buf
+) {
+	manager.AddRequestBuf(client_fd, request_buf);
+	expected_request_buf += request_buf;
+}
+
+void SetNewRequestBuf(
+	server::MessageManager &manager,
+	std::string            &expected_request_buf,
+	int                     client_fd,
+	const std::string      &request_buf
+) {
+	manager.SetNewRequestBuf(client_fd, request_buf);
+	expected_request_buf = request_buf;
+}
+
+/*
+MessageManager class主な使用関数
+- AddRequestBuf()
+- SetNewRequestBuf()
+- GetRequestBuf()
+*/
+int RunTestRequestBuf() {
+	int ret_code = EXIT_SUCCESS;
+
+	server::MessageManager manager;
+	std::string            expected_request_buf;
+
+	static const int client_fd = 4;
+	// add fd: 4
+	manager.AddNewMessage(client_fd);
+
+	// readしたbuffer追加
+	AddRequestBuf(manager, expected_request_buf, client_fd, "abc");
+	// readしたbuffer追加
+	AddRequestBuf(manager, expected_request_buf, client_fd, "defg");
+
+	// request_buf == "abcdefg"
+	ret_code |= Test(RunIsSameRequestBuf(manager, expected_request_buf, client_fd)); // test12
+
+	// 新規でrequest_bufをセット
+	SetNewRequestBuf(manager, expected_request_buf, client_fd, "hi");
+
+	// request_buf == "hi"
+	ret_code |= Test(RunIsSameRequestBuf(manager, expected_request_buf, client_fd)); // test13
+
+	return ret_code;
+}
+
 } // namespace
 
 int main() {
@@ -381,6 +451,7 @@ int main() {
 	ret_code |= RunTestDeleteMessage();
 	ret_code |= RunTestResponseDeque();
 	ret_code |= RunTestIsCompleteRequest();
+	ret_code |= RunTestRequestBuf();
 
 	return ret_code;
 }
