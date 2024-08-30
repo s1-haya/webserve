@@ -533,6 +533,36 @@ int main() {
 	ret_code |= RunErrorTest(
 		"test_file_error/error_test19.conf", expected, "test_file_error/error_test19.conf"
 	);
+	ret_code |= RunErrorTest(
+		"test_file_error/error_test20.conf", expected, "test_file_error/error_test20.conf"
+	);
+	ret_code |= RunErrorTest(
+		"test_file_error/error_test21.conf", expected, "test_file_error/error_test21.conf"
+	);
+	ret_code |= RunErrorTest(
+		"test_file_error/error_test22.conf", expected, "test_file_error/error_test22.conf"
+	);
+	ret_code |= RunErrorTest(
+		"test_file_error/error_test23.conf", expected, "test_file_error/error_test23.conf"
+	);
+	ret_code |= RunErrorTest(
+		"test_file_error/error_test24.conf", expected, "test_file_error/error_test24.conf"
+	);
+	ret_code |= RunErrorTest(
+		"test_file_error/error_test25.conf", expected, "test_file_error/error_test25.conf"
+	);
+	ret_code |= RunErrorTest(
+		"test_file_error/error_test26.conf", expected, "test_file_error/error_test26.conf"
+	);
+	ret_code |= RunErrorTest(
+		"test_file_error/error_test27.conf", expected, "test_file_error/error_test27.conf"
+	);
+	ret_code |= RunErrorTest(
+		"test_file_error/error_test28.conf", expected, "test_file_error/error_test28.conf"
+	);
+	ret_code |= RunErrorTest(
+		"test_file_error/error_test29.conf", expected, "test_file_error/error_test29.conf"
+	);
 
 	return ret_code;
 }
