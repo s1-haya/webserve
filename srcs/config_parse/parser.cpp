@@ -49,7 +49,7 @@ context::ServerCon Parser::CreateServerContext(NodeItr &it) {
 		throw std::runtime_error("expect { after server");
 	}
 	++it; // skip L_BRACKET
-	while ((*it).token_type != node::R_BRACKET) {
+	while (it != tokens_.end() && (*it).token_type != node::R_BRACKET) {
 		switch ((*it).token_type) {
 		case node::DIRECTIVE:
 			HandleServerContextDirective(server, it);
@@ -186,7 +186,7 @@ context::LocationCon Parser::CreateLocationContext(NodeItr &it) {
 		throw std::runtime_error("expect { after location argument");
 	}
 	++it; // skip L_BRACKET
-	while ((*it).token_type != node::R_BRACKET) {
+	while (it != tokens_.end() && (*it).token_type != node::R_BRACKET) {
 		switch ((*it).token_type) {
 		case node::DIRECTIVE:
 			HandleLocationContextDirective(location, it);

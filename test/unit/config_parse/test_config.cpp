@@ -482,6 +482,7 @@ int main() {
 
 	std::cout << std::endl;
 	std::cout << "Error Tests" << std::endl;
+
 	/* Server Directive Tests */
 	ret_code |= RunErrorTest("server/server_no_end_bracket.conf", "server_no_end_bracket.conf");
 	ret_code |= RunErrorTest(
