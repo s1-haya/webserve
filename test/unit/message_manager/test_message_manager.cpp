@@ -13,6 +13,8 @@ namespace {
 static const double REQUEST_TIMEOUT = 3.0;
 
 typedef server::MessageManager::TimeoutFds TimeoutFds;
+typedef std::deque<std::string>            ResponseDeque;
+typedef server::message::Response          Response;
 
 struct Result {
 	Result() : is_success(true) {}
@@ -76,6 +78,7 @@ std::ostream &operator<<(std::ostream &os, const std::list<T> &lst) {
 	return os;
 }
 
+// -----------------------------------------------------------------------------
 Result
 RunIsSameTimeoutFds(server::MessageManager &manager, const TimeoutFds &expected_timeout_fds) {
 	Result             result;
@@ -87,6 +90,45 @@ RunIsSameTimeoutFds(server::MessageManager &manager, const TimeoutFds &expected_
 		oss << "timeout_fds" << std::endl;
 		oss << "- result  : " << timeout_fds << std::endl;
 		oss << "- expected: " << expected_timeout_fds << std::endl;
+	}
+	result.error_log = oss.str();
+	return result;
+}
+
+std::ostream &operator<<(std::ostream &os, const ResponseDeque &dq) {
+	typedef typename ResponseDeque::const_iterator It;
+	for (It it = dq.begin(); it != dq.end(); ++it) {
+		os << "[" << *it << "]";
+	}
+	return os;
+}
+
+bool IsSameResponseDeque(
+	server::MessageManager &manager,
+	ResponseDeque          &result_responses,
+	ResponseDeque           expected_responses,
+	int                     client_fd
+) {
+	// 単純なgetterがないので比較対象のResponseDequeの中身を取り出す
+	while (manager.IsResponseExist(client_fd)) {
+		const Response &response = manager.PopHeadResponse(client_fd);
+		result_responses.push_back(response.response_str);
+	}
+	return result_responses == expected_responses;
+}
+
+Result RunIsSameResponseDeque(
+	server::MessageManager &manager, const ResponseDeque &expected_responses, int client_fd
+) {
+	Result             result;
+	std::ostringstream oss;
+
+	ResponseDeque result_responses;
+	if (!IsSameResponseDeque(manager, result_responses, expected_responses, client_fd)) {
+		result.is_success = false;
+		oss << "response_deque" << std::endl;
+		oss << "- result  : " << result_responses << std::endl;
+		oss << "- expected: " << expected_responses << std::endl;
 	}
 	result.error_log = oss.str();
 	return result;
@@ -239,6 +281,55 @@ int RunTestDeleteMessage() {
 	return ret_code;
 }
 
+void PushBackResponse(
+	server::MessageManager &manager,
+	ResponseDeque          &expected_responses,
+	int                     client_fd,
+	const std::string      &response
+) {
+	manager.AddNormalResponse(client_fd, server::message::KEEP, response);
+	expected_responses.push_back(response);
+}
+
+void PushFrontResponse(
+	server::MessageManager &manager,
+	ResponseDeque          &expected_responses,
+	int                     client_fd,
+	const std::string      &response
+) {
+	manager.AddPrimaryResponse(client_fd, server::message::KEEP, response);
+	expected_responses.push_front(response);
+}
+
+/*
+MessageManager class主な使用関数
+- AddNormalResponse()
+- AddPrimaryResponse()
+- PopHeadResponse()
+- IsResponseExist()
+*/
+int RunTestResponseDeque() {
+	int ret_code = EXIT_SUCCESS;
+
+	server::MessageManager manager;
+	ResponseDeque          expected_responses;
+
+	static const int client_fd = 4;
+	// add fd: 4
+	manager.AddNewMessage(client_fd);
+
+	// push_back response : {res1}
+	PushBackResponse(manager, expected_responses, client_fd, "res1");
+	// push_back response : {res1, res2}
+	PushBackResponse(manager, expected_responses, client_fd, "res2");
+	// push_front response: {res3, res1, res2}
+	PushFrontResponse(manager, expected_responses, client_fd, "res3");
+
+	ret_code |= Test(RunIsSameResponseDeque(manager, expected_responses, client_fd)); // test9
+
+	return ret_code;
+}
+
 } // namespace
 
 int main() {
@@ -247,6 +338,7 @@ int main() {
 	ret_code |= RunTestGetTimeoutFds();
 	ret_code |= RunTestUpdateTime();
 	ret_code |= RunTestDeleteMessage();
+	ret_code |= RunTestResponseDeque();
 
 	return ret_code;
 }
