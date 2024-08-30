@@ -95,7 +95,7 @@ void Epoll::Replace(int socket_fd, const event::Type new_type) {
 	}
 }
 
-// append old_type to new_type
+// append new_type to old_type
 void Epoll::Append(const event::Event &event, const event::Type new_type) {
 	int socket_fd = event.fd;
 
