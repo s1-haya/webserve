@@ -3,6 +3,7 @@
 #include "dto_server_to_http.hpp"
 #include "event.hpp"
 #include "read.hpp"
+#include "send.hpp"
 #include "server_info.hpp"
 #include "utils.hpp"
 #include "virtual_server.hpp"
@@ -205,14 +206,22 @@ void Server::SendResponse(int client_fd) {
 	const message::ConnectionState connection_state = response.connection_state;
 	const std::string             &response_str     = response.response_str;
 
-	// todo: handle return size
-	send(client_fd, response_str.c_str(), response_str.size(), 0);
+	const Send::SendResult send_result = Send::SendResponse(client_fd, response_str);
+	if (!send_result.IsOk()) {
+		// Even if sending fails, continue the server
+		// e.g., in case of a SIGPIPE(EPIPE) when the client disconnects
+		utils::Debug("server", "failed to send response to client", client_fd);
+		// todo: close()だけしない？
+		Disconnect(client_fd);
+		return;
+	}
+	const std::string &new_response_str = send_result.GetValue();
+	if (!new_response_str.empty()) {
+		// If not everything was sent, re-add the remaining unsent part to the front
+		message_manager_.AddPrimaryResponse(client_fd, connection_state, new_response_str);
+		return;
+	}
 	utils::Debug("server", "send response to client", client_fd);
-	// todo:
-	//   全てのresponse_strをsend()できなかった場合はsend_size分だけeraseして
-	//   Response dequeの先頭にAdd()し直して↓
-	//   message_manager_.AddPrimaryResponse(client_fd, response)
-	//   早期return
 
 	switch (connection_state) {
 	case message::KEEP:
