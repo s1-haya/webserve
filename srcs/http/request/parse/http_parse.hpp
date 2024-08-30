@@ -52,7 +52,7 @@ class HttpParse {
 	static void              TmpRun(HttpRequestParsedData &data);
 	static void              TmpRunHttpResultVersion(HttpRequestParsedData &data);
 	class HttpParseException : public std::runtime_error {
-      public:
+	  public:
 		explicit HttpParseException(const std::string &error_message, StatusCode status_code);
 		StatusCode GetStatusCode() const;
 
@@ -75,7 +75,6 @@ class HttpParse {
 	static void         CheckValidVersion(const std::string &version);
 
 	static void CheckValidHeaderFieldName(const std::string &header_field_value);
-
 };
 
 } // namespace http

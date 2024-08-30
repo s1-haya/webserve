@@ -15,17 +15,17 @@ HttpResult TmpHttp::Run(
 	const server::ServerInfo &server_info,
 	const std::string        &read_buf
 ) {
-	//todo: when HttpResponse::Run arguments require server_info.
+	// todo: when HttpResponse::Run arguments require server_info.
 	(void)server_info;
-	HttpResult result;
+	HttpResult         result;
 	utils::Result<int> parsed_result = TmpParseHttpRequestFormat(client_info.GetFd(), read_buf);
 	if (!parsed_result.IsOk()) {
-		result.response      = CreateHttpResponse(client_info.GetFd());
+		result.response             = CreateHttpResponse(client_info.GetFd());
 		result.is_response_complete = true;
 		return result;
 	}
 	if (GetIsHttpRequestFormatComplete(client_info.GetFd())) {
-		result.response = CreateHttpResponse(client_info.GetFd());
+		result.response             = CreateHttpResponse(client_info.GetFd());
 		result.is_response_complete = true;
 	}
 	return result;
