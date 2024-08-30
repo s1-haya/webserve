@@ -64,11 +64,10 @@ int main(void) {
 	ret_code |= HandleResult(redirect, expected_redirect);
 
 	// ファイルが権限ない場合
-	// CRLF 権限のないファイルをaddすることができなかったためローカルで各自テストしてください
-	// std::string forbidden;
-	// std::string expected_forbidden = LoadFileContent("expected/forbidden.txt");
-	// http::HttpResponse::GetHandler("test/forbidden_file", forbidden);
-	// ret_code |= HandleResult(forbidden, expected_forbidden);
+	std::string forbidden;
+	std::string expected_forbidden = LoadFileContent("expected/forbidden.txt");
+	http::HttpResponse::GetHandler("test/forbidden_file", forbidden);
+	ret_code |= HandleResult(forbidden, expected_forbidden);
 
 	// POST test
 	// 新しいファイルをアップロードする場合
@@ -92,7 +91,6 @@ int main(void) {
 	// ディレクトリの場合
 	std::string test3_request_body_message;
 	std::string test3_response_body_message;
-	std::string expected_forbidden = LoadFileContent("expected/forbidden.txt");
 	http::HttpResponse::PostHandler(
 		"test/directory", test3_request_body_message, test3_response_body_message
 	);
@@ -124,11 +122,11 @@ int main(void) {
 	http::HttpResponse::DeleteHandler("not_found_directory", delete_test5_response_body_message);
 	ret_code |= HandleResult(delete_test5_response_body_message, expected_not_found);
 
-	// 書き込み権限がないディレクトリの中にあるファイル場合(テストするときはローカルで書き込み権限を削除してください)
-	// std::string delete_test5_response_body_message;
-	// http::HttpResponse::DeleteHandler(
-	// 	"test/no_authority_directory/test.txt", delete_test5_response_body_message
-	// );
-	// ret_code |= HandleResult(delete_test5_response_body_message, expected_forbidden);
+	// 書き込み権限がないディレクトリの中にあるファイル場合
+	std::string delete_test6_response_body_message;
+	http::HttpResponse::DeleteHandler(
+		"test/no_authority_directory/test.txt", delete_test6_response_body_message
+	);
+	ret_code |= HandleResult(delete_test6_response_body_message, expected_forbidden);
 	return ret_code;
 }

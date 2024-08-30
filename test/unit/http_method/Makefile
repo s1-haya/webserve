@@ -2,6 +2,7 @@ NAME			:=	a.out
 
 # 1. Set each directory name
 TEST_DIR		:=	method
+TEST_CASE_DIR		:=	test
 
 LOG_DIR			:=	log
 LOG_FILE_NAME	:=	$(TEST_DIR).log
@@ -49,7 +50,18 @@ MKDIR		:=	mkdir -p
 all: $(NAME)
 
 $(NAME): $(OBJS)
+	@make init
 	$(CXX) -o $@ $^
+
+# create test file and directory
+.PHONY	: init
+init: $(TEST_CASE_DIR)/forbidden_file $(TEST_CASE_DIR)/no_authority_directory
+
+$(TEST_CASE_DIR)/forbidden_file:
+	-(mkdir -p $(TEST_CASE_DIR) && touch $@ && chmod 000 $@)
+
+$(TEST_CASE_DIR)/no_authority_directory:
+	-(mkdir -p $(TEST_CASE_DIR) && mkdir -p $@ && chmod 000 $@)
 
 vpath %.cpp $(SRCS_DIR)
 $(OBJ_DIR)/%.o: %.cpp
