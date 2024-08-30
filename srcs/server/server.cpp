@@ -260,6 +260,8 @@ void Server::KeepConnection(int client_fd) {
 	utils::Debug("server", "Connection: keep-alive client", client_fd);
 }
 
+// todo: 強制Disconnectする場合はHttpにclient_fdを知らせてdata削除する必要あり
+//       internal server error用responseを貰って実際は送らないという手もあり
 // delete from context, event, message
 void Server::Disconnect(int client_fd) {
 	context_.DeleteClientInfo(client_fd);
