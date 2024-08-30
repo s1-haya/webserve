@@ -251,7 +251,7 @@ void Server::KeepConnection(int client_fd) {
 	utils::Debug("server", "Connection: keep-alive client", client_fd);
 }
 
-// delete from buffer, client_info, event, message
+// delete from context, event, message
 void Server::Disconnect(int client_fd) {
 	context_.DeleteClientInfo(client_fd);
 	event_monitor_.Delete(client_fd);
