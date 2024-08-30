@@ -493,6 +493,9 @@ int main() {
 	ret_code |= RunErrorTest(
 		"server/server_multi_start_bracket.conf", "server/server_multi_start_bracket.conf"
 	);
+	ret_code |= RunErrorTest(
+		"server/server_multi_end_bracket.conf", "server/server_multi_end_bracket.conf"
+	);
 	ret_code |= RunErrorTest("server/server_in_server.conf", "server/server_in_server.conf");
 	PrintTest("listen");
 	ret_code |= RunErrorTest("listen/listen_no_param.conf", "listen/listen_no_param.conf");
@@ -542,8 +545,11 @@ int main() {
 	ret_code |= RunErrorTest(
 		"location/location_multi_start_bracket.conf", "location/location_multi_start_bracket.conf"
 	);
+	ret_code |= RunErrorTest(
+		"location/location_multi_end_bracket.conf", "location/location_multi_end_bracket.conf"
+	);
 	PrintTest("alias");
-	ret_code |= RunErrorTest("alias/alias_no_param.conf", "alias/alias_no_param.conf"); // to alias
+	ret_code |= RunErrorTest("alias/alias_no_param.conf", "alias/alias_no_param.conf");
 	ret_code |= RunErrorTest("alias/alias_duplicated.conf", "alias/alias_duplicated.conf");
 	PrintTest("index");
 	ret_code |= RunErrorTest("index/index_no_param.conf", "index/index_no_param.conf");
