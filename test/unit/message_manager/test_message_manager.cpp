@@ -134,6 +134,23 @@ Result RunIsSameResponseDeque(
 	return result;
 }
 
+Result RunIsSameIsCompleteRequest(
+	const server::MessageManager &manager, bool expected_is_complete_request, int client_fd
+) {
+	Result             result;
+	std::ostringstream oss;
+
+	const bool is_complete_request = manager.IsCompleteRequest(client_fd);
+	if (!IsSame(is_complete_request, expected_is_complete_request)) {
+		result.is_success = false;
+		oss << "is_complete_request" << std::endl;
+		oss << "- result  : " << std::boolalpha << is_complete_request << std::endl;
+		oss << "- expected: " << std::boolalpha << expected_is_complete_request << std::endl;
+	}
+	result.error_log = oss.str();
+	return result;
+}
+
 // -----------------------------------------------------------------------------
 // add fd            : 4 5         6
 // timeout(3s)       :       4 5         6
@@ -330,6 +347,30 @@ int RunTestResponseDeque() {
 	return ret_code;
 }
 
+/*
+MessageManager class主な使用関数
+- SetIsCompleteRequest()
+- IsCompleteRequest()
+*/
+int RunTestIsCompleteRequest() {
+	int ret_code = EXIT_SUCCESS;
+
+	server::MessageManager manager;
+
+	static const int client_fd = 4;
+	// add fd: 4
+	manager.AddNewMessage(client_fd);
+
+	// is_complete_requestの初期値はtrue
+	ret_code |= Test(RunIsSameIsCompleteRequest(manager, true, client_fd)); // test10
+
+	// is_complete_requestをfalseに変更
+	manager.SetIsCompleteRequest(client_fd, false);
+	ret_code |= Test(RunIsSameIsCompleteRequest(manager, false, client_fd)); // test11
+
+	return ret_code;
+}
+
 } // namespace
 
 int main() {
@@ -339,6 +380,7 @@ int main() {
 	ret_code |= RunTestUpdateTime();
 	ret_code |= RunTestDeleteMessage();
 	ret_code |= RunTestResponseDeque();
+	ret_code |= RunTestIsCompleteRequest();
 
 	return ret_code;
 }
