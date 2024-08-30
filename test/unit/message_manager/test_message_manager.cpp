@@ -156,7 +156,7 @@ int RunTestGetTimeoutFds() {
 // current time      : 0 1 2 3 4 5 6 7 8 9 10 11
 // GetNewTimeoutFds():                   *    *
 // -----------------------------------------------------------------------------
-int RunTestDeleteSentResponseAndResetTime() {
+int RunTestUpdateTime() {
 	int ret_code = EXIT_SUCCESS;
 
 	server::MessageManager manager;
@@ -245,7 +245,7 @@ int main() {
 	int ret_code = EXIT_SUCCESS;
 
 	ret_code |= RunTestGetTimeoutFds();
-	ret_code |= RunTestDeleteSentResponseAndResetTime();
+	ret_code |= RunTestUpdateTime();
 	ret_code |= RunTestDeleteMessage();
 
 	return ret_code;
