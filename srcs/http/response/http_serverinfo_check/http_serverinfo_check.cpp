@@ -1,4 +1,6 @@
 #include "http_serverinfo_check.hpp"
+#include "http_exception.hpp"
+#include "status_code.hpp"
 #include <cstdlib> // atoi
 #include <iostream>
 
@@ -19,10 +21,8 @@ void HttpServerInfoCheck::CheckDTOServerInfo(
 	const MockDtoServerInfos &server_info,
 	HeaderFields             &header_fields
 ) {
-	if (server_info.host != header_fields["Host"]) { // Check host_name
-		result.status = CheckServerInfoResult::INVALID_HOST;
-	} else if (static_cast<size_t>(std::atoi(header_fields["Content-Length"].c_str())) > server_info.client_max_body_size) { // Check content_length
-		result.status = CheckServerInfoResult::PAYLOAD_TOO_LARGE;
+	if (static_cast<size_t>(std::atoi(header_fields["Content-Length"].c_str())) > server_info.client_max_body_size) { // Check content_length
+		throw HttpException("Error: payload too large.", PAYLOAD_TOO_LARGE);
 	} else if (!server_info.error_page.second.empty()) { // Check error_page
 		result.error_page = server_info.error_page;
 	}
@@ -33,9 +33,6 @@ void HttpServerInfoCheck::CheckDTOServerInfo(
 void HttpServerInfoCheck::CheckLocationList(
 	CheckServerInfoResult &result, const LocationList &locations, const std::string &request_target
 ) {
-	if (result.status != CheckServerInfoResult::CONTINUE) {
-		return;
-	}
 	const MockLocationCon &match_location = CheckLocation(result, locations, request_target);
 	// std::cout << match_location.request_uri << std::endl; // for debug
 	CheckIndex(result, match_location);
@@ -67,7 +64,7 @@ const MockLocationCon HttpServerInfoCheck::CheckLocation(
 		}
 	}
 	if (match_loc.request_uri.empty()) {
-		result.status = CheckServerInfoResult::LOCATION_NOT_FOUND;
+		throw HttpException("Error: location not found", NOT_FOUND);
 	}
 	return match_loc;
 }

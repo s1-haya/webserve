@@ -11,10 +11,7 @@ namespace http {
 struct CheckServerInfoResult {
 	enum CheckStatus {
 		CONTINUE,
-		REDIRECT_ON,
-		INVALID_HOST,
-		PAYLOAD_TOO_LARGE,
-		LOCATION_NOT_FOUND
+		REDIRECT_ON
 	}; // rfc + 見やすいように独自で名前をつけた
 	// 呼び出し元でこれをチェックしてstatus codeを付ける用
 
