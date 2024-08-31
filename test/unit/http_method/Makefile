@@ -47,10 +47,9 @@ DEPS		:=	$(OBJS:.o=.d)
 MKDIR		:=	mkdir -p
 
 .PHONY	: all
-all: $(NAME)
+all:  init $(NAME)
 
 $(NAME): $(OBJS)
-	@make init
 	$(CXX) -o $@ $^
 
 # create test file and directory
@@ -58,10 +57,10 @@ $(NAME): $(OBJS)
 init: $(TEST_CASE_DIR)/no_authority_file $(TEST_CASE_DIR)/no_authority_directory
 
 $(TEST_CASE_DIR)/no_authority_file:
-	-(mkdir -p $(TEST_CASE_DIR) && touch $@ && chmod 000 $@)
+	-mkdir -p $(TEST_CASE_DIR) && touch $@ && chmod 000 $@
 
 $(TEST_CASE_DIR)/no_authority_directory:
-	-(mkdir -p $(TEST_CASE_DIR) && mkdir -p $@ && chmod 000 $@)
+	-mkdir -p $(TEST_CASE_DIR) && mkdir -p $@ && chmod 000 $@
 
 vpath %.cpp $(SRCS_DIR)
 $(OBJ_DIR)/%.o: %.cpp
@@ -69,8 +68,8 @@ $(OBJ_DIR)/%.o: %.cpp
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
 
 .PHONY	: clean
-clean:
-	-@clean-test
+clean: 
+	-@make clean-test
 	$(RM) -r $(OBJ_DIR)
 
 .PHONY	: clean-test
