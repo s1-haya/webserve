@@ -26,7 +26,10 @@ class VirtualServer {
 	VirtualServer();
 	// todo: configもらう？
 	VirtualServer(
-		const std::string &server_name, const LocationList &locations, const PortList &ports
+		const std::string  &server_name,
+		const LocationList &locations,
+		const PortList     &ports,
+		const HostPortList &host_port_list
 	);
 	~VirtualServer();
 	VirtualServer(const VirtualServer &other);

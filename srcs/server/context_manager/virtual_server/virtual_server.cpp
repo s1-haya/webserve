@@ -5,9 +5,15 @@ namespace server {
 VirtualServer::VirtualServer() {}
 
 VirtualServer::VirtualServer(
-	const std::string &server_name, const LocationList &locations, const PortList &ports
+	const std::string  &server_name,
+	const LocationList &locations,
+	const PortList     &ports,
+	const HostPortList &host_port_list
 )
-	: server_name_(server_name), locations_(locations), ports_(ports) {}
+	: server_name_(server_name),
+	  locations_(locations),
+	  ports_(ports),
+	  host_port_list_(host_port_list) {}
 
 VirtualServer::~VirtualServer() {}
 

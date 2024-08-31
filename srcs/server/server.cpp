@@ -50,7 +50,22 @@ VirtualServer ConvertToVirtualServer(const config::context::ServerCon &config_se
 	const std::string          &server_name = *(config_server.server_names.begin()); // tmp
 	VirtualServer::LocationList locations   = ConvertLocations(config_server.location_con);
 	VirtualServer::PortList     ports       = ConvertPorts(config_server.port);
-	return VirtualServer(server_name, locations, ports);
+
+	// todo: tmp
+	static int                  n = 0;
+	VirtualServer::HostPortList host_port_list;
+	if (n == 0) {
+		host_port_list.push_back(std::make_pair("0.0.0.0", 8080));
+		host_port_list.push_back(std::make_pair("::1", 8080));
+	} else {
+		host_port_list.push_back(std::make_pair("0.0.0.0", 8080));
+		host_port_list.push_back(std::make_pair("0.0.0.0", 9999));
+		host_port_list.push_back(std::make_pair("0.0.0.0", 12345));
+		// host_port_list.push_back(std::make_pair("::1", 8080));
+	}
+	++n;
+
+	return VirtualServer(server_name, locations, ports, host_port_list);
 }
 
 // todo: tmp for debug
