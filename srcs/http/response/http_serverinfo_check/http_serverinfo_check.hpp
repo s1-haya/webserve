@@ -1,14 +1,14 @@
 #ifndef HTTP_SERVERINFO_CHECK_HPP_
 #define HTTP_SERVERINFO_CHECK_HPP_
 
-#include "http_parse.hpp"
+#include "http_format.hpp"
 #include <string>
+#include <list>
 
 // Mock(Serverの構造体に未実装の部分があるため)
 /*-------------------------------------------------------------*/
 /*-------------------------------------------------------------*/
 
-#include <list>
 struct MockLocationCon { /*一部serverで未実装*/
 	std::string                          request_uri;
 	std::string                          alias;
@@ -84,7 +84,8 @@ class HttpServerInfoCheck {
 	static void CheckRedirect(CheckServerInfoResult &result, const MockLocationCon &location);
 
   public:
-	static CheckServerInfoResult Check(const MockDtoServerInfos &server_info, HttpRequest &request);
+	static CheckServerInfoResult
+	Check(const MockDtoServerInfos &server_info, HttpRequestFormat &request);
 };
 
 } // namespace http

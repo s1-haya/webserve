@@ -73,7 +73,8 @@ Result IsSameHeaderFields(const http::HeaderFields &res, http::HeaderFields expe
 	return header_fields_result;
 }
 
-Result IsSameHttpRequest(const http::HttpRequest &res, const http::HttpRequest &expected) {
+Result
+IsSameHttpRequest(const http::HttpRequestFormat &res, const http::HttpRequestFormat &expected) {
 	Result request_line_result = IsSameRequestLine(res.request_line, expected.request_line);
 	if (!(request_line_result.is_success)) {
 		return request_line_result;

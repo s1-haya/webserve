@@ -9,7 +9,7 @@
 namespace http {
 
 std::string HttpResponse::Run(const HttpRequestResult &request_info) {
-	HttpResponseResult response = CreateHttpResponseResult(request_info);
+	HttpResponseFormat response = CreateHttpResponseResult(request_info);
 	return CreateHttpResponseFormat(response);
 }
 
@@ -18,14 +18,14 @@ std::string HttpResponse::TmpRun(
 	const server::DtoServerInfos &server_info,
 	HttpRequestResult            &request_info
 ) {
-	HttpResponseResult response =
+	HttpResponseFormat response =
 		TmpCreateHttpResponseResult(client_info, server_info, request_info);
 	return CreateHttpResponseFormat(response);
 }
 
-// todo: HttpResponseResult HttpResponse::CreateHttpResponseResult(const HttpRequestResult
+// todo: HttpResponseFormat HttpResponse::CreateHttpResponseResult(const HttpRequestResult
 // &request_info) 作成
-HttpResponseResult HttpResponse::TmpCreateHttpResponseResult(
+HttpResponseFormat HttpResponse::TmpCreateHttpResponseResult(
 	const server::DtoClientInfos &client_info,
 	const server::DtoServerInfos &server_info,
 	HttpRequestResult            &request_info
@@ -51,7 +51,7 @@ HttpResponseResult HttpResponse::TmpCreateHttpResponseResult(
 		//.    else
 		//       response = MethodHandler();
 		//     return CreateSuccessResponseResult();
-		HttpResponseResult result;
+		HttpResponseFormat result;
 		(void)client_info;
 		(void)server_info;
 		(void)request_info;
@@ -63,8 +63,8 @@ HttpResponseResult HttpResponse::TmpCreateHttpResponseResult(
 }
 
 // mock
-HttpResponseResult HttpResponse::CreateHttpResponseResult(const HttpRequestResult &request_info) {
-	HttpResponseResult response;
+HttpResponseFormat HttpResponse::CreateHttpResponseResult(const HttpRequestResult &request_info) {
+	HttpResponseFormat response;
 	if (request_info.status_code != http::OK) {
 		response = CreateErrorHttpResponseResult(request_info);
 	} else {
@@ -74,10 +74,10 @@ HttpResponseResult HttpResponse::CreateHttpResponseResult(const HttpRequestResul
 }
 
 // mock
-HttpResponseResult
+HttpResponseFormat
 HttpResponse::CreateSuccessHttpResponseResult(const HttpRequestResult &request_info) {
 	(void)request_info;
-	HttpResponseResult response;
+	HttpResponseFormat response;
 	response.status_line.version         = HTTP_VERSION;
 	response.status_line.status_code     = "200";
 	response.status_line.reason_phrase   = "OK";
@@ -100,9 +100,9 @@ std::string HttpResponse::CreateDefaultBodyMessageFormat(
 }
 
 // mock
-HttpResponseResult HttpResponse::CreateErrorHttpResponseResult(const HttpRequestResult &request_info
+HttpResponseFormat HttpResponse::CreateErrorHttpResponseResult(const HttpRequestResult &request_info
 ) {
-	HttpResponseResult response;
+	HttpResponseFormat response;
 	response.status_line.version       = HTTP_VERSION;
 	response.status_line.status_code   = utils::ToString(request_info.status_code);
 	response.status_line.reason_phrase = reason_phrase.at(request_info.status_code);
@@ -119,7 +119,7 @@ HttpResponseResult HttpResponse::CreateErrorHttpResponseResult(const HttpRequest
 	return response;
 }
 
-std::string HttpResponse::CreateHttpResponseFormat(const HttpResponseResult &response) {
+std::string HttpResponse::CreateHttpResponseFormat(const HttpResponseFormat &response) {
 	std::ostringstream response_stream;
 	response_stream << response.status_line.version << SP << response.status_line.status_code << SP
 					<< response.status_line.reason_phrase << CRLF;

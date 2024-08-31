@@ -5,7 +5,7 @@
 namespace http {
 
 CheckServerInfoResult
-HttpServerInfoCheck::Check(const MockDtoServerInfos &server_info, HttpRequest &request) {
+HttpServerInfoCheck::Check(const MockDtoServerInfos &server_info, HttpRequestFormat &request) {
 	CheckServerInfoResult result;
 
 	CheckDTOServerInfo(result, server_info, request.header_fields);

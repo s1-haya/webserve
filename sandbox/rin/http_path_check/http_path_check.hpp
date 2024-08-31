@@ -41,7 +41,7 @@ struct RequestLine {
 
 typedef std::map<std::string, std::string> HeaderFields;
 
-struct HttpRequest {
+struct HttpRequestFormat {
 	RequestLine  request_line;
 	HeaderFields header_fields;
 	std::string  body_message;
@@ -69,7 +69,7 @@ struct CheckPathResult {
 	std::string error_page_path;
 	int         error_status_code; // error_pageで指定 まとめる？
 	CheckStatus is_ok;
-	CheckPathResult() : autoindex(false), status_code(0), error_status_code(0), is_ok(OK) {};
+	CheckPathResult() : autoindex(false), status_code(0), error_status_code(0), is_ok(OK){};
 };
 
 class HttpPathCheck {
@@ -92,7 +92,7 @@ class HttpPathCheck {
 	static void CheckRedirect(CheckPathResult &result, const LocationCon &location);
 
   public:
-	static CheckPathResult Check(const DtoServerInfos &server_info, HttpRequest &request);
+	static CheckPathResult Check(const DtoServerInfos &server_info, HttpRequestFormat &request);
 };
 
 } // namespace http

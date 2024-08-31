@@ -4,7 +4,8 @@
 
 namespace http {
 
-CheckPathResult HttpPathCheck::Check(const DtoServerInfos &server_info, HttpRequest &request) {
+CheckPathResult
+HttpPathCheck::Check(const DtoServerInfos &server_info, HttpRequestFormat &request) {
 	CheckPathResult result;
 
 	CheckDTOServerInfo(result, server_info, request.header_fields);
@@ -18,8 +19,7 @@ void HttpPathCheck::CheckDTOServerInfo(
 ) {
 	if (server_info.host != header_fields["Host"]) { // Check host_name
 		result.is_ok = INVALID_HOST;
-	} else if (static_cast<size_t>(std::atoi(header_fields["Content-Length"].c_str())) >
-			   server_info.client_max_body_size) { // Check content_length
+	} else if (static_cast<size_t>(std::atoi(header_fields["Content-Length"].c_str())) > server_info.client_max_body_size) { // Check content_length
 		result.is_ok = PAYLOAD_TOO_LARGE;
 	} else if (!server_info.error_page.second.empty()) { // Check error_page
 		result.error_status_code = server_info.error_page.first;

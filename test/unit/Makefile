@@ -28,3 +28,16 @@ run:
 		status=$$((status | dir_status)); \
 	done; \
 	exit $$status;
+
+.PHONY	: fclean
+fclean:
+	@status=0; \
+	for dir in $(TEST_DIRS); do \
+		echo "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"; \
+		echo "┃ $$dir"; \
+		echo "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"; \
+		(MAKEFLAGS="-s" make -C $$dir fclean); \
+		dir_status=$$?; \
+		status=$$((status | dir_status)); \
+	done; \
+	exit $$status;

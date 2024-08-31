@@ -1,6 +1,7 @@
 #ifndef HTTP_RESPONSE_HPP_
 #define HTTP_RESPONSE_HPP_
 
+#include "http_format.hpp"
 #include "status_code.hpp"
 #include <map>
 #include <string>
@@ -16,31 +17,17 @@ namespace http {
 
 struct HttpRequestResult;
 
-struct StatusLine {
-	std::string version;
-	std::string status_code;
-	std::string reason_phrase;
-};
-
-typedef std::map<std::string, std::string> HeaderFields;
-
-struct HttpResponseResult {
-	StatusLine   status_line;
-	HeaderFields header_fields;
-	std::string  body_message;
-};
-
 // HttpResponse {
 // public:
 //   static std::string Run(HttpRequestResult)
 //   static std::string CreateTimeoutRequestResponse(HttpRequestResult)
 //   static std::string CreateInternalServerErrorResponse(HttpRequestResult)
 //  private:
-//   static std::string        CreateHttpResponseFormat(const HttpResponseResult &response);
-//   static HttpResponseResult CreateHttpResponseResult(const HttpRequestResult &request_info);
-//   static HttpResponseResult CreateSuccessHttpResponseResult(const HttpRequestResult
+//   static std::string        CreateHttpResponseFormat(const HttpResponseFormat &response);
+//   static HttpResponseFormat CreateHttpResponseResult(const HttpRequestResult &request_info);
+//   static HttpResponseFormat CreateSuccessHttpResponseResult(const HttpRequestResult
 //   &request_info);
-//   static HttpResponseResult CreateErrorHttpResponseResult(const HttpRequestResult
+//   static HttpResponseFormat CreateErrorHttpResponseResult(const HttpRequestResult
 //   &request_info);
 //    GetTimeoutRequestBodyMessage();
 //    GetInternalServerErrorBodyMessage();
@@ -66,16 +53,16 @@ class HttpResponse {
 	HttpResponse();
 	~HttpResponse();
 
-	static std::string        CreateHttpResponseFormat(const HttpResponseResult &response);
-	static HttpResponseResult CreateHttpResponseResult(const HttpRequestResult &request_info);
-	static HttpResponseResult TmpCreateHttpResponseResult(
+	static std::string        CreateHttpResponseFormat(const HttpResponseFormat &response);
+	static HttpResponseFormat CreateHttpResponseResult(const HttpRequestResult &request_info);
+	static HttpResponseFormat TmpCreateHttpResponseResult(
 		const server::DtoClientInfos &client_info,
 		const server::DtoServerInfos &server_info,
 		HttpRequestResult            &request_info
 	);
-	static HttpResponseResult CreateSuccessHttpResponseResult(const HttpRequestResult &request_info
+	static HttpResponseFormat CreateSuccessHttpResponseResult(const HttpRequestResult &request_info
 	);
-	static HttpResponseResult CreateErrorHttpResponseResult(const HttpRequestResult &request_info);
+	static HttpResponseFormat CreateErrorHttpResponseResult(const HttpRequestResult &request_info);
 	static std::string        CreateDefaultBodyMessageFormat(
 			   const std::string &status_code, const std::string &reason_phrase
 		   );
