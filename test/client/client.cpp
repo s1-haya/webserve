@@ -27,8 +27,8 @@ void DebugPrint(const std::string &s) {
 
 void Client::SendRequestAndReceiveResponse(const std::string &message) {
 	// send request message
-	send(sock_fd_, message.c_str(), message.size(), 0);
-	DebugPrint("Message sent.");
+	ssize_t send_size = send(sock_fd_, message.c_str(), message.size(), 0);
+	DebugPrint("Message sent. (" + utils::ToString(send_size) + " bytes)");
 
 	DebugPrint("Response from server:");
 	// receive response
