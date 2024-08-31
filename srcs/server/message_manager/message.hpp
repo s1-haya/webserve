@@ -48,9 +48,11 @@ class Message {
 
 	// getter
 	int                GetFd() const;
+	bool               GetIsCompleteRequest() const;
 	const std::string &GetRequestBuf() const;
 	// setter
 	void SetTimeout();
+	void SetIsCompleteRequest(bool is_complete_request_message);
 
   private:
 	Message();
@@ -60,6 +62,7 @@ class Message {
 	int           client_fd_;
 	Time          start_time_;
 	bool          is_timeout_;
+	bool          is_complete_request_message_;
 	std::string   request_buf_;
 	ResponseDeque responses_;
 };

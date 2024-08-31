@@ -37,7 +37,10 @@ class MessageManager {
 	bool              IsResponseExist(int client_fd) const;
 
 	// getter
+	bool               GetIsCompleteRequest(int client_fd) const;
 	const std::string &GetRequestBuf(int client_fd) const;
+	// setter
+	void SetIsCompleteRequest(int client_fd, bool is_complete_request);
 
   private:
 	// variable

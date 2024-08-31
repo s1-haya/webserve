@@ -184,8 +184,10 @@ void Server::RunHttp(const event::Event &event) {
 	// Check if it's ready to start write/send.
 	// If not completed, the request will be re-read by the event_monitor.
 	if (!http_result.is_response_complete) {
+		message_manager_.SetIsCompleteRequest(client_fd, false);
 		return;
 	}
+	message_manager_.SetIsCompleteRequest(client_fd, true);
 	utils::Debug("server", "received all request from client", client_fd);
 	std::cerr << message_manager_.GetRequestBuf(client_fd) << std::endl;
 
@@ -214,17 +216,14 @@ void Server::SendResponse(int client_fd) {
 
 	switch (connection_state) {
 	case message::KEEP:
-		message_manager_.UpdateTime(client_fd);
-		utils::Debug("server", "Connection: keep-alive client", client_fd);
+		KeepConnection(client_fd);
 		break;
 	case message::CLOSE:
 		Disconnect(client_fd);
-		utils::Debug("server", "Connection: close, disconnected client", client_fd);
 		break;
 	default:
 		break;
 	}
-	utils::Debug("------------------------------------------");
 }
 
 void Server::HandleTimeoutMessages() {
@@ -235,12 +234,21 @@ void Server::HandleTimeoutMessages() {
 	// timeout用のresponseをセットしてevent監視をWRITEに変更
 	typedef MessageManager::TimeoutFds::const_iterator Itr;
 	for (Itr it = timeout_fds.begin(); it != timeout_fds.end(); ++it) {
-		const int          client_fd        = *it;
+		const int client_fd = *it;
+		if (message_manager_.GetIsCompleteRequest(client_fd)) {
+			Disconnect(client_fd);
+			continue;
+		}
 		const std::string &timeout_response = mock_http_.GetTimeoutResponse(client_fd);
 		message_manager_.AddPrimaryResponse(client_fd, message::CLOSE, timeout_response);
 		event_monitor_.Replace(client_fd, event::EVENT_WRITE);
 		utils::Debug("server", "timeout client", client_fd);
 	}
+}
+
+void Server::KeepConnection(int client_fd) {
+	message_manager_.UpdateTime(client_fd);
+	utils::Debug("server", "Connection: keep-alive client", client_fd);
 }
 
 // delete from buffer, client_info, event, message
@@ -249,6 +257,8 @@ void Server::Disconnect(int client_fd) {
 	event_monitor_.Delete(client_fd);
 	message_manager_.DeleteMessage(client_fd);
 	close(client_fd);
+	utils::Debug("server", "Connection: close, disconnected client", client_fd);
+	utils::Debug("------------------------------------------");
 }
 
 void Server::UpdateEventInResponseComplete(

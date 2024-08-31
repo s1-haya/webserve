@@ -5,12 +5,16 @@ namespace server {
 namespace message {
 
 Message::Message(int client_fd)
-	: client_fd_(client_fd), start_time_(GetCurrentTime()), is_timeout_(false) {}
+	: client_fd_(client_fd),
+	  start_time_(GetCurrentTime()),
+	  is_timeout_(false),
+	  is_complete_request_message_(true) {}
 
 Message::Message(int client_fd, const std::string &request_buf)
 	: client_fd_(client_fd),
 	  start_time_(GetCurrentTime()),
 	  is_timeout_(false),
+	  is_complete_request_message_(true),
 	  request_buf_(request_buf) {}
 
 Message::~Message() {}
@@ -21,11 +25,12 @@ Message::Message(const Message &other) {
 
 Message &Message::operator=(const Message &other) {
 	if (this != &other) {
-		client_fd_   = other.client_fd_;
-		start_time_  = other.start_time_;
-		is_timeout_  = other.is_timeout_;
-		request_buf_ = other.request_buf_;
-		responses_   = other.responses_;
+		client_fd_                   = other.client_fd_;
+		start_time_                  = other.start_time_;
+		is_timeout_                  = other.is_timeout_;
+		is_complete_request_message_ = other.is_complete_request_message_;
+		request_buf_                 = other.request_buf_;
+		responses_                   = other.responses_;
 	}
 	return *this;
 }
@@ -80,12 +85,20 @@ int Message::GetFd() const {
 	return client_fd_;
 }
 
+bool Message::GetIsCompleteRequest() const {
+	return is_complete_request_message_;
+}
+
 const std::string &Message::GetRequestBuf() const {
 	return request_buf_;
 }
 
 void Message::SetTimeout() {
 	is_timeout_ = true;
+}
+
+void Message::SetIsCompleteRequest(bool is_complete_request_message) {
+	is_complete_request_message_ = is_complete_request_message;
 }
 
 Message::Time Message::GetCurrentTime() {
