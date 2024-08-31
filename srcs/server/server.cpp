@@ -199,9 +199,6 @@ void Server::RunHttp(const event::Event &event) {
 }
 
 void Server::SendResponse(int client_fd) {
-	if (!message_manager_.IsResponseExist(client_fd)) {
-		return;
-	}
 	message::Response              response         = message_manager_.PopHeadResponse(client_fd);
 	const message::ConnectionState connection_state = response.connection_state;
 	const std::string             &response_str     = response.response_str;
@@ -223,16 +220,10 @@ void Server::SendResponse(int client_fd) {
 	}
 	utils::Debug("server", "send response to client", client_fd);
 
-	switch (connection_state) {
-	case message::KEEP:
-		KeepConnection(client_fd);
-		break;
-	case message::CLOSE:
-		Disconnect(client_fd);
-		break;
-	default:
-		break;
+	if (!message_manager_.IsResponseExist(client_fd)) {
+		event_monitor_.Replace(client_fd, event::EVENT_READ);
 	}
+	UpdateConnectionAfterSendResponse(client_fd, connection_state);
 }
 
 void Server::HandleTimeoutMessages() {
@@ -281,6 +272,21 @@ void Server::UpdateEventInResponseComplete(
 		break;
 	case message::CLOSE:
 		event_monitor_.Replace(event.fd, event::EVENT_WRITE);
+		break;
+	default:
+		break;
+	}
+}
+
+void Server::UpdateConnectionAfterSendResponse(
+	int client_fd, const message::ConnectionState connection_state
+) {
+	switch (connection_state) {
+	case message::KEEP:
+		KeepConnection(client_fd);
+		break;
+	case message::CLOSE:
+		Disconnect(client_fd);
 		break;
 	default:
 		break;

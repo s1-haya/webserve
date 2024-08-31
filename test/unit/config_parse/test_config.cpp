@@ -37,6 +37,10 @@ void PrintError(const std::string &message) {
 	std::cerr << utils::color::RED << message << utils::color::RESET << std::endl;
 }
 
+void PrintTest(const std::string &test_name) {
+	std::cout << "\033[44;37m[" + test_name + "]\033[m" << std::endl;
+}
+
 } // namespace
 
 /*------------------------------------------------------------------*/
@@ -464,6 +468,199 @@ ServerList MakeExpectedTest9() {
 	return expected_result;
 }
 
+/* For Server Context */
+int ServerDirectiveErrorTests() {
+	int ret_code = EXIT_SUCCESS;
+
+	PrintTest("server");
+	ret_code |= RunErrorTest("server/server_no_end_bracket.conf", "server_no_end_bracket.conf");
+	ret_code |=
+		RunErrorTest("server/server_multi_start_bracket.conf", "server_multi_start_bracket.conf");
+	ret_code |=
+		RunErrorTest("server/server_multi_end_bracket.conf", "server_multi_end_bracket.conf");
+
+	return ret_code;
+}
+
+int ListenDirectiveErrorTests() {
+	int ret_code = EXIT_SUCCESS;
+
+	PrintTest("listen");
+	ret_code |= RunErrorTest("listen/listen_no_param.conf", "listen/listen_no_param.conf");
+	ret_code |= RunErrorTest("listen/listen_no_delimiter.conf", "listen/listen_no_delimiter.conf");
+	ret_code |= RunErrorTest("listen/listen_multi_params.conf", "listen/listen_multi_params.conf");
+	ret_code |=
+		RunErrorTest("listen/listen_duplicated_port.conf", "listen/listen_duplicated_port.conf");
+	ret_code |= RunErrorTest("listen/listen_multi_hosts.conf", "listen/listen_multi_hosts.conf");
+
+	return ret_code;
+}
+
+int ServerNameDirectiveErrorTests() {
+	int ret_code = EXIT_SUCCESS;
+
+	PrintTest("server_name");
+	ret_code |= RunErrorTest(
+		"server_name/server_name_no_param.conf", "server_name/server_name_no_param.conf"
+	);
+	ret_code |= RunErrorTest(
+		"server_name/server_name_no_delimiter.conf", "server_name/server_name_no_delimiter.conf"
+	);
+
+	return ret_code;
+}
+
+int ClientMaxBodySizeDirectiveErrorTests() {
+	int ret_code = EXIT_SUCCESS;
+
+	PrintTest("client_max_body_size");
+	ret_code |= RunErrorTest(
+		"client_max_body_size/"
+		"client_max_body_size_no_param.conf",
+		"client_max_body_size/"
+		"client_max_body_size_no_param.conf"
+	);
+	ret_code |= RunErrorTest(
+		"client_max_body_size/"
+		"client_max_body_size_duplicated.conf",
+		"client_max_body_size/"
+		"client_max_body_size_duplicated.conf"
+	);
+
+	return ret_code;
+}
+
+int ErrorPageDirectiveErrorTests() {
+	int ret_code = EXIT_SUCCESS;
+
+	PrintTest("error_page");
+	ret_code |= RunErrorTest(
+		"error_page/error_page_duplicated.conf", "error_page/error_page_duplicated.conf"
+	);
+	ret_code |= RunErrorTest(
+		"error_page/error_page_invalid_status_code.conf",
+		"error_page/error_page_invalid_status_code.conf"
+	);
+
+	return ret_code;
+}
+
+/* For Location Context */
+int LocationDirectiveErrorTests() {
+	int ret_code = EXIT_SUCCESS;
+
+	PrintTest("location");
+	ret_code |= RunErrorTest("location/location_no_param.conf", "location/location_no_param.conf");
+	ret_code |=
+		RunErrorTest("location/location_multi_params.conf", "location/location_multi_params.conf");
+	ret_code |= RunErrorTest(
+		"location/location_no_end_bracket.conf", "location/location_no_end_bracket.conf"
+	);
+	ret_code |= RunErrorTest(
+		"location/location_multi_start_bracket.conf", "location/location_multi_start_bracket.conf"
+	);
+	ret_code |= RunErrorTest(
+		"location/location_multi_end_bracket.conf", "location/location_multi_end_bracket.conf"
+	);
+
+	return ret_code;
+}
+
+int AliasDirectiveErrorTests() {
+	int ret_code = EXIT_SUCCESS;
+
+	PrintTest("alias");
+	ret_code |= RunErrorTest("alias/alias_no_param.conf", "alias/alias_no_param.conf");
+	ret_code |= RunErrorTest("alias/alias_duplicated.conf", "alias/alias_duplicated.conf");
+
+	return ret_code;
+}
+
+int IndexDirectiveErrorTests() {
+	int ret_code = EXIT_SUCCESS;
+
+	PrintTest("index");
+	ret_code |= RunErrorTest("index/index_no_param.conf", "index/index_no_param.conf");
+	ret_code |= RunErrorTest("index/index_duplicated.conf", "index/index_duplicated.conf");
+
+	return ret_code;
+}
+
+int AutoIndexDirectiveErrorTests() {
+	int ret_code = EXIT_SUCCESS;
+
+	PrintTest("autoindex");
+	ret_code |=
+		RunErrorTest("autoindex/autoindex_no_param.conf", "autoindex/autoindex_no_param.conf");
+	ret_code |= RunErrorTest(
+		"autoindex/autoindex_invalid_param.conf", "autoindex/autoindex_invalid_param.conf"
+	);
+	ret_code |=
+		RunErrorTest("autoindex/autoindex_duplicated.conf", "autoindex/autoindex_duplicated.conf");
+
+	return ret_code;
+}
+
+int AllowedMethodsDirectiveErrorTests() {
+	int ret_code = EXIT_SUCCESS;
+
+	PrintTest("allowed_methods");
+	ret_code |= RunErrorTest(
+		"allowed_methods/allowed_methods_no_param.conf",
+		"allowed_methods/allowed_methods_no_param.conf"
+	);
+	ret_code |= RunErrorTest(
+		"allowed_methods/allowed_methods_invalid_method.conf",
+		"allowed_methods/allowed_methods_invalid_method.conf"
+	);
+	ret_code |= RunErrorTest(
+		"allowed_methods/allowed_methods_duplicated.conf",
+		"allowed_methods/allowed_methods_duplicated.conf"
+	);
+
+	return ret_code;
+}
+
+int ReturnDirectiveErrorTests() {
+	int ret_code = EXIT_SUCCESS;
+
+	PrintTest("return");
+	ret_code |= RunErrorTest("return/return_no_param.conf", "return/return_no_param.conf");
+	ret_code |= RunErrorTest("return/return_duplicated.conf", "return/return_duplicated.conf");
+	ret_code |= RunErrorTest(
+		"return/return_invalid_status_code.conf", "return/return_invalid_status_code.conf"
+	);
+
+	return ret_code;
+}
+
+int CgiExtensionDirectiveErrorTests() {
+	int ret_code = EXIT_SUCCESS;
+
+	PrintTest("cgi_extension");
+	ret_code |= RunErrorTest(
+		"cgi_extension/cgi_extension_no_param.conf", "cgi_extension/cgi_extension_no_param.conf"
+	);
+	ret_code |= RunErrorTest(
+		"cgi_extension/cgi_extension_duplicated.conf", "cgi_extension/cgi_extension_duplicated.conf"
+	);
+
+	return ret_code;
+}
+
+int UploadDirectoryDirectiveErrorTests() {
+	int ret_code = EXIT_SUCCESS;
+
+	PrintTest("upload_dir");
+	ret_code |=
+		RunErrorTest("upload_dir/upload_dir_no_param.conf", "upload_dir/upload_dir_no_param.conf");
+	ret_code |= RunErrorTest(
+		"upload_dir/upload_dir_duplicated.conf", "upload_dir/upload_dir_duplicated.conf"
+	);
+
+	return ret_code;
+}
+
 } // namespace
 
 int main() {
@@ -482,65 +679,34 @@ int main() {
 
 	std::cout << std::endl;
 	std::cout << "Error Tests" << std::endl;
-	ServerList expected;
-	ret_code |= RunErrorTest("server/server_no_end_bracket.conf", "server_no_end_bracket.conf");
-	ret_code |= RunErrorTest("server/server_in_server.conf", "server/server_in_server.conf");
-	ret_code |= RunErrorTest("listen/listen_no_param.conf", "listen/listen_no_param.conf");
-	ret_code |= RunErrorTest(
-		"server_name/server_name_no_delimiter.conf", "server_name/server_name_no_delimiter.conf"
-	);
-	ret_code |= RunErrorTest("listen/listen_no_delimiter.conf", "listen/listen_no_delimiter.conf");
-	ret_code |= RunErrorTest("listen/listen_multi_params.conf", "listen/listen_multi_params.conf");
-	ret_code |= RunErrorTest("invalid_context.conf", "invalid_context.conf");
+
+	/* Server Context Directive Tests */
+	ret_code |= ServerDirectiveErrorTests();
+	ret_code |= ListenDirectiveErrorTests();
+	ret_code |= ServerNameDirectiveErrorTests();
+	ret_code |= ClientMaxBodySizeDirectiveErrorTests();
+	ret_code |= ErrorPageDirectiveErrorTests();
+	std::cout << std::endl;
+
+	/* Location Context Directive Tests */
+	ret_code |= LocationDirectiveErrorTests();
+	ret_code |= AliasDirectiveErrorTests();
+	ret_code |= IndexDirectiveErrorTests();
+	ret_code |= AutoIndexDirectiveErrorTests();
+	ret_code |= AllowedMethodsDirectiveErrorTests();
+	ret_code |= ReturnDirectiveErrorTests();
+	ret_code |= CgiExtensionDirectiveErrorTests();
+	ret_code |= UploadDirectoryDirectiveErrorTests();
+	std::cout << std::endl;
+
+	/* Other Tests */
+	PrintTest("other");
 	ret_code |= RunErrorTest("empty_file.conf", "empty_file.conf");
 	ret_code |= RunErrorTest("empty_with_nl.conf", "empty_with_nl.conf");
-	ret_code |=
-		RunErrorTest("location/location_multi_params.conf", "location/location_multi_params.conf");
-	ret_code |= RunErrorTest(
-		"location/location_no_end_bracket.conf", "location/location_no_end_bracket.conf"
-	);
-	ret_code |= RunErrorTest("root/root_no_param.conf", "root/root_no_param.conf");
 	ret_code |= RunErrorTest("no_context.conf", "no_context.conf");
-	ret_code |= RunErrorTest(
-		"server/server_multi_start_bracket.conf", "server/server_multi_start_bracket.conf"
-	);
-	ret_code |= RunErrorTest("multi_delimiters.conf", "multi_delimiters.conf");
+	ret_code |= RunErrorTest("invalid_context.conf", "invalid_context.conf");
 	ret_code |= RunErrorTest("invalid_directive.conf", "invalid_directive.conf");
-	ret_code |=
-		RunErrorTest("listen/listen_duplicated_port.conf", "listen/listen_duplicated_port.conf");
-	ret_code |= RunErrorTest(
-		"error_page/error_page_invalid_status_code.conf",
-		"error_page/error_page_invalid_status_code.conf"
-	);
-	ret_code |= RunErrorTest(
-		"allowed_methods/allowed_methods_invalid_method.conf",
-		"allowed_methods/allowed_methods_invalid_method.conf"
-	);
-	ret_code |= RunErrorTest("listen/listen_multi_hosts.conf", "listen/listen_multi_hosts.conf");
-	ret_code |= RunErrorTest(
-		"client_max_body_size/"
-		"client_max_body_size_duplicated.conf",
-		"client_max_body_size/"
-		"client_max_body_size_duplicated.conf"
-	);
-	ret_code |= RunErrorTest(
-		"error_page/error_page_duplicated.conf", "error_page/error_page_duplicated.conf"
-	);
-	ret_code |= RunErrorTest("alias/alias_duplicated.conf", "alias/alias_duplicated.conf");
-	ret_code |= RunErrorTest("index/index_duplicated.conf", "index/index_duplicated.conf");
-	ret_code |=
-		RunErrorTest("autoindex/autoindex_duplicated.conf", "autoindex/autoindex_duplicated.conf");
-	ret_code |= RunErrorTest(
-		"allowed_methods/allowed_methods_duplicated.conf",
-		"allowed_methods/allowed_methods_duplicated.conf"
-	);
-	ret_code |= RunErrorTest("return/return_duplicated.conf", "return/return_duplicated.conf");
-	ret_code |= RunErrorTest(
-		"cgi_extension/cgi_extension_duplicated.conf", "cgi_extension/cgi_extension_duplicated.conf"
-	);
-	ret_code |= RunErrorTest(
-		"upload_dir/upload_dir_duplicated.conf", "upload_dir/upload_dir_duplicated.conf"
-	);
+	ret_code |= RunErrorTest("multi_delimiters.conf", "multi_delimiters.conf");
 
 	return ret_code;
 }
