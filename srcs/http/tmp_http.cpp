@@ -1,4 +1,5 @@
 #include "tmp_http.hpp"
+#include "dto_server_to_http.hpp"
 #include "http_message.hpp"
 #include "http_result.hpp"
 #include "http_storage.hpp"
@@ -10,22 +11,21 @@ TmpHttp::TmpHttp() {}
 
 TmpHttp::~TmpHttp() {}
 
-HttpResult TmpHttp::Run(
-	const server::ClientInfo &client_info,
-	const server::ServerInfo &server_info,
-	const std::string        &read_buf
-) {
+HttpResult
+TmpHttp::Run(const server::DtoClientInfos &client_info, const server::DtoServerInfos &server_info) {
 	// todo: when HttpResponse::Run arguments require server_info.
 	(void)server_info;
 	HttpResult         result;
-	utils::Result<int> parsed_result = TmpParseHttpRequestFormat(client_info.GetFd(), read_buf);
+	utils::Result<int> parsed_result =
+		TmpParseHttpRequestFormat(client_info.fd, client_info.request_buf);
 	if (!parsed_result.IsOk()) {
-		result.response             = CreateHttpResponse(client_info.GetFd());
+		// todo: request_buf, is_connection_keep
+		result.response             = CreateHttpResponse(client_info.fd);
 		result.is_response_complete = true;
 		return result;
 	}
-	if (GetIsHttpRequestFormatComplete(client_info.GetFd())) {
-		result.response             = CreateHttpResponse(client_info.GetFd());
+	if (GetIsHttpRequestFormatComplete(client_info.fd)) {
+		result.response             = CreateHttpResponse(client_info.fd);
 		result.is_response_complete = true;
 	}
 	return result;

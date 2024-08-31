@@ -1,4 +1,5 @@
 #include "http_response.hpp"
+#include "dto_server_to_http.hpp"
 #include "http_message.hpp"
 #include "http_parse.hpp"
 #include "utils.hpp"
@@ -13,9 +14,9 @@ std::string HttpResponse::Run(const HttpRequestResult &request_info) {
 }
 
 std::string HttpResponse::TmpRun(
-	const server::ClientInfo &client_info,
-	const server::ServerInfo &server_info,
-	HttpRequestResult  &request_info
+	const server::DtoClientInfos &client_info,
+	const server::DtoServerInfos &server_info,
+	HttpRequestResult            &request_info
 ) {
 	HttpResponseResult response =
 		TmpCreateHttpResponseResult(client_info, server_info, request_info);
@@ -25,37 +26,37 @@ std::string HttpResponse::TmpRun(
 // todo: HttpResponseResult HttpResponse::CreateHttpResponseResult(const HttpRequestResult
 // &request_info) 作成
 HttpResponseResult HttpResponse::TmpCreateHttpResponseResult(
-	const server::ClientInfo &client_info,
-	const server::ServerInfo &server_info,
-	HttpRequestResult  &request_info
+	const server::DtoClientInfos &client_info,
+	const server::DtoServerInfos &server_info,
+	HttpRequestResult            &request_info
 ) {
 	try {
-	// todo:
-	// CheckServerInfoResult config_info = HttpServerInfoCheck::Check(server_info,
-	// request_info.request);
-	//     // todo: IsCgi()
-	//     // - path
-	//     // - cgi_extension
-	//     // - method allowed
-	//     if (is_cgi)
-	//         // todo: cgi実行
-	//         // try {
-	//         //     cgi::Run()
-	//         // } catch {
-	//         //     cgi::Exception
-	//         //     このthrowはCreateHttpResponseResult内でcatchする
-	//         //     // throw Httpのエラー用に
-	//         // }
-	//         // response = cgi -> webserv用
-	//.    else
-	//       response = MethodHandler();
-	//     return CreateSuccessResponseResult();
+		// todo:
+		// CheckServerInfoResult config_info = HttpServerInfoCheck::Check(server_info,
+		// request_info.request);
+		//     // todo: IsCgi()
+		//     // - path
+		//     // - cgi_extension
+		//     // - method allowed
+		//     if (is_cgi)
+		//         // todo: cgi実行
+		//         // try {
+		//         //     cgi::Run()
+		//         // } catch {
+		//         //     cgi::Exception
+		//         //     このthrowはCreateHttpResponseResult内でcatchする
+		//         //     // throw Httpのエラー用に
+		//         // }
+		//         // response = cgi -> webserv用
+		//.    else
+		//       response = MethodHandler();
+		//     return CreateSuccessResponseResult();
 		HttpResponseResult result;
 		(void)client_info;
 		(void)server_info;
 		(void)request_info;
 		return result;
-	} catch (const HttpException& e) {
+	} catch (const HttpException &e) {
 		request_info.status_code = e.GetStatusCode();
 		return CreateErrorHttpResponseResult(request_info);
 	}
