@@ -2,6 +2,7 @@
 #include "client_infos.hpp"
 #include "http_message.hpp"
 #include "http_parse.hpp"
+#include "http_serverinfo_check.hpp"
 #include "server_infos.hpp"
 #include <iostream>
 #include <sstream>
@@ -31,32 +32,31 @@ HttpResponseFormat HttpResponse::TmpCreateHttpResponseResult(
 	HttpRequestResult        &request_info
 ) {
 	try {
-		// todo:
-		// CheckServerInfoResult config_info = HttpServerInfoCheck::Check(server_info,
-		// request_info.request);
-		//     // todo: IsCgi()
-		//     // - path
-		//     // - cgi_extension
-		//     // - method allowed
-		//     if (is_cgi)
-		//         // todo: cgi実行
-		//         // try {
-		//         //     cgi::Run()
-		//         // } catch {
-		//         //     cgi::Exception
-		//         //     このthrowはCreateHttpResponseResult内でcatchする
-		//         //     // throw Httpのエラー用に
-		//         // }
-		//         // response = cgi -> webserv用
-		//.    else
-		//       response = MethodHandler();
+		HttpResponseFormat    result;
+		CheckServerInfoResult server_info_result =
+			HttpServerInfoCheck::Check(server_info, request_info.request);
+		// todo: if redirect
+		// if (server_info_result.redirect.IsOk()) {
+		// 	result = RedirectHandler();
+		// todo: IsCgi()
+		// - path
+		// - cgi_extension
+		// - method allowed
+		// } else if (IsCgi()) {
+		// todo: cgi実行
+		// cgi::Run()
+		// -> Internal　Server Errorを投げる可能性あり
+		// result = CgiToServerHandler();
+		// } else {
+		// 	result = MethodHandler();
+		// }
 		//     return CreateSuccessResponseResult();
-		HttpResponseFormat result;
 		(void)client_info;
-		(void)server_info;
 		(void)request_info;
+		(void)server_info_result;
 		return result;
 	} catch (const HttpException &e) {
+		// feature: header_fieldとerror_pageとの関連性がわかり次第変更あり
 		request_info.status_code = e.GetStatusCode();
 		return CreateErrorHttpResponseResult(request_info);
 	}
