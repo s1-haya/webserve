@@ -35,8 +35,8 @@ class TmpHttp {
 	HttpResult
 		 Run(const server::DtoClientInfos &client_info, const server::DtoServerInfos &server_info);
 	void ParseHttpRequestFormat(int client_fd, const std::string &read_buf);
-	utils::Result<int> TmpParseHttpRequestFormat(int client_fd, const std::string &read_buf);
-	std::string        CreateHttpResponse(int client_fd);
+	utils::Result<void> TmpParseHttpRequestFormat(int client_fd, const std::string &read_buf);
+	std::string         CreateHttpResponse(int client_fd);
 	// todo: 408のtimeoutのレスポンス
 
 	// For test
