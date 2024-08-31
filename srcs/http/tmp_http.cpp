@@ -16,8 +16,8 @@ HttpResult
 TmpHttp::Run(const MockDtoClientInfos &client_info, const MockDtoServerInfos &server_info) {
 	// todo: when HttpResponse::Run arguments require server_info.
 	(void)server_info;
-	HttpResult         result;
-	utils::Result<int> parsed_result =
+	HttpResult          result;
+	utils::Result<void> parsed_result =
 		TmpParseHttpRequestFormat(client_info.fd, client_info.request_buf);
 	if (!parsed_result.IsOk()) {
 		// todo: request_buf, is_connection_keep
@@ -32,8 +32,8 @@ TmpHttp::Run(const MockDtoClientInfos &client_info, const MockDtoServerInfos &se
 	return result;
 }
 
-utils::Result<int> TmpHttp::TmpParseHttpRequestFormat(int client_fd, const std::string &read_buf) {
-	utils::Result<int>    result;
+utils::Result<void> TmpHttp::TmpParseHttpRequestFormat(int client_fd, const std::string &read_buf) {
+	utils::Result<void>   result;
 	HttpRequestParsedData save_data = storage_.GetClientSaveData(client_fd);
 	save_data.current_buf += read_buf;
 	try {
