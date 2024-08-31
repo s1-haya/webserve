@@ -7,16 +7,11 @@
 #include <map>
 #include <string>
 
-namespace server {
-
-struct DtoClientInfos;
-struct DtoServerInfos;
-
-} // namespace server
-
 namespace http {
 
 struct HttpRequestResult;
+struct MockDtoClientInfos;
+struct MockDtoServerInfos;
 
 // HttpResponse {
 // public:
@@ -39,9 +34,9 @@ class HttpResponse {
 	typedef std::map<StatusCode, std::string> ReasonPhrase;
 	static std::string                        Run(const HttpRequestResult &request_info);
 	static std::string                        TmpRun(
-							   const server::DtoClientInfos &client_info,
-							   const server::DtoServerInfos &server_info,
-							   HttpRequestResult            &request_info
+							   const MockDtoClientInfos &client_info,
+							   const MockDtoServerInfos &server_info,
+							   HttpRequestResult        &request_info
 						   );
 	static void GetHandler(const std::string &path, std::string &body_message);
 	static void PostHandler(
@@ -58,9 +53,9 @@ class HttpResponse {
 	static std::string        CreateHttpResponseFormat(const HttpResponseFormat &response);
 	static HttpResponseFormat CreateHttpResponseResult(const HttpRequestResult &request_info);
 	static HttpResponseFormat TmpCreateHttpResponseResult(
-		const server::DtoClientInfos &client_info,
-		const server::DtoServerInfos &server_info,
-		HttpRequestResult            &request_info
+		const MockDtoClientInfos &client_info,
+		const MockDtoServerInfos &server_info,
+		HttpRequestResult        &request_info
 	);
 	static HttpResponseFormat CreateSuccessHttpResponseResult(const HttpRequestResult &request_info
 	);

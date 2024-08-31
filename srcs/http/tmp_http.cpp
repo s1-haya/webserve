@@ -1,8 +1,9 @@
 #include "tmp_http.hpp"
-#include "dto_server_to_http.hpp"
+#include "client_infos.hpp"
 #include "http_message.hpp"
 #include "http_result.hpp"
 #include "http_storage.hpp"
+#include "server_infos.hpp"
 #include <iostream>
 
 namespace http {
@@ -12,7 +13,7 @@ TmpHttp::TmpHttp() {}
 TmpHttp::~TmpHttp() {}
 
 HttpResult
-TmpHttp::Run(const server::DtoClientInfos &client_info, const server::DtoServerInfos &server_info) {
+TmpHttp::Run(const MockDtoClientInfos &client_info, const MockDtoServerInfos &server_info) {
 	// todo: when HttpResponse::Run arguments require server_info.
 	(void)server_info;
 	HttpResult         result;

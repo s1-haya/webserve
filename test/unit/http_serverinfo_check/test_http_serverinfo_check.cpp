@@ -6,6 +6,8 @@
 
 namespace {
 
+using namespace http;
+
 MockLocationCon BuildLocationCon(
 	const std::string                          &request_uri,
 	const std::string                          &alias,
@@ -104,8 +106,6 @@ InputIt Next(InputIt it, typename std::iterator_traits<InputIt>::difference_type
 } // std::next for c++98
 
 // ================================================= //
-
-using namespace http;
 
 int Test1() {
 	// request

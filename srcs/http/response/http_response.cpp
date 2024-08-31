@@ -1,7 +1,8 @@
 #include "http_response.hpp"
-#include "dto_server_to_http.hpp"
+#include "client_infos.hpp"
 #include "http_message.hpp"
 #include "http_parse.hpp"
+#include "server_infos.hpp"
 #include <iostream>
 #include <sstream>
 
@@ -13,9 +14,9 @@ std::string HttpResponse::Run(const HttpRequestResult &request_info) {
 }
 
 std::string HttpResponse::TmpRun(
-	const server::DtoClientInfos &client_info,
-	const server::DtoServerInfos &server_info,
-	HttpRequestResult            &request_info
+	const MockDtoClientInfos &client_info,
+	const MockDtoServerInfos &server_info,
+	HttpRequestResult        &request_info
 ) {
 	HttpResponseFormat response =
 		TmpCreateHttpResponseResult(client_info, server_info, request_info);
@@ -25,9 +26,9 @@ std::string HttpResponse::TmpRun(
 // todo: HttpResponseFormat HttpResponse::CreateHttpResponseResult(const HttpRequestResult
 // &request_info) 作成
 HttpResponseFormat HttpResponse::TmpCreateHttpResponseResult(
-	const server::DtoClientInfos &client_info,
-	const server::DtoServerInfos &server_info,
-	HttpRequestResult            &request_info
+	const MockDtoClientInfos &client_info,
+	const MockDtoServerInfos &server_info,
+	HttpRequestResult        &request_info
 ) {
 	try {
 		// todo:

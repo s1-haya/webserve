@@ -1,7 +1,8 @@
 #ifndef IHTTP_HPP_
 #define IHTTP_HPP_
 
-#include "server/dto/dto_server_to_http.hpp"
+#include "client_infos.hpp"
+#include "server_infos.hpp"
 
 namespace http {
 
@@ -25,8 +26,8 @@ class IHttp {
 	 *         and containing the response data.
 	 */
 	virtual HttpResult
-	Run(const server::DtoClientInfos &client_infos, const server::DtoServerInfos &server_infos) = 0;
-	virtual std::string GetTimeoutResponse(int client_fd)                                       = 0;
+	Run(const MockDtoClientInfos &client_infos, const MockDtoServerInfos &server_infos) = 0;
+	virtual std::string GetTimeoutResponse(int client_fd)                               = 0;
 };
 
 } // namespace http
