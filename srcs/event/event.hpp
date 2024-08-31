@@ -14,8 +14,8 @@ enum Type {
 };
 
 struct Event {
-	int     fd;
-	int32_t type;
+	int      fd;
+	uint32_t type;
 };
 
 } // namespace event

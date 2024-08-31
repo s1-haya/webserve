@@ -49,23 +49,25 @@ namespace context {
 bool operator==(const LocationCon &lhs, const LocationCon &rhs) {
 	return lhs.request_uri == rhs.request_uri && lhs.alias == rhs.alias && lhs.index == rhs.index &&
 		   lhs.autoindex == rhs.autoindex && lhs.allowed_methods == rhs.allowed_methods &&
-		   lhs.redirect == rhs.redirect;
+		   lhs.redirect == rhs.redirect && lhs.cgi_extension == rhs.cgi_extension &&
+		   lhs.upload_directory == rhs.upload_directory;
 }
 
 bool operator!=(const LocationCon &lhs, const LocationCon &rhs) {
 	return lhs.request_uri != rhs.request_uri || lhs.alias != rhs.alias || lhs.index != rhs.index ||
 		   lhs.autoindex != rhs.autoindex || lhs.allowed_methods != rhs.allowed_methods ||
-		   lhs.redirect != rhs.redirect;
+		   lhs.redirect != rhs.redirect || lhs.cgi_extension != rhs.cgi_extension ||
+		   lhs.upload_directory != rhs.upload_directory;
 }
 
 bool operator==(const ServerCon &lhs, const ServerCon &rhs) {
-	return lhs.port == rhs.port && lhs.server_names == rhs.server_names &&
+	return lhs.host == rhs.host && lhs.port == rhs.port && lhs.server_names == rhs.server_names &&
 		   lhs.location_con == rhs.location_con &&
 		   lhs.client_max_body_size == rhs.client_max_body_size && lhs.error_page == rhs.error_page;
 }
 
 bool operator!=(const ServerCon &lhs, const ServerCon &rhs) {
-	return lhs.port != rhs.port || lhs.server_names != rhs.server_names ||
+	return lhs.host != rhs.host || lhs.port != rhs.port || lhs.server_names != rhs.server_names ||
 		   lhs.location_con != rhs.location_con ||
 		   lhs.client_max_body_size != rhs.client_max_body_size || lhs.error_page != rhs.error_page;
 }
@@ -197,9 +199,11 @@ std::ostream &operator<<(std::ostream &os, const ServerList &servers) {
 	return os;
 }
 
-Result Run(const std::string &file_path, const ServerList &expected) {
+Result Run(std::string file_path, const ServerList &expected) {
 	Result run_result;
 
+	// add file path
+	file_path = "../../config_files/test_files/" + file_path;
 	ConfigInstance->Create(file_path);
 	if (ConfigInstance->servers_ != expected) {
 		std::ostringstream error_log;
@@ -237,12 +241,15 @@ int Test(const Result &result, const std::string &file_path) {
 }
 
 /* For Error Tests */
-int RunErrorTest(const std::string &file_path, const ServerList &expected, const std::string &src) {
+int RunErrorTest(std::string file_path, const std::string &src) {
 	int ret_code = EXIT_SUCCESS;
 
+	// add file path
+	file_path = "../../config_files/error_test_files/" + file_path;
 	try {
-		Run(file_path, expected);
+		ConfigInstance->Create(file_path);
 		PrintNg();
+		ConfigInstance->Destroy();
 		PrintError("ConfigParser failed (No Throw):");
 		std::cerr << "src:[\n" << src << "]" << std::endl;
 		ret_code |= EXIT_FAILURE;
@@ -463,75 +470,76 @@ int main() {
 	int ret_code = EXIT_SUCCESS;
 
 	std::cout << "Normal Tests" << std::endl;
-	ret_code |= Test(Run("test_file/test1.conf", MakeExpectedTest1()), "test_file/test1.conf");
-	ret_code |= Test(Run("test_file/test2.conf", MakeExpectedTest2()), "test_file/test2.conf");
-	ret_code |= Test(Run("test_file/test3.conf", MakeExpectedTest3()), "test_file/test3.conf");
-	ret_code |= Test(Run("test_file/test4.conf", MakeExpectedTest4()), "test_file/test4.conf");
-	ret_code |= Test(Run("test_file/test5.conf", MakeExpectedTest5()), "test_file/test5.conf");
-	ret_code |= Test(Run("test_file/test6.conf", MakeExpectedTest6()), "test_file/test6.conf");
-	ret_code |= Test(Run("test_file/test7.conf", MakeExpectedTest7()), "test_file/test7.conf");
-	ret_code |= Test(Run("test_file/test8.conf", MakeExpectedTest8()), "test_file/test8.conf");
-	ret_code |= Test(Run("test_file/test9.conf", MakeExpectedTest9()), "test_file/test9.conf");
+	ret_code |= Test(Run("test1.conf", MakeExpectedTest1()), "test1.conf");
+	ret_code |= Test(Run("test2.conf", MakeExpectedTest2()), "test2.conf");
+	ret_code |= Test(Run("test3.conf", MakeExpectedTest3()), "test3.conf");
+	ret_code |= Test(Run("test4.conf", MakeExpectedTest4()), "test4.conf");
+	ret_code |= Test(Run("test5.conf", MakeExpectedTest5()), "test5.conf");
+	ret_code |= Test(Run("test6.conf", MakeExpectedTest6()), "test6.conf");
+	ret_code |= Test(Run("test7.conf", MakeExpectedTest7()), "test7.conf");
+	ret_code |= Test(Run("test8.conf", MakeExpectedTest8()), "test8.conf");
+	ret_code |= Test(Run("test9.conf", MakeExpectedTest9()), "test9.conf");
 
 	std::cout << std::endl;
 	std::cout << "Error Tests" << std::endl;
 	ServerList expected;
+	ret_code |= RunErrorTest("server/server_no_end_bracket.conf", "server_no_end_bracket.conf");
+	ret_code |= RunErrorTest("server/server_in_server.conf", "server/server_in_server.conf");
+	ret_code |= RunErrorTest("listen/listen_no_param.conf", "listen/listen_no_param.conf");
 	ret_code |= RunErrorTest(
-		"test_file_error/error_test1.conf", expected, "test_file_error/error_test1.conf"
+		"server_name/server_name_no_delimiter.conf", "server_name/server_name_no_delimiter.conf"
+	);
+	ret_code |= RunErrorTest("listen/listen_no_delimiter.conf", "listen/listen_no_delimiter.conf");
+	ret_code |= RunErrorTest("listen/listen_multi_params.conf", "listen/listen_multi_params.conf");
+	ret_code |= RunErrorTest("invalid_context.conf", "invalid_context.conf");
+	ret_code |= RunErrorTest("empty_file.conf", "empty_file.conf");
+	ret_code |= RunErrorTest("empty_with_nl.conf", "empty_with_nl.conf");
+	ret_code |=
+		RunErrorTest("location/location_multi_params.conf", "location/location_multi_params.conf");
+	ret_code |= RunErrorTest(
+		"location/location_no_end_bracket.conf", "location/location_no_end_bracket.conf"
+	);
+	ret_code |= RunErrorTest("root/root_no_param.conf", "root/root_no_param.conf");
+	ret_code |= RunErrorTest("no_context.conf", "no_context.conf");
+	ret_code |= RunErrorTest(
+		"server/server_multi_start_bracket.conf", "server/server_multi_start_bracket.conf"
+	);
+	ret_code |= RunErrorTest("multi_delimiters.conf", "multi_delimiters.conf");
+	ret_code |= RunErrorTest("invalid_directive.conf", "invalid_directive.conf");
+	ret_code |=
+		RunErrorTest("listen/listen_duplicated_port.conf", "listen/listen_duplicated_port.conf");
+	ret_code |= RunErrorTest(
+		"error_page/error_page_invalid_status_code.conf",
+		"error_page/error_page_invalid_status_code.conf"
 	);
 	ret_code |= RunErrorTest(
-		"test_file_error/error_test2.conf", expected, "test_file_error/error_test2.conf"
+		"allowed_methods/allowed_methods_invalid_method.conf",
+		"allowed_methods/allowed_methods_invalid_method.conf"
+	);
+	ret_code |= RunErrorTest("listen/listen_multi_hosts.conf", "listen/listen_multi_hosts.conf");
+	ret_code |= RunErrorTest(
+		"client_max_body_size/"
+		"client_max_body_size_duplicated.conf",
+		"client_max_body_size/"
+		"client_max_body_size_duplicated.conf"
 	);
 	ret_code |= RunErrorTest(
-		"test_file_error/error_test3.conf", expected, "test_file_error/error_test3.conf"
+		"error_page/error_page_duplicated.conf", "error_page/error_page_duplicated.conf"
+	);
+	ret_code |= RunErrorTest("alias/alias_duplicated.conf", "alias/alias_duplicated.conf");
+	ret_code |= RunErrorTest("index/index_duplicated.conf", "index/index_duplicated.conf");
+	ret_code |=
+		RunErrorTest("autoindex/autoindex_duplicated.conf", "autoindex/autoindex_duplicated.conf");
+	ret_code |= RunErrorTest(
+		"allowed_methods/allowed_methods_duplicated.conf",
+		"allowed_methods/allowed_methods_duplicated.conf"
+	);
+	ret_code |= RunErrorTest("return/return_duplicated.conf", "return/return_duplicated.conf");
+	ret_code |= RunErrorTest(
+		"cgi_extension/cgi_extension_duplicated.conf", "cgi_extension/cgi_extension_duplicated.conf"
 	);
 	ret_code |= RunErrorTest(
-		"test_file_error/error_test4.conf", expected, "test_file_error/error_test4.conf"
-	);
-	ret_code |= RunErrorTest(
-		"test_file_error/error_test5.conf", expected, "test_file_error/error_test5.conf"
-	);
-	ret_code |= RunErrorTest(
-		"test_file_error/error_test6.conf", expected, "test_file_error/error_test6.conf"
-	);
-	ret_code |= RunErrorTest(
-		"test_file_error/error_test7.conf", expected, "test_file_error/error_test7.conf"
-	);
-	ret_code |= RunErrorTest(
-		"test_file_error/error_test8.conf", expected, "test_file_error/error_test8.conf"
-	);
-	ret_code |= RunErrorTest(
-		"test_file_error/error_test9.conf", expected, "test_file_error/error_test9.conf"
-	);
-	ret_code |= RunErrorTest(
-		"test_file_error/error_test10.conf", expected, "test_file_error/error_test10.conf"
-	);
-	ret_code |= RunErrorTest(
-		"test_file_error/error_test11.conf", expected, "test_file_error/error_test11.conf"
-	);
-	ret_code |= RunErrorTest(
-		"test_file_error/error_test12.conf", expected, "test_file_error/error_test12.conf"
-	);
-	ret_code |= RunErrorTest(
-		"test_file_error/error_test13.conf", expected, "test_file_error/error_test13.conf"
-	);
-	ret_code |= RunErrorTest(
-		"test_file_error/error_test14.conf", expected, "test_file_error/error_test14.conf"
-	);
-	ret_code |= RunErrorTest(
-		"test_file_error/error_test15.conf", expected, "test_file_error/error_test15.conf"
-	);
-	ret_code |= RunErrorTest(
-		"test_file_error/error_test16.conf", expected, "test_file_error/error_test16.conf"
-	);
-	ret_code |= RunErrorTest(
-		"test_file_error/error_test17.conf", expected, "test_file_error/error_test17.conf"
-	);
-	ret_code |= RunErrorTest(
-		"test_file_error/error_test18.conf", expected, "test_file_error/error_test18.conf"
-	);
-	ret_code |= RunErrorTest(
-		"test_file_error/error_test19.conf", expected, "test_file_error/error_test19.conf"
+		"upload_dir/upload_dir_duplicated.conf", "upload_dir/upload_dir_duplicated.conf"
 	);
 
 	return ret_code;
