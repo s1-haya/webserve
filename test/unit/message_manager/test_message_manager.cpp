@@ -78,7 +78,6 @@ std::ostream &operator<<(std::ostream &os, const std::list<T> &lst) {
 	return os;
 }
 
-// -----------------------------------------------------------------------------
 Result
 RunIsSameTimeoutFds(server::MessageManager &manager, const TimeoutFds &expected_timeout_fds) {
 	Result             result;
@@ -96,7 +95,7 @@ RunIsSameTimeoutFds(server::MessageManager &manager, const TimeoutFds &expected_
 }
 
 std::ostream &operator<<(std::ostream &os, const ResponseDeque &dq) {
-	typedef typename ResponseDeque::const_iterator It;
+	typedef ResponseDeque::const_iterator It;
 	for (It it = dq.begin(); it != dq.end(); ++it) {
 		os << "[" << *it << "]";
 	}
