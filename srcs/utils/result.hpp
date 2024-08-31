@@ -52,6 +52,35 @@ class Result {
 	T    success_value_;
 };
 
+// Specialization for void type
+template <>
+class Result<void> {
+  public:
+	Result() : is_success_(true) {}
+	~Result() {}
+	explicit Result(bool is_success) : is_success_(is_success) {}
+	Result(const Result &other) {
+		*this = other;
+	}
+	Result &operator=(const Result &other) {
+		if (this != &other) {
+			is_success_ = other.is_success_;
+		}
+		return *this;
+	}
+	// getter
+	bool IsOk() const {
+		return is_success_;
+	}
+	// setter
+	void Set(bool is_success) {
+		is_success_ = is_success;
+	}
+
+  private:
+	bool is_success_;
+};
+
 } // namespace utils
 
 #endif /* RESULT_HPP_ */

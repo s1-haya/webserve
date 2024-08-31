@@ -128,6 +128,12 @@ void HttpParse::TmpRun(HttpRequestParsedData &data) {
 	}
 }
 
+void HttpParse::TmpRunHttpResultVersion(HttpRequestParsedData &data) {
+	ParseRequestLine(data);
+	ParseHeaderFields(data);
+	ParseBodyMessage(data);
+}
+
 // todo: tmp request_
 HttpRequestResult HttpParse::Run(const std::string &read_buf) {
 	HttpRequestResult result;
