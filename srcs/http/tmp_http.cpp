@@ -24,7 +24,7 @@ TmpHttp::Run(const server::DtoClientInfos &client_info, const server::DtoServerI
 		result.is_response_complete = true;
 		return result;
 	}
-	if (GetIsHttpRequestFormatComplete(client_info.fd)) {
+	if (IsHttpRequestFormatComplete(client_info.fd)) {
 		result.response             = CreateHttpResponse(client_info.fd);
 		result.is_response_complete = true;
 	}
@@ -85,7 +85,7 @@ std::string TmpHttp::CreateHttpResponse(int client_fd) {
 }
 
 // todo: HTTPRequestの書式が完全かどうか(どのように取得するかは要検討)
-bool TmpHttp::GetIsHttpRequestFormatComplete(int client_fd) {
+bool TmpHttp::IsHttpRequestFormatComplete(int client_fd) {
 	HttpRequestParsedData save_data = storage_.GetClientSaveData(client_fd);
 	return save_data.is_request_format.is_request_line &&
 		   save_data.is_request_format.is_header_fields &&

@@ -6,8 +6,10 @@
 #include <string>
 
 namespace server {
+
 struct DtoClientInfos;
 struct DtoServerInfos;
+
 } // namespace server
 
 namespace http {

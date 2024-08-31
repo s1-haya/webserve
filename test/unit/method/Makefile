@@ -14,7 +14,8 @@ WS_HTTP_DIR				:=	$(WS_SRCS_DIR)/http
 WS_HTTP_REQUEST_DIR	:=	$(WS_HTTP_DIR)/request
 WS_HTTP_PARSE_DIR	:=	$(WS_HTTP_DIR)/request/parse
 WS_HTTP_RESPONSE_DIR	:=	$(WS_HTTP_DIR)/response
-WS_SOCK_CONTEXT_DIR	:=	$(WS_SRCS_DIR)/server/context_manager/sock_context
+WS_DTO_SERVER_TO_HTTP_DIR	:=	$(WS_SRCS_DIR)/server/dto
+WS_VERTUAL_SERVER_DIR	:=	$(WS_SRCS_DIR)/server/context_manager/virtual_server
 
 SRCS			+=	$(WS_UTILS_DIR)/color.cpp \
 					$(WS_UTILS_DIR)/system_exception.cpp \
@@ -24,8 +25,7 @@ SRCS			+=	$(WS_UTILS_DIR)/color.cpp \
 					$(WS_HTTP_RESPONSE_DIR)/stat.cpp \
 					$(WS_HTTP_RESPONSE_DIR)/http_response.cpp \
 					$(WS_HTTP_RESPONSE_DIR)/handle_method.cpp \
-					$(WS_SOCK_CONTEXT_DIR)/client_info.cpp \
-					$(WS_SOCK_CONTEXT_DIR)/server_info.cpp
+					$(WS_VERTUAL_SERVER_DIR)/virtual_server.cpp \
 
 # 3. Add unit test files
 SRCS	+=	test_method.cpp
@@ -36,7 +36,8 @@ SRCS_DIR	:=	$(WS_UTILS_DIR) \
 				$(WS_HTTP_REQUEST_DIR) \
 				$(WS_HTTP_PARSE_DIR) \
 				$(WS_HTTP_RESPONSE_DIR) \
-				$(WS_SOCK_CONTEXT_DIR) \
+				$(WS_DTO_SERVER_TO_HTTP_DIR) \
+				$(WS_VERTUAL_SERVER_DIR)
 
 #--------------------------------------------
 OBJ_DIR		:=	objs

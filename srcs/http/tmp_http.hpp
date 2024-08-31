@@ -7,8 +7,10 @@
 #include "result.hpp"
 
 namespace server {
+
 struct DtoClientInfos;
 struct DtoServerInfos;
+
 } // namespace server
 
 namespace http {
@@ -35,7 +37,6 @@ class TmpHttp {
 	void ParseHttpRequestFormat(int client_fd, const std::string &read_buf);
 	utils::Result<int> TmpParseHttpRequestFormat(int client_fd, const std::string &read_buf);
 	std::string        CreateHttpResponse(int client_fd);
-	bool               GetIsHttpRequestFormatComplete(int client_fd);
 	// todo: 408のtimeoutのレスポンス
 
 	// For test
@@ -45,6 +46,7 @@ class TmpHttp {
 	TmpHttp(const TmpHttp &other);
 	TmpHttp    &operator=(const TmpHttp &other);
 	HttpStorage storage_;
+	bool        IsHttpRequestFormatComplete(int client_fd);
 };
 
 } // namespace http
