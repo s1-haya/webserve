@@ -2,6 +2,7 @@
 #define HTTP_RESPONSE_HPP_
 
 #include "status_code.hpp"
+#include "utils.hpp"
 #include <map>
 #include <string>
 
@@ -61,6 +62,7 @@ class HttpResponse {
 		const std::string &request_body_message,
 		std::string       &response_body_message
 	);
+	static void DeleteHandler(const std::string &path, std::string &response_body_message);
 
   private:
 	HttpResponse();
@@ -79,6 +81,13 @@ class HttpResponse {
 	static std::string        CreateDefaultBodyMessageFormat(
 			   const std::string &status_code, const std::string &reason_phrase
 		   );
+	static void
+	SystemExceptionHandler(const utils::SystemException &e, std::string &response_body_message);
+	static void FileCreationHandler(
+		const std::string &path,
+		const std::string &request_body_message,
+		std::string       &response_body_message
+	);
 };
 
 } // namespace http

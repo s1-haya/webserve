@@ -77,10 +77,13 @@ format-srcs:
 
 .PHONY	: format-test
 format-test:
-	@black test
-	@isort test
 	@find test -name "*.cpp" -exec clang-format -i {} +
 	@find test -name "*.hpp" -exec clang-format -i {} +
+
+.PHONY	: python-format-test
+python-format-test:
+	@black test
+	@isort test
 
 .PHONY	: test
 test:

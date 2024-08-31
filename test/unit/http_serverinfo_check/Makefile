@@ -16,10 +16,11 @@ WS_HTTP_PARSE_DIR		:=	$(WS_HTTP_REQUEST_DIR)/parse
 WS_HTTP_RESPONSE_DIR	:=	$(WS_HTTP_DIR)/response
 WS_HTTP_SERVERINFO_CHECK_DIR	:=	$(WS_HTTP_RESPONSE_DIR)/http_serverinfo_check
 
-SRCS				+=	$(WS_HTTP_SERVERINFO_CHECK_DIR)/http_serverinfo_check.cpp
+SRCS				+=	$(WS_HTTP_SERVERINFO_CHECK_DIR)/http_serverinfo_check.cpp \
+						$(WS_UTILS_DIR)/color.cpp
 
 # 3. Add unit test files
-SRCS	+=	main.cpp
+SRCS	+=	test_http_serverinfo_check.cpp
 
 # 4. Add directory for INCLUDE
 SRCS_DIR	:=	$(WS_UTILS_DIR) \
