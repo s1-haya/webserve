@@ -17,22 +17,30 @@ class MessageManager {
 	~MessageManager();
 	MessageManager(const MessageManager &other);
 	MessageManager &operator=(const MessageManager &other);
+
 	// functions
 	void       AddNewMessage(int client_fd);
-	void       AddNewMessage(int client_fd, const std::string &request_buf);
 	void       DeleteMessage(int client_fd);
 	TimeoutFds GetNewTimeoutFds(double timeout);
-	void       UpdateMessage(int client_fd);
-	void       AddRequestBuf(int client_fd, const std::string &request_buf);
-	// getter
-	message::ConnectionState GetConnectionState(int client_fd) const;
-	const std::string       &GetRequestBuf(int client_fd) const;
-	const std::string       &GetResponse(int client_fd) const;
-	// setter
+	void       UpdateTime(int client_fd);
+	// request_buf
+	void AddRequestBuf(int client_fd, const std::string &request_buf);
 	void SetNewRequestBuf(int client_fd, const std::string &request_buf);
-	void SetResponse(
+	// response
+	void AddNormalResponse(
 		int client_fd, message::ConnectionState connection_state, const std::string &response
 	);
+	void AddPrimaryResponse(
+		int client_fd, message::ConnectionState connection_state, const std::string &response
+	);
+	message::Response PopHeadResponse(int client_fd);
+	bool              IsResponseExist(int client_fd) const;
+
+	// getter
+	bool               GetIsCompleteRequest(int client_fd) const;
+	const std::string &GetRequestBuf(int client_fd) const;
+	// setter
+	void SetIsCompleteRequest(int client_fd, bool is_complete_request);
 
   private:
 	// variable

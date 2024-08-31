@@ -5,6 +5,7 @@
 #include "custom_const_iterator.hpp"
 #include "node.hpp"
 #include <list>
+#include <set>
 
 namespace config {
 namespace parser {
@@ -56,8 +57,9 @@ class Parser {
 	static const int STATUS_CODE_MAX = 599;
 
 	/* For duplicated parameter */
-	bool client_max_body_size_set;
-	bool autoindex_set;
+	typedef std::set<std::string> DirectiveSet;
+	DirectiveSet                  server_directive_set_;
+	DirectiveSet                  location_directive_set_;
 
   public:
 	explicit Parser(std::list<node::Node> &);

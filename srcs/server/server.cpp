@@ -184,38 +184,46 @@ void Server::RunHttp(const event::Event &event) {
 	// Check if it's ready to start write/send.
 	// If not completed, the request will be re-read by the event_monitor.
 	if (!http_result.is_response_complete) {
+		message_manager_.SetIsCompleteRequest(client_fd, false);
 		return;
 	}
+	message_manager_.SetIsCompleteRequest(client_fd, true);
 	utils::Debug("server", "received all request from client", client_fd);
 	std::cerr << message_manager_.GetRequestBuf(client_fd) << std::endl;
 
 	const message::ConnectionState connection_state =
 		http_result.is_connection_keep ? message::KEEP : message::CLOSE;
-	message_manager_.SetResponse(client_fd, connection_state, http_result.response);
-	event_monitor_.Update(event.fd, event::EVENT_WRITE);
+	message_manager_.AddNormalResponse(client_fd, connection_state, http_result.response);
+	UpdateEventInResponseComplete(connection_state, event);
 }
 
 void Server::SendResponse(int client_fd) {
-	const std::string &response = message_manager_.GetResponse(client_fd);
+	if (!message_manager_.IsResponseExist(client_fd)) {
+		return;
+	}
+	message::Response              response         = message_manager_.PopHeadResponse(client_fd);
+	const message::ConnectionState connection_state = response.connection_state;
+	const std::string             &response_str     = response.response_str;
 
 	// todo: handle return size
-	send(client_fd, response.c_str(), response.size(), 0);
+	send(client_fd, response_str.c_str(), response_str.size(), 0);
 	utils::Debug("server", "send response to client", client_fd);
+	// todo:
+	//   全てのresponse_strをsend()できなかった場合はsend_size分だけeraseして
+	//   Response dequeの先頭にAdd()し直して↓
+	//   message_manager_.AddPrimaryResponse(client_fd, response)
+	//   早期return
 
-	switch (message_manager_.GetConnectionState(client_fd)) {
+	switch (connection_state) {
 	case message::KEEP:
-		message_manager_.UpdateMessage(client_fd);
-		event_monitor_.Update(client_fd, event::EVENT_READ);
-		utils::Debug("server", "Connection: keep-alive client", client_fd);
+		KeepConnection(client_fd);
 		break;
 	case message::CLOSE:
 		Disconnect(client_fd);
-		utils::Debug("server", "Connection: close, disconnected client", client_fd);
 		break;
 	default:
 		break;
 	}
-	utils::Debug("------------------------------------------");
 }
 
 void Server::HandleTimeoutMessages() {
@@ -226,12 +234,21 @@ void Server::HandleTimeoutMessages() {
 	// timeout用のresponseをセットしてevent監視をWRITEに変更
 	typedef MessageManager::TimeoutFds::const_iterator Itr;
 	for (Itr it = timeout_fds.begin(); it != timeout_fds.end(); ++it) {
-		const int          client_fd        = *it;
+		const int client_fd = *it;
+		if (message_manager_.GetIsCompleteRequest(client_fd)) {
+			Disconnect(client_fd);
+			continue;
+		}
 		const std::string &timeout_response = mock_http_.GetTimeoutResponse(client_fd);
-		message_manager_.SetResponse(client_fd, message::CLOSE, timeout_response);
-		event_monitor_.Update(client_fd, event::EVENT_WRITE);
+		message_manager_.AddPrimaryResponse(client_fd, message::CLOSE, timeout_response);
+		event_monitor_.Replace(client_fd, event::EVENT_WRITE);
 		utils::Debug("server", "timeout client", client_fd);
 	}
+}
+
+void Server::KeepConnection(int client_fd) {
+	message_manager_.UpdateTime(client_fd);
+	utils::Debug("server", "Connection: keep-alive client", client_fd);
 }
 
 // delete from buffer, client_info, event, message
@@ -240,6 +257,23 @@ void Server::Disconnect(int client_fd) {
 	event_monitor_.Delete(client_fd);
 	message_manager_.DeleteMessage(client_fd);
 	close(client_fd);
+	utils::Debug("server", "Connection: close, disconnected client", client_fd);
+	utils::Debug("------------------------------------------");
+}
+
+void Server::UpdateEventInResponseComplete(
+	const message::ConnectionState connection_state, const event::Event &event
+) {
+	switch (connection_state) {
+	case message::KEEP:
+		event_monitor_.Append(event, event::EVENT_WRITE);
+		break;
+	case message::CLOSE:
+		event_monitor_.Replace(event.fd, event::EVENT_WRITE);
+		break;
+	default:
+		break;
+	}
 }
 
 void Server::Init() {
