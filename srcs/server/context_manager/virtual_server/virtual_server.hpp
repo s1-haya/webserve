@@ -38,6 +38,7 @@ class VirtualServer {
 	const std::string  &GetServerName() const;
 	const LocationList &GetLocations() const;
 	const PortList     &GetPorts() const; // todo: remove
+	const HostPortList &GetHostPortList() const;
 
   private:
 	// todo: add member(& operator=)

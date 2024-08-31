@@ -43,4 +43,8 @@ const VirtualServer::PortList &VirtualServer::GetPorts() const {
 	return ports_;
 }
 
+const VirtualServer::HostPortList &VirtualServer::GetHostPortList() const {
+	return host_port_list_;
+}
+
 } // namespace server
