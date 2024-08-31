@@ -17,9 +17,10 @@ VirtualServer::VirtualServer(const VirtualServer &other) {
 
 VirtualServer &VirtualServer::operator=(const VirtualServer &other) {
 	if (this != &other) {
-		server_name_ = other.server_name_;
-		locations_   = other.locations_;
-		ports_       = other.ports_;
+		server_name_    = other.server_name_;
+		locations_      = other.locations_;
+		ports_          = other.ports_;
+		host_port_list_ = other.host_port_list_;
 	}
 	return *this;
 }
