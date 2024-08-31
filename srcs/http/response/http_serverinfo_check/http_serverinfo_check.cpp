@@ -21,7 +21,8 @@ void HttpServerInfoCheck::CheckDTOServerInfo(
 	const MockDtoServerInfos &server_info,
 	HeaderFields             &header_fields
 ) {
-	if (static_cast<size_t>(std::atoi(header_fields["Content-Length"].c_str())) > server_info.client_max_body_size) { // Check content_length
+	if (static_cast<size_t>(std::atoi(header_fields["Content-Length"].c_str())) >
+		server_info.client_max_body_size) { // Check content_length
 		throw HttpException("Error: payload too large.", PAYLOAD_TOO_LARGE);
 	} else if (!server_info.error_page.second.empty()) { // Check error_page
 		result.error_page = server_info.error_page;
@@ -106,9 +107,7 @@ void HttpServerInfoCheck::CheckRedirect(
 	// ex. return 301 /var/data/index.html
 	// /www/target.html -> /var/data/index.html
 	// status code: 301
-	result.redirect_status_code = location.redirect.first;
-	result.path                 = location.redirect.second;
-	result.status               = CheckServerInfoResult::REDIRECT_ON;
+	result.redirect.Set(true, location.redirect);
 }
 
 void HttpServerInfoCheck::CheckAllowedMethods(

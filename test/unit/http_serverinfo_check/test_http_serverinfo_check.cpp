@@ -126,9 +126,8 @@ int Test1() {
 		COMPARE(result.allowed_methods, location.allowed_methods);
 		COMPARE(result.cgi_extension, location.cgi_extension);
 		COMPARE(result.upload_directory, location.upload_directory);
-		COMPARE(result.redirect_status_code, location.redirect.first);
+		COMPARE(result.redirect.GetValue(), location.redirect);
 		COMPARE(result.error_page, server_info.error_page);
-		COMPARE(result.status, CheckServerInfoResult::CONTINUE);
 	} catch (const std::exception &e) {
 		PrintNg();
 		std::cerr << e.what() << '\n';
@@ -151,15 +150,13 @@ int Test2() {
 	MockLocationCon location = *(Next(server_info.locations.begin(), 1)); // location2(redirect)
 
 	try {
-		COMPARE(result.path, location.redirect.second);
 		COMPARE(result.index, location.index);
 		COMPARE(result.autoindex, location.autoindex);
 		COMPARE(result.allowed_methods, location.allowed_methods);
 		COMPARE(result.cgi_extension, location.cgi_extension);
 		COMPARE(result.upload_directory, location.upload_directory);
-		COMPARE(result.redirect_status_code, location.redirect.first);
+		COMPARE(result.redirect.GetValue(), location.redirect);
 		COMPARE(result.error_page, server_info.error_page);
-		COMPARE(result.status, CheckServerInfoResult::REDIRECT_ON);
 	} catch (const std::exception &e) {
 		PrintNg();
 		std::cerr << e.what() << '\n';
@@ -188,9 +185,8 @@ int Test3() {
 		COMPARE(result.allowed_methods, location.allowed_methods);
 		COMPARE(result.cgi_extension, location.cgi_extension);
 		COMPARE(result.upload_directory, location.upload_directory);
-		COMPARE(result.redirect_status_code, location.redirect.first);
+		COMPARE(result.redirect.GetValue(), location.redirect);
 		COMPARE(result.error_page, server_info.error_page);
-		COMPARE(result.status, CheckServerInfoResult::CONTINUE);
 	} catch (const std::exception &e) {
 		PrintNg();
 		std::cerr << e.what() << '\n';
@@ -220,9 +216,8 @@ int Test4() {
 		COMPARE(result.allowed_methods, location.allowed_methods);
 		COMPARE(result.cgi_extension, location.cgi_extension);
 		COMPARE(result.upload_directory, location.upload_directory);
-		COMPARE(result.redirect_status_code, location.redirect.first);
+		COMPARE(result.redirect.GetValue(), location.redirect);
 		COMPARE(result.error_page, server_info.error_page);
-		COMPARE(result.status, CheckServerInfoResult::CONTINUE);
 	} catch (const std::exception &e) {
 		PrintNg();
 		std::cerr << e.what() << '\n';

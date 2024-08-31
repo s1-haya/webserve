@@ -2,6 +2,7 @@
 #define HTTP_SERVERINFO_CHECK_HPP_
 
 #include "http_format.hpp"
+#include "result.hpp"
 #include "server_infos.hpp"
 #include <list>
 #include <string>
@@ -9,13 +10,7 @@
 namespace http {
 
 struct CheckServerInfoResult {
-	enum CheckStatus {
-		CONTINUE,
-		REDIRECT_ON
-	}; // rfc + 見やすいように独自で名前をつけた
-	// 呼び出し元でこれをチェックしてstatus codeを付ける用
-
-	std::string path; // alias, index, redirectを見る
+	std::string path; // alias, indexを見る
 	std::string index;
 	bool        autoindex;
 
@@ -24,10 +19,9 @@ struct CheckServerInfoResult {
 	std::string            cgi_extension;
 	std::string            upload_directory;
 
-	unsigned int                         redirect_status_code;
-	std::pair<unsigned int, std::string> error_page;
-	CheckStatus                          status;
-	CheckServerInfoResult() : autoindex(false), redirect_status_code(0), status(CONTINUE){};
+	utils::Result< std::pair<unsigned int, std::string> > redirect;
+	std::pair<unsigned int, std::string>                  error_page;
+	CheckServerInfoResult() : autoindex(false){};
 };
 
 class HttpServerInfoCheck {
