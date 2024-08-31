@@ -42,59 +42,59 @@ int main(void) {
 	int ret_code = EXIT_SUCCESS;
 
 	// http_method/expected
-	// CF:   exist target resourse file
+	// LF:   exist target resourse file
+	std::string expected_file = LoadFileContent("expected/file.txt");
 	// CRLF: use default status code file
+	std::string expected_created = LoadFileContent("expected/created.txt");
+	std::string expected_no_content = LoadFileContent("expected/no_content.txt");
+	std::string expected_redirect = LoadFileContent("expected/redirect.txt");
+	std::string expected_forbidden = LoadFileContent("expected/forbidden.txt");
+	std::string expected_not_found = LoadFileContent("expected/not_found.txt");
 
 	// ファイルが存在する場合
-	std::string file;
-	std::string expected_file = LoadFileContent("expected/file.txt");
-	http::HttpResponse::GetHandler("test/file.txt", file);
-	ret_code |= HandleResult(file, expected_file);
+	std::string get_test1_response_body_message;
+	http::HttpResponse::GetHandler("test/file.txt", get_test1_response_body_message);
+	ret_code |= HandleResult(get_test1_response_body_message, expected_file);
 
 	// ファイルが存在しない場合
-	std::string not_found;
-	std::string expected_not_found = LoadFileContent("expected/not_found.txt");
-	http::HttpResponse::GetHandler("test/a", not_found);
-	ret_code |= HandleResult(not_found, expected_not_found);
+	std::string  get_test2_response_body_message;
+	http::HttpResponse::GetHandler("test/a",  get_test2_response_body_message);
+	ret_code |= HandleResult( get_test2_response_body_message, expected_not_found);
 
 	// ディレクトリの場合かつ'/'がない場合
-	std::string redirect;
-	std::string expected_redirect = LoadFileContent("expected/redirect.txt");
-	http::HttpResponse::GetHandler("test/directory", redirect);
-	ret_code |= HandleResult(redirect, expected_redirect);
+	std::string get_test3_response_body_message;
+	http::HttpResponse::GetHandler("test/directory", get_test3_response_body_message);
+	ret_code |= HandleResult(get_test3_response_body_message, expected_redirect);
 
 	// ファイルが権限ない場合
-	std::string forbidden;
-	std::string expected_forbidden = LoadFileContent("expected/forbidden.txt");
-	http::HttpResponse::GetHandler("test/no_authority_file", forbidden);
-	ret_code |= HandleResult(forbidden, expected_forbidden);
+	std::string get_test4_response_body_message;
+	http::HttpResponse::GetHandler("test/no_authority_file", get_test4_response_body_message);
+	ret_code |= HandleResult(get_test4_response_body_message, expected_forbidden);
 
 	// POST test
 	// 新しいファイルをアップロードする場合
-	std::string test1_request_body_message = "OK";
-	std::string test1_response_body_message;
-	std::string expected_created = LoadFileContent("expected/created.txt");
+	std::string post_test1_request_body_message = "OK";
+	std::string post_test1_response_body_message;
 	http::HttpResponse::PostHandler(
-		"ok.txt", test1_request_body_message, test1_response_body_message
+		"ok.txt", post_test1_request_body_message, post_test1_response_body_message
 	);
-	ret_code |= HandleResult(test1_response_body_message, expected_created);
+	ret_code |= HandleResult(post_test1_response_body_message, expected_created);
 
 	// すでにアップロードされたファイルをアップロードする場合
-	std::string test2_request_body_message = "OK";
-	std::string test2_response_body_message;
-	std::string expected_no_content = LoadFileContent("expected/no_content.txt");
+	std::string post_test2_request_body_message = "OK";
+	std::string post_test2_response_body_message;
 	http::HttpResponse::PostHandler(
-		"ok.txt", test2_request_body_message, test2_response_body_message
+		"ok.txt", post_test2_request_body_message, post_test2_response_body_message
 	);
-	ret_code |= HandleResult(test2_response_body_message, expected_no_content);
+	ret_code |= HandleResult(post_test2_response_body_message, expected_no_content);
 
 	// ディレクトリの場合
-	std::string test3_request_body_message;
-	std::string test3_response_body_message;
+	std::string post_test3_request_body_message;
+	std::string post_test3_response_body_message;
 	http::HttpResponse::PostHandler(
-		"test/directory", test3_request_body_message, test3_response_body_message
+		"test/directory", post_test3_request_body_message, post_test3_response_body_message
 	);
-	ret_code |= HandleResult(test3_response_body_message, expected_forbidden);
+	ret_code |= HandleResult(post_test3_response_body_message, expected_forbidden);
 
 	// DELETE test
 	// ファイルが存在するかつ親ディレクトリが書き込み権限あるとき
