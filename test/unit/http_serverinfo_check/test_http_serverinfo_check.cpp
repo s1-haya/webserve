@@ -110,7 +110,7 @@ using namespace http;
 int Test1() {
 	// request
 	const RequestLine request_line = {"GET", "/", "HTTP/1.1"};
-	HttpRequest       request;
+	HttpRequestFormat request;
 	request.request_line                = request_line;
 	request.header_fields["Host"]       = "localhost";
 	request.header_fields["Connection"] = "keep-alive";
@@ -141,7 +141,7 @@ int Test1() {
 int Test2() {
 	// request
 	const RequestLine request_line = {"GET", "/www/test.html", "HTTP/1.1"}; // location2(redirect)
-	HttpRequest       request;
+	HttpRequestFormat request;
 	request.request_line                = request_line;
 	request.header_fields["Host"]       = "localhost";
 	request.header_fields["Connection"] = "keep-alive";
@@ -172,7 +172,7 @@ int Test2() {
 int Test3() {
 	// request
 	const RequestLine request_line = {"GET", "/www/data/test.html", "HTTP/1.1"};
-	HttpRequest       request;
+	HttpRequestFormat request;
 	request.request_line                = request_line;
 	request.header_fields["Host"]       = "localhost";
 	request.header_fields["Connection"] = "keep-alive";
@@ -203,7 +203,7 @@ int Test3() {
 int Test4() {
 	// request
 	const RequestLine request_line = {"GET", "/web/", "HTTP/1.1"};
-	HttpRequest       request;
+	HttpRequestFormat request;
 	request.request_line                = request_line;
 	request.header_fields["Host"]       = "localhost";
 	request.header_fields["Connection"] = "keep-alive";

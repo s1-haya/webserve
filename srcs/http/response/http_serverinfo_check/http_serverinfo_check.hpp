@@ -2,8 +2,8 @@
 #define HTTP_SERVERINFO_CHECK_HPP_
 
 #include "http_format.hpp"
-#include <string>
 #include <list>
+#include <string>
 
 // Mock(Serverの構造体に未実装の部分があるため)
 /*-------------------------------------------------------------*/
@@ -62,7 +62,7 @@ struct CheckServerInfoResult {
 	unsigned int                         redirect_status_code;
 	std::pair<unsigned int, std::string> error_page;
 	CheckStatus                          status;
-	CheckServerInfoResult() : autoindex(false), redirect_status_code(0), status(CONTINUE) {};
+	CheckServerInfoResult() : autoindex(false), redirect_status_code(0), status(CONTINUE){};
 };
 
 class HttpServerInfoCheck {

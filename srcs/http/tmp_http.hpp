@@ -23,7 +23,7 @@ namespace http {
 // - InternalServer: システムコール等が失敗した場合
 
 // private
-// - HttpRequest
+// - HttpRequestFormat
 // - HttpResponse
 // }
 struct HttpResult;
