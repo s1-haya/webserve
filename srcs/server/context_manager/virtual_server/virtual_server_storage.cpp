@@ -47,6 +47,15 @@ const VirtualServer &VirtualServerStorage::GetVirtualServer(int server_fd) const
 	}
 }
 
+const VirtualServerStorage::VirtualServerAddrList &
+VirtualServerStorage::GetVirtualServerAddrList(int server_fd) const {
+	try {
+		return virtual_server_addr_list_map_.at(server_fd);
+	} catch (const std::exception &e) {
+		throw std::logic_error("VirtualServerAddrList doesn't exists");
+	}
+}
+
 // todo: tmp. need?
 const VirtualServerStorage::VirtualServerList &
 VirtualServerStorage::GetAllVirtualServerList() const {
