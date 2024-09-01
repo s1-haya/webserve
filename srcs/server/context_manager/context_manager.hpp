@@ -10,9 +10,11 @@ namespace server {
 
 struct ServerContext {
 	int                         fd;
-	std::string                 server_name;
-	std::string                 port;
-	VirtualServer::LocationList locations;
+	std::string                 server_name; // todo: remove
+	std::string                 port;        // todo: remove
+	VirtualServer::LocationList locations;   // todo: remove
+
+	VirtualServerStorage::VirtualServerAddrList virtual_server_addr_list;
 };
 
 // holds and manages virtual server info and socket context(server socket info, client socket info).

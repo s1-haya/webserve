@@ -56,15 +56,17 @@ ServerContext ContextManager::GetServerContext(int client_fd) const {
 	const int         server_fd   = server_info.GetFd();
 
 	// from virtual_servers
+	// todo: remove
 	const VirtualServer &virtual_server = virtual_servers_.GetVirtualServer(server_fd);
 
 	// create ServerContext
 	ServerContext server_infos;
 	server_infos.fd          = server_fd;
-	server_infos.server_name = virtual_server.GetServerName();
+	server_infos.server_name = virtual_server.GetServerName(); // todo: remove
 	// todo: uintのままで良いかも？
-	server_infos.port      = utils::ConvertUintToStr(server_info.GetPort());
-	server_infos.locations = virtual_server.GetLocations();
+	server_infos.port      = utils::ConvertUintToStr(server_info.GetPort()); // todo: remove
+	server_infos.locations = virtual_server.GetLocations();                  // todo: remove
+	server_infos.virtual_server_addr_list = virtual_servers_.GetVirtualServerAddrList(server_fd);
 	return server_infos;
 }
 
