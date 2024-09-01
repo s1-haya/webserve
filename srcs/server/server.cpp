@@ -226,7 +226,7 @@ void Server::HandleTimeoutMessages() {
 	typedef MessageManager::TimeoutFds::const_iterator Itr;
 	for (Itr it = timeout_fds.begin(); it != timeout_fds.end(); ++it) {
 		const int client_fd = *it;
-		if (message_manager_.GetIsCompleteRequest(client_fd)) {
+		if (message_manager_.IsCompleteRequest(client_fd)) {
 			Disconnect(client_fd);
 			continue;
 		}
@@ -242,7 +242,7 @@ void Server::KeepConnection(int client_fd) {
 	utils::Debug("server", "Connection: keep-alive client", client_fd);
 }
 
-// delete from buffer, client_info, event, message
+// delete from context, event, message
 void Server::Disconnect(int client_fd) {
 	context_.DeleteClientInfo(client_fd);
 	event_monitor_.Delete(client_fd);
