@@ -15,7 +15,8 @@ VirtualServerStorage::VirtualServerStorage(const VirtualServerStorage &other) {
 VirtualServerStorage &VirtualServerStorage::operator=(const VirtualServerStorage &other) {
 	if (this != &other) {
 		virtual_servers_               = other.virtual_servers_;
-		mapping_fd_to_virtual_servers_ = other.mapping_fd_to_virtual_servers_;
+		mapping_fd_to_virtual_servers_ = other.mapping_fd_to_virtual_servers_; // todo: remove
+		virtual_server_addr_list_map_  = other.virtual_server_addr_list_map_;
 	}
 	return *this;
 }
