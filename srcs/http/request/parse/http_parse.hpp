@@ -11,7 +11,7 @@
 namespace http {
 
 struct HttpRequestResult {
-	StatusCode        status_code;
+	EStatusCode       status_code;
 	HttpRequestFormat request;
 	HttpRequestResult() : status_code(OK) {}
 };

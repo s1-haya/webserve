@@ -9,11 +9,11 @@ namespace http {
 
 class HttpException : public std::runtime_error {
   public:
-	explicit HttpException(const std::string &error_message, StatusCode status_code);
-	StatusCode GetStatusCode() const;
+	explicit HttpException(const std::string &error_message, EStatusCode status_code);
+	EStatusCode GetStatusCode() const;
 
   private:
-	StatusCode status_code_;
+	EStatusCode status_code_;
 };
 
 } // namespace http

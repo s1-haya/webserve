@@ -87,7 +87,7 @@ IsSameHttpRequest(const http::HttpRequestFormat &res, const http::HttpRequestFor
 	return http_request_result;
 }
 
-Result IsSameStatusCode(http::StatusCode status_code, http::StatusCode expected) {
+Result IsSameStatusCode(http::EStatusCode status_code, http::EStatusCode expected) {
 	Result status_code_result;
 	if (status_code != expected) {
 		std::ostringstream error_log;

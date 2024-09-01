@@ -31,13 +31,13 @@ struct MockDtoServerInfos;
 
 class HttpResponse {
   public:
-	typedef std::map<StatusCode, std::string> ReasonPhrase;
-	static std::string                        Run(const HttpRequestResult &request_info);
-	static std::string                        TmpRun(
-							   const MockDtoClientInfos &client_info,
-							   const MockDtoServerInfos &server_info,
-							   HttpRequestResult        &request_info
-						   );
+	typedef std::map<EStatusCode, std::string> ReasonPhrase;
+	static std::string                         Run(const HttpRequestResult &request_info);
+	static std::string                         TmpRun(
+								const MockDtoClientInfos &client_info,
+								const MockDtoServerInfos &server_info,
+								HttpRequestResult        &request_info
+							);
 	static void GetHandler(const std::string &path, std::string &body_message);
 	static void PostHandler(
 		const std::string &path,

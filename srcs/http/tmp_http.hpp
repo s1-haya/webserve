@@ -35,10 +35,10 @@ class TmpHttp {
 	HttpResult Run(const MockDtoClientInfos &client_info, const MockDtoServerInfos &server_info);
 	void       ParseHttpRequestFormat(int client_fd, const std::string &read_buf);
 	utils::Result<void> TmpParseHttpRequestFormat(int client_fd, const std::string &read_buf);
-	std::string        CreateHttpResponse(int client_fd);
-	std::string        CreateHttpResponse(
-			   const MockDtoClientInfos &client_info, const MockDtoServerInfos &server_info
-		   );
+	std::string         CreateHttpResponse(int client_fd);
+	std::string         CreateHttpResponse(
+				const MockDtoClientInfos &client_info, const MockDtoServerInfos &server_info
+			);
 	// todo: 408のtimeoutのレスポンス
 
 	// For test
