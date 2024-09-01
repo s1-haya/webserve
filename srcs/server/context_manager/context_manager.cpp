@@ -1,7 +1,6 @@
 #include "context_manager.hpp"
 #include "client_info.hpp"
 #include "server_info.hpp"
-#include "utils.hpp"
 
 namespace server {
 
@@ -58,6 +57,11 @@ ServerContext ContextManager::GetServerContext(int client_fd) const {
 	server_infos.fd                       = server_fd;
 	server_infos.virtual_server_addr_list = virtual_servers_.GetVirtualServerAddrList(server_fd);
 	return server_infos;
+}
+
+ContextManager::GetServerInfoResult
+ContextManager::GetServerInfo(const std::string &host, unsigned int port) const {
+	return sock_context_.GetServerInfo(host, port);
 }
 
 // todo: IP以外も必要ならClientContext作って詰めて返す

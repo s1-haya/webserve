@@ -2,6 +2,7 @@
 #define SERVER_CONTEXTMANAGER_CONTEXTMANAGER_HPP_
 
 #include "sock_context.hpp"
+#include "utils.hpp"
 #include "virtual_server.hpp"
 #include "virtual_server_storage.hpp"
 #include <string>
@@ -16,6 +17,8 @@ struct ServerContext {
 // holds and manages virtual server info and socket context(server socket info, client socket info).
 class ContextManager {
   public:
+	typedef utils::Result<ServerInfo> GetServerInfoResult;
+
 	ContextManager();
 	~ContextManager();
 	ContextManager(const ContextManager &other);
@@ -28,7 +31,8 @@ class ContextManager {
 	// getter
 	const VirtualServerStorage::VirtualServerList &GetAllVirtualServer() const;
 	ServerContext                                  GetServerContext(int client_fd) const;
-	const std::string                             &GetClientIp(int client_fd) const;
+	GetServerInfoResult GetServerInfo(const std::string &host, unsigned int port) const;
+	const std::string  &GetClientIp(int client_fd) const;
 
   private:
 	VirtualServerStorage virtual_servers_;

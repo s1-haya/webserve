@@ -296,9 +296,6 @@ void Server::Init() {
 	const VirtualServerStorage::VirtualServerList &all_virtual_server =
 		context_.GetAllVirtualServer();
 
-	// todo: refactor
-	std::map<VirtualServer::HostPortPair, ServerInfo> host_port_fd_map;
-
 	typedef VirtualServerStorage::VirtualServerList::const_iterator ItVirtualServer;
 	for (ItVirtualServer it = all_virtual_server.begin(); it != all_virtual_server.end(); ++it) {
 		const VirtualServer               &virtual_server = *it;
@@ -309,20 +306,19 @@ void Server::Init() {
 		for (ItHostPort it_host_port = host_port_list.begin(); it_host_port != host_port_list.end();
 			 ++it_host_port) {
 			ServerInfo server_info;
-			// first host:port
-			if (host_port_fd_map.count(*it_host_port) == 0) {
-				// create ServerInfo & listen
+
+			const ContextManager::GetServerInfoResult result =
+				context_.GetServerInfo(it_host_port->first, it_host_port->second);
+			if (result.IsOk()) {
+				server_info = result.GetValue();
+			} else {
+				// create ServerInfo & listen the first host:port
 				server_info         = ServerInfo(it_host_port->first, it_host_port->second);
 				const int server_fd = connection_.Connect(server_info);
 				server_info.SetSockFd(server_fd);
 
 				event_monitor_.Add(server_fd, event::EVENT_READ);
 				utils::Debug("server", "listen", server_fd);
-
-				// listen済みhost:portであることとそのserver_infoを記録
-				host_port_fd_map[*it_host_port] = server_info;
-			} else {
-				server_info = host_port_fd_map.at(*it_host_port);
 			}
 			// add to context
 			context_.AddServerInfo(server_info, &virtual_server);
