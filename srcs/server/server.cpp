@@ -34,23 +34,9 @@ VirtualServer::LocationList ConvertLocations(const config::context::LocationList
 	return location_list;
 }
 
-// todo: remove
-// todo: configからstd::list<unsigned int>で渡されるようになったら変更する
-VirtualServer::PortList ConvertPorts(const config::context::PortList &ports_str) {
-	VirtualServer::PortList port_list;
-
-	typedef config::context::PortList::const_iterator Itr;
-	for (Itr it = ports_str.begin(); it != ports_str.end(); ++it) {
-		const unsigned int port = static_cast<unsigned int>(*it);
-		port_list.push_back(port);
-	}
-	return port_list;
-}
-
 VirtualServer ConvertToVirtualServer(const config::context::ServerCon &config_server) {
 	const std::string          &server_name = *(config_server.server_names.begin()); // tmp
 	VirtualServer::LocationList locations   = ConvertLocations(config_server.location_con);
-	VirtualServer::PortList     ports       = ConvertPorts(config_server.port); // todo: remove
 
 	// todo: tmp
 	static int                  n = 0;
@@ -66,7 +52,7 @@ VirtualServer ConvertToVirtualServer(const config::context::ServerCon &config_se
 	}
 	++n;
 
-	return VirtualServer(server_name, locations, ports, host_port_list);
+	return VirtualServer(server_name, locations, host_port_list);
 }
 // todo: tmp for debug
 void DebugVirtualServerNames(
@@ -166,9 +152,6 @@ DtoServerInfos Server::GetServerInfos(int client_fd) const {
 
 	DtoServerInfos server_infos;
 	server_infos.fd                       = server_context.fd;
-	server_infos.server_name              = server_context.server_name; // todo: remove
-	server_infos.port                     = server_context.port;        // todo: remove
-	server_infos.locations                = server_context.locations;   // todo: remove
 	server_infos.virtual_server_addr_list = server_context.virtual_server_addr_list;
 	return server_infos;
 }

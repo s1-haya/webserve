@@ -9,11 +9,7 @@
 namespace server {
 
 struct ServerContext {
-	int                         fd;
-	std::string                 server_name; // todo: remove
-	std::string                 port;        // todo: remove
-	VirtualServer::LocationList locations;   // todo: remove
-
+	int                                         fd;
 	VirtualServerStorage::VirtualServerAddrList virtual_server_addr_list;
 };
 

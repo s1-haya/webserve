@@ -18,7 +18,6 @@ struct Location {
 class VirtualServer {
   public:
 	typedef std::list<Location>                  LocationList;
-	typedef std::list<unsigned int>              PortList; // todo: remove
 	typedef std::pair<std::string, unsigned int> HostPortPair;
 	typedef std::list<HostPortPair>              HostPortList;
 
@@ -28,7 +27,6 @@ class VirtualServer {
 	VirtualServer(
 		const std::string  &server_name,
 		const LocationList &locations,
-		const PortList     &ports,
 		const HostPortList &host_port_list
 	);
 	~VirtualServer();
@@ -37,14 +35,12 @@ class VirtualServer {
 	// getter
 	const std::string  &GetServerName() const;
 	const LocationList &GetLocations() const;
-	const PortList     &GetPorts() const; // todo: remove
 	const HostPortList &GetHostPortList() const;
 
   private:
 	// todo: add member(& operator=)
 	std::string  server_name_;
 	LocationList locations_; // todo
-	PortList     ports_;     // todo: remove
 	HostPortList host_port_list_;
 };
 

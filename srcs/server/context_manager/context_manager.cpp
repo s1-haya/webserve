@@ -29,7 +29,6 @@ void ContextManager::AddServerInfo(
 	const ServerInfo &server_info, const VirtualServer *virtual_server
 ) {
 	const int server_fd = server_info.GetFd();
-	virtual_servers_.RemoveAddMapping(server_fd, virtual_server); // todo: remove
 	virtual_servers_.AddMapping(server_fd, virtual_server);
 	if (sock_context_.IsServerInfoExist(server_fd)) {
 		return;
@@ -51,21 +50,12 @@ const VirtualServerStorage::VirtualServerList &ContextManager::GetAllVirtualServ
 }
 
 ServerContext ContextManager::GetServerContext(int client_fd) const {
-	// from sock_context
 	const ServerInfo &server_info = sock_context_.GetConnectedServerInfo(client_fd);
 	const int         server_fd   = server_info.GetFd();
 
-	// from virtual_servers
-	// todo: remove
-	const VirtualServer &virtual_server = virtual_servers_.GetVirtualServer(server_fd);
-
 	// create ServerContext
 	ServerContext server_infos;
-	server_infos.fd          = server_fd;
-	server_infos.server_name = virtual_server.GetServerName(); // todo: remove
-	// todo: uintのままで良いかも？
-	server_infos.port      = utils::ConvertUintToStr(server_info.GetPort()); // todo: remove
-	server_infos.locations = virtual_server.GetLocations();                  // todo: remove
+	server_infos.fd                       = server_fd;
 	server_infos.virtual_server_addr_list = virtual_servers_.GetVirtualServerAddrList(server_fd);
 	return server_infos;
 }
