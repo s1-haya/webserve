@@ -45,12 +45,10 @@ response_header_get_sub_200 = (
 
 
 def test_get_root_close_200():
-    expected_response = response_header_get_root_200 + read_file(
-        "../../html/index.html"
-    )
+    expected_response = response_header_get_root_200 + read_file("html/index.html")
     client_instance = client.Client(8080)
     request = read_file_binary(
-        "../request_messages/webserv/get/200_root_connection-close.txt"
+        "test/request_messages/webserv/get/200_root_connection-close.txt"
     )
     response = client_instance.SendRequestAndReceiveResponse(request)
     assert (
@@ -59,13 +57,11 @@ def test_get_root_close_200():
 
 
 def test_get_root_keep_200():
-    expected_response = response_header_get_root_200 + read_file(
-        "../../html/index.html"
-    )
+    expected_response = response_header_get_root_200 + read_file("html/index.html")
     # responseヘッダーもkeepaliveになる？
     client_instance = client.Client(8080)
     request = read_file_binary(
-        "../request_messages/webserv/get/200_root_connection-keep.txt"
+        "test/request_messages/webserv/get/200_root_connection-keep.txt"
     )
     response = client_instance.SendRequestAndReceiveResponse(request)
     assert (
@@ -74,12 +70,10 @@ def test_get_root_keep_200():
 
 
 def test_get_sub_close_200():
-    expected_response = response_header_get_sub_200 + read_file(
-        "../../html/sub/index.html"
-    )
+    expected_response = response_header_get_sub_200 + read_file("html/sub/index.html")
     client_instance = client.Client(8080)
     request = read_file_binary(
-        "../request_messages/webserv/get/200_sub_connection-close.txt"
+        "test/request_messages/webserv/get/200_sub_connection-close.txt"
     )
     response = client_instance.SendRequestAndReceiveResponse(request)
     assert (
