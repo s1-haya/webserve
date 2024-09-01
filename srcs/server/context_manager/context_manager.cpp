@@ -42,7 +42,7 @@ void ContextManager::DeleteClientInfo(int client_fd) {
 	sock_context_.DeleteClientInfo(client_fd);
 }
 
-const VirtualServerStorage::VirtualServerList &ContextManager::GetVirtualServerList() const {
+const VirtualServerStorage::VirtualServerList &ContextManager::GetAllVirtualServer() const {
 	return virtual_servers_.GetAllVirtualServerList();
 }
 

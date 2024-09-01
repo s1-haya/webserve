@@ -309,12 +309,11 @@ void Server::UpdateConnectionAfterSendResponse(
 }
 
 void Server::Init() {
-	const VirtualServerStorage::VirtualServerList &all_virtual_server_list =
-		context_.GetVirtualServerList();
+	const VirtualServerStorage::VirtualServerList &all_virtual_server =
+		context_.GetAllVirtualServer();
 
 	typedef VirtualServerStorage::VirtualServerList::const_iterator ItVirtualServer;
-	for (ItVirtualServer it = all_virtual_server_list.begin(); it != all_virtual_server_list.end();
-		 ++it) {
+	for (ItVirtualServer it = all_virtual_server.begin(); it != all_virtual_server.end(); ++it) {
 		const VirtualServer           &virtual_server = *it;
 		const VirtualServer::PortList &ports          = virtual_server.GetPorts();
 

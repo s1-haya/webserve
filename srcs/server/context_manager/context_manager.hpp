@@ -28,7 +28,7 @@ class ContextManager {
 	void AddClientInfo(const ClientInfo &client_info, int server_fd);
 	void DeleteClientInfo(int client_fd);
 	// getter
-	const VirtualServerStorage::VirtualServerList &GetVirtualServerList() const;
+	const VirtualServerStorage::VirtualServerList &GetAllVirtualServer() const;
 	ServerContext                                  GetServerContext(int client_fd) const;
 	const std::string                             &GetClientIp(int client_fd) const;
 
