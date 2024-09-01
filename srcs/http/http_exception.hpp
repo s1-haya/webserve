@@ -1,5 +1,5 @@
-#ifndef HTTP_RESPONSE_EXCEPTION_HPP_
-#define HTTP_RESPONSE_EXCEPTION_HPP_
+#ifndef HTTP_EXCEPTION_HPP_
+#define HTTP_EXCEPTION_HPP_
 
 #include "status_code.hpp"
 #include <stdexcept>
