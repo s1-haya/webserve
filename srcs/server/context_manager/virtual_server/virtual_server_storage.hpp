@@ -23,6 +23,7 @@ class VirtualServerStorage {
 	VirtualServerStorage &operator=(const VirtualServerStorage &other);
 	// functions
 	void AddVirtualServer(const VirtualServer &virtual_server);
+	void RemoveAddMapping(int server_fd, const VirtualServer *virtual_server); // todo: remove
 	void AddMapping(int server_fd, const VirtualServer *virtual_server);
 	// getter
 	const VirtualServer         &GetVirtualServer(int server_fd) const; // todo: remove

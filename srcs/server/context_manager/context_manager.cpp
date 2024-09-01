@@ -29,6 +29,7 @@ void ContextManager::AddServerInfo(
 	const ServerInfo &server_info, const VirtualServer *virtual_server
 ) {
 	const int server_fd = server_info.GetFd();
+	virtual_servers_.RemoveAddMapping(server_fd, virtual_server); // todo: remove
 	virtual_servers_.AddMapping(server_fd, virtual_server);
 	if (sock_context_.IsServerInfoExist(server_fd)) {
 		return;
