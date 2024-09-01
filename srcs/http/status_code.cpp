@@ -1,4 +1,5 @@
 #include "status_code.hpp"
+#include "utils.hpp"
 
 namespace http {
 
@@ -18,5 +19,24 @@ ReasonPhrase InitReasonPhrase() {
 }
 
 const ReasonPhrase reason_phrase = InitReasonPhrase();
+
+StatusCode::StatusCode(const EStatusCode &status_code)
+	: status_code_(status_code),
+	  str_status_code_(utils::ToString(status_code)),
+	  reason_phrase_(InitReasonPhrase()) {}
+
+StatusCode::~StatusCode() {}
+
+std::string StatusCode::GetStatusCode() const {
+	return str_status_code_;
+}
+
+EStatusCode StatusCode::GetEStatusCode() const {
+	return status_code_;
+}
+
+std::string StatusCode::GetReasonPhrase() const {
+	return reason_phrase_.at(status_code_);
+}
 
 } // namespace http

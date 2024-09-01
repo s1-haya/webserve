@@ -5,6 +5,7 @@ TEST_DIRS	:=	convert_str \
 				http_parse \
 				http_storage \
 				http_method \
+				http_status_code \
 				http_serverinfo_check \
 				sock_context \
 				split_str \

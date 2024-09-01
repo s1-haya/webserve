@@ -6,7 +6,7 @@
 
 namespace http {
 
-enum StatusCode {
+enum EStatusCode {
 	OK                    = 200,
 	CREATED               = 201,
 	NO_CONTENT            = 204,
@@ -18,8 +18,24 @@ enum StatusCode {
 	INTERNAL_SERVER_ERROR = 500,
 	NOT_IMPLEMENTED       = 501
 };
-typedef std::map<StatusCode, std::string> ReasonPhrase;
-extern const ReasonPhrase                 reason_phrase;
+
+typedef std::map<EStatusCode, std::string> ReasonPhrase;
+extern const ReasonPhrase                  reason_phrase;
+
+class StatusCode {
+  public:
+	explicit StatusCode(const EStatusCode &status_code);
+	~StatusCode();
+	std::string GetStatusCode() const;
+	EStatusCode GetEStatusCode() const;
+	std::string GetReasonPhrase() const;
+
+  private:
+	EStatusCode                                status_code_;
+	std::string                                str_status_code_;
+	typedef std::map<EStatusCode, std::string> ReasonPhrase;
+	ReasonPhrase                               reason_phrase_;
+};
 
 } // namespace http
 
