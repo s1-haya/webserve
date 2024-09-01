@@ -20,6 +20,7 @@ class SockContext {
 	SockContext &operator=(const SockContext &other);
 	// functions
 	void AddServerInfo(int server_fd, const ServerInfo &server_info);
+	bool IsServerInfoExist(int server_fd) const;
 	void AddClientInfo(int client_fd, const ClientInfo &client_info, int server_fd);
 	void DeleteClientInfo(int client_fd);
 	// getter

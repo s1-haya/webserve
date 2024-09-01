@@ -30,6 +30,9 @@ void ContextManager::AddServerInfo(
 ) {
 	const int server_fd = server_info.GetFd();
 	virtual_servers_.AddMapping(server_fd, virtual_server);
+	if (sock_context_.IsServerInfoExist(server_fd)) {
+		return;
+	}
 	sock_context_.AddServerInfo(server_fd, server_info);
 }
 
