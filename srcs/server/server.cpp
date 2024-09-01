@@ -322,7 +322,7 @@ void Server::Init() {
 		typedef VirtualServer::PortList::const_iterator ItPort;
 		for (ItPort it_port = ports.begin(); it_port != ports.end(); ++it_port) {
 			// create ServerInfo & listen
-			ServerInfo server_info(*it_port);
+			ServerInfo server_info("0.0.0.0", *it_port);
 			const int  server_fd = connection_.Connect(server_info);
 			server_info.SetSockFd(server_fd);
 
