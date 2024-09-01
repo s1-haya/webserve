@@ -26,6 +26,7 @@ int ServerInfo::GetFd() const {
 	return fd_;
 }
 
+// todo: not used yet
 const std::string &ServerInfo::GetHost() const {
 	return host_;
 }

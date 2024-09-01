@@ -30,6 +30,7 @@ const std::string &VirtualServer::GetServerName() const {
 	return server_name_;
 }
 
+// todo: not used yet
 const VirtualServer::LocationList &VirtualServer::GetLocations() const {
 	return locations_;
 }
