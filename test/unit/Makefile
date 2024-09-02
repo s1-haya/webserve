@@ -15,7 +15,7 @@ TEST_DIRS	:=	convert_str \
 				config_parse/parser \
 				config_parse \
 				custom_const_iterator \
-				stat \
+				stat
 
 .PHONY	: run
 run:
