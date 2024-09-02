@@ -26,7 +26,8 @@ except ImportError as e:
 
 def read_file(file):
     with open(file, "r") as f:
-        return f.read()
+        data = f.read()
+        return data, len(data)
 
 
 # \r\nをそのまま読み込む用(ヘッダー部分)
@@ -35,50 +36,49 @@ def read_file_binary(file):
         return f.read()
 
 
-response_header_get_root_200 = (
-    "HTTP/1.1 200 OK\r\nConnection: close \r\nContent-Length: 1250 \r\n\r\n"
-)
-
-response_header_get_sub_200 = (
-    "HTTP/1.1 200 OK\r\nConnection: close \r\nContent-Length: 398 \r\n\r\n"
-)
-
-
-def test_get_root_close_200():
-    expected_response = response_header_get_root_200 + read_file("html/index.html")
-    client_instance = client.Client(8080)
-    request = read_file_binary(
-        "test/request_messages/webserv/get/200_root_connection-close.txt"
-    )
-    response = client_instance.SendRequestAndReceiveResponse(request)
+def assert_response(response, expected_response):
     assert (
         response == expected_response
     ), f"Expected response\n\n {repr(expected_response)}, but got\n\n {repr(response)}"
 
 
+root_index_file, root_index_file_length = read_file("html/index.html")
+sub_index_file, sub_index_file_length = read_file("html/sub/index.html")
+
+response_header_get_root_200 = f"HTTP/1.1 200 OK\r\nConnection: close \r\nContent-Length: {root_index_file_length} \r\n\r\n"
+
+response_header_get_sub_200 = f"HTTP/1.1 200 OK\r\nConnection: close \r\nContent-Length: {sub_index_file_length} \r\n\r\n"
+
+
+def test_get_root_close_200():
+    expected_response = response_header_get_root_200 + root_index_file
+    client_instance = client.Client(8080)
+    request = read_file_binary(
+        "test/request_messages/webserv/get/200_root_connection-close.txt"
+    )
+    response = client_instance.SendRequestAndReceiveResponse(request)
+    assert_response(response, expected_response)
+
+
 def test_get_root_keep_200():
-    expected_response = response_header_get_root_200 + read_file("html/index.html")
+    expected_response = response_header_get_root_200 + root_index_file
     # responseヘッダーもkeepaliveになる？
     client_instance = client.Client(8080)
     request = read_file_binary(
         "test/request_messages/webserv/get/200_root_connection-keep.txt"
     )
     response = client_instance.SendRequestAndReceiveResponse(request)
-    assert (
-        response == expected_response
-    ), f"Expected response\n\n {repr(expected_response)}, but got\n\n {repr(response)}"
+    assert_response(response, expected_response)
 
 
 def test_get_sub_close_200():
-    expected_response = response_header_get_sub_200 + read_file("html/sub/index.html")
+    expected_response = response_header_get_sub_200 + sub_index_file
     client_instance = client.Client(8080)
     request = read_file_binary(
         "test/request_messages/webserv/get/200_sub_connection-close.txt"
     )
     response = client_instance.SendRequestAndReceiveResponse(request)
-    assert (
-        response == expected_response
-    ), f"Expected response\n\n {repr(expected_response)}, but got\n\n {repr(response)}"
+    assert_response(response, expected_response)
 
 
 # def test_get_404():
