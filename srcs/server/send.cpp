@@ -1,4 +1,5 @@
 #include "send.hpp"
+#include "utils.hpp"
 #include <cstdio>       // perror
 #include <sys/socket.h> // send
 
@@ -12,6 +13,7 @@ Send::SendResult Send::SendResponse(int client_fd, const Response &response) {
 	SendResult send_result;
 
 	ssize_t send_size = send(client_fd, response.c_str(), response.size(), 0);
+	utils::Debug("Send", "send_size: ", send_size);
 	if (send_size == SYSTEM_ERROR) {
 		perror("send failed");
 		send_result.Set(false);

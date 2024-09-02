@@ -45,11 +45,11 @@ int main(void) {
 	// LF:   exist target resourse file
 	std::string expected_file = LoadFileContent("expected/file.txt");
 	// CRLF: use default status code file
-	std::string expected_created = LoadFileContent("expected/created.txt");
+	std::string expected_created    = LoadFileContent("expected/created.txt");
 	std::string expected_no_content = LoadFileContent("expected/no_content.txt");
-	std::string expected_redirect = LoadFileContent("expected/redirect.txt");
-	std::string expected_forbidden = LoadFileContent("expected/forbidden.txt");
-	std::string expected_not_found = LoadFileContent("expected/not_found.txt");
+	std::string expected_redirect   = LoadFileContent("expected/redirect.txt");
+	std::string expected_forbidden  = LoadFileContent("expected/forbidden.txt");
+	std::string expected_not_found  = LoadFileContent("expected/not_found.txt");
 
 	// ファイルが存在する場合
 	std::string get_test1_response_body_message;
@@ -57,9 +57,9 @@ int main(void) {
 	ret_code |= HandleResult(get_test1_response_body_message, expected_file);
 
 	// ファイルが存在しない場合
-	std::string  get_test2_response_body_message;
-	http::HttpResponse::GetHandler("test/a",  get_test2_response_body_message);
-	ret_code |= HandleResult( get_test2_response_body_message, expected_not_found);
+	std::string get_test2_response_body_message;
+	http::HttpResponse::GetHandler("test/a", get_test2_response_body_message);
+	ret_code |= HandleResult(get_test2_response_body_message, expected_not_found);
 
 	// ディレクトリの場合かつ'/'がない場合
 	std::string get_test3_response_body_message;

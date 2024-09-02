@@ -8,6 +8,7 @@
 #include "utils.hpp"
 #include "virtual_server.hpp"
 #include <errno.h>
+#include <fcntl.h>      // fcntl
 #include <sys/socket.h> // socket
 #include <unistd.h>     // close
 
@@ -120,6 +121,7 @@ void Server::HandleNewConnection(int server_fd) {
 	// A new socket that has established a connection with the peer socket.
 	const ClientInfo new_client_info = Connection::Accept(server_fd);
 	const int        client_fd       = new_client_info.GetFd();
+	SetNonBlockingMode(client_fd);
 
 	// add client_info, event, message
 	context_.AddClientInfo(new_client_info, server_fd);
@@ -316,6 +318,7 @@ void Server::Init() {
 				server_info         = ServerInfo(it_host_port->first, it_host_port->second);
 				const int server_fd = connection_.Connect(server_info);
 				server_info.SetSockFd(server_fd);
+				SetNonBlockingMode(server_fd);
 
 				event_monitor_.Add(server_fd, event::EVENT_READ);
 				utils::Debug(
@@ -327,6 +330,17 @@ void Server::Init() {
 			// add to context
 			context_.AddServerInfo(server_info, &virtual_server);
 		}
+	}
+}
+
+void Server::SetNonBlockingMode(int sock_fd) {
+	int flags = fcntl(sock_fd, F_GETFL);
+	if (flags == SYSTEM_ERROR) {
+		throw std::runtime_error("fcntl F_GETFL failed");
+	}
+	flags |= O_NONBLOCK;
+	if (fcntl(sock_fd, F_SETFL, flags) == SYSTEM_ERROR) {
+		throw std::runtime_error("fcntl F_SETFL failed");
 	}
 }
 
