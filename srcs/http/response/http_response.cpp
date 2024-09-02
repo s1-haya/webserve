@@ -65,7 +65,7 @@ HttpResponseFormat HttpResponse::TmpCreateHttpResponseResult(
 // mock
 HttpResponseFormat HttpResponse::CreateHttpResponseResult(const HttpRequestResult &request_info) {
 	HttpResponseFormat response;
-	if (request_info.status_code != http::OK) {
+	if (request_info.status_code.GetEStatusCode() != http::OK) {
 		response = CreateErrorHttpResponseResult(request_info);
 	} else {
 		response = CreateSuccessHttpResponseResult(request_info);
@@ -104,8 +104,8 @@ HttpResponseFormat HttpResponse::CreateErrorHttpResponseResult(const HttpRequest
 ) {
 	HttpResponseFormat response;
 	response.status_line.version       = HTTP_VERSION;
-	response.status_line.status_code   = utils::ToString(request_info.status_code);
-	response.status_line.reason_phrase = reason_phrase.at(request_info.status_code);
+	response.status_line.status_code   = request_info.status_code.GetStatusCode();
+	response.status_line.reason_phrase = request_info.status_code.GetReasonPhrase();
 	// todo: StatusCodeをクラスにして、プライベートで保持する。
 	// response.status_line.status_code   = request_info.status_code.GetStrStatusCode();
 	// response.status_line.reason_phrase   = request_info.status_code.GetReasonPhrase();

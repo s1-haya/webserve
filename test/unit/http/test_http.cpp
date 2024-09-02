@@ -84,10 +84,13 @@ Result IsSameHttpRequestParsedData(
 ) {
 	Result             request_parsed_result;
 	std::ostringstream oss;
-	if (!IsSame(result.request_result.status_code, expected.request_result.status_code)) {
+	if (!IsSame(
+			result.request_result.status_code.GetEStatusCode(),
+			expected.request_result.status_code.GetEStatusCode()
+		)) {
 		oss << "Error: Status Code\n";
-		oss << "- Expected: [" << expected.request_result.status_code << "]\n";
-		oss << "- Result  : [" << result.request_result.status_code << "]\n";
+		oss << "- Expected: [" << expected.request_result.status_code.GetStatusCode() << "]\n";
+		oss << "- Result  : [" << result.request_result.status_code.GetStatusCode() << "]\n";
 		request_parsed_result.is_success = false;
 	}
 	if (!IsSameHttpRequestFormat(result.is_request_format, expected.is_request_format)) {
@@ -139,18 +142,18 @@ int main(void) {
 
 	// 1.リクエストラインの書式が正しい場合
 	http::HttpRequestParsedData test1_request_line;
-	test1_request_line.request_result.status_code        = http::OK;
+	test1_request_line.request_result.status_code        = http::StatusCode(http::OK);
 	test1_request_line.is_request_format.is_request_line = true;
 
 	// 2.リクエストラインの書式が正しいくない場合
 	http::HttpRequestParsedData test2_request_line;
-	test2_request_line.request_result.status_code        = http::BAD_REQUEST;
+	test2_request_line.request_result.status_code        = http::StatusCode(http::BAD_REQUEST);
 	test2_request_line.is_request_format.is_request_line = false;
 
 	// 3.CRLNがない場合
 	http::HttpRequestParsedData test3_request_line;
 	// 本来のステータスコードはRequest Timeout
-	test3_request_line.request_result.status_code        = http::OK;
+	test3_request_line.request_result.status_code        = http::StatusCode(http::OK);
 	test3_request_line.is_request_format.is_request_line = false;
 
 	static const TestCase test_case_http_request_line_format[] = {
@@ -166,14 +169,14 @@ int main(void) {
 
 	// 4.ヘッダフィールドの書式が正しい場合
 	http::HttpRequestParsedData test1_header_fields;
-	test1_header_fields.request_result.status_code         = http::OK;
+	test1_header_fields.request_result.status_code         = http::StatusCode(http::OK);
 	test1_header_fields.is_request_format.is_request_line  = true;
 	test1_header_fields.is_request_format.is_header_fields = true;
 	test1_header_fields.is_request_format.is_body_message  = true;
 
 	// 5.ヘッダフィールドの書式が正しくない場合
 	http::HttpRequestParsedData test2_header_fields;
-	test2_header_fields.request_result.status_code         = http::BAD_REQUEST;
+	test2_header_fields.request_result.status_code         = http::StatusCode(http::BAD_REQUEST);
 	test2_header_fields.is_request_format.is_request_line  = true;
 	test2_header_fields.is_request_format.is_header_fields = false;
 	test2_header_fields.is_request_format.is_body_message  = false;
@@ -181,7 +184,7 @@ int main(void) {
 	// 6.ヘッダフィールドにContent-Lengthがあるがボディメッセージがない場合
 	http::HttpRequestParsedData test3_header_fileds;
 	// 本来のステータスコードはRequest Timeout
-	test3_header_fileds.request_result.status_code         = http::OK;
+	test3_header_fileds.request_result.status_code         = http::StatusCode(http::OK);
 	test3_header_fileds.is_request_format.is_request_line  = true;
 	test3_header_fileds.is_request_format.is_header_fields = true;
 	test3_header_fileds.is_request_format.is_body_message  = false;
@@ -202,14 +205,14 @@ int main(void) {
 
 	// 7.ボディメッセージが正しい場合
 	http::HttpRequestParsedData test1_body_message;
-	test1_body_message.request_result.status_code         = http::OK;
+	test1_body_message.request_result.status_code         = http::StatusCode(http::OK);
 	test1_body_message.is_request_format.is_request_line  = true;
 	test1_body_message.is_request_format.is_header_fields = true;
 	test1_body_message.is_request_format.is_body_message  = true;
 
 	// 8.Content-Lengthの数値以上にボディメッセージがある場合
 	http::HttpRequestParsedData test2_body_message;
-	test2_body_message.request_result.status_code          = http::OK;
+	test2_body_message.request_result.status_code          = http::StatusCode(http::OK);
 	test2_body_message.is_request_format.is_request_line   = true;
 	test2_body_message.is_request_format.is_header_fields  = true;
 	test2_body_message.is_request_format.is_body_message   = true;
@@ -217,7 +220,7 @@ int main(void) {
 
 	// 9.Content-Lengthの値の書式が間違ってる場合
 	http::HttpRequestParsedData test3_body_message;
-	test3_body_message.request_result.status_code          = http::BAD_REQUEST;
+	test3_body_message.request_result.status_code          = http::StatusCode(http::BAD_REQUEST);
 	test3_body_message.is_request_format.is_request_line   = true;
 	test3_body_message.is_request_format.is_header_fields  = true;
 	test3_body_message.is_request_format.is_body_message   = false;
@@ -248,7 +251,7 @@ int main(void) {
 	// 10.ボディメッセージを追加で送信した場合
 	http::TmpHttp               test4_body_message;
 	http::HttpRequestParsedData test4_expected_body_message;
-	test4_expected_body_message.request_result.status_code          = http::OK;
+	test4_expected_body_message.request_result.status_code          = http::StatusCode(http::OK);
 	test4_expected_body_message.is_request_format.is_request_line   = true;
 	test4_expected_body_message.is_request_format.is_header_fields  = true;
 	test4_expected_body_message.is_request_format.is_body_message   = false;

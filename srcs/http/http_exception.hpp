@@ -1,5 +1,5 @@
-#ifndef HTTP_RESPONSE_EXCEPTION_HPP_
-#define HTTP_RESPONSE_EXCEPTION_HPP_
+#ifndef HTTP_EXCEPTION_HPP_
+#define HTTP_EXCEPTION_HPP_
 
 #include "status_code.hpp"
 #include <stdexcept>
@@ -9,11 +9,12 @@ namespace http {
 
 class HttpException : public std::runtime_error {
   public:
-	explicit HttpException(const std::string &error_message, EStatusCode status_code);
-	EStatusCode GetStatusCode() const;
+	HttpException(const std::string &error_message, const StatusCode &status_code);
+	~HttpException() throw();
+	const StatusCode &GetStatusCode() const throw();
 
   private:
-	EStatusCode status_code_;
+	StatusCode status_code_;
 };
 
 } // namespace http

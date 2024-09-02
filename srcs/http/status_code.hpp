@@ -24,11 +24,14 @@ extern const ReasonPhrase                  reason_phrase;
 
 class StatusCode {
   public:
-	explicit StatusCode(const EStatusCode &status_code);
+	explicit StatusCode(EStatusCode status_code);
 	~StatusCode();
-	std::string GetStatusCode() const;
-	EStatusCode GetEStatusCode() const;
-	std::string GetReasonPhrase() const;
+	StatusCode(const StatusCode &other);
+	StatusCode &operator=(const StatusCode &other);
+
+	EStatusCode        GetEStatusCode() const;
+	const std::string &GetStatusCode() const;
+	const std::string &GetReasonPhrase() const;
 
   private:
 	EStatusCode                                status_code_;

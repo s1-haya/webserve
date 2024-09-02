@@ -23,7 +23,7 @@ void HttpServerInfoCheck::CheckDTOServerInfo(
 ) {
 	if (static_cast<size_t>(std::atoi(header_fields["Content-Length"].c_str())) >
 		server_info.client_max_body_size) { // Check content_length
-		throw HttpException("Error: payload too large.", PAYLOAD_TOO_LARGE);
+		throw HttpException("Error: payload too large.", StatusCode(PAYLOAD_TOO_LARGE));
 	} else if (!server_info.error_page.second.empty()) { // Check error_page
 		result.error_page = server_info.error_page;
 	}
@@ -65,7 +65,7 @@ const MockLocationCon HttpServerInfoCheck::CheckLocation(
 		}
 	}
 	if (match_loc.request_uri.empty()) {
-		throw HttpException("Error: location not found", NOT_FOUND);
+		throw HttpException("Error: location not found", StatusCode(NOT_FOUND));
 	}
 	return match_loc;
 }

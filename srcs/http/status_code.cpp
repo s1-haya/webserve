@@ -20,14 +20,27 @@ ReasonPhrase InitReasonPhrase() {
 
 const ReasonPhrase reason_phrase = InitReasonPhrase();
 
-StatusCode::StatusCode(const EStatusCode &status_code)
+StatusCode::StatusCode(EStatusCode status_code)
 	: status_code_(status_code),
 	  str_status_code_(utils::ToString(status_code)),
 	  reason_phrase_(InitReasonPhrase()) {}
 
 StatusCode::~StatusCode() {}
 
-std::string StatusCode::GetStatusCode() const {
+StatusCode::StatusCode(const StatusCode &other) {
+	*this = other;
+}
+
+StatusCode &StatusCode::operator=(const StatusCode &other) {
+	if (this != &other) {
+		status_code_     = other.status_code_;
+		str_status_code_ = other.str_status_code_;
+		reason_phrase_   = other.reason_phrase_;
+	}
+	return *this;
+}
+
+const std::string &StatusCode::GetStatusCode() const {
 	return str_status_code_;
 }
 
@@ -35,7 +48,7 @@ EStatusCode StatusCode::GetEStatusCode() const {
 	return status_code_;
 }
 
-std::string StatusCode::GetReasonPhrase() const {
+const std::string &StatusCode::GetReasonPhrase() const {
 	return reason_phrase_.at(status_code_);
 }
 

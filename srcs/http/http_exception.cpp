@@ -2,10 +2,12 @@
 
 namespace http {
 
-HttpException::HttpException(const std::string &error_message, EStatusCode status_code)
+HttpException::HttpException(const std::string &error_message, const StatusCode &status_code)
 	: runtime_error(error_message), status_code_(status_code) {}
 
-EStatusCode HttpException::GetStatusCode() const {
+HttpException::~HttpException() throw() {}
+
+const StatusCode &HttpException::GetStatusCode() const throw() {
 	return status_code_;
 }
 

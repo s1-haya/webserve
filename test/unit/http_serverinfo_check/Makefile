@@ -18,7 +18,8 @@ WS_HTTP_SERVERINFO_CHECK_DIR	:=	$(WS_HTTP_RESPONSE_DIR)/http_serverinfo_check
 
 SRCS				+=	$(WS_HTTP_SERVERINFO_CHECK_DIR)/http_serverinfo_check.cpp \
 						$(WS_UTILS_DIR)/color.cpp \
-						$(WS_HTTP_DIR)/http_exception.cpp
+						$(WS_HTTP_DIR)/http_exception.cpp \
+						$(WS_HTTP_DIR)/status_code.cpp
 
 # 3. Add unit test files
 SRCS	+=	test_http_serverinfo_check.cpp
