@@ -20,7 +20,7 @@ SRCS				+=	$(WS_UTILS_DIR)/color.cpp \
 						$(WS_HTTP_DIR)/http_message.cpp \
 						$(WS_HTTP_DIR)/http_exception.cpp \
 						$(WS_HTTP_DIR)/status_code.cpp \
-						$(WS_HTTP_PARSE_DIR)/http_parse.cpp \
+						$(WS_HTTP_PARSE_DIR)/http_parse.cpp
 
 # 3. Add unit test files
 SRCS	+=	test_http_parse.cpp

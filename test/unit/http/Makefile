@@ -30,7 +30,7 @@ SRCS				+=	$(WS_UTILS_DIR)/color.cpp \
 						$(WS_HTTP_RESPONSE_DIR)/http_response.cpp \
 						$(WS_HTTP_SERVER_INFO_CHECK_DIR)/http_serverinfo_check.cpp \
 						$(WS_HTTP_PARSE_DIR)/http_parse.cpp \
-						$(WS_VERTUAL_SERVER_DIR)/virtual_server.cpp \
+						$(WS_VERTUAL_SERVER_DIR)/virtual_server.cpp
 
 # 3. Add unit test files
 SRCS	+=	test_http.cpp
