@@ -14,7 +14,7 @@ TEST_DIRS	:=	convert_str \
 				config_parse/parser \
 				config_parse \
 				custom_const_iterator \
-				stat \
+				stat
 
 .PHONY	: run
 run:
@@ -33,9 +33,6 @@ run:
 fclean:
 	@status=0; \
 	for dir in $(TEST_DIRS); do \
-		echo "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"; \
-		echo "┃ $$dir"; \
-		echo "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"; \
 		(MAKEFLAGS="-s" make -C $$dir fclean); \
 		dir_status=$$?; \
 		status=$$((status | dir_status)); \
