@@ -32,7 +32,7 @@ Connection::AddrInfo *Connection::GetAddrInfoList(const ServerInfo &server_info)
 	InitHints(&hints);
 
 	AddrInfo *result;
-	const int status = getaddrinfo(NULL, port.c_str(), &hints, &result);
+	const int status = getaddrinfo(server_info.GetHost().c_str(), port.c_str(), &hints, &result);
 	// EAI_MEMORY is also included in status != 0
 	if (status != 0) {
 		throw std::runtime_error("getaddrinfo failed: " + std::string(gai_strerror(status)));
