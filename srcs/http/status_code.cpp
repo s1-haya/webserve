@@ -3,9 +3,7 @@
 
 namespace http {
 
-typedef std::map<EStatusCode, std::string> ReasonPhrase;
-
-ReasonPhrase StatusCode::InitReasonPhrase() {
+StatusCode::ReasonPhrase StatusCode::InitReasonPhrase() {
 	ReasonPhrase init_reason_phrase;
 	init_reason_phrase[OK]                    = "OK";
 	init_reason_phrase[CREATED]               = "Created";
