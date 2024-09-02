@@ -19,9 +19,6 @@ enum EStatusCode {
 	NOT_IMPLEMENTED       = 501
 };
 
-typedef std::map<EStatusCode, std::string> ReasonPhrase;
-extern const ReasonPhrase                  reason_phrase;
-
 class StatusCode {
   public:
 	explicit StatusCode(EStatusCode status_code);
@@ -38,6 +35,7 @@ class StatusCode {
 	std::string                                str_status_code_;
 	typedef std::map<EStatusCode, std::string> ReasonPhrase;
 	ReasonPhrase                               reason_phrase_;
+	ReasonPhrase                               InitReasonPhrase();
 };
 
 } // namespace http

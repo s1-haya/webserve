@@ -3,7 +3,9 @@
 
 namespace http {
 
-ReasonPhrase InitReasonPhrase() {
+typedef std::map<EStatusCode, std::string> ReasonPhrase;
+
+ReasonPhrase StatusCode::InitReasonPhrase() {
 	ReasonPhrase init_reason_phrase;
 	init_reason_phrase[OK]                    = "OK";
 	init_reason_phrase[CREATED]               = "Created";
@@ -17,8 +19,6 @@ ReasonPhrase InitReasonPhrase() {
 	init_reason_phrase[NOT_IMPLEMENTED]       = "Not Implemented";
 	return init_reason_phrase;
 }
-
-const ReasonPhrase reason_phrase = InitReasonPhrase();
 
 StatusCode::StatusCode(EStatusCode status_code)
 	: status_code_(status_code),
