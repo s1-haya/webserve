@@ -60,9 +60,7 @@ class HttpResponse {
 	static HttpResponseFormat CreateSuccessHttpResponseResult(const HttpRequestResult &request_info
 	);
 	static HttpResponseFormat CreateErrorHttpResponseResult(const StatusCode &status_code);
-	static std::string        CreateDefaultBodyMessageFormat(
-			   const std::string &status_code, const std::string &reason_phrase
-		   );
+	static std::string        CreateDefaultBodyMessageFormat(const StatusCode &status_code);
 	static void
 	SystemExceptionHandler(const utils::SystemException &e, std::string &response_body_message);
 	static void FileCreationHandler(

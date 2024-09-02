@@ -40,10 +40,7 @@ void HttpResponse::GetHandler(const std::string &path, std::string &response_bod
 		if (info.IsDirectory()) {
 			// No empty string because the path has '/'
 			if (path[path.size() - 1] != '/') {
-				response_body_message = CreateDefaultBodyMessageFormat(
-					utils::ToString(http::MOVED_PERMANENTLY),
-					reason_phrase.at(http::MOVED_PERMANENTLY)
-				);
+				response_body_message = CreateDefaultBodyMessageFormat(StatusCode(MOVED_PERMANENTLY));
 				return;
 			}
 			// todo: Check for index directive and handle ReadFile function
@@ -51,16 +48,12 @@ void HttpResponse::GetHandler(const std::string &path, std::string &response_bod
 			// todo: Return 403 Forbidden if neither index nor autoindex directives exist
 		} else if (info.IsRegularFile()) {
 			if (!info.IsReadableFile()) {
-				response_body_message = CreateDefaultBodyMessageFormat(
-					utils::ToString(http::FORBIDDEN), reason_phrase.at(http::FORBIDDEN)
-				);
+				response_body_message = CreateDefaultBodyMessageFormat(StatusCode(FORBIDDEN));
 			} else {
 				response_body_message = ReadFile(path);
 			}
 		} else {
-			response_body_message = CreateDefaultBodyMessageFormat(
-				utils::ToString(http::NOT_FOUND), reason_phrase.at(http::NOT_FOUND)
-			);
+			response_body_message = CreateDefaultBodyMessageFormat(StatusCode(NOT_FOUND));
 		}
 	} catch (const utils::SystemException &e) {
 		SystemExceptionHandler(e, response_body_message);
@@ -75,13 +68,9 @@ void HttpResponse::PostHandler(
 	try {
 		Stat info(path);
 		if (info.IsDirectory()) {
-			response_body_message = CreateDefaultBodyMessageFormat(
-				utils::ToString(http::FORBIDDEN), reason_phrase.at(http::FORBIDDEN)
-			);
+			response_body_message = CreateDefaultBodyMessageFormat(StatusCode(FORBIDDEN));
 		} else if (info.IsRegularFile()) {
-			response_body_message = CreateDefaultBodyMessageFormat(
-				utils::ToString(http::NO_CONTENT), reason_phrase.at(http::NO_CONTENT)
-			);
+			response_body_message = CreateDefaultBodyMessageFormat(StatusCode(NO_CONTENT));
 		} else {
 			// Location header fields: URI-reference
 			// ex) POST /save/test.txt HTTP/1.1
@@ -102,13 +91,9 @@ void HttpResponse::DeleteHandler(const std::string &path, std::string &response_
 	try {
 		Stat info(path);
 		if (info.IsDirectory()) {
-			response_body_message = CreateDefaultBodyMessageFormat(
-				utils::ToString(http::FORBIDDEN), reason_phrase.at(http::FORBIDDEN)
-			);
+			response_body_message = CreateDefaultBodyMessageFormat(StatusCode(FORBIDDEN));
 		} else if (std::remove(path.c_str()) == 0) {
-			response_body_message = CreateDefaultBodyMessageFormat(
-				utils::ToString(http::NO_CONTENT), reason_phrase.at(http::NO_CONTENT)
-			);
+			response_body_message = CreateDefaultBodyMessageFormat(StatusCode(NO_CONTENT));
 		} else {
 			throw utils::SystemException(std::strerror(errno), errno);
 		}
@@ -122,18 +107,11 @@ void HttpResponse::SystemExceptionHandler(
 ) {
 	int error_number = e.GetErrorNumber();
 	if (error_number == EACCES || error_number == EPERM) {
-		response_body_message = CreateDefaultBodyMessageFormat(
-			utils::ToString(http::FORBIDDEN), reason_phrase.at(http::FORBIDDEN)
-		);
+		response_body_message = CreateDefaultBodyMessageFormat(StatusCode(FORBIDDEN));
 	} else if (error_number == ENOENT || error_number == ENOTDIR || error_number == ELOOP || error_number == ENAMETOOLONG) {
-		response_body_message = CreateDefaultBodyMessageFormat(
-			utils::ToString(http::NOT_FOUND), reason_phrase.at(http::NOT_FOUND)
-		);
+		response_body_message = CreateDefaultBodyMessageFormat(StatusCode(NOT_FOUND));
 	} else {
-		response_body_message = CreateDefaultBodyMessageFormat(
-			utils::ToString(http::INTERNAL_SERVER_ERROR),
-			reason_phrase.at(http::INTERNAL_SERVER_ERROR)
-		);
+		response_body_message = CreateDefaultBodyMessageFormat(StatusCode(INTERNAL_SERVER_ERROR));
 	}
 }
 
@@ -144,9 +122,7 @@ void HttpResponse::FileCreationHandler(
 ) {
 	std::ofstream file(path.c_str(), std::ios::binary);
 	if (file.fail()) {
-		response_body_message = CreateDefaultBodyMessageFormat(
-			utils::ToString(http::FORBIDDEN), reason_phrase.at(http::FORBIDDEN)
-		);
+		response_body_message = CreateDefaultBodyMessageFormat(StatusCode(FORBIDDEN));
 		return;
 	}
 	file.write(request_body_message.c_str(), request_body_message.length());
@@ -155,14 +131,10 @@ void HttpResponse::FileCreationHandler(
 		if (std::remove(path.c_str()) != 0) {
 			throw utils::SystemException(std::strerror(errno), errno);
 		}
-		response_body_message = CreateDefaultBodyMessageFormat(
-			utils::ToString(http::FORBIDDEN), reason_phrase.at(http::FORBIDDEN)
-		);
+		response_body_message = CreateDefaultBodyMessageFormat(StatusCode(FORBIDDEN));
 		return;
 	}
-	response_body_message = CreateDefaultBodyMessageFormat(
-		utils::ToString(http::CREATED), reason_phrase.at(http::CREATED)
-	);
+	response_body_message = CreateDefaultBodyMessageFormat(StatusCode(CREATED));
 }
 
 } // namespace http

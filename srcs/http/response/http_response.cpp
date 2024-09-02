@@ -87,13 +87,11 @@ HttpResponse::CreateSuccessHttpResponseResult(const HttpRequestResult &request_i
 	return response;
 }
 
-std::string HttpResponse::CreateDefaultBodyMessageFormat(
-	const std::string &status_code, const std::string &reason_phrase
-) {
+std::string HttpResponse::CreateDefaultBodyMessageFormat(const StatusCode &status_code) {
 	std::ostringstream body_message;
-	body_message << "<html>" << CRLF << "<head><title>" << status_code << SP << reason_phrase
-				 << "</title></head>" << CRLF << "<body>" << CRLF << "<center><h1>" << status_code
-				 << SP << reason_phrase << "</h1></center>" << CRLF << "<hr><center>"
+	body_message << "<html>" << CRLF << "<head><title>" << status_code.GetStatusCode() << SP << status_code.GetReasonPhrase()
+				 << "</title></head>" << CRLF << "<body>" << CRLF << "<center><h1>" << status_code.GetStatusCode()
+				 << SP << status_code.GetReasonPhrase() << "</h1></center>" << CRLF << "<hr><center>"
 				 << SERVER_VERSION << "</center>" << CRLF << "</body>" << CRLF << "</html>" << CRLF;
 	return body_message.str();
 }
@@ -107,9 +105,7 @@ HttpResponseFormat HttpResponse::CreateErrorHttpResponseResult(const StatusCode 
 	response.header_fields[CONTENT_TYPE] = "text/html";
 	response.header_fields[SERVER]       = SERVER_VERSION;
 	response.header_fields[CONNECTION]   = "close";
-	response.body_message                = CreateDefaultBodyMessageFormat(
-        response.status_line.status_code, response.status_line.reason_phrase
-    );
+	response.body_message                = CreateDefaultBodyMessageFormat(status_code);
 	response.header_fields[CONTENT_LENGTH] = utils::ToString(response.body_message.length());
 	return response;
 }
