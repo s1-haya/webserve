@@ -128,7 +128,7 @@ int Test1() {
 		COMPARE(result.cgi_extension, location.cgi_extension);
 		COMPARE(result.upload_directory, location.upload_directory);
 		COMPARE(result.redirect.GetValue(), location.redirect);
-		COMPARE(result.error_page, server_info.error_page);
+		COMPARE(result.error_page.GetValue(), server_info.error_page);
 	} catch (const std::exception &e) {
 		PrintNg();
 		std::cerr << e.what() << '\n';
@@ -157,7 +157,7 @@ int Test2() {
 		COMPARE(result.cgi_extension, location.cgi_extension);
 		COMPARE(result.upload_directory, location.upload_directory);
 		COMPARE(result.redirect.GetValue(), location.redirect);
-		COMPARE(result.error_page, server_info.error_page);
+		COMPARE(result.error_page.GetValue(), server_info.error_page);
 	} catch (const std::exception &e) {
 		PrintNg();
 		std::cerr << e.what() << '\n';
@@ -187,7 +187,7 @@ int Test3() {
 		COMPARE(result.cgi_extension, location.cgi_extension);
 		COMPARE(result.upload_directory, location.upload_directory);
 		COMPARE(result.redirect.GetValue(), location.redirect);
-		COMPARE(result.error_page, server_info.error_page);
+		COMPARE(result.error_page.GetValue(), server_info.error_page);
 	} catch (const std::exception &e) {
 		PrintNg();
 		std::cerr << e.what() << '\n';
@@ -218,7 +218,7 @@ int Test4() {
 		COMPARE(result.cgi_extension, location.cgi_extension);
 		COMPARE(result.upload_directory, location.upload_directory);
 		COMPARE(result.redirect.GetValue(), location.redirect);
-		COMPARE(result.error_page, server_info.error_page);
+		COMPARE(result.error_page.GetValue(), server_info.error_page);
 	} catch (const std::exception &e) {
 		PrintNg();
 		std::cerr << e.what() << '\n';

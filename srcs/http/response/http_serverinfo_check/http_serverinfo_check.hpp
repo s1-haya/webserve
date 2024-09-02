@@ -20,8 +20,11 @@ struct CheckServerInfoResult {
 	std::string            upload_directory;
 
 	utils::Result< std::pair<unsigned int, std::string> > redirect;
-	std::pair<unsigned int, std::string>                  error_page;
-	CheckServerInfoResult() : autoindex(false){};
+	utils::Result< std::pair<unsigned int, std::string> > error_page;
+	CheckServerInfoResult() : autoindex(false) {
+		redirect.Set(false);
+		error_page.Set(false);
+	};
 };
 
 class HttpServerInfoCheck {

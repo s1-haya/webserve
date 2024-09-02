@@ -32,7 +32,7 @@ void HttpServerInfoCheck::CheckDTOServerInfo(
 		}
 	}
 	if (!server_info.error_page.second.empty()) {
-		result.error_page = server_info.error_page;
+		result.error_page.Set(true, server_info.error_page);
 	}
 }
 
