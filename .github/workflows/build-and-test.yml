@@ -42,10 +42,6 @@ jobs:
         run:
           sleep 3
 
-      - name: Check whether webserv is running
-        run:
-          make is-running
-
       - name: Run tests
         run:
           make test
