@@ -318,7 +318,11 @@ void Server::Init() {
 				server_info.SetSockFd(server_fd);
 
 				event_monitor_.Add(server_fd, event::EVENT_READ);
-				utils::Debug("server", "listen", server_fd);
+				utils::Debug(
+					"server",
+					"listen " + it_host_port->first + ":" + utils::ToString(it_host_port->second),
+					server_fd
+				);
 			}
 			// add to context
 			context_.AddServerInfo(server_info, &virtual_server);
