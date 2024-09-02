@@ -294,6 +294,23 @@ void Server::UpdateConnectionAfterSendResponse(
 	}
 }
 
+ServerInfo Server::Listen(const std::string &host, unsigned int port) {
+	const ContextManager::GetServerInfoResult result = context_.GetServerInfo(host, port);
+	if (result.IsOk()) {
+		return result.GetValue();
+	}
+
+	// create ServerInfo & listen the first host:port
+	ServerInfo server_info(host, port);
+	const int  server_fd = connection_.Connect(server_info);
+	server_info.SetSockFd(server_fd);
+	SetNonBlockingMode(server_fd);
+
+	event_monitor_.Add(server_fd, event::EVENT_READ);
+	utils::Debug("server", "listen " + host + ":" + utils::ToString(port), server_fd);
+	return server_info;
+}
+
 void Server::Init() {
 	const VirtualServerStorage::VirtualServerList &all_virtual_server =
 		context_.GetAllVirtualServer();
@@ -303,32 +320,13 @@ void Server::Init() {
 		const VirtualServer               &virtual_server = *it;
 		const VirtualServer::HostPortList &host_port_list = virtual_server.GetHostPortList();
 
-		// 各virtual serverの全host:portをsocket通信
+		// Socket communication for all host:port pairs of each virtual server.
 		typedef VirtualServer::HostPortList::const_iterator ItHostPort;
 		for (ItHostPort it_host_port = host_port_list.begin(); it_host_port != host_port_list.end();
 			 ++it_host_port) {
-			ServerInfo server_info;
-
-			const ContextManager::GetServerInfoResult result =
-				context_.GetServerInfo(it_host_port->first, it_host_port->second);
-			if (result.IsOk()) {
-				server_info = result.GetValue();
-			} else {
-				// create ServerInfo & listen the first host:port
-				server_info         = ServerInfo(it_host_port->first, it_host_port->second);
-				const int server_fd = connection_.Connect(server_info);
-				server_info.SetSockFd(server_fd);
-				SetNonBlockingMode(server_fd);
-
-				event_monitor_.Add(server_fd, event::EVENT_READ);
-				utils::Debug(
-					"server",
-					"listen " + it_host_port->first + ":" + utils::ToString(it_host_port->second),
-					server_fd
-				);
-			}
-			// add to context
-			context_.AddServerInfo(server_info, &virtual_server);
+			const ServerInfo listen_server_info = Listen(it_host_port->first, it_host_port->second);
+			// Whether new or existing server_info, add a link to the virtual_server.
+			context_.AddServerInfo(listen_server_info, &virtual_server);
 		}
 	}
 }
