@@ -20,10 +20,10 @@ struct MockDtoServerInfos;
 //   static std::string CreateInternalServerErrorResponse(HttpRequestResult)
 //  private:
 //   static std::string        CreateHttpResponseFormat(const HttpResponseFormat &response);
-//   static HttpResponseFormat CreateHttpResponseResult(const HttpRequestResult &request_info);
-//   static HttpResponseFormat CreateSuccessHttpResponseResult(const HttpRequestResult
+//   static HttpResponseFormat CreateHttpResponseFormat(const HttpRequestResult &request_info);
+//   static HttpResponseFormat CreateSuccessHttpResponseFormat(const HttpRequestResult
 //   &request_info);
-//   static HttpResponseFormat CreateErrorHttpResponseResult(const HttpRequestResult
+//   static HttpResponseFormat CreateErrorHttpResponseFormat(const HttpRequestResult
 //   &request_info);
 //    GetTimeoutRequestBodyMessage();
 //    GetInternalServerErrorBodyMessage();
@@ -50,16 +50,16 @@ class HttpResponse {
 	HttpResponse();
 	~HttpResponse();
 
-	static std::string        CreateHttpResponseFormat(const HttpResponseFormat &response);
-	static HttpResponseFormat CreateHttpResponseResult(const HttpRequestResult &request_info);
-	static HttpResponseFormat TmpCreateHttpResponseResult(
+	static std::string        CreateHttpResponse(const HttpResponseFormat &response);
+	static HttpResponseFormat CreateHttpResponseFormat(const HttpRequestResult &request_info);
+	static HttpResponseFormat TmpCreateHttpResponseFormat(
 		const MockDtoClientInfos &client_info,
 		const MockDtoServerInfos &server_info,
 		HttpRequestResult        &request_info
 	);
-	static HttpResponseFormat CreateSuccessHttpResponseResult(const HttpRequestResult &request_info
+	static HttpResponseFormat CreateSuccessHttpResponseFormat(const HttpRequestResult &request_info
 	);
-	static HttpResponseFormat CreateErrorHttpResponseResult(const HttpRequestResult &request_info);
+	static HttpResponseFormat CreateErrorHttpResponseFormat(const HttpRequestResult &request_info);
 	static std::string        CreateDefaultBodyMessageFormat(
 			   const std::string &status_code, const std::string &reason_phrase
 		   );

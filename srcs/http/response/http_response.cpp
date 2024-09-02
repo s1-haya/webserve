@@ -10,8 +10,8 @@
 namespace http {
 
 std::string HttpResponse::Run(const HttpRequestResult &request_info) {
-	HttpResponseFormat response = CreateHttpResponseResult(request_info);
-	return CreateHttpResponseFormat(response);
+	HttpResponseFormat response = CreateHttpResponseFormat(request_info);
+	return CreateHttpResponse(response);
 }
 
 std::string HttpResponse::TmpRun(
@@ -20,13 +20,13 @@ std::string HttpResponse::TmpRun(
 	HttpRequestResult        &request_info
 ) {
 	HttpResponseFormat response =
-		TmpCreateHttpResponseResult(client_info, server_info, request_info);
-	return CreateHttpResponseFormat(response);
+		TmpCreateHttpResponseFormat(client_info, server_info, request_info);
+	return CreateHttpResponse(response);
 }
 
-// todo: HttpResponseFormat HttpResponse::CreateHttpResponseResult(const HttpRequestResult
+// todo: HttpResponseFormat HttpResponse::CreateHttpResponseFormat(const HttpRequestResult
 // &request_info) 作成
-HttpResponseFormat HttpResponse::TmpCreateHttpResponseResult(
+HttpResponseFormat HttpResponse::TmpCreateHttpResponseFormat(
 	const MockDtoClientInfos &client_info,
 	const MockDtoServerInfos &server_info,
 	HttpRequestResult        &request_info
@@ -58,24 +58,24 @@ HttpResponseFormat HttpResponse::TmpCreateHttpResponseResult(
 	} catch (const HttpException &e) {
 		// feature: header_fieldとerror_pageとの関連性がわかり次第変更あり
 		request_info.status_code = e.GetStatusCode();
-		return CreateErrorHttpResponseResult(request_info);
+		return CreateErrorHttpResponseFormat(request_info);
 	}
 }
 
 // mock
-HttpResponseFormat HttpResponse::CreateHttpResponseResult(const HttpRequestResult &request_info) {
+HttpResponseFormat HttpResponse::CreateHttpResponseFormat(const HttpRequestResult &request_info) {
 	HttpResponseFormat response;
 	if (request_info.status_code != http::OK) {
-		response = CreateErrorHttpResponseResult(request_info);
+		response = CreateErrorHttpResponseFormat(request_info);
 	} else {
-		response = CreateSuccessHttpResponseResult(request_info);
+		response = CreateSuccessHttpResponseFormat(request_info);
 	}
 	return response;
 }
 
 // mock
 HttpResponseFormat
-HttpResponse::CreateSuccessHttpResponseResult(const HttpRequestResult &request_info) {
+HttpResponse::CreateSuccessHttpResponseFormat(const HttpRequestResult &request_info) {
 	(void)request_info;
 	HttpResponseFormat response;
 	response.status_line.version         = HTTP_VERSION;
@@ -100,7 +100,7 @@ std::string HttpResponse::CreateDefaultBodyMessageFormat(
 }
 
 // mock
-HttpResponseFormat HttpResponse::CreateErrorHttpResponseResult(const HttpRequestResult &request_info
+HttpResponseFormat HttpResponse::CreateErrorHttpResponseFormat(const HttpRequestResult &request_info
 ) {
 	HttpResponseFormat response;
 	response.status_line.version       = HTTP_VERSION;
@@ -119,7 +119,7 @@ HttpResponseFormat HttpResponse::CreateErrorHttpResponseResult(const HttpRequest
 	return response;
 }
 
-std::string HttpResponse::CreateHttpResponseFormat(const HttpResponseFormat &response) {
+std::string HttpResponse::CreateHttpResponse(const HttpResponseFormat &response) {
 	std::ostringstream response_stream;
 	response_stream << response.status_line.version << SP << response.status_line.status_code << SP
 					<< response.status_line.reason_phrase << CRLF;
