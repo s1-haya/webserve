@@ -6,15 +6,6 @@
 
 namespace server {
 
-// テストfail時のPortListのdebug出力用
-std::ostream &operator<<(std::ostream &os, const VirtualServer::PortList &ports) {
-	typedef VirtualServer::PortList::const_iterator It;
-	for (It it = ports.begin(); it != ports.end(); ++it) {
-		os << "[" << *it << "]";
-	}
-	return os;
-}
-
 // テストfail時のLocationListのdebug出力用
 std::ostream &operator<<(std::ostream &os, const VirtualServer::LocationList &locations) {
 	typedef VirtualServer::LocationList::const_iterator It;
@@ -35,13 +26,27 @@ bool operator==(const Location &lhs, const Location &rhs) {
 		   lhs.allowed_method == rhs.allowed_method;
 }
 
+// テストfail時のHostPortListのdebug出力用
+std::ostream &operator<<(std::ostream &os, const VirtualServer::HostPortList &host_port_list) {
+	typedef VirtualServer::HostPortList::const_iterator It;
+	for (It it = host_port_list.begin(); it != host_port_list.end(); ++it) {
+		const VirtualServer::HostPortPair &host_port_pair = *it;
+		os << "host: [" << host_port_pair.first << "], port: [" << host_port_pair.second << "]";
+		if (++It(it) != host_port_list.end()) {
+			os << std::endl;
+		}
+	}
+	return os;
+}
+
 } // namespace server
 
 namespace {
 
 typedef server::Location                    Location;
 typedef server::VirtualServer::LocationList LocationList;
-typedef server::VirtualServer::PortList     PortList;
+typedef server::VirtualServer::HostPortPair HostPortPair;
+typedef server::VirtualServer::HostPortList HostPortList;
 
 struct Result {
 	bool        is_ok;
@@ -88,7 +93,7 @@ Result TestIsSameMembers(
 	const server::VirtualServer &under_test_vs,
 	const std::string           &expected_server_name,
 	const LocationList          &expected_locations,
-	const PortList              &expected_ports
+	const HostPortList          &expected_host_port_list
 ) {
 	using namespace server;
 
@@ -116,15 +121,15 @@ Result TestIsSameMembers(
 		oss << expected_locations << std::endl;
 	}
 
-	// VirtualServer.GetPorts()
-	const PortList &ports = under_test_vs.GetPorts();
-	if (!IsSame(ports, expected_ports)) {
+	// VirtualServer.GetHostPortList()
+	const HostPortList &host_port_list = under_test_vs.GetHostPortList();
+	if (!IsSame(host_port_list, expected_host_port_list)) {
 		result.is_ok = false;
-		oss << "ports" << std::endl;
+		oss << "host_port_list" << std::endl;
 		oss << "- result  " << std::endl;
-		oss << ports << std::endl;
+		oss << host_port_list << std::endl;
 		oss << "- expected" << std::endl;
-		oss << expected_ports << std::endl;
+		oss << expected_host_port_list << std::endl;
 	}
 
 	result.error_log = oss.str();
@@ -135,13 +140,13 @@ Result TestIsSameMembers(
 Result RunDefaultConstructor(
 	const std::string  &expected_server_name,
 	const LocationList &expected_locations,
-	const PortList     &expected_ports
+	const HostPortList &expected_host_port_list
 ) {
 	// default constructor
 	server::VirtualServer virtual_server;
 
 	return TestIsSameMembers(
-		virtual_server, expected_server_name, expected_locations, expected_ports
+		virtual_server, expected_server_name, expected_locations, expected_host_port_list
 	);
 }
 
@@ -149,16 +154,18 @@ Result RunDefaultConstructor(
 Result RunCopyConstructor(
 	const std::string  &expected_server_name,
 	const LocationList &expected_locations,
-	const PortList     &expected_ports
+	const HostPortList &expected_host_port_list
 ) {
 	// construct
-	server::VirtualServer virtual_server(expected_server_name, expected_locations, expected_ports);
+	server::VirtualServer virtual_server(
+		expected_server_name, expected_locations, expected_host_port_list
+	);
 
 	// copy
 	server::VirtualServer copy_virtual_server(virtual_server);
 
 	return TestIsSameMembers(
-		copy_virtual_server, expected_server_name, expected_locations, expected_ports
+		copy_virtual_server, expected_server_name, expected_locations, expected_host_port_list
 	);
 }
 
@@ -166,15 +173,17 @@ Result RunCopyConstructor(
 Result RunCopyAssignmentOperator(
 	const std::string  &expected_server_name,
 	const LocationList &expected_locations,
-	const PortList     &expected_ports
+	const HostPortList &expected_host_port_list
 ) {
 	// construct
-	server::VirtualServer virtual_server(expected_server_name, expected_locations, expected_ports);
+	server::VirtualServer virtual_server(
+		expected_server_name, expected_locations, expected_host_port_list
+	);
 
 	// copy assignment operator=
 	server::VirtualServer copy_virtual_server = virtual_server;
 	return TestIsSameMembers(
-		copy_virtual_server, expected_server_name, expected_locations, expected_ports
+		copy_virtual_server, expected_server_name, expected_locations, expected_host_port_list
 	);
 }
 
@@ -198,33 +207,36 @@ int main() {
 	int ret_code = EXIT_SUCCESS;
 
 	/* -------------- expected用意 -------------- */
-	// location: 0個
-	// port    : 0個
+	// location : 0個
+	// host:port: 0個
 	LocationList expected_locations1;
-	PortList     expected_ports1;
+	HostPortList expected_host_port_list1;
 
-	// location: 1個
-	// port    : 1個
+	// location : 1個
+	// host:port: 1個
 	LocationList expected_locations2;
 	expected_locations2.push_back(CreateLocation("/www/", "/data/", "index.html", "GET"));
-	PortList expected_ports2;
-	expected_ports2.push_back(9999);
+	HostPortList expected_host_port_list2;
+	expected_host_port_list2.push_back(std::make_pair("host1", 9999));
 
-	// location: 複数
-	// port    : 複数
+	// location : 複数
+	// host:port: 複数
 	LocationList expected_locations3;
 	expected_locations3.push_back(CreateLocation("/", "/data/www/test", "index.html", "GET POST"));
 	expected_locations3.push_back(
 		CreateLocation("/static/", "/data/www", "index.html", "GET POST DELETE")
 	);
-	PortList expected_ports3;
-	expected_ports3.push_back(8080);
-	expected_ports3.push_back(12345);
+	HostPortList expected_host_port_list3;
+	expected_host_port_list3.push_back(std::make_pair("host1", 8080));
+	expected_host_port_list3.push_back(std::make_pair("host2", 12345));
 
 	/* ------------------ test ------------------ */
-	ret_code |= Test(RunDefaultConstructor("", expected_locations1, expected_ports1));
-	ret_code |= Test(RunCopyConstructor("localhost", expected_locations2, expected_ports2));
-	ret_code |= Test(RunCopyAssignmentOperator("localhost2", expected_locations3, expected_ports3));
+	ret_code |= Test(RunDefaultConstructor("", expected_locations1, expected_host_port_list1));
+	ret_code |=
+		Test(RunCopyConstructor("localhost", expected_locations2, expected_host_port_list2));
+	ret_code |=
+		Test(RunCopyAssignmentOperator("localhost2", expected_locations3, expected_host_port_list3)
+		);
 
 	return ret_code;
 }
