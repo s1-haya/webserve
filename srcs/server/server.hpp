@@ -46,6 +46,7 @@ class Server {
 	void UpdateConnectionAfterSendResponse(
 		int client_fd, const message::ConnectionState connection_state
 	);
+	void SetNonBlockingMode(int sock_fd);
 	// for Server to Http
 	DtoClientInfos GetClientInfos(int client_fd) const;
 	DtoServerInfos GetServerInfos(int client_fd) const;
