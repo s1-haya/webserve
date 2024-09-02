@@ -27,6 +27,16 @@ RUN pip install --upgrade pip && \
     pip-compile /workspaces/webserv/requirements.in --strip-extras && \
     pip-sync
 
+# この書き方だとここ(pip系の後)でないとできない
+RUN apt-get update && \
+    apt-get install -y lsb-release wget software-properties-common gnupg && \
+    wget https://apt.llvm.org/llvm.sh && \
+    chmod +x llvm.sh && \
+    ./llvm.sh 14 && \
+    apt update && \
+    apt install clang-format-14 && \
+    ln -sf /usr/bin/clang-format-14 /usr/local/bin/clang-format
+
 RUN rm -rf /var/lib/apt/lists/*
 
 VOLUME [ "/workspaces" ]
