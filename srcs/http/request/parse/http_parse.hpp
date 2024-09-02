@@ -1,7 +1,7 @@
 #ifndef HTTP_PARSE_HPP_
 #define HTTP_PARSE_HPP_
 
-#include "status_code.hpp"
+#include "http_exception.hpp"
 #include <map>
 #include <stdexcept> //runtime_error
 #include <string>
@@ -31,7 +31,7 @@ struct HttpRequestResult {
 
 struct IsHttpRequestFormat {
 	IsHttpRequestFormat()
-		: is_request_line(false), is_header_fields(false), is_body_message(false) {};
+		: is_request_line(false), is_header_fields(false), is_body_message(false){};
 	bool is_request_line;
 	bool is_header_fields;
 	bool is_body_message;
@@ -51,14 +51,6 @@ class HttpParse {
 	static HttpRequestResult Run(const std::string &read_buf);
 	static void              TmpRun(HttpRequestParsedData &data);
 	static void              TmpRunHttpResultVersion(HttpRequestParsedData &data);
-	class HttpParseException : public std::runtime_error {
-	  public:
-		explicit HttpParseException(const std::string &error_message, StatusCode status_code);
-		StatusCode GetStatusCode() const;
-
-	  private:
-		StatusCode status_code_;
-	};
 
   private:
 	HttpParse();

@@ -6,6 +6,13 @@
 #include <map>
 #include <string>
 
+namespace server {
+
+struct DtoClientInfos;
+struct DtoServerInfos;
+
+} // namespace server
+
 namespace http {
 
 struct HttpRequestResult;
@@ -44,6 +51,11 @@ class HttpResponse {
   public:
 	typedef std::map<StatusCode, std::string> ReasonPhrase;
 	static std::string                        Run(const HttpRequestResult &request_info);
+	static std::string                        TmpRun(
+							   const server::DtoClientInfos &client_info,
+							   const server::DtoServerInfos &server_info,
+							   HttpRequestResult            &request_info
+						   );
 	static void GetHandler(const std::string &path, std::string &body_message);
 	static void PostHandler(
 		const std::string &path,
@@ -58,6 +70,11 @@ class HttpResponse {
 
 	static std::string        CreateHttpResponseFormat(const HttpResponseResult &response);
 	static HttpResponseResult CreateHttpResponseResult(const HttpRequestResult &request_info);
+	static HttpResponseResult TmpCreateHttpResponseResult(
+		const server::DtoClientInfos &client_info,
+		const server::DtoServerInfos &server_info,
+		HttpRequestResult            &request_info
+	);
 	static HttpResponseResult CreateSuccessHttpResponseResult(const HttpRequestResult &request_info
 	);
 	static HttpResponseResult CreateErrorHttpResponseResult(const HttpRequestResult &request_info);

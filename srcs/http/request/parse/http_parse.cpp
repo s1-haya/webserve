@@ -101,7 +101,7 @@ void HttpParse::ParseBodyMessage(HttpRequestParsedData &data) {
 	const utils::Result<std::size_t> convert_result =
 		utils::ConvertStrToSize(data.request_result.request.header_fields[CONTENT_LENGTH]);
 	if (!convert_result.IsOk()) {
-		throw HttpParseException("Error: wrong Content-Length number", BAD_REQUEST);
+		throw HttpException("Error: wrong Content-Length number", BAD_REQUEST);
 	}
 	const size_t content_length = convert_result.GetValue();
 	size_t       readable_content_length =
@@ -123,7 +123,7 @@ void HttpParse::TmpRun(HttpRequestParsedData &data) {
 		ParseRequestLine(data);
 		ParseHeaderFields(data);
 		ParseBodyMessage(data);
-	} catch (const HttpParseException &e) {
+	} catch (const HttpException &e) {
 		data.request_result.status_code = e.GetStatusCode();
 	}
 }
@@ -145,7 +145,7 @@ HttpRequestResult HttpParse::Run(const std::string &read_buf) {
 		result.request.request_line = SetRequestLine(utils::SplitStr(b[0], SP));
 		const std::vector<std::string> header_fields_info(b.begin() + 1, b.end());
 		result.request.header_fields = SetHeaderFields(header_fields_info);
-	} catch (const HttpParseException &e) {
+	} catch (const HttpException &e) {
 		result.status_code = e.GetStatusCode();
 	}
 	return result;
@@ -166,7 +166,7 @@ HeaderFields HttpParse::SetHeaderFields(const std::vector<std::string> &header_f
 	for (It it = header_fields_info.begin(); it != header_fields_info.end(); ++it) {
 		std::vector<std::string> header_field_name_and_value = utils::SplitStr(*it, ":");
 		if (header_field_name_and_value.size() != 2) {
-			throw HttpParseException(
+			throw HttpException(
 				"Error: Missing colon or multiple colons found in header filed", BAD_REQUEST
 			);
 		}
@@ -179,9 +179,7 @@ HeaderFields HttpParse::SetHeaderFields(const std::vector<std::string> &header_f
 		typedef std::pair<HeaderFields::const_iterator, bool> Result;
 		Result result = header_fields.insert(std::make_pair(header_field_name, header_field_value));
 		if (result.second == false) {
-			throw HttpParseException(
-				"Error: The value already exists in header fields", BAD_REQUEST
-			);
+			throw HttpException("Error: The value already exists in header fields", BAD_REQUEST);
 		}
 	}
 	return header_fields;
@@ -196,21 +194,21 @@ void HttpParse::CheckValidRequestLine(const std::vector<std::string> &request_li
 void HttpParse::CheckValidMethod(const std::string &method) {
 	// US-ASCIIかまたは大文字かどうか -> 400
 	if (IsStringUsAscii(method) == false || IsStringUpper(method) == false) {
-		throw HttpParseException(
+		throw HttpException(
 			"Error: This method contains lowercase or non-USASCII characters.", BAD_REQUEST
 		);
 	}
 	// GET, POST, DELETEかどうか ->　501
 	if (std::find(BASIC_METHODS, BASIC_METHODS + BASIC_METHODS_SIZE, method) ==
 		BASIC_METHODS + BASIC_METHODS_SIZE) {
-		throw HttpParseException("Error: This method doesn't exist in webserv.", NOT_IMPLEMENTED);
+		throw HttpException("Error: This method doesn't exist in webserv.", NOT_IMPLEMENTED);
 	}
 }
 
 void HttpParse::CheckValidRequestTarget(const std::string &request_target) {
 	// /が先頭になかったら場合 -> 400
 	if (request_target.empty() || request_target[0] != '/') {
-		throw HttpParseException(
+		throw HttpException(
 			"Error: the request target is missing the '/' character at the beginning", BAD_REQUEST
 		);
 	}
@@ -219,7 +217,7 @@ void HttpParse::CheckValidRequestTarget(const std::string &request_target) {
 void HttpParse::CheckValidVersion(const std::string &version) {
 	// HTTP/1.1かどうか -> 400
 	if (version != HTTP_VERSION) {
-		throw HttpParseException("Error: The version is not supported by webserv", BAD_REQUEST);
+		throw HttpException("Error: The version is not supported by webserv", BAD_REQUEST);
 	}
 }
 
@@ -229,19 +227,10 @@ void HttpParse::CheckValidHeaderFieldName(const std::string &header_field_value)
 			REQUEST_HEADER_FIELDS + REQUEST_HEADER_FIELDS_SIZE,
 			header_field_value
 		) == REQUEST_HEADER_FIELDS + REQUEST_HEADER_FIELDS_SIZE) {
-		throw HttpParseException(
+		throw HttpException(
 			"Error: the value does not exist in format of header fields", BAD_REQUEST
 		);
 	}
-}
-
-HttpParse::HttpParseException::HttpParseException(
-	const std::string &error_message, StatusCode status_code
-)
-	: runtime_error(error_message), status_code_(status_code) {}
-
-StatusCode HttpParse::HttpParseException::GetStatusCode() const {
-	return status_code_;
 }
 
 // status_line && header

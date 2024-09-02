@@ -21,8 +21,7 @@ void HttpServerInfoCheck::CheckDTOServerInfo(
 ) {
 	if (server_info.host != header_fields["Host"]) { // Check host_name
 		result.status = CheckServerInfoResult::INVALID_HOST;
-	} else if (static_cast<size_t>(std::atoi(header_fields["Content-Length"].c_str())) >
-			   server_info.client_max_body_size) { // Check content_length
+	} else if (static_cast<size_t>(std::atoi(header_fields["Content-Length"].c_str())) > server_info.client_max_body_size) { // Check content_length
 		result.status = CheckServerInfoResult::PAYLOAD_TOO_LARGE;
 	} else if (!server_info.error_page.second.empty()) { // Check error_page
 		result.error_page = server_info.error_page;

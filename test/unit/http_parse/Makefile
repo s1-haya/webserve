@@ -18,7 +18,8 @@ SRCS				+=	$(WS_UTILS_DIR)/color.cpp \
 						$(WS_UTILS_DIR)/isdigit.cpp \
 						$(WS_UTILS_DIR)/convert_str.cpp \
 						$(WS_HTTP_DIR)/http_message.cpp \
-						$(WS_HTTP_PARSE_DIR)/http_parse.cpp
+						$(WS_HTTP_PARSE_DIR)/http_parse.cpp \
+						$(WS_HTTP_DIR)/http_exception.cpp
 
 # 3. Add unit test files
 SRCS	+=	test_http_parse.cpp
