@@ -36,7 +36,7 @@ class HttpResponse {
 	static std::string                         TmpRun(
 								const MockDtoClientInfos &client_info,
 								const MockDtoServerInfos &server_info,
-								HttpRequestResult        &request_info
+								const HttpRequestResult  &request_info
 							);
 	static void GetHandler(const std::string &path, std::string &body_message);
 	static void PostHandler(
@@ -55,11 +55,11 @@ class HttpResponse {
 	static HttpResponseFormat TmpCreateHttpResponseResult(
 		const MockDtoClientInfos &client_info,
 		const MockDtoServerInfos &server_info,
-		HttpRequestResult        &request_info
+		const HttpRequestResult  &request_info
 	);
 	static HttpResponseFormat CreateSuccessHttpResponseResult(const HttpRequestResult &request_info
 	);
-	static HttpResponseFormat CreateErrorHttpResponseResult(const HttpRequestResult &request_info);
+	static HttpResponseFormat CreateErrorHttpResponseResult(const StatusCode &status_code);
 	static std::string        CreateDefaultBodyMessageFormat(
 			   const std::string &status_code, const std::string &reason_phrase
 		   );

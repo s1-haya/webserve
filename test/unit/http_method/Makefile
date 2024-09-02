@@ -21,6 +21,8 @@ WS_VERTUAL_SERVER_DIR	:=	$(WS_SRCS_DIR)/server/context_manager/virtual_server
 
 SRCS			+=	$(WS_UTILS_DIR)/color.cpp \
 					$(WS_UTILS_DIR)/system_exception.cpp \
+					$(WS_UTILS_DIR)/convert_str.cpp \
+					$(WS_UTILS_DIR)/isdigit.cpp \
 					$(WS_HTTP_DIR)/http_message.cpp \
 					$(WS_HTTP_DIR)/status_code.cpp \
 					$(WS_HTTP_DIR)/http_exception.cpp \

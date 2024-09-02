@@ -32,7 +32,7 @@ class HttpServerInfoCheck {
 	static void CheckDTOServerInfo(
 		CheckServerInfoResult    &result,
 		const MockDtoServerInfos &server_info,
-		HeaderFields             &header_fields
+		const HeaderFields       &header_fields
 	);
 	static void CheckLocationList(
 		CheckServerInfoResult &result,
@@ -55,7 +55,7 @@ class HttpServerInfoCheck {
 
   public:
 	static CheckServerInfoResult
-	Check(const MockDtoServerInfos &server_info, HttpRequestFormat &request);
+	Check(const MockDtoServerInfos &server_info, const HttpRequestFormat &request);
 };
 
 } // namespace http

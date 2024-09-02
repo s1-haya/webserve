@@ -17,7 +17,7 @@ std::string HttpResponse::Run(const HttpRequestResult &request_info) {
 std::string HttpResponse::TmpRun(
 	const MockDtoClientInfos &client_info,
 	const MockDtoServerInfos &server_info,
-	HttpRequestResult        &request_info
+	const HttpRequestResult  &request_info
 ) {
 	HttpResponseFormat response =
 		TmpCreateHttpResponseResult(client_info, server_info, request_info);
@@ -29,7 +29,7 @@ std::string HttpResponse::TmpRun(
 HttpResponseFormat HttpResponse::TmpCreateHttpResponseResult(
 	const MockDtoClientInfos &client_info,
 	const MockDtoServerInfos &server_info,
-	HttpRequestResult        &request_info
+	const HttpRequestResult  &request_info
 ) {
 	try {
 		HttpResponseFormat    result;
@@ -57,8 +57,7 @@ HttpResponseFormat HttpResponse::TmpCreateHttpResponseResult(
 		return result;
 	} catch (const HttpException &e) {
 		// feature: header_fieldとerror_pageとの関連性がわかり次第変更あり
-		request_info.status_code = e.GetStatusCode();
-		return CreateErrorHttpResponseResult(request_info);
+		return CreateErrorHttpResponseResult(e.GetStatusCode());
 	}
 }
 
@@ -66,7 +65,7 @@ HttpResponseFormat HttpResponse::TmpCreateHttpResponseResult(
 HttpResponseFormat HttpResponse::CreateHttpResponseResult(const HttpRequestResult &request_info) {
 	HttpResponseFormat response;
 	if (request_info.status_code.GetEStatusCode() != http::OK) {
-		response = CreateErrorHttpResponseResult(request_info);
+		response = CreateErrorHttpResponseResult(request_info.status_code);
 	} else {
 		response = CreateSuccessHttpResponseResult(request_info);
 	}
@@ -100,15 +99,11 @@ std::string HttpResponse::CreateDefaultBodyMessageFormat(
 }
 
 // mock
-HttpResponseFormat HttpResponse::CreateErrorHttpResponseResult(const HttpRequestResult &request_info
-) {
+HttpResponseFormat HttpResponse::CreateErrorHttpResponseResult(const StatusCode &status_code) {
 	HttpResponseFormat response;
-	response.status_line.version       = HTTP_VERSION;
-	response.status_line.status_code   = request_info.status_code.GetStatusCode();
-	response.status_line.reason_phrase = request_info.status_code.GetReasonPhrase();
-	// todo: StatusCodeをクラスにして、プライベートで保持する。
-	// response.status_line.status_code   = request_info.status_code.GetStrStatusCode();
-	// response.status_line.reason_phrase   = request_info.status_code.GetReasonPhrase();
+	response.status_line.version         = HTTP_VERSION;
+	response.status_line.status_code     = status_code.GetStatusCode();
+	response.status_line.reason_phrase   = status_code.GetReasonPhrase();
 	response.header_fields[CONTENT_TYPE] = "text/html";
 	response.header_fields[SERVER]       = SERVER_VERSION;
 	response.header_fields[CONNECTION]   = "close";
