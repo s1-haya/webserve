@@ -28,12 +28,17 @@ int HandleResult(const T &result, const T &expected) {
 int main(void) {
 	int ret_code = EXIT_SUCCESS;
 
+	// OKのステータスコードの場合
 	http::StatusCode   ok(http::OK);
 	const std::string &expected_200 = "200";
 	const std::string &expected_ok  = "OK";
 	ret_code |= HandleResult(ok.GetEStatusCode(), http::OK);
 	ret_code |= HandleResult(ok.GetStatusCode(), expected_200);
 	ret_code |= HandleResult(ok.GetReasonPhrase(), expected_ok);
+
+	// 存在しないステータスコードの場合 コンパイルエラー
+	// http::StatusCode   no_status_code(0);
+	// ret_code |= HandleResult(no_status_code.GetEStatusCode(), 0);
 
 	return ret_code;
 }
