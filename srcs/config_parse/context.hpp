@@ -24,7 +24,7 @@ typedef std::list<LocationCon>               LocationList;
 typedef std::pair<std::string, unsigned int> HostPortPair;
 
 struct ServerCon {
-	HostPortPair                         host_port;
+	std::list<HostPortPair>              host_ports;
 	std::list<std::string>               server_names;
 	LocationList                         location_con;
 	std::size_t                          client_max_body_size;
