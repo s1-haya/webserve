@@ -2,6 +2,7 @@
 #define HTTP_RESPONSE_HPP_
 
 #include "http_format.hpp"
+#include "http_serverinfo_check.hpp"
 #include "status_code.hpp"
 #include "utils.hpp"
 #include <map>
@@ -45,6 +46,7 @@ class HttpResponse {
 		std::string       &response_body_message
 	);
 	static void DeleteHandler(const std::string &path, std::string &response_body_message);
+	static void MethodHandler(const CheckServerInfoResult &server_info, const std::string &method);
 
   private:
 	HttpResponse();

@@ -1,6 +1,9 @@
 #include "http_response.hpp"
 #include "stat.hpp"
 #include "system_exception.hpp"
+#include "http_exception.hpp"
+#include "http_message.hpp"
+#include "http_serverinfo_check.hpp"
 #include <cstring>
 #include <fstream>
 #include <iostream>
@@ -33,6 +36,22 @@ std::string ReadFile(const std::string &file_path) {
 // - 各メソッドを実行
 
 namespace http {
+
+void HttpResponse::MethodHandler(const CheckServerInfoResult &server_info, const std::string& method) {
+	std::string request_message;
+	std::string response_message;
+	if (method == GET) {
+		GetHandler(server_info.path, response_message);
+	} else if (method == POST) {
+		PostHandler(server_info.path, request_message, response_message);
+	} else if (method == DELETE) {
+		DeleteHandler(server_info.path, response_message);
+	} else {
+		throw HttpException("Error: Not Implemented", StatusCode(NOT_IMPLEMENTED));
+	}
+	(void)request_message;
+	(void)response_message;
+ }
 
 void HttpResponse::GetHandler(const std::string &path, std::string &response_body_message) {
 	try {

@@ -2,7 +2,6 @@
 #include "client_infos.hpp"
 #include "http_message.hpp"
 #include "http_parse.hpp"
-#include "http_serverinfo_check.hpp"
 #include "server_infos.hpp"
 #include <iostream>
 #include <sstream>
@@ -33,7 +32,7 @@ HttpResponseFormat HttpResponse::TmpCreateHttpResponseResult(
 ) {
 	try {
 		HttpResponseFormat    result;
-		CheckServerInfoResult server_info_result =
+		const CheckServerInfoResult& server_info_result =
 			HttpServerInfoCheck::Check(server_info, request_info.request);
 		// todo: if redirect
 		// if (server_info_result.redirect.IsOk()) {
