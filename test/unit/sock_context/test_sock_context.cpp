@@ -76,7 +76,7 @@ Result RunGetClientInfo(
 }
 
 bool IsSameServerInfo(const server::ServerInfo &a, const server::ServerInfo &b) {
-	return a.GetFd() == b.GetFd() && a.GetPort() == b.GetPort();
+	return a.GetFd() == b.GetFd() && a.GetHost() == b.GetHost() && a.GetPort() == b.GetPort();
 }
 
 // ServerInfo同士のメンバが全て等しいことを期待するテスト
@@ -95,6 +95,8 @@ Result RunGetConnectedServerInfo(
 		std::ostringstream oss;
 		oss << "server_fd  : result   [" << a.GetFd() << "]" << std::endl;
 		oss << "             expected [" << b.GetFd() << "]" << std::endl;
+		oss << "host       : result   [" << a.GetHost() << "]" << std::endl;
+		oss << "             expected [" << b.GetHost() << "]" << std::endl;
 		oss << "port       : result   [" << a.GetPort() << "]" << std::endl;
 		oss << "             expected [" << b.GetPort() << "]" << std::endl;
 		result.error_log = oss.str();
@@ -198,9 +200,9 @@ int RunTestSockContext() {
 
 	/* ----------- 準備 ----------- */
 	// SockContextに渡す用のServerInfoを2個作成
-	server::ServerInfo server_info1(8080);
+	server::ServerInfo server_info1("localhost", 8080);
 	server_info1.SetSockFd(4);
-	server::ServerInfo server_info2(12345);
+	server::ServerInfo server_info2("0.0.0.0", 12345);
 	server_info2.SetSockFd(5);
 
 	// SockContextに渡す用のClientInfoを2個作成

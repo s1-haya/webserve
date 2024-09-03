@@ -8,15 +8,6 @@
 // (todo : test_virtual_server.cppと全く同じoverloadを書いてるのでどうにかしても良いかも)
 namespace server {
 
-// テストfail時のPortListのdebug出力用
-std::ostream &operator<<(std::ostream &os, const VirtualServer::PortList &ports) {
-	typedef VirtualServer::PortList::const_iterator It;
-	for (It it = ports.begin(); it != ports.end(); ++it) {
-		os << "[" << *it << "]";
-	}
-	return os;
-}
-
 // テストfail時のLocationListのdebug出力用
 std::ostream &operator<<(std::ostream &os, const VirtualServer::LocationList &locations) {
 	typedef VirtualServer::LocationList::const_iterator It;
@@ -37,13 +28,30 @@ bool operator==(const Location &lhs, const Location &rhs) {
 		   lhs.allowed_method == rhs.allowed_method;
 }
 
+// テストfail時のHostPortListのdebug出力用
+std::ostream &operator<<(std::ostream &os, const VirtualServer::HostPortList &host_port_list) {
+	typedef VirtualServer::HostPortList::const_iterator It;
+	for (It it = host_port_list.begin(); it != host_port_list.end(); ++it) {
+		const VirtualServer::HostPortPair &host_port_pair = *it;
+		os << "host: [" << host_port_pair.first << "], port: [" << host_port_pair.second << "]";
+		if (++It(it) != host_port_list.end()) {
+			os << std::endl;
+		}
+	}
+	return os;
+}
+
 } // namespace server
 
 namespace {
 
-typedef server::Location                    Location;
+typedef server::Location Location;
+
 typedef server::VirtualServer::LocationList LocationList;
-typedef server::VirtualServer::PortList     PortList;
+typedef server::VirtualServer::HostPortPair HostPortPair;
+typedef server::VirtualServer::HostPortList HostPortList;
+
+typedef server::VirtualServerStorage::VirtualServerAddrList VirtualServerAddrList;
 
 struct Result {
 	bool        is_ok;
@@ -86,48 +94,38 @@ int Test(Result result) {
 }
 
 // -----------------------------------------------------------------------------
-Result
-TestIsSameVirtualServer(const server::VirtualServer &vs, const server::VirtualServer &expected_vs) {
+Result TestIsSameVirtualServer(
+	const VirtualServerAddrList &vs_addr_list, const VirtualServerAddrList &expected_vs_addr_list
+) {
 	using namespace server;
 
 	Result result;
 	result.is_ok = true;
+
+	if (vs_addr_list.size() != expected_vs_addr_list.size()) {
+		result.is_ok     = false;
+		result.error_log = "wrong virtual_server_addr_list's size()";
+		return result;
+	}
+
 	std::ostringstream oss;
 
-	// server_name
-	const std::string &server_name          = vs.GetServerName();
-	const std::string &expected_server_name = expected_vs.GetServerName();
-	if (!IsSame(server_name, expected_server_name)) {
-		result.is_ok = false;
-		oss << "server_name" << std::endl;
-		oss << "- result   [" << server_name << "]" << std::endl;
-		oss << "- expected [" << expected_server_name << "]" << std::endl;
-	}
+	typedef VirtualServerAddrList::const_iterator Itr;
+	Itr                                           it_vs          = vs_addr_list.begin();
+	Itr                                           it_expected_vs = expected_vs_addr_list.begin();
+	for (; it_vs != vs_addr_list.end(); ++it_vs, ++it_expected_vs) {
+		const VirtualServer *vs          = *it_vs;
+		const VirtualServer *expected_vs = *it_expected_vs;
 
-	// locations
-	const LocationList &locations          = vs.GetLocations();
-	const LocationList &expected_locations = expected_vs.GetLocations();
-	if (!IsSame(locations, expected_locations)) {
-		result.is_ok = false;
-		oss << "locations" << std::endl;
-		oss << "- result  " << std::endl;
-		oss << locations << std::endl;
-		oss << "- expected" << std::endl;
-		oss << expected_locations << std::endl;
+		// virtual_server_addr, server_name
+		if (!IsSame(vs, expected_vs)) {
+			result.is_ok = false;
+			oss << "virtual_server_addr" << std::endl;
+			oss << "- result   [" << vs << "],[" << vs->GetServerName() << "]" << std::endl;
+			oss << "- expected [" << expected_vs << "],[" << expected_vs->GetServerName() << "]"
+				<< std::endl;
+		}
 	}
-
-	// ports
-	const PortList &ports          = vs.GetPorts();
-	const PortList &expected_ports = expected_vs.GetPorts();
-	if (!IsSame(ports, expected_ports)) {
-		result.is_ok = false;
-		oss << "ports" << std::endl;
-		oss << "- result  " << std::endl;
-		oss << ports << std::endl;
-		oss << "- expected" << std::endl;
-		oss << expected_ports << std::endl;
-	}
-
 	result.error_log = oss.str();
 	return result;
 }
@@ -135,11 +133,11 @@ TestIsSameVirtualServer(const server::VirtualServer &vs, const server::VirtualSe
 Result RunGetVirtualServer(
 	const server::VirtualServerStorage &vs_storage,
 	int                                 server_fd,
-	const server::VirtualServer        &expected_vs
+	const VirtualServerAddrList        &expected_vs_addr_list
 ) {
-	const server::VirtualServer &vs = vs_storage.GetVirtualServer(server_fd);
+	const VirtualServerAddrList &vs_addr_list = vs_storage.GetVirtualServerAddrList(server_fd);
 
-	return TestIsSameVirtualServer(vs, expected_vs);
+	return TestIsSameVirtualServer(vs_addr_list, expected_vs_addr_list);
 }
 
 Location CreateLocation(
@@ -158,10 +156,10 @@ Location CreateLocation(
 
 // -----------------------------------------------------------------------------
 // - virtual_serverは以下の想定
-// virtual_server | server_name | locations         | ports
+// virtual_server | server_name | locations         | host:port
 // ----------------- ----------------------------------------------
-//       vs1      | localhost   | {"/www/"}         | {8080, 12345}
-//       vs2      | localhost2  | {"/", "/static/"} | {9999}
+//       vs1      | localhost   | {"/www/"}         | {host1:8080, host2:12345}
+//       vs2      | localhost2  | {"/", "/static/"} | {host1:8080, host3:9999}
 int RunTestVirtualServerStorage() {
 	int ret_code = EXIT_SUCCESS;
 
@@ -169,10 +167,10 @@ int RunTestVirtualServerStorage() {
 	std::string  expected_server_name1 = "localhost";
 	LocationList expected_locations1;
 	expected_locations1.push_back(CreateLocation("/www/", "/data/", "index.html", "GET"));
-	PortList expected_ports1;
-	expected_ports1.push_back(8080);
-	expected_ports1.push_back(12345);
-	server::VirtualServer vs1(expected_server_name1, expected_locations1, expected_ports1);
+	HostPortList expected_host_port_list1;
+	expected_host_port_list1.push_back(std::make_pair("host1", 8080));
+	expected_host_port_list1.push_back(std::make_pair("host2", 12345));
+	server::VirtualServer vs1(expected_server_name1, expected_locations1, expected_host_port_list1);
 
 	std::string  expected_server_name2 = "localhost2";
 	LocationList expected_locations2;
@@ -180,9 +178,21 @@ int RunTestVirtualServerStorage() {
 	expected_locations2.push_back(
 		CreateLocation("/static/", "/data/www", "index.html", "GET POST DELETE")
 	);
-	PortList expected_ports2;
-	expected_ports2.push_back(9999);
-	server::VirtualServer vs2(expected_server_name2, expected_locations2, expected_ports2);
+	HostPortList expected_host_port_list2;
+	expected_host_port_list1.push_back(std::make_pair("host1", 8080));
+	expected_host_port_list2.push_back(std::make_pair("host3", 9999));
+	server::VirtualServer vs2(expected_server_name2, expected_locations2, expected_host_port_list2);
+
+	/* -------------- VirtualServerAddrList用意 -------------- */
+	VirtualServerAddrList expected_vs_addr_list1;
+	expected_vs_addr_list1.push_back(&vs1);
+	expected_vs_addr_list1.push_back(&vs2);
+
+	VirtualServerAddrList expected_vs_addr_list2;
+	expected_vs_addr_list2.push_back(&vs1);
+
+	VirtualServerAddrList expected_vs_addr_list3;
+	expected_vs_addr_list3.push_back(&vs2);
 
 	/* -------------- VirtualServerStorage -------------- */
 	server::VirtualServerStorage vs_storage;
@@ -192,34 +202,35 @@ int RunTestVirtualServerStorage() {
 	vs_storage.AddVirtualServer(vs2);
 
 	// - socket通信した結果のserver_fdとvirtual_serverは以下の想定
-	// fd | virtual_server  | port
+	// fd | virtual_server  | host:port
 	// ----------------------------
-	//  4 |       vs1       | 8080
-	//  5 |       vs1       | 12345
-	//  6 |       vs2       | 9999
+	//  4 |     vs1, vs2    | host1:8080
+	//  5 |       vs1       | host2:12345
+	//  6 |       vs2       | host3:9999
 
 	// server_fdとvirtual_serverの紐づけをvirtual_server_storageに追加
 	vs_storage.AddMapping(4, &vs1);
+	vs_storage.AddMapping(4, &vs2);
 	vs_storage.AddMapping(5, &vs1);
 	vs_storage.AddMapping(6, &vs2);
 
 	// getterを使用して期待通りvirtual_serverが追加されてるか・紐づけられているかテスト
-	ret_code |= Test(RunGetVirtualServer(vs_storage, 4, vs1));
-	ret_code |= Test(RunGetVirtualServer(vs_storage, 5, vs1));
-	ret_code |= Test(RunGetVirtualServer(vs_storage, 6, vs2));
+	ret_code |= Test(RunGetVirtualServer(vs_storage, 4, expected_vs_addr_list1));
+	ret_code |= Test(RunGetVirtualServer(vs_storage, 5, expected_vs_addr_list2));
+	ret_code |= Test(RunGetVirtualServer(vs_storage, 6, expected_vs_addr_list3));
 
 	// virtual_server_storageのcopyのテスト
 	// copy constructor
 	server::VirtualServerStorage copy_vs_storage1(vs_storage);
-	ret_code |= Test(RunGetVirtualServer(copy_vs_storage1, 4, vs1));
-	ret_code |= Test(RunGetVirtualServer(copy_vs_storage1, 5, vs1));
-	ret_code |= Test(RunGetVirtualServer(copy_vs_storage1, 6, vs2));
+	ret_code |= Test(RunGetVirtualServer(copy_vs_storage1, 4, expected_vs_addr_list1));
+	ret_code |= Test(RunGetVirtualServer(copy_vs_storage1, 5, expected_vs_addr_list2));
+	ret_code |= Test(RunGetVirtualServer(copy_vs_storage1, 6, expected_vs_addr_list3));
 
 	// copy assignment operator=
 	server::VirtualServerStorage copy_vs_storage2 = vs_storage;
-	ret_code |= Test(RunGetVirtualServer(copy_vs_storage2, 4, vs1));
-	ret_code |= Test(RunGetVirtualServer(copy_vs_storage2, 5, vs1));
-	ret_code |= Test(RunGetVirtualServer(copy_vs_storage2, 6, vs2));
+	ret_code |= Test(RunGetVirtualServer(copy_vs_storage2, 4, expected_vs_addr_list1));
+	ret_code |= Test(RunGetVirtualServer(copy_vs_storage2, 5, expected_vs_addr_list2));
+	ret_code |= Test(RunGetVirtualServer(copy_vs_storage2, 6, expected_vs_addr_list3));
 
 	return ret_code;
 }

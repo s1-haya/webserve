@@ -1,7 +1,9 @@
 #ifndef SERVER_CONTEXTMANAGER_SOCKCONTEXT_SOCKCONTEXT_HPP_
 #define SERVER_CONTEXTMANAGER_SOCKCONTEXT_SOCKCONTEXT_HPP_
 
+#include "utils.hpp"
 #include <map>
+#include <string>
 
 namespace server {
 
@@ -14,17 +16,22 @@ class SockContext {
 	typedef std::map<int, ServerInfo>         ServerInfoMap;
 	typedef std::map<int, ClientInfo>         ClientInfoMap;
 	typedef std::map<int, const ServerInfo *> HostServerInfoMap;
+
+	typedef utils::Result<ServerInfo> GetServerInfoResult;
+
 	SockContext();
 	~SockContext();
 	SockContext(const SockContext &other);
 	SockContext &operator=(const SockContext &other);
 	// functions
 	void AddServerInfo(int server_fd, const ServerInfo &server_info);
+	bool IsServerInfoExist(int server_fd) const;
 	void AddClientInfo(int client_fd, const ClientInfo &client_info, int server_fd);
 	void DeleteClientInfo(int client_fd);
 	// getter
-	const ClientInfo &GetClientInfo(int client_fd) const;
-	const ServerInfo &GetConnectedServerInfo(int client_fd) const;
+	GetServerInfoResult GetServerInfo(const std::string &host, unsigned int port) const;
+	const ClientInfo   &GetClientInfo(int client_fd) const;
+	const ServerInfo   &GetConnectedServerInfo(int client_fd) const;
 
   private:
 	// function

@@ -2,9 +2,10 @@
 
 namespace server {
 
-ServerInfo::ServerInfo() : fd_(0), port_(0) {}
+ServerInfo::ServerInfo() : fd_(0), host_("0.0.0.0"), port_(0) {}
 
-ServerInfo::ServerInfo(unsigned int port) : fd_(0), port_(port) {}
+ServerInfo::ServerInfo(const std::string &host, unsigned int port)
+	: fd_(0), host_(host), port_(port) {}
 
 ServerInfo::~ServerInfo() {}
 
@@ -15,6 +16,7 @@ ServerInfo::ServerInfo(const ServerInfo &other) {
 ServerInfo &ServerInfo::operator=(const ServerInfo &other) {
 	if (this != &other) {
 		fd_   = other.fd_;
+		host_ = other.host_;
 		port_ = other.port_;
 	}
 	return *this;
@@ -22,6 +24,10 @@ ServerInfo &ServerInfo::operator=(const ServerInfo &other) {
 
 int ServerInfo::GetFd() const {
 	return fd_;
+}
+
+const std::string &ServerInfo::GetHost() const {
+	return host_;
 }
 
 unsigned int ServerInfo::GetPort() const {

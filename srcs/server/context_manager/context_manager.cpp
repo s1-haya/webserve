@@ -1,7 +1,6 @@
 #include "context_manager.hpp"
 #include "client_info.hpp"
 #include "server_info.hpp"
-#include "utils.hpp"
 
 namespace server {
 
@@ -30,6 +29,9 @@ void ContextManager::AddServerInfo(
 ) {
 	const int server_fd = server_info.GetFd();
 	virtual_servers_.AddMapping(server_fd, virtual_server);
+	if (sock_context_.IsServerInfoExist(server_fd)) {
+		return;
+	}
 	sock_context_.AddServerInfo(server_fd, server_info);
 }
 
@@ -42,26 +44,24 @@ void ContextManager::DeleteClientInfo(int client_fd) {
 	sock_context_.DeleteClientInfo(client_fd);
 }
 
-const VirtualServerStorage::VirtualServerList &ContextManager::GetVirtualServerList() const {
+const VirtualServerStorage::VirtualServerList &ContextManager::GetAllVirtualServer() const {
 	return virtual_servers_.GetAllVirtualServerList();
 }
 
 ServerContext ContextManager::GetServerContext(int client_fd) const {
-	// from sock_context
 	const ServerInfo &server_info = sock_context_.GetConnectedServerInfo(client_fd);
 	const int         server_fd   = server_info.GetFd();
 
-	// from virtual_servers
-	const VirtualServer &virtual_server = virtual_servers_.GetVirtualServer(server_fd);
-
 	// create ServerContext
 	ServerContext server_infos;
-	server_infos.fd          = server_fd;
-	server_infos.server_name = virtual_server.GetServerName();
-	// todo: uintのままで良いかも？
-	server_infos.port      = utils::ConvertUintToStr(server_info.GetPort());
-	server_infos.locations = virtual_server.GetLocations();
+	server_infos.fd                       = server_fd;
+	server_infos.virtual_server_addr_list = virtual_servers_.GetVirtualServerAddrList(server_fd);
 	return server_infos;
+}
+
+ContextManager::GetServerInfoResult
+ContextManager::GetServerInfo(const std::string &host, unsigned int port) const {
+	return sock_context_.GetServerInfo(host, port);
 }
 
 // todo: IP以外も必要ならClientContext作って詰めて返す

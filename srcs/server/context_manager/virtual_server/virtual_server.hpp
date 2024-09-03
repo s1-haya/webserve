@@ -17,13 +17,17 @@ struct Location {
 // virtual serverとして必要な情報を保持・取得する
 class VirtualServer {
   public:
-	typedef std::list<Location>     LocationList;
-	typedef std::list<unsigned int> PortList;
+	typedef std::list<Location>                  LocationList;
+	typedef std::pair<std::string, unsigned int> HostPortPair;
+	typedef std::list<HostPortPair>              HostPortList;
+
 	// default constructor: necessary for map's insert/[]
 	VirtualServer();
 	// todo: configもらう？
 	VirtualServer(
-		const std::string &server_name, const LocationList &locations, const PortList &ports
+		const std::string  &server_name,
+		const LocationList &locations,
+		const HostPortList &host_port_list
 	);
 	~VirtualServer();
 	VirtualServer(const VirtualServer &other);
@@ -31,13 +35,13 @@ class VirtualServer {
 	// getter
 	const std::string  &GetServerName() const;
 	const LocationList &GetLocations() const;
-	const PortList     &GetPorts() const;
+	const HostPortList &GetHostPortList() const;
 
   private:
 	// todo: add member(& operator=)
 	std::string  server_name_;
 	LocationList locations_; // todo
-	PortList     ports_;
+	HostPortList host_port_list_;
 };
 
 } // namespace server
