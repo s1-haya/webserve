@@ -123,6 +123,10 @@ void Parser::HandleListen(std::list<context::HostPortPair> &host_ports, NodeItr 
 		if (!port_number.IsOk() || port_number.GetValue() < PORT_MIN ||
 			port_number.GetValue() > PORT_MAX) {
 			throw std::runtime_error("invalid port number for ports");
+		} else if (FindDuplicated(
+					   host_ports, std::make_pair(std::string("0.0.0.0"), port_number.GetValue())
+				   )) {
+			throw std::runtime_error("a duplicated parameter in 'listen' directive");
 		}
 		host_ports.push_back(std::make_pair("0.0.0.0", port_number.GetValue()));
 		++it;
@@ -135,6 +139,10 @@ void Parser::HandleListen(std::list<context::HostPortPair> &host_ports, NodeItr 
 	if (host_port_vec[0] == "" || !port_number.IsOk() || port_number.GetValue() < PORT_MIN ||
 		port_number.GetValue() > PORT_MAX) {
 		throw std::runtime_error("invalid port number for ports");
+	} else if (FindDuplicated(
+				   host_ports, std::make_pair(host_port_vec[0], port_number.GetValue())
+			   )) {
+		throw std::runtime_error("a duplicated parameter in 'listen' directive");
 	}
 	// server_name directive can be duplicated
 	host_ports.push_back(std::make_pair(host_port_vec[0], port_number.GetValue()));
