@@ -119,17 +119,17 @@ void Parser::HandleListen(context::HostPortPair &host_port, NodeItr &it) {
 		throw std::runtime_error("invalid number of arguments in 'listen' directive");
 	}
 	if (((*it).token).find(":") == std::string::npos) { // for listen 4242
-		// utils::Result<unsigned int> port_number = utils::ConvertStrToUint((*it).token);
-		// if (!port_number.IsOk() || port_number.GetValue() < PORT_MIN ||
-		// 	port_number.GetValue() > PORT_MAX) {
-		// 	throw std::runtime_error("invalid port number for ports");
+		utils::Result<unsigned int> port_number = utils::ConvertStrToUint((*it).token);
+		if (!port_number.IsOk() || port_number.GetValue() < PORT_MIN ||
+			port_number.GetValue() > PORT_MAX) {
+			throw std::runtime_error("invalid port number for ports");
+		}
+		// } else if (FindDuplicated(port, port_number.GetValue())) {
+		// 	throw std::runtime_error("a duplicated parameter in 'listen' directive");
 		// }
-		// // } else if (FindDuplicated(port, port_number.GetValue())) {
-		// // 	throw std::runtime_error("a duplicated parameter in 'listen' directive");
-		// // }
-		// ;
-		// ++it;
-		// return;
+		host_port = std::make_pair("0.0.0.0", port_number.GetValue());
+		++it;
+		return;
 		// handle and check duplicate
 	}
 	// for listen localhost:8080
