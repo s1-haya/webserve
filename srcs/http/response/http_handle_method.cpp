@@ -1,9 +1,9 @@
-#include "http_response.hpp"
-#include "stat.hpp"
-#include "system_exception.hpp"
 #include "http_exception.hpp"
 #include "http_message.hpp"
+#include "http_response.hpp"
 #include "http_serverinfo_check.hpp"
+#include "stat.hpp"
+#include "system_exception.hpp"
 #include <cstring>
 #include <fstream>
 #include <iostream>
@@ -37,7 +37,9 @@ std::string ReadFile(const std::string &file_path) {
 
 namespace http {
 
-void HttpResponse::MethodHandler(const CheckServerInfoResult &server_info, const std::string& method) {
+void HttpResponse::MethodHandler(
+	const CheckServerInfoResult &server_info, const std::string &method
+) {
 	std::string request_message;
 	std::string response_message;
 	if (method == GET) {
@@ -51,7 +53,7 @@ void HttpResponse::MethodHandler(const CheckServerInfoResult &server_info, const
 	}
 	(void)request_message;
 	(void)response_message;
- }
+}
 
 void HttpResponse::GetHandler(const std::string &path, std::string &response_body_message) {
 	try {
@@ -59,7 +61,8 @@ void HttpResponse::GetHandler(const std::string &path, std::string &response_bod
 		if (info.IsDirectory()) {
 			// No empty string because the path has '/'
 			if (path[path.size() - 1] != '/') {
-				response_body_message = CreateDefaultBodyMessageFormat(StatusCode(MOVED_PERMANENTLY));
+				response_body_message =
+					CreateDefaultBodyMessageFormat(StatusCode(MOVED_PERMANENTLY));
 				return;
 			}
 			// todo: Check for index directive and handle ReadFile function
@@ -127,7 +130,8 @@ void HttpResponse::SystemExceptionHandler(
 	int error_number = e.GetErrorNumber();
 	if (error_number == EACCES || error_number == EPERM) {
 		response_body_message = CreateDefaultBodyMessageFormat(StatusCode(FORBIDDEN));
-	} else if (error_number == ENOENT || error_number == ENOTDIR || error_number == ELOOP || error_number == ENAMETOOLONG) {
+	} else if (error_number == ENOENT || error_number == ENOTDIR || error_number == ELOOP ||
+			   error_number == ENAMETOOLONG) {
 		response_body_message = CreateDefaultBodyMessageFormat(StatusCode(NOT_FOUND));
 	} else {
 		response_body_message = CreateDefaultBodyMessageFormat(StatusCode(INTERNAL_SERVER_ERROR));

@@ -15,9 +15,9 @@ enum ConnectionState {
 
 // todo: tmp
 struct Response {
-	Response() : connection_state(KEEP){};
+	Response() : connection_state(KEEP) {};
 	Response(ConnectionState connection_state, const std::string &response_str)
-		: connection_state(connection_state), response_str(response_str){};
+		: connection_state(connection_state), response_str(response_str) {};
 
 	ConnectionState connection_state;
 	std::string     response_str;
