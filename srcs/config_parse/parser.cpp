@@ -90,7 +90,7 @@ void Parser::HandleServerContextDirective(context::ServerCon &server, NodeItr &i
 	if ((*it).token == SERVER_NAME) {
 		HandleServerName(server.server_names, ++it);
 	} else if ((*it).token == LISTEN) {
-		HandleListen(server.host_port, ++it);
+		HandleListen(server.host_ports, ++it);
 		// pair {host, port}
 	} else if ((*it).token == CLIENT_MAX_BODY_SIZE) {
 		HandleClientMaxBodySize(server.client_max_body_size, ++it);
@@ -111,10 +111,10 @@ void Parser::HandleServerName(std::list<std::string> &server_names, NodeItr &it)
 			throw std::runtime_error("a duplicated parameter in 'server_name' directive");
 		}
 		server_names.push_back((*it++).token);
-	}
+	} // server_name directive can be duplicated
 }
 
-void Parser::HandleListen(context::HostPortPair &host_port, NodeItr &it) {
+void Parser::HandleListen(std::list<context::HostPortPair> &host_ports, NodeItr &it) {
 	if ((*it).token_type != node::WORD) {
 		throw std::runtime_error("invalid number of arguments in 'listen' directive");
 	}
@@ -124,13 +124,9 @@ void Parser::HandleListen(context::HostPortPair &host_port, NodeItr &it) {
 			port_number.GetValue() > PORT_MAX) {
 			throw std::runtime_error("invalid port number for ports");
 		}
-		// } else if (FindDuplicated(port, port_number.GetValue())) {
-		// 	throw std::runtime_error("a duplicated parameter in 'listen' directive");
-		// }
-		host_port = std::make_pair("0.0.0.0", port_number.GetValue());
+		host_ports.push_back(std::make_pair("0.0.0.0", port_number.GetValue()));
 		++it;
 		return;
-		// handle and check duplicate
 	}
 	// for listen localhost:8080
 	std::vector<std::string> host_port_vec = utils::SplitStr((*it).token, ":");
@@ -139,8 +135,9 @@ void Parser::HandleListen(context::HostPortPair &host_port, NodeItr &it) {
 	if (host_port_vec[0] == "" || !port_number.IsOk() || port_number.GetValue() < PORT_MIN ||
 		port_number.GetValue() > PORT_MAX) {
 		throw std::runtime_error("invalid port number for ports");
-	} // duplicate check
-	host_port = std::make_pair(host_port_vec[0], port_number.GetValue());
+	}
+	// server_name directive can be duplicated
+	host_ports.push_back(std::make_pair(host_port_vec[0], port_number.GetValue()));
 	++it;
 }
 
