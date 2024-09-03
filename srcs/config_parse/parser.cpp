@@ -90,7 +90,8 @@ void Parser::HandleServerContextDirective(context::ServerCon &server, NodeItr &i
 	if ((*it).token == SERVER_NAME) {
 		HandleServerName(server.server_names, ++it);
 	} else if ((*it).token == LISTEN) {
-		HandleListen(server.host, server.port, ++it);
+		HandleListen(server.host_port, ++it);
+		// pair {host, port}
 	} else if ((*it).token == CLIENT_MAX_BODY_SIZE) {
 		HandleClientMaxBodySize(server.client_max_body_size, ++it);
 	} else if ((*it).token == ERROR_PAGE) {
@@ -113,37 +114,33 @@ void Parser::HandleServerName(std::list<std::string> &server_names, NodeItr &it)
 	}
 }
 
-void Parser::HandleListen(std::string &host, context::PortList &port, NodeItr &it) {
+void Parser::HandleListen(context::HostPortPair &host_port, NodeItr &it) {
 	if ((*it).token_type != node::WORD) {
 		throw std::runtime_error("invalid number of arguments in 'listen' directive");
 	}
 	if (((*it).token).find(":") == std::string::npos) { // for listen 4242
-		utils::Result<unsigned int> port_number = utils::ConvertStrToUint((*it).token);
-		if (!port_number.IsOk() || port_number.GetValue() < PORT_MIN ||
-			port_number.GetValue() > PORT_MAX) {
-			throw std::runtime_error("invalid port number for ports");
-		} else if (FindDuplicated(port, port_number.GetValue())) {
-			throw std::runtime_error("a duplicated parameter in 'listen' directive");
-		}
-		port.push_back(port_number.GetValue());
-		++it;
-		return;
+		// utils::Result<unsigned int> port_number = utils::ConvertStrToUint((*it).token);
+		// if (!port_number.IsOk() || port_number.GetValue() < PORT_MIN ||
+		// 	port_number.GetValue() > PORT_MAX) {
+		// 	throw std::runtime_error("invalid port number for ports");
+		// }
+		// // } else if (FindDuplicated(port, port_number.GetValue())) {
+		// // 	throw std::runtime_error("a duplicated parameter in 'listen' directive");
+		// // }
+		// ;
+		// ++it;
+		// return;
+		// handle and check duplicate
 	}
 	// for listen localhost:8080
-	std::vector<std::string> host_port = utils::SplitStr((*it).token, ":");
+	std::vector<std::string> host_port_vec = utils::SplitStr((*it).token, ":");
 	// 2個ないときは他の部分で例外が投げられる
-	utils::Result<unsigned int> port_number = utils::ConvertStrToUint(host_port[1]);
-	if (host_port[0] == "" || !port_number.IsOk() || port_number.GetValue() < PORT_MIN ||
+	utils::Result<unsigned int> port_number = utils::ConvertStrToUint(host_port_vec[1]);
+	if (host_port_vec[0] == "" || !port_number.IsOk() || port_number.GetValue() < PORT_MIN ||
 		port_number.GetValue() > PORT_MAX) {
 		throw std::runtime_error("invalid port number for ports");
-	} else if (FindDuplicated(port, port_number.GetValue())) {
-		throw std::runtime_error("a duplicated parameter in 'listen' directive");
-	}
-	if (IsDuplicateDirectiveName(server_directive_set_, HOST)) {
-		throw std::runtime_error("'host' directive is duplicated");
-	}
-	host = host_port[0];
-	port.push_back(port_number.GetValue());
+	} // duplicate check
+	host_port = std::make_pair(host_port_vec[0], port_number.GetValue());
 	++it;
 }
 
