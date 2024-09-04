@@ -41,10 +41,9 @@ VirtualServer::LocationList ConvertLocations(const config::context::LocationList
 }
 
 VirtualServer ConvertToVirtualServer(const config::context::ServerCon &config_server) {
-	const std::string                 &server_name = *(config_server.server_names.begin()); // tmp
-	const VirtualServer::LocationList &locations   = ConvertLocations(config_server.location_con);
+	const VirtualServer::LocationList &locations = ConvertLocations(config_server.location_con);
 	return VirtualServer(
-		server_name,
+		config_server.server_names,
 		locations,
 		config_server.host_ports,
 		config_server.client_max_body_size,
@@ -59,7 +58,7 @@ void DebugVirtualServerNames(
 	std::cerr << "server_name: ";
 	for (ItVs it = virtual_server_addr_list.begin(); it != virtual_server_addr_list.end(); ++it) {
 		const VirtualServer *virtual_server = *it;
-		std::cerr << "[" << virtual_server->GetServerName() << "]";
+		std::cerr << "[" << *virtual_server->GetServerNames().begin() << "]"; // todo: tmp
 	}
 	std::cerr << std::endl;
 }

@@ -27,6 +27,7 @@ struct Location {
 // virtual serverとして必要な情報を保持・取得する
 class VirtualServer {
   public:
+	typedef std::list<std::string>               ServerNameList;
 	typedef std::list<Location>                  LocationList;
 	typedef std::pair<std::string, unsigned int> HostPortPair;
 	typedef std::list<HostPortPair>              HostPortList;
@@ -35,30 +36,30 @@ class VirtualServer {
 	// default constructor: necessary for map's insert/[]
 	VirtualServer();
 	VirtualServer(
-		const std::string  &server_name,
-		const LocationList &locations,
-		const HostPortList &host_ports,
-		std::size_t         client_max_body_size,
-		const ErrorPage    &error_page
+		const ServerNameList &server_names,
+		const LocationList   &locations,
+		const HostPortList   &host_ports,
+		std::size_t           client_max_body_size,
+		const ErrorPage      &error_page
 	);
 	~VirtualServer();
 	VirtualServer(const VirtualServer &other);
 	VirtualServer &operator=(const VirtualServer &other);
 	// getter
-	const std::string  &GetServerName() const;
-	const LocationList &GetLocations() const;
-	const HostPortList &GetHostPortList() const;
-	std::size_t         GetClientMaxBodySize() const;
-	const ErrorPage    &GetErrorPage() const;
+	const ServerNameList &GetServerNames() const;
+	const LocationList   &GetLocations() const;
+	const HostPortList   &GetHostPortList() const;
+	std::size_t           GetClientMaxBodySize() const;
+	const ErrorPage      &GetErrorPage() const;
 
   private:
 	static const std::size_t DEFAULT_CLIENT_MAX_BODY_SIZE = 1024;
 	// variables
-	std::string  server_name_;
-	LocationList locations_;
-	HostPortList host_ports_;
-	std::size_t  client_max_body_size_;
-	ErrorPage    error_page_;
+	ServerNameList server_names_;
+	LocationList   locations_;
+	HostPortList   host_ports_;
+	std::size_t    client_max_body_size_;
+	ErrorPage      error_page_;
 };
 
 } // namespace server

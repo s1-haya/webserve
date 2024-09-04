@@ -6,13 +6,13 @@ VirtualServer::VirtualServer()
 	: client_max_body_size_(DEFAULT_CLIENT_MAX_BODY_SIZE), error_page_(std::make_pair(0, "")) {}
 
 VirtualServer::VirtualServer(
-	const std::string  &server_name,
-	const LocationList &locations,
-	const HostPortList &host_ports,
-	std::size_t         client_max_body_size,
-	const ErrorPage    &error_page
+	const ServerNameList &server_names,
+	const LocationList   &locations,
+	const HostPortList   &host_ports,
+	std::size_t           client_max_body_size,
+	const ErrorPage      &error_page
 )
-	: server_name_(server_name),
+	: server_names_(server_names),
 	  locations_(locations),
 	  host_ports_(host_ports),
 	  client_max_body_size_(client_max_body_size),
@@ -26,7 +26,7 @@ VirtualServer::VirtualServer(const VirtualServer &other) {
 
 VirtualServer &VirtualServer::operator=(const VirtualServer &other) {
 	if (this != &other) {
-		server_name_          = other.server_name_;
+		server_names_         = other.server_names_;
 		locations_            = other.locations_;
 		host_ports_           = other.host_ports_;
 		client_max_body_size_ = other.client_max_body_size_;
@@ -35,8 +35,8 @@ VirtualServer &VirtualServer::operator=(const VirtualServer &other) {
 	return *this;
 }
 
-const std::string &VirtualServer::GetServerName() const {
-	return server_name_;
+const VirtualServer::ServerNameList &VirtualServer::GetServerNames() const {
+	return server_names_;
 }
 
 // todo: not used yet
