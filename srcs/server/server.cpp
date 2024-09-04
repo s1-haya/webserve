@@ -43,7 +43,9 @@ VirtualServer::LocationList ConvertLocations(const config::context::LocationList
 VirtualServer ConvertToVirtualServer(const config::context::ServerCon &config_server) {
 	const std::string                 &server_name = *(config_server.server_names.begin()); // tmp
 	const VirtualServer::LocationList &locations   = ConvertLocations(config_server.location_con);
-	return VirtualServer(server_name, locations, config_server.host_ports);
+	return VirtualServer(
+		server_name, locations, config_server.host_ports, config_server.client_max_body_size
+	);
 }
 // todo: tmp for debug
 void DebugVirtualServerNames(

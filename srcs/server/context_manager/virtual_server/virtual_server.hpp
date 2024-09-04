@@ -1,6 +1,7 @@
 #ifndef SERVER_CONTEXTMANAGER_VIRTUALSERVER_VIRTUALSERVER_HPP_
 #define SERVER_CONTEXTMANAGER_VIRTUALSERVER_VIRTUALSERVER_HPP_
 
+#include <cstddef> // size_t
 #include <list>
 #include <string>
 
@@ -35,7 +36,8 @@ class VirtualServer {
 	VirtualServer(
 		const std::string  &server_name,
 		const LocationList &locations,
-		const HostPortList &host_ports
+		const HostPortList &host_ports,
+		std::size_t         client_max_body_size
 	);
 	~VirtualServer();
 	VirtualServer(const VirtualServer &other);
@@ -44,12 +46,15 @@ class VirtualServer {
 	const std::string  &GetServerName() const;
 	const LocationList &GetLocations() const;
 	const HostPortList &GetHostPortList() const;
+	std::size_t         GetClientMaxBodySize() const;
 
   private:
-	// todo: add member(& operator=)
+	static const std::size_t DEFAULT_CLIENT_MAX_BODY_SIZE = 1024;
+	// variables
 	std::string  server_name_;
 	LocationList locations_;
 	HostPortList host_ports_;
+	std::size_t  client_max_body_size_;
 };
 
 } // namespace server
