@@ -38,22 +38,7 @@ VirtualServer::LocationList ConvertLocations(const config::context::LocationList
 VirtualServer ConvertToVirtualServer(const config::context::ServerCon &config_server) {
 	const std::string          &server_name = *(config_server.server_names.begin()); // tmp
 	VirtualServer::LocationList locations   = ConvertLocations(config_server.location_con);
-
-	// todo: tmp
-	static int                  n = 0;
-	VirtualServer::HostPortList host_port_list;
-	if (n == 0) {
-		host_port_list.push_back(std::make_pair("0.0.0.0", 8080));
-		// host_port_list.push_back(std::make_pair("::1", 8080));
-	} else {
-		host_port_list.push_back(std::make_pair("0.0.0.0", 8080));
-		host_port_list.push_back(std::make_pair("0.0.0.0", 9999));
-		host_port_list.push_back(std::make_pair("0.0.0.0", 12345));
-		// host_port_list.push_back(std::make_pair("::1", 8080));
-	}
-	++n;
-
-	return VirtualServer(server_name, locations, host_port_list);
+	return VirtualServer(server_name, locations, config_server.host_ports);
 }
 // todo: tmp for debug
 void DebugVirtualServerNames(

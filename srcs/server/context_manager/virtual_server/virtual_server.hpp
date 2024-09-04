@@ -23,11 +23,10 @@ class VirtualServer {
 
 	// default constructor: necessary for map's insert/[]
 	VirtualServer();
-	// todo: configもらう？
 	VirtualServer(
 		const std::string  &server_name,
 		const LocationList &locations,
-		const HostPortList &host_port_list
+		const HostPortList &host_ports
 	);
 	~VirtualServer();
 	VirtualServer(const VirtualServer &other);
@@ -41,7 +40,7 @@ class VirtualServer {
 	// todo: add member(& operator=)
 	std::string  server_name_;
 	LocationList locations_; // todo
-	HostPortList host_port_list_;
+	HostPortList host_ports_;
 };
 
 } // namespace server

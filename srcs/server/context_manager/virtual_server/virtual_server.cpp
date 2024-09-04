@@ -5,11 +5,9 @@ namespace server {
 VirtualServer::VirtualServer() {}
 
 VirtualServer::VirtualServer(
-	const std::string  &server_name,
-	const LocationList &locations,
-	const HostPortList &host_port_list
+	const std::string &server_name, const LocationList &locations, const HostPortList &host_ports
 )
-	: server_name_(server_name), locations_(locations), host_port_list_(host_port_list) {}
+	: server_name_(server_name), locations_(locations), host_ports_(host_ports) {}
 
 VirtualServer::~VirtualServer() {}
 
@@ -19,9 +17,9 @@ VirtualServer::VirtualServer(const VirtualServer &other) {
 
 VirtualServer &VirtualServer::operator=(const VirtualServer &other) {
 	if (this != &other) {
-		server_name_    = other.server_name_;
-		locations_      = other.locations_;
-		host_port_list_ = other.host_port_list_;
+		server_name_ = other.server_name_;
+		locations_   = other.locations_;
+		host_ports_  = other.host_ports_;
 	}
 	return *this;
 }
@@ -36,7 +34,7 @@ const VirtualServer::LocationList &VirtualServer::GetLocations() const {
 }
 
 const VirtualServer::HostPortList &VirtualServer::GetHostPortList() const {
-	return host_port_list_;
+	return host_ports_;
 }
 
 } // namespace server
