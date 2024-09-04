@@ -21,7 +21,7 @@ struct RequestLine {
 
 typedef std::map<std::string, std::string> HeaderFields;
 
-struct HttpRequest {
+struct HttpRequestFormat {
 	RequestLine  request_line;
 	HeaderFields header_fields;
 	std::string  body_message;
@@ -35,8 +35,8 @@ enum StatusCode {
 };
 
 struct HttpRequestResult {
-	StatusCode  status_code;
-	HttpRequest request;
+	StatusCode        status_code;
+	HttpRequestFormat request;
 	HttpRequestResult() : status_code(OK) {}
 };
 

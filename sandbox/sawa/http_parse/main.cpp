@@ -67,7 +67,7 @@ int main(void) {
 	// assert_request_line(expect6, test6.request_line);
 
 	// StatusLineとHeadersを含むHTTPリクエスト
-	// http::HttpRequest test2 =
+	// http::HttpRequestFormat test2 =
 	// 	a.Run("GET /sub HTTP/1.1\r\nHost: www.example.com\r\nConnection: keep-alive\r\n\r\n");
 	// assert("GET" == test2.request_line.method);
 	// assert("/sub" == test2.request_line.request_target);
@@ -76,7 +76,7 @@ int main(void) {
 	// assert("keep-alive" == test2.header_fields["Connection"]);
 
 	// // StatusLineとHeader、Bodyを含むHTTPリクエスト
-	// http::HttpRequest test3 = http::HttpParse::Run("POST /index.html HTTP/1.1\r\nHost: "
+	// http::HttpRequestFormat test3 = http::HttpParse::Run("POST /index.html HTTP/1.1\r\nHost: "
 	// 								"www.example.com\r\nConnection: keep-alive\r\n\r\nbodymessage");
 	// assert("POST" == test3.request_line.method);
 	// assert("/index.html" == test3.request_line.request_target);
@@ -86,7 +86,7 @@ int main(void) {
 	// assert("bodymessage" == test3.message_body);
 
 	// // StatusLineとHeader、Body(改行バージョン)を含むHTTPリクエスト
-	// http::HttpRequest test4 =
+	// http::HttpRequestFormat test4 =
 	// 	a.Run("POST /index.html HTTP/1.1\r\nHost: www.example.com\r\nConnection: "
 	// 		  "keep-alive\r\n\r\naa\r\naa\naa");
 	// std::cout << "Method: " << test4.request_line.method << std::endl;

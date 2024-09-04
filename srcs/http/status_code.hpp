@@ -14,6 +14,7 @@ enum StatusCode {
 	BAD_REQUEST           = 400,
 	FORBIDDEN             = 403,
 	NOT_FOUND             = 404,
+	PAYLOAD_TOO_LARGE     = 413,
 	INTERNAL_SERVER_ERROR = 500,
 	NOT_IMPLEMENTED       = 501
 };

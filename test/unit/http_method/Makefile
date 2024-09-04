@@ -15,8 +15,7 @@ WS_HTTP_DIR				:=	$(WS_SRCS_DIR)/http
 WS_HTTP_REQUEST_DIR	:=	$(WS_HTTP_DIR)/request
 WS_HTTP_PARSE_DIR	:=	$(WS_HTTP_DIR)/request/parse
 WS_HTTP_RESPONSE_DIR	:=	$(WS_HTTP_DIR)/response
-WS_DTO_SERVER_TO_HTTP_DIR	:=	$(WS_SRCS_DIR)/server/dto
-WS_VERTUAL_SERVER_DIR	:=	$(WS_SRCS_DIR)/server/context_manager/virtual_server
+WS_HTTP_SERVER_INFO_CHECK_DIR	:=	$(WS_HTTP_RESPONSE_DIR)/http_serverinfo_check
 
 SRCS			+=	$(WS_UTILS_DIR)/color.cpp \
 					$(WS_UTILS_DIR)/system_exception.cpp \
@@ -26,7 +25,7 @@ SRCS			+=	$(WS_UTILS_DIR)/color.cpp \
 					$(WS_HTTP_RESPONSE_DIR)/stat.cpp \
 					$(WS_HTTP_RESPONSE_DIR)/http_response.cpp \
 					$(WS_HTTP_RESPONSE_DIR)/http_handle_method.cpp \
-					$(WS_VERTUAL_SERVER_DIR)/virtual_server.cpp \
+					$(WS_HTTP_SERVER_INFO_CHECK_DIR)/http_serverinfo_check.cpp \
 
 # 3. Add unit test files
 SRCS	+=	test_http_method.cpp
@@ -37,8 +36,7 @@ SRCS_DIR	:=	$(WS_UTILS_DIR) \
 				$(WS_HTTP_REQUEST_DIR) \
 				$(WS_HTTP_PARSE_DIR) \
 				$(WS_HTTP_RESPONSE_DIR) \
-				$(WS_DTO_SERVER_TO_HTTP_DIR) \
-				$(WS_VERTUAL_SERVER_DIR)
+				$(WS_HTTP_SERVER_INFO_CHECK_DIR)
 
 #--------------------------------------------
 OBJ_DIR		:=	objs
@@ -53,7 +51,7 @@ DEPS		:=	$(OBJS:.o=.d)
 MKDIR		:=	mkdir -p
 
 .PHONY	: all
-all:  init $(NAME)
+all: init $(NAME)
 
 $(NAME): $(OBJS)
 	$(CXX) -o $@ $^
@@ -74,15 +72,14 @@ $(OBJ_DIR)/%.o: %.cpp
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
 
 .PHONY	: clean
-clean: 
-	-@make clean-test
+clean: clean-test
 	$(RM) -r $(OBJ_DIR)
 
 .PHONY	: clean-test
 clean-test:
-	$(RM) $(TEST_CASE_DIR)/no_authority_file
-	@chmod 700 $(TEST_CASE_DIR)/no_authority_directory
-	$(RM) -r $(TEST_CASE_DIR)/no_authority_directory
+	-$(RM) $(TEST_CASE_DIR)/no_authority_file
+	-@chmod 700 $(TEST_CASE_DIR)/no_authority_directory
+	-$(RM) -r $(TEST_CASE_DIR)/no_authority_directory
 
 .PHONY	: fclean
 fclean: clean
@@ -102,6 +99,7 @@ run: all
 	status=$${PIPESTATUS[0]}; \
 	echo -e "\nunit test's log =>" $(LOG_FILE_PATH); \
 	exit $$status;
+	@make clean-test
 
 .PHONY	: val
 val: all

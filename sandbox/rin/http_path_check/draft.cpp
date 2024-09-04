@@ -11,7 +11,7 @@ struct RequestLine {
 
 typedef std::map<std::string, std::string> HeaderFields;
 
-struct HttpRequest {
+struct HttpRequestFormat {
 	RequestLine  request_line;
 	HeaderFields header_fields;
 	std::string  body_message;
@@ -108,8 +108,8 @@ void CheckAutoIndex(CheckPathResult &result, const LocationCon &location) {
 	}
 }
 
-// void CheckAllowedMethods(CheckPathResult &result, LocationCon &location, HttpRequest &request) {
-// 	std::list<std::string>::iterator is_allowed_method = std::find(
+// void CheckAllowedMethods(CheckPathResult &result, LocationCon &location, HttpRequestFormat
+// &request) { 	std::list<std::string>::iterator is_allowed_method = std::find(
 // 		location.allowed_methods.begin(),
 // 		location.allowed_methods.end(),
 // 		request.request_line.method
@@ -168,8 +168,7 @@ void CheckDTOServerInfo(
 ) {
 	if (server_info.host != header_fields["Host"]) { // Check host_name
 		result.is_ok = INVALID_HOST;
-	} else if (static_cast<size_t>(std::atoi(header_fields["Content-Length"].c_str())) >
-			   server_info.client_max_body_size) { // Check content_length
+	} else if (static_cast<size_t>(std::atoi(header_fields["Content-Length"].c_str())) > server_info.client_max_body_size) { // Check content_length
 		result.is_ok = PAYLOAD_TOO_LARGE;
 	} else if (server_info.error_page.second != "") { // Check error_page
 		result.error_status_code = server_info.error_page.first;
@@ -178,7 +177,7 @@ void CheckDTOServerInfo(
 	return;
 }
 
-CheckPathResult Check(const DtoServerInfos &server_info, HttpRequest &request) {
+CheckPathResult Check(const DtoServerInfos &server_info, HttpRequestFormat &request) {
 	CheckPathResult result;
 
 	std::memset(&result, 0, sizeof(result));
@@ -220,7 +219,7 @@ LocationCon BuildLocationCon(
 int main() {
 	// request
 	const RequestLine request_line_1 = {"GET", "/www/data/test.html", "HTTP/1.1"};
-	HttpRequest       request;
+	HttpRequestFormat request;
 	request.request_line                = request_line_1;
 	request.header_fields["Host"]       = "localhost";
 	request.header_fields["Connection"] = "keep-alive";

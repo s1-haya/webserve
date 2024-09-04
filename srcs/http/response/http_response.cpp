@@ -1,82 +1,83 @@
 #include "http_response.hpp"
-#include "dto_server_to_http.hpp"
+#include "client_infos.hpp"
 #include "http_message.hpp"
 #include "http_parse.hpp"
+#include "http_serverinfo_check.hpp"
+#include "server_infos.hpp"
 #include <iostream>
 #include <sstream>
 
 namespace http {
 
 std::string HttpResponse::Run(const HttpRequestResult &request_info) {
-	HttpResponseResult response = CreateHttpResponseResult(request_info);
-	return CreateHttpResponseFormat(response);
+	HttpResponseFormat response = CreateHttpResponseFormat(request_info);
+	return CreateHttpResponse(response);
 }
 
 std::string HttpResponse::TmpRun(
-	const server::DtoClientInfos &client_info,
-	const server::DtoServerInfos &server_info,
-	HttpRequestResult            &request_info
+	const MockDtoClientInfos &client_info,
+	const MockDtoServerInfos &server_info,
+	HttpRequestResult        &request_info
 ) {
-	HttpResponseResult response =
-		TmpCreateHttpResponseResult(client_info, server_info, request_info);
-	return CreateHttpResponseFormat(response);
+	HttpResponseFormat response =
+		TmpCreateHttpResponseFormat(client_info, server_info, request_info);
+	return CreateHttpResponse(response);
 }
 
-// todo: HttpResponseResult HttpResponse::CreateHttpResponseResult(const HttpRequestResult
+// todo: HttpResponseFormat HttpResponse::CreateHttpResponseFormat(const HttpRequestResult
 // &request_info) 作成
-HttpResponseResult HttpResponse::TmpCreateHttpResponseResult(
-	const server::DtoClientInfos &client_info,
-	const server::DtoServerInfos &server_info,
-	HttpRequestResult            &request_info
+HttpResponseFormat HttpResponse::TmpCreateHttpResponseFormat(
+	const MockDtoClientInfos &client_info,
+	const MockDtoServerInfos &server_info,
+	HttpRequestResult        &request_info
 ) {
 	try {
-		// todo:
-		// CheckServerInfoResult config_info = HttpServerInfoCheck::Check(server_info,
-		// request_info.request);
-		//     // todo: IsCgi()
-		//     // - path
-		//     // - cgi_extension
-		//     // - method allowed
-		//     if (is_cgi)
-		//         // todo: cgi実行
-		//         // try {
-		//         //     cgi::Run()
-		//         // } catch {
-		//         //     cgi::Exception
-		//         //     このthrowはCreateHttpResponseResult内でcatchする
-		//         //     // throw Httpのエラー用に
-		//         // }
-		//         // response = cgi -> webserv用
-		//.    else
-		//       response = MethodHandler();
+		HttpResponseFormat    result;
+		CheckServerInfoResult server_info_result =
+			HttpServerInfoCheck::Check(server_info, request_info.request);
+		// todo: if redirect
+		// if (server_info_result.redirect.IsOk()) {
+		// 	result = RedirectHandler();
+		// todo: IsCgi()
+		// - path
+		// - cgi_extension
+		// - method allowed
+		// } else if (IsCgi()) {
+		// todo: cgi実行
+		// cgi::Run()
+		// -> Internal　Server Errorを投げる可能性あり
+		// result = CgiToServerHandler();
+		// } else {
+		// 	result = MethodHandler();
+		// }
 		//     return CreateSuccessResponseResult();
-		HttpResponseResult result;
 		(void)client_info;
-		(void)server_info;
 		(void)request_info;
+		(void)server_info_result;
 		return result;
 	} catch (const HttpException &e) {
+		// feature: header_fieldとerror_pageとの関連性がわかり次第変更あり
 		request_info.status_code = e.GetStatusCode();
-		return CreateErrorHttpResponseResult(request_info);
+		return CreateErrorHttpResponseFormat(request_info);
 	}
 }
 
 // mock
-HttpResponseResult HttpResponse::CreateHttpResponseResult(const HttpRequestResult &request_info) {
-	HttpResponseResult response;
+HttpResponseFormat HttpResponse::CreateHttpResponseFormat(const HttpRequestResult &request_info) {
+	HttpResponseFormat response;
 	if (request_info.status_code != http::OK) {
-		response = CreateErrorHttpResponseResult(request_info);
+		response = CreateErrorHttpResponseFormat(request_info);
 	} else {
-		response = CreateSuccessHttpResponseResult(request_info);
+		response = CreateSuccessHttpResponseFormat(request_info);
 	}
 	return response;
 }
 
 // mock
-HttpResponseResult
-HttpResponse::CreateSuccessHttpResponseResult(const HttpRequestResult &request_info) {
+HttpResponseFormat
+HttpResponse::CreateSuccessHttpResponseFormat(const HttpRequestResult &request_info) {
 	(void)request_info;
-	HttpResponseResult response;
+	HttpResponseFormat response;
 	response.status_line.version         = HTTP_VERSION;
 	response.status_line.status_code     = "200";
 	response.status_line.reason_phrase   = "OK";
@@ -99,9 +100,9 @@ std::string HttpResponse::CreateDefaultBodyMessageFormat(
 }
 
 // mock
-HttpResponseResult HttpResponse::CreateErrorHttpResponseResult(const HttpRequestResult &request_info
+HttpResponseFormat HttpResponse::CreateErrorHttpResponseFormat(const HttpRequestResult &request_info
 ) {
-	HttpResponseResult response;
+	HttpResponseFormat response;
 	response.status_line.version       = HTTP_VERSION;
 	response.status_line.status_code   = utils::ToString(request_info.status_code);
 	response.status_line.reason_phrase = reason_phrase.at(request_info.status_code);
@@ -118,7 +119,7 @@ HttpResponseResult HttpResponse::CreateErrorHttpResponseResult(const HttpRequest
 	return response;
 }
 
-std::string HttpResponse::CreateHttpResponseFormat(const HttpResponseResult &response) {
+std::string HttpResponse::CreateHttpResponse(const HttpResponseFormat &response) {
 	std::ostringstream response_stream;
 	response_stream << response.status_line.version << SP << response.status_line.status_code << SP
 					<< response.status_line.reason_phrase << CRLF;

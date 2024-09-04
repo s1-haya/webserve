@@ -1,8 +1,9 @@
 #include "tmp_http.hpp"
-#include "dto_server_to_http.hpp"
+#include "client_infos.hpp"
 #include "http_message.hpp"
 #include "http_result.hpp"
 #include "http_storage.hpp"
+#include "server_infos.hpp"
 #include <iostream>
 
 namespace http {
@@ -12,7 +13,7 @@ TmpHttp::TmpHttp() {}
 TmpHttp::~TmpHttp() {}
 
 HttpResult
-TmpHttp::Run(const server::DtoClientInfos &client_info, const server::DtoServerInfos &server_info) {
+TmpHttp::Run(const MockDtoClientInfos &client_info, const MockDtoServerInfos &server_info) {
 	// todo: when HttpResponse::Run arguments require server_info.
 	(void)server_info;
 	HttpResult          result;
@@ -25,7 +26,7 @@ TmpHttp::Run(const server::DtoClientInfos &client_info, const server::DtoServerI
 		return result;
 	}
 	if (IsHttpRequestFormatComplete(client_info.fd)) {
-		result.response             = CreateHttpResponse(client_info.fd);
+		result.response             = CreateHttpResponse(client_info, server_info);
 		result.is_response_complete = true;
 	}
 	return result;
@@ -82,6 +83,14 @@ std::string TmpHttp::CreateHttpResponse(int client_fd) {
 	HttpRequestParsedData data = storage_.GetClientSaveData(client_fd);
 	storage_.DeleteClientSaveData(client_fd);
 	return HttpResponse::Run(data.request_result);
+}
+
+std::string TmpHttp::CreateHttpResponse(
+	const MockDtoClientInfos &client_info, const MockDtoServerInfos &server_info
+) {
+	HttpRequestParsedData data = storage_.GetClientSaveData(client_info.fd);
+	storage_.DeleteClientSaveData(client_info.fd);
+	return HttpResponse::TmpRun(client_info, server_info, data.request_result);
 }
 
 // todo: HTTPRequestの書式が完全かどうか(どのように取得するかは要検討)
