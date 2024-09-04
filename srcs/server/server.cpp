@@ -41,10 +41,9 @@ VirtualServer::LocationList ConvertLocations(const config::context::LocationList
 }
 
 VirtualServer ConvertToVirtualServer(const config::context::ServerCon &config_server) {
-	const VirtualServer::LocationList &locations = ConvertLocations(config_server.location_con);
 	return VirtualServer(
 		config_server.server_names,
-		locations,
+		ConvertLocations(config_server.location_con),
 		config_server.host_ports,
 		config_server.client_max_body_size,
 		config_server.error_page
