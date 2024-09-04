@@ -35,7 +35,7 @@ class StatusCode {
 	std::string                                str_status_code_;
 	typedef std::map<EStatusCode, std::string> ReasonPhrase;
 	ReasonPhrase                               reason_phrase_;
-	ReasonPhrase                   InitReasonPhrase();
+	ReasonPhrase                               InitReasonPhrase();
 };
 
 } // namespace http

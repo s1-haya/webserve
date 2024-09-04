@@ -89,9 +89,10 @@ HttpResponse::CreateSuccessHttpResponseFormat(const HttpRequestResult &request_i
 
 std::string HttpResponse::CreateDefaultBodyMessageFormat(const StatusCode &status_code) {
 	std::ostringstream body_message;
-	body_message << "<html>" << CRLF << "<head><title>" << status_code.GetStatusCode() << SP << status_code.GetReasonPhrase()
-				 << "</title></head>" << CRLF << "<body>" << CRLF << "<center><h1>" << status_code.GetStatusCode()
-				 << SP << status_code.GetReasonPhrase() << "</h1></center>" << CRLF << "<hr><center>"
+	body_message << "<html>" << CRLF << "<head><title>" << status_code.GetStatusCode() << SP
+				 << status_code.GetReasonPhrase() << "</title></head>" << CRLF << "<body>" << CRLF
+				 << "<center><h1>" << status_code.GetStatusCode() << SP
+				 << status_code.GetReasonPhrase() << "</h1></center>" << CRLF << "<hr><center>"
 				 << SERVER_VERSION << "</center>" << CRLF << "</body>" << CRLF << "</html>" << CRLF;
 	return body_message.str();
 }
@@ -99,13 +100,13 @@ std::string HttpResponse::CreateDefaultBodyMessageFormat(const StatusCode &statu
 // mock
 HttpResponseFormat HttpResponse::CreateErrorHttpResponseFormat(const StatusCode &status_code) {
 	HttpResponseFormat response;
-	response.status_line.version         = HTTP_VERSION;
-	response.status_line.status_code     = status_code.GetStatusCode();
-	response.status_line.reason_phrase   = status_code.GetReasonPhrase();
-	response.header_fields[CONTENT_TYPE] = "text/html";
-	response.header_fields[SERVER]       = SERVER_VERSION;
-	response.header_fields[CONNECTION]   = "close";
-	response.body_message                = CreateDefaultBodyMessageFormat(status_code);
+	response.status_line.version           = HTTP_VERSION;
+	response.status_line.status_code       = status_code.GetStatusCode();
+	response.status_line.reason_phrase     = status_code.GetReasonPhrase();
+	response.header_fields[CONTENT_TYPE]   = "text/html";
+	response.header_fields[SERVER]         = SERVER_VERSION;
+	response.header_fields[CONNECTION]     = "close";
+	response.body_message                  = CreateDefaultBodyMessageFormat(status_code);
 	response.header_fields[CONTENT_LENGTH] = utils::ToString(response.body_message.length());
 	return response;
 }
