@@ -35,12 +35,12 @@ VirtualServer &VirtualServer::operator=(const VirtualServer &other) {
 	return *this;
 }
 
-const VirtualServer::ServerNameList &VirtualServer::GetServerNames() const {
+const VirtualServer::ServerNameList &VirtualServer::GetServerNameList() const {
 	return server_names_;
 }
 
 // todo: not used yet
-const VirtualServer::LocationList &VirtualServer::GetLocations() const {
+const VirtualServer::LocationList &VirtualServer::GetLocationList() const {
 	return locations_;
 }
 

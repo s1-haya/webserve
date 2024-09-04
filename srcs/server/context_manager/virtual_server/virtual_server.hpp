@@ -46,8 +46,8 @@ class VirtualServer {
 	VirtualServer(const VirtualServer &other);
 	VirtualServer &operator=(const VirtualServer &other);
 	// getter
-	const ServerNameList &GetServerNames() const;
-	const LocationList   &GetLocations() const;
+	const ServerNameList &GetServerNameList() const;
+	const LocationList   &GetLocationList() const;
 	const HostPortList   &GetHostPortList() const;
 	std::size_t           GetClientMaxBodySize() const;
 	const ErrorPage      &GetErrorPage() const;

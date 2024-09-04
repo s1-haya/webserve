@@ -57,7 +57,7 @@ void DebugVirtualServerNames(
 	std::cerr << "server_name: ";
 	for (ItVs it = virtual_server_addr_list.begin(); it != virtual_server_addr_list.end(); ++it) {
 		const VirtualServer *virtual_server = *it;
-		std::cerr << "[" << *virtual_server->GetServerNames().begin() << "]"; // todo: tmp
+		std::cerr << "[" << *virtual_server->GetServerNameList().begin() << "]"; // todo: tmp
 	}
 	std::cerr << std::endl;
 }
