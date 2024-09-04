@@ -26,18 +26,23 @@ VirtualServer::LocationList ConvertLocations(const config::context::LocationList
 	typedef config::context::LocationList::const_iterator Itr;
 	for (Itr it = config_locations.begin(); it != config_locations.end(); ++it) {
 		Location location;
-		location.location       = it->request_uri;
-		location.root           = it->alias;
-		location.index          = it->index;
-		location.allowed_method = "GET"; // todo: tmp
+		location.request_uri      = it->request_uri;
+		location.alias            = it->alias;
+		location.index            = it->index;
+		location.autoindex        = it->autoindex;
+		location.allowed_methods  = it->allowed_methods;
+		location.redirect         = it->redirect;
+		location.cgi_extension    = it->cgi_extension;
+		location.upload_directory = it->upload_directory;
+
 		location_list.push_back(location);
 	}
 	return location_list;
 }
 
 VirtualServer ConvertToVirtualServer(const config::context::ServerCon &config_server) {
-	const std::string          &server_name = *(config_server.server_names.begin()); // tmp
-	VirtualServer::LocationList locations   = ConvertLocations(config_server.location_con);
+	const std::string                 &server_name = *(config_server.server_names.begin()); // tmp
+	const VirtualServer::LocationList &locations   = ConvertLocations(config_server.location_con);
 	return VirtualServer(server_name, locations, config_server.host_ports);
 }
 // todo: tmp for debug

@@ -8,10 +8,19 @@ namespace server {
 
 // todo: in VirtualServer class?
 struct Location {
-	std::string location;
-	std::string root;
-	std::string index;
-	std::string allowed_method;
+	typedef std::list<std::string>               AllowedMethodList;
+	typedef std::pair<unsigned int, std::string> Redirect;
+
+	Location() : autoindex(false), redirect(std::make_pair(0, "")) {}
+
+	std::string       request_uri;
+	std::string       alias;
+	std::string       index;
+	bool              autoindex;
+	AllowedMethodList allowed_methods;
+	Redirect          redirect;
+	std::string       cgi_extension;
+	std::string       upload_directory;
 };
 
 // virtual serverとして必要な情報を保持・取得する
@@ -39,7 +48,7 @@ class VirtualServer {
   private:
 	// todo: add member(& operator=)
 	std::string  server_name_;
-	LocationList locations_; // todo
+	LocationList locations_;
 	HostPortList host_ports_;
 };
 
