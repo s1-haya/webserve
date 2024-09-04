@@ -30,6 +30,7 @@ class VirtualServer {
 	typedef std::list<Location>                  LocationList;
 	typedef std::pair<std::string, unsigned int> HostPortPair;
 	typedef std::list<HostPortPair>              HostPortList;
+	typedef std::pair<unsigned int, std::string> ErrorPage;
 
 	// default constructor: necessary for map's insert/[]
 	VirtualServer();
@@ -37,7 +38,8 @@ class VirtualServer {
 		const std::string  &server_name,
 		const LocationList &locations,
 		const HostPortList &host_ports,
-		std::size_t         client_max_body_size
+		std::size_t         client_max_body_size,
+		const ErrorPage    &error_page
 	);
 	~VirtualServer();
 	VirtualServer(const VirtualServer &other);
@@ -47,6 +49,7 @@ class VirtualServer {
 	const LocationList &GetLocations() const;
 	const HostPortList &GetHostPortList() const;
 	std::size_t         GetClientMaxBodySize() const;
+	const ErrorPage    &GetErrorPage() const;
 
   private:
 	static const std::size_t DEFAULT_CLIENT_MAX_BODY_SIZE = 1024;
@@ -55,6 +58,7 @@ class VirtualServer {
 	LocationList locations_;
 	HostPortList host_ports_;
 	std::size_t  client_max_body_size_;
+	ErrorPage    error_page_;
 };
 
 } // namespace server
