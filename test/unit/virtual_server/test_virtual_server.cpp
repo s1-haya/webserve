@@ -300,11 +300,11 @@ int main() {
 	// server_name : 0個
 	// location    : 0個
 	// host:port   : 0個
-	ServerNameList    expected_server_names1;
-	LocationList      expected_locations1;
-	HostPortList      expected_host_ports1;
-	const std::size_t expected_client_max_body_size1 = 1024;
-	ErrorPage         error_page1                    = std::make_pair(0, "");
+	const ServerNameList expected_server_names1;
+	const LocationList   expected_locations1;
+	const HostPortList   expected_host_ports1;
+	const std::size_t    expected_client_max_body_size1 = 1024;
+	const ErrorPage      error_page1                    = std::make_pair(0, "");
 
 	// server_name : 1個
 	// location    : 1個
@@ -327,7 +327,7 @@ int main() {
 	HostPortList expected_host_ports2;
 	expected_host_ports2.push_back(std::make_pair("host1", 9999));
 	const std::size_t expected_client_max_body_size2 = 2048;
-	ErrorPage         error_page2                    = std::make_pair(404, "/error_page.html");
+	const ErrorPage   error_page2                    = std::make_pair(404, "/error_page.html");
 
 	// server_name : 複数
 	// location    : 複数
@@ -364,7 +364,7 @@ int main() {
 	expected_host_ports3.push_back(std::make_pair("host1", 8080));
 	expected_host_ports3.push_back(std::make_pair("host2", 12345));
 	const std::size_t expected_client_max_body_size3 = 4096;
-	ErrorPage         error_page3                    = std::make_pair(404, "/error.html");
+	const ErrorPage   error_page3                    = std::make_pair(404, "/error.html");
 
 	/* ------------------ test ------------------ */
 	ret_code |= Test(RunDefaultConstructor(

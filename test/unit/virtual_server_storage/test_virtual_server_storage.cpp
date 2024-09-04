@@ -120,9 +120,10 @@ Result RunGetVirtualServer(
 
 server::VirtualServer
 CreateVirtualServer(const ServerNameList &server_names, const HostPortList &host_ports) {
-	LocationList      locations;
-	const std::size_t client_max_body_size = 1024;
-	ErrorPage         error_page           = std::make_pair(404, "/error_page.html");
+	const LocationList locations;
+	const std::size_t  client_max_body_size = 1024;
+	const ErrorPage    error_page           = std::make_pair(404, "/error_page.html");
+
 	return server::VirtualServer(
 		server_names, locations, host_ports, client_max_body_size, error_page
 	);
@@ -143,7 +144,7 @@ int RunTestVirtualServerStorage() {
 	HostPortList host_ports;
 	host_ports.push_back(std::make_pair("host1", 8080));
 	host_ports.push_back(std::make_pair("host2", 12345));
-	server::VirtualServer vs1 = CreateVirtualServer(server_name1, host_ports);
+	const server::VirtualServer vs1 = CreateVirtualServer(server_name1, host_ports);
 
 	ServerNameList server_name2;
 	server_name2.push_back("localhost2");
@@ -151,7 +152,7 @@ int RunTestVirtualServerStorage() {
 	HostPortList host_ports2;
 	host_ports2.push_back(std::make_pair("host1", 8080));
 	host_ports2.push_back(std::make_pair("host3", 9999));
-	server::VirtualServer vs2 = CreateVirtualServer(server_name2, host_ports2);
+	const server::VirtualServer vs2 = CreateVirtualServer(server_name2, host_ports2);
 
 	/* -------------- VirtualServerAddrList用意 -------------- */
 	VirtualServerAddrList expected_vs_addr_list1;
