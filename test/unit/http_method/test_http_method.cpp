@@ -67,9 +67,9 @@ int main(void) {
 	ret_code |= HandleResult(get_test3_response_body_message, expected_redirect);
 
 	// ファイルが権限ない場合
-	// std::string get_test4_response_body_message;
-	// http::HttpResponse::GetHandler("test/no_authority_file", get_test4_response_body_message);
-	// ret_code |= HandleResult(get_test4_response_body_message, expected_forbidden);
+	std::string get_test4_response_body_message;
+	http::HttpResponse::GetHandler("test/no_authority_file", get_test4_response_body_message);
+	ret_code |= HandleResult(get_test4_response_body_message, expected_forbidden);
 
 	// POST test
 	// 新しいファイルをアップロードする場合
@@ -123,10 +123,10 @@ int main(void) {
 	ret_code |= HandleResult(delete_test5_response_body_message, expected_not_found);
 
 	// 書き込み権限がないディレクトリの中にあるファイル場合
-	// std::string delete_test6_response_body_message;
-	// http::HttpResponse::DeleteHandler(
-	// 	"test/no_authority_directory/test.txt", delete_test6_response_body_message
-	// );
-	// ret_code |= HandleResult(delete_test6_response_body_message, expected_forbidden);
+	std::string delete_test6_response_body_message;
+	http::HttpResponse::DeleteHandler(
+		"test/no_authority_directory/test.txt", delete_test6_response_body_message
+	);
+	ret_code |= HandleResult(delete_test6_response_body_message, expected_forbidden);
 	return ret_code;
 }
