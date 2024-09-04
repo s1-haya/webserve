@@ -118,6 +118,16 @@ Result RunGetVirtualServer(
 	return TestIsSameVirtualServer(vs_addr_list, expected_vs_addr_list);
 }
 
+server::VirtualServer
+CreateVirtualServer(const ServerNameList &server_names, const HostPortList &host_ports) {
+	LocationList      locations;
+	const std::size_t client_max_body_size = 1024;
+	ErrorPage         error_page           = std::make_pair(404, "/error_page.html");
+	return server::VirtualServer(
+		server_names, locations, host_ports, client_max_body_size, error_page
+	);
+}
+
 // -----------------------------------------------------------------------------
 // - virtual_serverは以下の想定
 // virtual_server | server_name          | host:port
@@ -128,40 +138,20 @@ int RunTestVirtualServerStorage() {
 	int ret_code = EXIT_SUCCESS;
 
 	/* -------------- VirtualServer2個用意 -------------- */
-	ServerNameList expected_server_name1;
-	expected_server_name1.push_back("localhost");
-	AllowedMethodList allowed_methods1;
-	LocationList      expected_locations1;
-	HostPortList      expected_host_port_list1;
-	expected_host_port_list1.push_back(std::make_pair("host1", 8080));
-	expected_host_port_list1.push_back(std::make_pair("host2", 12345));
-	const std::size_t     expected_client_max_body_size1 = 1024;
-	ErrorPage             error_page1                    = std::make_pair(0, "");
-	server::VirtualServer vs1(
-		expected_server_name1,
-		expected_locations1,
-		expected_host_port_list1,
-		expected_client_max_body_size1,
-		error_page1
-	);
+	ServerNameList server_name1;
+	server_name1.push_back("localhost");
+	HostPortList host_ports;
+	host_ports.push_back(std::make_pair("host1", 8080));
+	host_ports.push_back(std::make_pair("host2", 12345));
+	server::VirtualServer vs1 = CreateVirtualServer(server_name1, host_ports);
 
-	ServerNameList expected_server_name2;
-	expected_server_name2.push_back("localhost2");
-	expected_server_name2.push_back("test_serv");
-	AllowedMethodList allowed_methods2;
-	LocationList      expected_locations2;
-	HostPortList      expected_host_port_list2;
-	expected_host_port_list1.push_back(std::make_pair("host1", 8080));
-	expected_host_port_list2.push_back(std::make_pair("host3", 9999));
-	const std::size_t     expected_client_max_body_size2 = 2048;
-	ErrorPage             error_page2                    = std::make_pair(404, "/error_page.html");
-	server::VirtualServer vs2(
-		expected_server_name2,
-		expected_locations2,
-		expected_host_port_list2,
-		expected_client_max_body_size2,
-		error_page2
-	);
+	ServerNameList server_name2;
+	server_name2.push_back("localhost2");
+	server_name2.push_back("test_serv");
+	HostPortList host_ports2;
+	host_ports2.push_back(std::make_pair("host1", 8080));
+	host_ports2.push_back(std::make_pair("host3", 9999));
+	server::VirtualServer vs2 = CreateVirtualServer(server_name2, host_ports2);
 
 	/* -------------- VirtualServerAddrList用意 -------------- */
 	VirtualServerAddrList expected_vs_addr_list1;
