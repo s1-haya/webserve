@@ -9,15 +9,19 @@ class ClientInfo {
   public:
 	// default constructor: necessary for map's insert/[]
 	ClientInfo();
-	explicit ClientInfo(int fd);
+	ClientInfo(int fd, const std::string &listen_host, unsigned int listen_port);
 	~ClientInfo();
 	ClientInfo(const ClientInfo &other);
 	ClientInfo &operator=(const ClientInfo &other);
 	// getter
-	int GetFd() const;
+	int                GetFd() const;
+	const std::string &GetListenIp() const;
+	unsigned int       GetListenPort() const;
 
   private:
-	int fd_;
+	int          fd_;
+	std::string  listen_ip_;
+	unsigned int listen_port_;
 };
 
 } // namespace server

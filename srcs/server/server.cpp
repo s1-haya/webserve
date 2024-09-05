@@ -121,7 +121,12 @@ void Server::HandleNewConnection(int server_fd) {
 	context_.AddClientInfo(new_client_info, server_fd);
 	event_monitor_.Add(client_fd, event::EVENT_READ);
 	message_manager_.AddNewMessage(client_fd);
-	utils::Debug("server", "add new client", client_fd);
+	utils::Debug(
+		"server",
+		"add new client / listen server: " + new_client_info.GetListenIp() + ":" +
+			utils::ToString(new_client_info.GetListenPort()),
+		client_fd
+	);
 }
 
 void Server::HandleExistingConnection(const event::Event &event) {

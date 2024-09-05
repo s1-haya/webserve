@@ -101,7 +101,7 @@ ClientInfo Connection::Accept(int server_fd) {
 	}
 
 	// create new client struct
-	ClientInfo client_info(client_fd);
+	ClientInfo client_info(client_fd, "0.0.0.0", 8080); // todo: tmp
 	utils::Debug("server", "new ClientInfo created. fd", client_fd);
 	return client_info;
 }
