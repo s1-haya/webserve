@@ -54,7 +54,6 @@ void DebugVirtualServerNames(
 	const VirtualServerStorage::VirtualServerAddrList &virtual_server_addr_list
 ) {
 	typedef VirtualServerStorage::VirtualServerAddrList::const_iterator ItVs;
-	std::cerr << "server_name: ";
 	for (ItVs it = virtual_server_addr_list.begin(); it != virtual_server_addr_list.end(); ++it) {
 		const VirtualServer *virtual_server = *it;
 		std::cerr << "[" << *virtual_server->GetServerNameList().begin() << "]"; // todo: tmp
@@ -63,10 +62,10 @@ void DebugVirtualServerNames(
 }
 
 // todo: tmp for debug
-void DebugDto(const DtoClientInfos &client_infos, const DtoServerInfos &server_infos) {
+void DebugDto(const DtoClientInfos &client_infos, const VirtualServerAddrList &virtual_servers) {
 	utils::Debug("server", "ClientInfo - fd", client_infos.fd);
-	utils::Debug("server", "received ServerInfo, fd", server_infos.fd);
-	DebugVirtualServerNames(server_infos.virtual_server_addr_list);
+	utils::Debug("server", "received server_names");
+	DebugVirtualServerNames(virtual_servers);
 }
 
 } // namespace
@@ -147,13 +146,10 @@ DtoClientInfos Server::GetClientInfos(int client_fd) const {
 	return client_infos;
 }
 
-DtoServerInfos Server::GetServerInfos(int client_fd) const {
+VirtualServerAddrList Server::GetVirtualServerList(int client_fd) const {
 	const ServerContext &server_context = context_.GetServerContext(client_fd);
 
-	DtoServerInfos server_infos;
-	server_infos.fd                       = server_context.fd;
-	server_infos.virtual_server_addr_list = server_context.virtual_server_addr_list;
-	return server_infos;
+	return server_context.virtual_server_addr_list;
 }
 
 void Server::ReadRequest(int client_fd) {
@@ -174,11 +170,11 @@ void Server::RunHttp(const event::Event &event) {
 	const int client_fd = event.fd;
 
 	// Prepare to http.Run()
-	const DtoClientInfos &client_infos = GetClientInfos(client_fd);
-	const DtoServerInfos &server_infos = GetServerInfos(client_fd);
-	DebugDto(client_infos, server_infos);
+	const DtoClientInfos        &client_infos    = GetClientInfos(client_fd);
+	const VirtualServerAddrList &virtual_servers = GetVirtualServerList(client_fd);
+	DebugDto(client_infos, virtual_servers);
 
-	http::HttpResult http_result = mock_http_.Run(client_infos, server_infos);
+	http::HttpResult http_result = mock_http_.Run(client_infos, virtual_servers);
 	// Set the unused request_buf in Http.
 	message_manager_.SetNewRequestBuf(client_fd, http_result.request_buf);
 	// Check if it's ready to start write/send.
