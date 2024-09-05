@@ -6,12 +6,7 @@
 
 namespace http {
 
-Stat::Stat(const std::string &path) {
-	if (stat(path.c_str(), &stat_buf_) == -1) {
-		std::string error_message = "Error: stat on path '" + path + "': " + std::strerror(errno);
-		throw utils::SystemException(error_message, errno);
-	}
-}
+Stat::Stat(const struct stat &stat_buf) : stat_buf_(stat_buf) {}
 
 Stat::~Stat() {}
 
