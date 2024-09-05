@@ -33,12 +33,7 @@ class Http {
 	Http();
 	~Http();
 	HttpResult Run(const MockDtoClientInfos &client_info, const MockDtoServerInfos &server_info);
-	utils::Result<void> ParseHttpRequestFormat(int client_fd, const std::string &read_buf);
-	std::string         CreateHttpResponse(
-				const MockDtoClientInfos &client_info, const MockDtoServerInfos &server_info
-			);
-	// todo: 408のtimeoutのレスポンス
-
+	//  HttpResult GetErrorResponse(const ClientInfos &client_info, ErrState state);
 	// For test
 	HttpRequestParsedData GetClientData(int client_fd);
 
@@ -46,6 +41,10 @@ class Http {
 	Http(const Http &other);
 	Http       &operator=(const Http &other);
 	HttpStorage storage_;
+	utils::Result<void> ParseHttpRequestFormat(int client_fd, const std::string &read_buf);
+	std::string         CreateHttpResponse(
+				const MockDtoClientInfos &client_info, const MockDtoServerInfos &server_info
+			);
 	bool        IsHttpRequestFormatComplete(int client_fd);
 	// HttpResult CreateBadRequestResponse(int client_fd);
 };
