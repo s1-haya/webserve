@@ -16,21 +16,20 @@ HttpResult
 TmpHttp::Run(const MockDtoClientInfos &client_info, const MockDtoServerInfos &server_info) {
 	HttpResult          result;
 	utils::Result<void> parsed_result =
-		TmpParseHttpRequestFormat(client_info.fd, client_info.request_buf);
+		ParseHttpRequestFormat(client_info.fd, client_info.request_buf);
 	if (!parsed_result.IsOk()) {
 		// todo: request_buf, is_connection_keep
-		result.response             = CreateHttpResponse(client_info.fd);
-		result.is_response_complete = true;
 		return result;
 	}
 	if (IsHttpRequestFormatComplete(client_info.fd)) {
+		// todo: request_buf, is_connection_keep
 		result.response             = CreateHttpResponse(client_info, server_info);
 		result.is_response_complete = true;
 	}
 	return result;
 }
 
-utils::Result<void> TmpHttp::TmpParseHttpRequestFormat(int client_fd, const std::string &read_buf) {
+utils::Result<void> TmpHttp::ParseHttpRequestFormat(int client_fd, const std::string &read_buf) {
 	utils::Result<void>   result;
 	HttpRequestParsedData save_data = storage_.GetClientSaveData(client_fd);
 	save_data.current_buf += read_buf;
@@ -88,7 +87,7 @@ std::string TmpHttp::CreateHttpResponse(
 ) {
 	HttpRequestParsedData data = storage_.GetClientSaveData(client_info.fd);
 	storage_.DeleteClientSaveData(client_info.fd);
-	return HttpResponse::TmpRun(client_info, server_info, data.request_result);
+	return HttpResponse::Run(client_info, server_info, data.request_result);
 }
 
 // todo: HTTPRequestの書式が完全かどうか(どのように取得するかは要検討)

@@ -34,8 +34,7 @@ class Stat;
 class HttpResponse {
   public:
 	typedef std::map<EStatusCode, std::string> ReasonPhrase;
-	static std::string                         Run(const HttpRequestResult &request_info);
-	static std::string                         TmpRun(
+	static std::string                         Run(
 								const MockDtoClientInfos &client_info,
 								const MockDtoServerInfos &server_info,
 								const HttpRequestResult  &request_info
@@ -61,13 +60,10 @@ class HttpResponse {
 	~HttpResponse();
 
 	static std::string        CreateHttpResponse(const HttpResponseFormat &response);
-	static HttpResponseFormat CreateHttpResponseFormat(const HttpRequestResult &request_info);
-	static HttpResponseFormat TmpCreateHttpResponseFormat(
+	static HttpResponseFormat CreateHttpResponseFormat(
 		const MockDtoClientInfos &client_info,
 		const MockDtoServerInfos &server_info,
 		const HttpRequestResult  &request_info
-	);
-	static HttpResponseFormat CreateSuccessHttpResponseFormat(const HttpRequestResult &request_info
 	);
 	static HttpResponseFormat CreateDefaultHttpResponseFormat(const StatusCode &status_code);
 	static Stat               TryStat(const std::string &path, std::string &response_body_message);

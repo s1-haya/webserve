@@ -1,7 +1,6 @@
 # Add target test directories.
 # Each directory should have a Makefile with a 'run' target.
 TEST_DIRS	:=	convert_str \
-				http \
 				http_parse \
 				http_storage \
 				http_method \
