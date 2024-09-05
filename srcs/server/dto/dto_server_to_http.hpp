@@ -9,7 +9,6 @@ namespace server {
 struct DtoClientInfos {
 	int         fd;
 	std::string request_buf;
-	std::string ip;
 };
 
 struct DtoServerInfos {

@@ -64,7 +64,7 @@ void DebugVirtualServerNames(
 
 // todo: tmp for debug
 void DebugDto(const DtoClientInfos &client_infos, const DtoServerInfos &server_infos) {
-	utils::Debug("server", "ClientInfo - IP: " + client_infos.ip + ", fd", client_infos.fd);
+	utils::Debug("server", "ClientInfo - fd", client_infos.fd);
 	utils::Debug("server", "received ServerInfo, fd", server_infos.fd);
 	DebugVirtualServerNames(server_infos.virtual_server_addr_list);
 }
@@ -139,7 +139,6 @@ DtoClientInfos Server::GetClientInfos(int client_fd) const {
 	DtoClientInfos client_infos;
 	client_infos.fd          = client_fd;
 	client_infos.request_buf = message_manager_.GetRequestBuf(client_fd);
-	client_infos.ip          = context_.GetClientIp(client_fd);
 	return client_infos;
 }
 
