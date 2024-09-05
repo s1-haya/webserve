@@ -47,7 +47,9 @@ void TryGetHandler(const std::string &path, std::string &response_body_message) 
 	}
 }
 
-void TryPostHandler(const std::string &path, std::string& request_body_message, std::string &response_body_message) {
+void TryPostHandler(
+	const std::string &path, std::string &request_body_message, std::string &response_body_message
+) {
 	try {
 		http::HttpResponse::PostHandler(path, request_body_message, response_body_message);
 	} catch (const http::HttpException &e) {
@@ -82,8 +84,9 @@ void TryDeleteHandler(const std::string &path, std::string &response_body_messag
 // 			rTryDeleteHandler(path, response_body_message);
 // 		} else {
 // 			StatusCode status_code      = StatusCode(NOT_IMPLEMENTED);
-// 			response_body_message            = HttpResponse::CreateDefaultBodyMessageFormat(status_code);
-// 			throw HttpException("Error: Not Implemented", status_code);
+// 			response_body_message            =
+// HttpResponse::CreateDefaultBodyMessageFormat(status_code); 			throw HttpException("Error: Not
+// Implemented", status_code);
 // 		}
 // 	}
 // 	catch (const HttpException &e) {
@@ -129,17 +132,13 @@ int main(void) {
 	// 新しいファイルをアップロードする場合
 	std::string post_test1_request_body_message = "OK";
 	std::string post_test1_response_body_message;
-	TryPostHandler(
-		"ok.txt", post_test1_request_body_message, post_test1_response_body_message
-	);
+	TryPostHandler("ok.txt", post_test1_request_body_message, post_test1_response_body_message);
 	ret_code |= HandleResult(post_test1_response_body_message, expected_created);
 
 	// すでにアップロードされたファイルをアップロードする場合
 	std::string post_test2_request_body_message = "OK";
 	std::string post_test2_response_body_message;
-	TryPostHandler(
-		"ok.txt", post_test2_request_body_message, post_test2_response_body_message
-	);
+	TryPostHandler("ok.txt", post_test2_request_body_message, post_test2_response_body_message);
 	ret_code |= HandleResult(post_test2_response_body_message, expected_no_content);
 
 	// ディレクトリの場合
@@ -178,9 +177,7 @@ int main(void) {
 
 	// 書き込み権限がないディレクトリの中にあるファイル場合
 	std::string delete_test6_response_body_message;
-	TryDeleteHandler(
-		"test/no_authority_directory/test.txt", delete_test6_response_body_message
-	);
+	TryDeleteHandler("test/no_authority_directory/test.txt", delete_test6_response_body_message);
 	ret_code |= HandleResult(delete_test6_response_body_message, expected_forbidden);
 	return ret_code;
 }

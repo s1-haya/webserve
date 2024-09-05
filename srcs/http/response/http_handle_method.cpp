@@ -12,7 +12,7 @@
 
 namespace {
 
-bool IsExistPath(const std::string& path) {
+bool IsExistPath(const std::string &path) {
 	return access(path.c_str(), F_OK) == 0;
 }
 
