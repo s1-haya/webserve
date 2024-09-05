@@ -14,8 +14,7 @@ std::string HttpResponse::Run(
 	const MockDtoServerInfos &server_info,
 	const HttpRequestResult  &request_info
 ) {
-	HttpResponseFormat response =
-		CreateHttpResponseFormat(client_info, server_info, request_info);
+	HttpResponseFormat response = CreateHttpResponseFormat(client_info, server_info, request_info);
 	return CreateHttpResponse(response);
 }
 

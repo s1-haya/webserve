@@ -34,11 +34,10 @@ class Stat;
 class HttpResponse {
   public:
 	typedef std::map<EStatusCode, std::string> ReasonPhrase;
-	static std::string                         Run(
-								const MockDtoClientInfos &client_info,
-								const MockDtoServerInfos &server_info,
-								const HttpRequestResult  &request_info
-							);
+	static std::string
+					  Run(const MockDtoClientInfos &client_info,
+						  const MockDtoServerInfos &server_info,
+						  const HttpRequestResult  &request_info);
 	static StatusCode GetHandler(const std::string &path, std::string &body_message);
 	static StatusCode PostHandler(
 		const std::string &path,

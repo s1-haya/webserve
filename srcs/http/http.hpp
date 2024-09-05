@@ -39,13 +39,13 @@ class Http {
 
   private:
 	Http(const Http &other);
-	Http       &operator=(const Http &other);
-	HttpStorage storage_;
+	Http               &operator=(const Http &other);
+	HttpStorage         storage_;
 	utils::Result<void> ParseHttpRequestFormat(int client_fd, const std::string &read_buf);
 	std::string         CreateHttpResponse(
 				const MockDtoClientInfos &client_info, const MockDtoServerInfos &server_info
 			);
-	bool        IsHttpRequestFormatComplete(int client_fd);
+	bool IsHttpRequestFormatComplete(int client_fd);
 	// HttpResult CreateBadRequestResponse(int client_fd);
 };
 

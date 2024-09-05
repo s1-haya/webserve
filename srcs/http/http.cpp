@@ -1,9 +1,9 @@
-#include "tmp_http.hpp"
 #include "client_infos.hpp"
 #include "http_message.hpp"
 #include "http_result.hpp"
 #include "http_storage.hpp"
 #include "server_infos.hpp"
+#include "tmp_http.hpp"
 #include <iostream>
 
 namespace http {
@@ -12,8 +12,7 @@ Http::Http() {}
 
 Http::~Http() {}
 
-HttpResult
-Http::Run(const MockDtoClientInfos &client_info, const MockDtoServerInfos &server_info) {
+HttpResult Http::Run(const MockDtoClientInfos &client_info, const MockDtoServerInfos &server_info) {
 	HttpResult          result;
 	utils::Result<void> parsed_result =
 		ParseHttpRequestFormat(client_info.fd, client_info.request_buf);

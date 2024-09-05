@@ -4,12 +4,12 @@
 #include "http_serverinfo_check.hpp"
 #include "stat.hpp"
 #include "system_exception.hpp"
+#include <algorithm> // std::find
 #include <cstring>
 #include <fstream>
 #include <iostream>
 #include <sstream>
 #include <unistd.h> // access
-#include <algorithm> // std::find
 
 namespace {
 
