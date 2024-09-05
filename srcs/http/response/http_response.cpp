@@ -49,11 +49,9 @@ HttpResponseFormat HttpResponse::TmpCreateHttpResponseFormat(
 		// -> Internal　Server Errorを投げる可能性あり
 		// result = CgiToServerHandler();
 		// } else {
-		// 	StatusCode status_code = MethodHandler(server_info_result, re);
 		// }
 		//     return CreateSuccessResponseResult();
 		(void)client_info;
-		(void)request_info;
 		(void)server_info_result;
 		std::string response_body_message;
 		const StatusCode &status_code = MethodHandler(
@@ -74,7 +72,7 @@ HttpResponseFormat HttpResponse::TmpCreateHttpResponseFormat(
 		// 	response_message = ReadFile(server_info.error_page.GetValue().second);
 		// 	// check the path of error_page
 		// }
-		return CreateErrorHttpResponseFormat(e.GetStatusCode());
+		return CreateDefaultHttpResponseFormat(e.GetStatusCode());
 	}
 }
 
@@ -82,7 +80,7 @@ HttpResponseFormat HttpResponse::TmpCreateHttpResponseFormat(
 HttpResponseFormat HttpResponse::CreateHttpResponseFormat(const HttpRequestResult &request_info) {
 	HttpResponseFormat response;
 	if (request_info.status_code.GetEStatusCode() != http::OK) {
-		response = CreateErrorHttpResponseFormat(request_info.status_code);
+		response = CreateDefaultHttpResponseFormat(request_info.status_code);
 	} else {
 		response = CreateSuccessHttpResponseFormat(request_info);
 	}
@@ -115,7 +113,7 @@ std::string HttpResponse::CreateDefaultBodyMessageFormat(const StatusCode &statu
 }
 
 // mock
-HttpResponseFormat HttpResponse::CreateErrorHttpResponseFormat(const StatusCode &status_code) {
+HttpResponseFormat HttpResponse::CreateDefaultHttpResponseFormat(const StatusCode &status_code) {
 	HttpResponseFormat response;
 	response.status_line.version           = HTTP_VERSION;
 	response.status_line.status_code       = status_code.GetStatusCode();

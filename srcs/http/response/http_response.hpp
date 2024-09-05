@@ -25,7 +25,7 @@ class Stat;
 //   static HttpResponseFormat CreateHttpResponseFormat(const HttpRequestResult &request_info);
 //   static HttpResponseFormat CreateSuccessHttpResponseFormat(const HttpRequestResult
 //   &request_info);
-//   static HttpResponseFormat CreateErrorHttpResponseFormat(const HttpRequestResult
+//   static HttpResponseFormat CreateDefaultHttpResponseFormat(const HttpRequestResult
 //   &request_info);
 //    GetTimeoutRequestBodyMessage();
 //    GetInternalServerErrorBodyMessage();
@@ -56,29 +56,31 @@ class HttpResponse {
     );
 	static std::string CreateDefaultBodyMessageFormat(const StatusCode &status_code);
 
-  private:
-	HttpResponse();
-	~HttpResponse();
+	  private:
+		HttpResponse();
+		~HttpResponse();
 
-	static std::string        CreateHttpResponse(const HttpResponseFormat &response);
-	static HttpResponseFormat CreateHttpResponseFormat(const HttpRequestResult &request_info);
-	static HttpResponseFormat TmpCreateHttpResponseFormat(
-		const MockDtoClientInfos &client_info,
-		const MockDtoServerInfos &server_info,
-		const HttpRequestResult  &request_info
-	);
-	static HttpResponseFormat CreateSuccessHttpResponseFormat(const HttpRequestResult &request_info
-	);
-	static HttpResponseFormat CreateErrorHttpResponseFormat(const StatusCode &status_code);
-	static Stat               TryStat(const std::string &path, std::string &response_body_message);
-	static void
-	SystemExceptionHandler(const utils::SystemException &e, std::string &response_body_message);
-	static StatusCode FileCreationHandler(
-		const std::string &path,
-		const std::string &request_body_message,
-		std::string       &response_body_message
-	);
-};
+		static std::string        CreateHttpResponse(const HttpResponseFormat &response);
+		static HttpResponseFormat CreateHttpResponseFormat(const HttpRequestResult &request_info);
+		static HttpResponseFormat TmpCreateHttpResponseFormat(
+			const MockDtoClientInfos &client_info,
+			const MockDtoServerInfos &server_info,
+			const HttpRequestResult  &request_info
+		);
+		static HttpResponseFormat CreateSuccessHttpResponseFormat(
+			const HttpRequestResult &request_info
+		);
+		static HttpResponseFormat CreateDefaultHttpResponseFormat(const StatusCode &status_code);
+		static Stat TryStat(const std::string &path, std::string &response_body_message);
+		static void SystemExceptionHandler(
+			const utils::SystemException &e, std::string &response_body_message
+		);
+		static StatusCode FileCreationHandler(
+			const std::string &path,
+			const std::string &request_body_message,
+			std::string       &response_body_message
+		);
+	};
 
 } // namespace http
 
