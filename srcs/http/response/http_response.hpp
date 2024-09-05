@@ -47,8 +47,13 @@ class HttpResponse {
 		std::string       &response_body_message
 	);
 	static StatusCode DeleteHandler(const std::string &path, std::string &response_body_message);
-	static StatusCode
-	MethodHandler(const CheckServerInfoResult &server_info, const std::string &method);
+	static StatusCode        MethodHandler(
+		const std::string            &path,
+		const std::string            &method,
+		const std::list<std::string> &allow_method,
+		const std::string            &request_body_message,
+		std::string                  &response_body_message
+    );
 	static std::string CreateDefaultBodyMessageFormat(const StatusCode &status_code);
 
   private:

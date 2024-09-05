@@ -31,6 +31,7 @@ HttpResponseFormat HttpResponse::TmpCreateHttpResponseFormat(
 	const MockDtoServerInfos &server_info,
 	const HttpRequestResult  &request_info
 ) {
+	// todo: InitHeaderFields(最終的にはtryの外側でinitする/try, catch両方header_fieldsを使用するため)
 	try {
 		HttpResponseFormat           result;
 		const CheckServerInfoResult &server_info_result =
@@ -54,6 +55,14 @@ HttpResponseFormat HttpResponse::TmpCreateHttpResponseFormat(
 		(void)client_info;
 		(void)request_info;
 		(void)server_info_result;
+		std::string response_body_message;
+		const StatusCode &status_code = MethodHandler(
+			server_info_result.path,
+			request_info.request.request_line.method,
+			server_info_result.allowed_methods,
+			request_info.request.body_message,
+			response_body_message
+		);
 		return result;
 	} catch (const HttpException &e) {
 		// ステータスコードが300番台以上の場合

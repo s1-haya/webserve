@@ -43,22 +43,19 @@ std::string ReadFile(const std::string &file_path) {
 namespace http {
 
 StatusCode
-HttpResponse::MethodHandler(const CheckServerInfoResult &server_info, const std::string &method) {
+HttpResponse::MethodHandler(const std::string& path, const std::string& method, const std::list<std::string>& allow_method, const std::string& request_body_message, std::string& response_body_message) {
 	StatusCode  status_code(OK);
-	std::string request_message;
-	std::string response_message;
-	(void)request_message;
-	(void)response_message;
-	// 引数: path, allow_method, method, request_message, response_message
+	(void) allow_method;
+	// 引数: path, allow_method, method, request_body_message, response_body_message
 	if (method == GET) {
-		status_code = GetHandler(server_info.path, response_message);
+		status_code = GetHandler(path, response_body_message);
 	} else if (method == POST) {
-		status_code = PostHandler(server_info.path, request_message, response_message);
+		status_code = PostHandler(path, request_body_message, response_body_message);
 	} else if (method == DELETE) {
-		status_code = DeleteHandler(server_info.path, response_message);
+		status_code = DeleteHandler(path, response_body_message);
 	} else {
 		status_code      = StatusCode(NOT_IMPLEMENTED);
-		response_message = CreateDefaultBodyMessageFormat(status_code);
+		response_body_message = CreateDefaultBodyMessageFormat(status_code);
 		throw HttpException("Error: Not Implemented", status_code);
 	}
 	return status_code;
