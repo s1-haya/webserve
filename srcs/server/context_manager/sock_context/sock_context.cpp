@@ -39,6 +39,10 @@ void SockContext::AddServerInfo(int server_fd, const ServerInfo &server_info) {
 	}
 }
 
+bool SockContext::IsServerInfoExist(int server_fd) const {
+	return server_context_.count(server_fd) != 0;
+}
+
 void SockContext::AddClientInfo(int client_fd, const ClientInfo &client_info, int server_fd) {
 	// add client_info to client_context
 	typedef std::pair<ClientInfoMap::const_iterator, bool> ResultInsertToClientContext;
@@ -60,6 +64,22 @@ void SockContext::AddClientInfo(int client_fd, const ClientInfo &client_info, in
 void SockContext::DeleteClientInfo(int client_fd) {
 	client_context_.erase(client_fd);
 	host_servers_.erase(client_fd);
+}
+
+SockContext::GetServerInfoResult
+SockContext::GetServerInfo(const std::string &host, unsigned int port) const {
+	GetServerInfoResult result;
+	result.Set(false);
+
+	typedef ServerInfoMap::const_iterator Itr;
+	for (Itr it = server_context_.begin(); it != server_context_.end(); ++it) {
+		const ServerInfo &server_info = it->second;
+		if (server_info.GetHost() == host && server_info.GetPort() == port) {
+			result.Set(true, server_info);
+			break;
+		}
+	}
+	return result;
 }
 
 const ClientInfo &SockContext::GetClientInfo(int client_fd) const {

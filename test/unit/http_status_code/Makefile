@@ -14,13 +14,14 @@ WS_UTILS_DIR	:=	$(WS_SRCS_DIR)/utils
 WS_HTTP_DIR				:=	$(WS_SRCS_DIR)/http
 
 SRCS			+=	$(WS_UTILS_DIR)/color.cpp \
-					$(WS_HTTP_DIR)/status_code.cpp \
+					$(WS_HTTP_DIR)/status_code.cpp
+
 # 3. Add unit test files
 SRCS	+=	test_http_status_code.cpp
 
 # 4. Add directory for INCLUDE
 SRCS_DIR	:=	$(WS_UTILS_DIR) \
-				$(WS_HTTP_DIR) \
+				$(WS_HTTP_DIR)
 
 #--------------------------------------------
 OBJ_DIR		:=	objs

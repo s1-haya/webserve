@@ -3,10 +3,12 @@
 #include "dto_server_to_http.hpp"
 #include "event.hpp"
 #include "read.hpp"
+#include "send.hpp"
 #include "server_info.hpp"
 #include "utils.hpp"
 #include "virtual_server.hpp"
 #include <errno.h>
+#include <fcntl.h>      // fcntl
 #include <sys/socket.h> // socket
 #include <unistd.h>     // close
 
@@ -33,43 +35,44 @@ VirtualServer::LocationList ConvertLocations(const config::context::LocationList
 	return location_list;
 }
 
-// todo: configからstd::list<unsigned int>で渡されるようになったら変更する
-VirtualServer::PortList ConvertPorts(const config::context::PortList &ports_str) {
-	VirtualServer::PortList port_list;
-
-	typedef config::context::PortList::const_iterator Itr;
-	for (Itr it = ports_str.begin(); it != ports_str.end(); ++it) {
-		const unsigned int port = static_cast<unsigned int>(*it);
-		port_list.push_back(port);
-	}
-	return port_list;
-}
-
 VirtualServer ConvertToVirtualServer(const config::context::ServerCon &config_server) {
 	const std::string          &server_name = *(config_server.server_names.begin()); // tmp
 	VirtualServer::LocationList locations   = ConvertLocations(config_server.location_con);
-	VirtualServer::PortList     ports       = ConvertPorts(config_server.port);
-	return VirtualServer(server_name, locations, ports);
-}
 
-// todo: tmp for debug
-void PrintLocations(const VirtualServer::LocationList &locations) {
-	typedef VirtualServer::LocationList::const_iterator Itr;
-	for (Itr it = locations.begin(); it != locations.end(); ++it) {
-		const server::Location &location = *it;
-		std::cerr << "- location: " << location.location << ", root: " << location.root
-				  << ", index: " << location.index << std::endl;
+	// todo: tmp
+	static int                  n = 0;
+	VirtualServer::HostPortList host_port_list;
+	if (n == 0) {
+		host_port_list.push_back(std::make_pair("0.0.0.0", 8080));
+		// host_port_list.push_back(std::make_pair("::1", 8080));
+	} else {
+		host_port_list.push_back(std::make_pair("0.0.0.0", 8080));
+		host_port_list.push_back(std::make_pair("0.0.0.0", 9999));
+		host_port_list.push_back(std::make_pair("0.0.0.0", 12345));
+		// host_port_list.push_back(std::make_pair("::1", 8080));
 	}
+	++n;
+
+	return VirtualServer(server_name, locations, host_port_list);
+}
+// todo: tmp for debug
+void DebugVirtualServerNames(
+	const VirtualServerStorage::VirtualServerAddrList &virtual_server_addr_list
+) {
+	typedef VirtualServerStorage::VirtualServerAddrList::const_iterator ItVs;
+	std::cerr << "server_name: ";
+	for (ItVs it = virtual_server_addr_list.begin(); it != virtual_server_addr_list.end(); ++it) {
+		const VirtualServer *virtual_server = *it;
+		std::cerr << "[" << virtual_server->GetServerName() << "]";
+	}
+	std::cerr << std::endl;
 }
 
 // todo: tmp for debug
 void DebugDto(const DtoClientInfos &client_infos, const DtoServerInfos &server_infos) {
 	utils::Debug("server", "ClientInfo - IP: " + client_infos.ip + ", fd", client_infos.fd);
 	utils::Debug("server", "received ServerInfo, fd", server_infos.fd);
-	std::cerr << "server_name: " << server_infos.server_name << ", port: " << server_infos.port
-			  << std::endl;
-	std::cerr << "locations: " << std::endl;
-	PrintLocations(server_infos.locations);
+	DebugVirtualServerNames(server_infos.virtual_server_addr_list);
 }
 
 } // namespace
@@ -118,6 +121,7 @@ void Server::HandleNewConnection(int server_fd) {
 	// A new socket that has established a connection with the peer socket.
 	const ClientInfo new_client_info = Connection::Accept(server_fd);
 	const int        client_fd       = new_client_info.GetFd();
+	SetNonBlockingMode(client_fd);
 
 	// add client_info, event, message
 	context_.AddClientInfo(new_client_info, server_fd);
@@ -149,10 +153,8 @@ DtoServerInfos Server::GetServerInfos(int client_fd) const {
 	const ServerContext &server_context = context_.GetServerContext(client_fd);
 
 	DtoServerInfos server_infos;
-	server_infos.fd          = server_context.fd;
-	server_infos.server_name = server_context.server_name;
-	server_infos.port        = server_context.port;
-	server_infos.locations   = server_context.locations;
+	server_infos.fd                       = server_context.fd;
+	server_infos.virtual_server_addr_list = server_context.virtual_server_addr_list;
 	return server_infos;
 }
 
@@ -198,32 +200,31 @@ void Server::RunHttp(const event::Event &event) {
 }
 
 void Server::SendResponse(int client_fd) {
-	if (!message_manager_.IsResponseExist(client_fd)) {
-		return;
-	}
 	message::Response              response         = message_manager_.PopHeadResponse(client_fd);
 	const message::ConnectionState connection_state = response.connection_state;
 	const std::string             &response_str     = response.response_str;
 
-	// todo: handle return size
-	send(client_fd, response_str.c_str(), response_str.size(), 0);
-	utils::Debug("server", "send response to client", client_fd);
-	// todo:
-	//   全てのresponse_strをsend()できなかった場合はsend_size分だけeraseして
-	//   Response dequeの先頭にAdd()し直して↓
-	//   message_manager_.AddPrimaryResponse(client_fd, response)
-	//   早期return
-
-	switch (connection_state) {
-	case message::KEEP:
-		KeepConnection(client_fd);
-		break;
-	case message::CLOSE:
+	const Send::SendResult send_result = Send::SendResponse(client_fd, response_str);
+	if (!send_result.IsOk()) {
+		// Even if sending fails, continue the server
+		// e.g., in case of a SIGPIPE(EPIPE) when the client disconnects
+		utils::Debug("server", "failed to send response to client", client_fd);
+		// todo: close()だけしない？
 		Disconnect(client_fd);
-		break;
-	default:
-		break;
+		return;
 	}
+	const std::string &new_response_str = send_result.GetValue();
+	if (!new_response_str.empty()) {
+		// If not everything was sent, re-add the remaining unsent part to the front
+		message_manager_.AddPrimaryResponse(client_fd, connection_state, new_response_str);
+		return;
+	}
+	utils::Debug("server", "send response to client", client_fd);
+
+	if (!message_manager_.IsResponseExist(client_fd)) {
+		event_monitor_.Replace(client_fd, event::EVENT_READ);
+	}
+	UpdateConnectionAfterSendResponse(client_fd, connection_state);
 }
 
 void Server::HandleTimeoutMessages() {
@@ -235,7 +236,7 @@ void Server::HandleTimeoutMessages() {
 	typedef MessageManager::TimeoutFds::const_iterator Itr;
 	for (Itr it = timeout_fds.begin(); it != timeout_fds.end(); ++it) {
 		const int client_fd = *it;
-		if (message_manager_.GetIsCompleteRequest(client_fd)) {
+		if (message_manager_.IsCompleteRequest(client_fd)) {
 			Disconnect(client_fd);
 			continue;
 		}
@@ -251,7 +252,9 @@ void Server::KeepConnection(int client_fd) {
 	utils::Debug("server", "Connection: keep-alive client", client_fd);
 }
 
-// delete from buffer, client_info, event, message
+// todo: 強制Disconnectする場合はHttpにclient_fdを知らせてdata削除する必要あり
+//       internal server error用responseを貰って実際は送らないという手もあり
+// delete from context, event, message
 void Server::Disconnect(int client_fd) {
 	context_.DeleteClientInfo(client_fd);
 	event_monitor_.Delete(client_fd);
@@ -276,29 +279,66 @@ void Server::UpdateEventInResponseComplete(
 	}
 }
 
+void Server::UpdateConnectionAfterSendResponse(
+	int client_fd, const message::ConnectionState connection_state
+) {
+	switch (connection_state) {
+	case message::KEEP:
+		KeepConnection(client_fd);
+		break;
+	case message::CLOSE:
+		Disconnect(client_fd);
+		break;
+	default:
+		break;
+	}
+}
+
+ServerInfo Server::Listen(const std::string &host, unsigned int port) {
+	const ContextManager::GetServerInfoResult result = context_.GetServerInfo(host, port);
+	if (result.IsOk()) {
+		return result.GetValue();
+	}
+
+	// create ServerInfo & listen the first host:port
+	ServerInfo server_info(host, port);
+	const int  server_fd = connection_.Connect(server_info);
+	server_info.SetSockFd(server_fd);
+	SetNonBlockingMode(server_fd);
+
+	event_monitor_.Add(server_fd, event::EVENT_READ);
+	utils::Debug("server", "listen " + host + ":" + utils::ToString(port), server_fd);
+	return server_info;
+}
+
 void Server::Init() {
-	const VirtualServerStorage::VirtualServerList &all_virtual_server_list =
-		context_.GetVirtualServerList();
+	const VirtualServerStorage::VirtualServerList &all_virtual_server =
+		context_.GetAllVirtualServer();
 
 	typedef VirtualServerStorage::VirtualServerList::const_iterator ItVirtualServer;
-	for (ItVirtualServer it = all_virtual_server_list.begin(); it != all_virtual_server_list.end();
-		 ++it) {
-		const VirtualServer           &virtual_server = *it;
-		const VirtualServer::PortList &ports          = virtual_server.GetPorts();
+	for (ItVirtualServer it = all_virtual_server.begin(); it != all_virtual_server.end(); ++it) {
+		const VirtualServer               &virtual_server = *it;
+		const VirtualServer::HostPortList &host_port_list = virtual_server.GetHostPortList();
 
-		// 各virtual serverの全portをsocket通信
-		typedef VirtualServer::PortList::const_iterator ItPort;
-		for (ItPort it_port = ports.begin(); it_port != ports.end(); ++it_port) {
-			// create ServerInfo & listen
-			ServerInfo server_info(*it_port);
-			const int  server_fd = connection_.Connect(server_info);
-			server_info.SetSockFd(server_fd);
-
-			// add to context
-			context_.AddServerInfo(server_info, &virtual_server);
-			event_monitor_.Add(server_fd, event::EVENT_READ);
-			utils::Debug("server", "listen", server_fd);
+		// Socket communication for all host:port pairs of each virtual server.
+		typedef VirtualServer::HostPortList::const_iterator ItHostPort;
+		for (ItHostPort it_host_port = host_port_list.begin(); it_host_port != host_port_list.end();
+			 ++it_host_port) {
+			const ServerInfo listen_server_info = Listen(it_host_port->first, it_host_port->second);
+			// Whether new or existing server_info, add a link to the virtual_server.
+			context_.AddServerInfo(listen_server_info, &virtual_server);
 		}
+	}
+}
+
+void Server::SetNonBlockingMode(int sock_fd) {
+	int flags = fcntl(sock_fd, F_GETFL);
+	if (flags == SYSTEM_ERROR) {
+		throw std::runtime_error("fcntl F_GETFL failed");
+	}
+	flags |= O_NONBLOCK;
+	if (fcntl(sock_fd, F_SETFL, flags) == SYSTEM_ERROR) {
+		throw std::runtime_error("fcntl F_SETFL failed");
 	}
 }
 

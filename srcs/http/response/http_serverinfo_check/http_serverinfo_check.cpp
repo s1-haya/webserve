@@ -25,8 +25,8 @@ void HttpServerInfoCheck::CheckDTOServerInfo(
 	const HeaderFields       &header_fields
 ) {
 	if (header_fields.find(CONTENT_LENGTH) != header_fields.end()) {
-		utils::Result<unsigned int> content_length =
-			utils::ConvertStrToUint(header_fields.at(CONTENT_LENGTH));
+		utils::Result<std::size_t> content_length =
+			utils::ConvertStrToSize(header_fields.at(CONTENT_LENGTH));
 		if (content_length.IsOk() && content_length.GetValue() > server_info.client_max_body_size) {
 			throw HttpException("Error: payload too large.", StatusCode(PAYLOAD_TOO_LARGE));
 		}

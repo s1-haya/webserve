@@ -13,6 +13,8 @@ namespace {
 static const double REQUEST_TIMEOUT = 3.0;
 
 typedef server::MessageManager::TimeoutFds TimeoutFds;
+typedef std::deque<std::string>            ResponseDeque;
+typedef server::message::Response          Response;
 
 struct Result {
 	Result() : is_success(true) {}
@@ -92,6 +94,83 @@ RunIsSameTimeoutFds(server::MessageManager &manager, const TimeoutFds &expected_
 	return result;
 }
 
+std::ostream &operator<<(std::ostream &os, const ResponseDeque &dq) {
+	typedef ResponseDeque::const_iterator It;
+	for (It it = dq.begin(); it != dq.end(); ++it) {
+		os << "[" << *it << "]";
+	}
+	return os;
+}
+
+bool IsSameResponseDeque(
+	server::MessageManager &manager,
+	ResponseDeque          &result_responses,
+	ResponseDeque           expected_responses,
+	int                     client_fd
+) {
+	// 単純なgetterがないので比較対象のResponseDequeの中身を取り出す
+	while (manager.IsResponseExist(client_fd)) {
+		const Response &response = manager.PopHeadResponse(client_fd);
+		result_responses.push_back(response.response_str);
+	}
+	return result_responses == expected_responses;
+}
+
+Result RunIsSameResponseDeque(
+	server::MessageManager &manager, const ResponseDeque &expected_responses, int client_fd
+) {
+	Result             result;
+	std::ostringstream oss;
+
+	ResponseDeque result_responses;
+	if (!IsSameResponseDeque(manager, result_responses, expected_responses, client_fd)) {
+		result.is_success = false;
+		oss << "response_deque" << std::endl;
+		oss << "- result  : " << result_responses << std::endl;
+		oss << "- expected: " << expected_responses << std::endl;
+	}
+	result.error_log = oss.str();
+	return result;
+}
+
+Result RunIsSameIsCompleteRequest(
+	const server::MessageManager &manager, bool expected_is_complete_request, int client_fd
+) {
+	Result             result;
+	std::ostringstream oss;
+
+	const bool is_complete_request = manager.IsCompleteRequest(client_fd);
+	if (!IsSame(is_complete_request, expected_is_complete_request)) {
+		result.is_success = false;
+		oss << "is_complete_request" << std::endl;
+		oss << "- result  : " << std::boolalpha << is_complete_request << std::endl;
+		oss << "- expected: " << std::boolalpha << expected_is_complete_request << std::endl;
+	}
+	result.error_log = oss.str();
+	return result;
+}
+
+Result RunIsSameRequestBuf(
+	const server::MessageManager &manager, const std::string &expected_request_buf, int client_fd
+) {
+	Result             result;
+	std::ostringstream oss;
+
+	const std::string &request_buf = manager.GetRequestBuf(client_fd);
+	if (!IsSame(request_buf, expected_request_buf)) {
+		result.is_success = false;
+		oss << "request_buf" << std::endl;
+		oss << "- result  : " << request_buf << std::endl;
+		oss << "- expected: " << expected_request_buf << std::endl;
+	}
+	result.error_log = oss.str();
+	return result;
+}
+
+// -----------------------------------------------------------------------------
+// MessageManager classの主なテスト対象関数
+// - AddNewMessage()
+// - GetNewTimeoutFds()
 // -----------------------------------------------------------------------------
 // add fd            : 4 5         6
 // timeout(3s)       :       4 5         6
@@ -144,6 +223,9 @@ int RunTestGetTimeoutFds() {
 }
 
 // -----------------------------------------------------------------------------
+// MessageManager classの主なテスト対象関数
+// - UpdateTime()
+// -----------------------------------------------------------------------------
 // add fd            : 4 5       6
 // timeout(3s)       :       4 5       6
 // current time      : 0 1 2 3 4 5 6 7 8
@@ -156,7 +238,7 @@ int RunTestGetTimeoutFds() {
 // current time      : 0 1 2 3 4 5 6 7 8 9 10 11
 // GetNewTimeoutFds():                   *    *
 // -----------------------------------------------------------------------------
-int RunTestDeleteSentResponseAndResetTime() {
+int RunTestUpdateTime() {
 	int ret_code = EXIT_SUCCESS;
 
 	server::MessageManager manager;
@@ -208,6 +290,10 @@ int RunTestDeleteSentResponseAndResetTime() {
 	return ret_code;
 }
 
+// -----------------------------------------------------------------------------
+// MessageManager classの主なテスト対象関数
+// - DeleteMessage()
+// -----------------------------------------------------------------------------
 int RunTestDeleteMessage() {
 	int ret_code = EXIT_SUCCESS;
 
@@ -239,14 +325,143 @@ int RunTestDeleteMessage() {
 	return ret_code;
 }
 
+// -----------------------------------------------------------------------------
+// MessageManager classの主なテスト対象関数
+// - AddNormalResponse()
+// - AddPrimaryResponse()
+// - PopHeadResponse()
+// - IsResponseExist()
+// -----------------------------------------------------------------------------
+void PushBackResponse(
+	server::MessageManager &manager,
+	ResponseDeque          &expected_responses,
+	int                     client_fd,
+	const std::string      &response
+) {
+	manager.AddNormalResponse(client_fd, server::message::KEEP, response);
+	expected_responses.push_back(response);
+}
+
+void PushFrontResponse(
+	server::MessageManager &manager,
+	ResponseDeque          &expected_responses,
+	int                     client_fd,
+	const std::string      &response
+) {
+	manager.AddPrimaryResponse(client_fd, server::message::KEEP, response);
+	expected_responses.push_front(response);
+}
+
+int RunTestResponseDeque() {
+	int ret_code = EXIT_SUCCESS;
+
+	server::MessageManager manager;
+	ResponseDeque          expected_responses;
+
+	static const int client_fd = 4;
+	// add fd: 4
+	manager.AddNewMessage(client_fd);
+
+	// push_back response : {res1}
+	PushBackResponse(manager, expected_responses, client_fd, "res1");
+	// push_back response : {res1, res2}
+	PushBackResponse(manager, expected_responses, client_fd, "res2");
+	// push_front response: {res3, res1, res2}
+	PushFrontResponse(manager, expected_responses, client_fd, "res3");
+
+	ret_code |= Test(RunIsSameResponseDeque(manager, expected_responses, client_fd)); // test9
+
+	return ret_code;
+}
+
+// -----------------------------------------------------------------------------
+// MessageManager classの主なテスト対象関数
+// - SetIsCompleteRequest()
+// - IsCompleteRequest()
+// -----------------------------------------------------------------------------
+int RunTestIsCompleteRequest() {
+	int ret_code = EXIT_SUCCESS;
+
+	server::MessageManager manager;
+
+	static const int client_fd = 4;
+	// add fd: 4
+	manager.AddNewMessage(client_fd);
+
+	// is_complete_requestの初期値はtrue
+	ret_code |= Test(RunIsSameIsCompleteRequest(manager, true, client_fd)); // test10
+
+	// is_complete_requestをfalseに変更
+	manager.SetIsCompleteRequest(client_fd, false);
+	ret_code |= Test(RunIsSameIsCompleteRequest(manager, false, client_fd)); // test11
+
+	return ret_code;
+}
+
+// -----------------------------------------------------------------------------
+// MessageManager classの主なテスト対象関数
+// - AddRequestBuf()
+// - SetNewRequestBuf()
+// - GetRequestBuf()
+// -----------------------------------------------------------------------------
+void AddRequestBuf(
+	server::MessageManager &manager,
+	std::string            &expected_request_buf,
+	int                     client_fd,
+	const std::string      &request_buf
+) {
+	manager.AddRequestBuf(client_fd, request_buf);
+	expected_request_buf += request_buf;
+}
+
+void SetNewRequestBuf(
+	server::MessageManager &manager,
+	std::string            &expected_request_buf,
+	int                     client_fd,
+	const std::string      &request_buf
+) {
+	manager.SetNewRequestBuf(client_fd, request_buf);
+	expected_request_buf = request_buf;
+}
+
+int RunTestRequestBuf() {
+	int ret_code = EXIT_SUCCESS;
+
+	server::MessageManager manager;
+	std::string            expected_request_buf;
+
+	static const int client_fd = 4;
+	// add fd: 4
+	manager.AddNewMessage(client_fd);
+
+	// readしたbuffer追加
+	AddRequestBuf(manager, expected_request_buf, client_fd, "abc");
+	// readしたbuffer追加
+	AddRequestBuf(manager, expected_request_buf, client_fd, "defg");
+
+	// request_buf == "abcdefg"
+	ret_code |= Test(RunIsSameRequestBuf(manager, expected_request_buf, client_fd)); // test12
+
+	// 新規でrequest_bufをセット
+	SetNewRequestBuf(manager, expected_request_buf, client_fd, "hi");
+
+	// request_buf == "hi"
+	ret_code |= Test(RunIsSameRequestBuf(manager, expected_request_buf, client_fd)); // test13
+
+	return ret_code;
+}
+
 } // namespace
 
 int main() {
 	int ret_code = EXIT_SUCCESS;
 
 	ret_code |= RunTestGetTimeoutFds();
-	ret_code |= RunTestDeleteSentResponseAndResetTime();
+	ret_code |= RunTestUpdateTime();
 	ret_code |= RunTestDeleteMessage();
+	ret_code |= RunTestResponseDeque();
+	ret_code |= RunTestIsCompleteRequest();
+	ret_code |= RunTestRequestBuf();
 
 	return ret_code;
 }

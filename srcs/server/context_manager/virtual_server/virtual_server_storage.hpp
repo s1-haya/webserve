@@ -11,8 +11,11 @@ class VirtualServer;
 // fdとVirtualServerを紐づけて全VirtualServerを保持・取得する
 class VirtualServerStorage {
   public:
-	typedef std::list<VirtualServer>             VirtualServerList;
-	typedef std::map<int, const VirtualServer *> VirtualServerMapping;
+	typedef std::list<VirtualServer> VirtualServerList;
+
+	typedef std::list<const VirtualServer *>     VirtualServerAddrList;
+	typedef std::map<int, VirtualServerAddrList> VirtualServerAddrListMap;
+
 	VirtualServerStorage();
 	~VirtualServerStorage();
 	VirtualServerStorage(const VirtualServerStorage &other);
@@ -21,14 +24,14 @@ class VirtualServerStorage {
 	void AddVirtualServer(const VirtualServer &virtual_server);
 	void AddMapping(int server_fd, const VirtualServer *virtual_server);
 	// getter
-	const VirtualServer     &GetVirtualServer(int server_fd) const;
-	const VirtualServerList &GetAllVirtualServerList() const;
+	const VirtualServerAddrList &GetVirtualServerAddrList(int server_fd) const;
+	const VirtualServerList     &GetAllVirtualServerList() const;
 
   private:
 	// 全VirtualServerを保持
 	VirtualServerList virtual_servers_;
-	// VirtualServerと、VirtualServerが通信に使用している複数fdを紐づける
-	VirtualServerMapping mapping_fd_to_virtual_servers_;
+	// server_fd(host:port)が属するVirtualServerAddrのlistを保持
+	VirtualServerAddrListMap virtual_server_addr_list_map_;
 };
 
 } // namespace server
