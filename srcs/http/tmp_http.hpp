@@ -23,7 +23,7 @@ namespace http {
 // - InternalServer: システムコール等が失敗した場合
 
 // private
-// - HttpRequest
+// - HttpRequestFormat
 // - HttpResponse
 // }
 struct HttpResult;
@@ -32,11 +32,13 @@ class TmpHttp {
   public:
 	TmpHttp();
 	~TmpHttp();
-	HttpResult
-		 Run(const server::DtoClientInfos &client_info, const server::DtoServerInfos &server_info);
-	void ParseHttpRequestFormat(int client_fd, const std::string &read_buf);
+	HttpResult Run(const MockDtoClientInfos &client_info, const MockDtoServerInfos &server_info);
+	void       ParseHttpRequestFormat(int client_fd, const std::string &read_buf);
 	utils::Result<void> TmpParseHttpRequestFormat(int client_fd, const std::string &read_buf);
 	std::string         CreateHttpResponse(int client_fd);
+	std::string         CreateHttpResponse(
+				const MockDtoClientInfos &client_info, const MockDtoServerInfos &server_info
+			);
 	// todo: 408のtimeoutのレスポンス
 
 	// For test

@@ -21,13 +21,13 @@ struct RequestLine {
 
 typedef std::map<std::string, std::string> HeaderFields;
 
-struct HttpRequest {
+struct HttpRequestFormat {
 	RequestLine  request_line;
 	HeaderFields header_fields;
 	std::string  body_message;
 };
 
-enum StatusCode {
+enum EStatusCode {
 	OK,
 	BAD_REQUEST,
 	NOT_FOUND,
@@ -35,8 +35,8 @@ enum StatusCode {
 };
 
 struct HttpRequestResult {
-	StatusCode  status_code;
-	HttpRequest request;
+	EStatusCode       status_code;
+	HttpRequestFormat request;
 	HttpRequestResult() : status_code(OK) {}
 };
 
@@ -48,9 +48,9 @@ class HttpParse {
 	HttpParse();
 	~HttpParse();
 	static RequestLine
-	SetRequestLine(const std::vector<std::string> &request_line, StatusCode *status_code);
+	SetRequestLine(const std::vector<std::string> &request_line, EStatusCode *status_code);
 	static HeaderFields
-	SetHeaderFields(const std::vector<std::string> &header_fields_info, StatusCode *status_code);
+	SetHeaderFields(const std::vector<std::string> &header_fields_info, EStatusCode *status_code);
 
 	static std::string CheckMethod(const std::string &method);
 	static std::string CheckRequestTarget(const std::string &request_target);
@@ -59,11 +59,11 @@ class HttpParse {
 	static std::string CheckHeaderFieldValue(const std::string &header_field_value);
 	class HttpException {
 	  public:
-		explicit HttpException(StatusCode status_code);
-		StatusCode GetStatusCode() const;
+		explicit HttpException(EStatusCode status_code);
+		EStatusCode GetStatusCode() const;
 
 	  private:
-		StatusCode status_code_;
+		EStatusCode status_code_;
 	};
 };
 

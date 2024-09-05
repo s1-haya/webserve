@@ -2,6 +2,7 @@
 #define HTTP_PARSE_HPP_
 
 #include "http_exception.hpp"
+#include "http_format.hpp"
 #include <map>
 #include <stdexcept> //runtime_error
 #include <string>
@@ -9,29 +10,15 @@
 
 namespace http {
 
-struct RequestLine {
-	std::string method;
-	std::string request_target;
-	std::string version;
-};
-
-typedef std::map<std::string, std::string> HeaderFields;
-
-struct HttpRequest {
-	RequestLine  request_line;
-	HeaderFields header_fields;
-	std::string  body_message;
-};
-
 struct HttpRequestResult {
-	StatusCode  status_code;
-	HttpRequest request;
+	StatusCode        status_code;
+	HttpRequestFormat request;
 	HttpRequestResult() : status_code(OK) {}
 };
 
 struct IsHttpRequestFormat {
 	IsHttpRequestFormat()
-		: is_request_line(false), is_header_fields(false), is_body_message(false){};
+		: is_request_line(false), is_header_fields(false), is_body_message(false) {};
 	bool is_request_line;
 	bool is_header_fields;
 	bool is_body_message;

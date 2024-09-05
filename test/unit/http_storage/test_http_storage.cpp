@@ -36,18 +36,20 @@ int main(void) {
 
 	// クライアントのHttpRequestParsedDataを新規作成 -> OK
 	http::HttpRequestParsedData new_data = storage.GetClientSaveData(1);
-	ret_code |= HandleResult(new_data.request_result.status_code, http::OK);
+	ret_code |= HandleResult(new_data.request_result.status_code.GetEStatusCode(), http::OK);
 
 	// 登録したクライアントのHttpRequestParsedData取得 -> OK
 	http::HttpRequestParsedData save_data = storage.GetClientSaveData(1);
-	ret_code |= HandleResult(save_data.request_result.status_code, http::OK);
+	ret_code |= HandleResult(save_data.request_result.status_code.GetEStatusCode(), http::OK);
 
 	// ClientSaveDataを更新 -> OK
 	try {
-		save_data.request_result.status_code = http::BAD_REQUEST;
+		save_data.request_result.status_code = http::StatusCode(http::BAD_REQUEST);
 		storage.UpdateClientSaveData(1, save_data);
 		http::HttpRequestParsedData update_data = storage.GetClientSaveData(1);
-		ret_code |= HandleResult(update_data.request_result.status_code, http::BAD_REQUEST);
+		ret_code |= HandleResult(
+			update_data.request_result.status_code.GetEStatusCode(), http::BAD_REQUEST
+		);
 	} catch (const std::logic_error &e) {
 		ret_code |= ResultNg();
 		std::cerr << e.what() << std::endl;
@@ -67,7 +69,7 @@ int main(void) {
 		storage.DeleteClientSaveData(1);
 		new_data = storage.GetClientSaveData(1);
 		// 更新したSaveData情報を削除されているかどうかを確認するため、BAD_REQUESTではなくOK
-		ret_code |= HandleResult(new_data.request_result.status_code, http::OK);
+		ret_code |= HandleResult(new_data.request_result.status_code.GetEStatusCode(), http::OK);
 	} catch (const std::logic_error &e) {
 		ret_code |= ResultNg();
 		std::cerr << e.what() << std::endl;

@@ -491,6 +491,8 @@ int ListenDirectiveErrorTests() {
 	ret_code |= RunErrorTest("listen/listen_multi_params.conf", "listen/listen_multi_params.conf");
 	ret_code |=
 		RunErrorTest("listen/listen_duplicated_port.conf", "listen/listen_duplicated_port.conf");
+	ret_code |=
+		RunErrorTest("listen/listen_invalid_format.conf", "listen/listen_invalid_format.conf");
 
 	return ret_code;
 }

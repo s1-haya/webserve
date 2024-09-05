@@ -5,6 +5,7 @@ TEST_DIRS	:=	convert_str \
 				http_parse \
 				http_storage \
 				http_method \
+				http_status_code \
 				http_serverinfo_check \
 				sock_context \
 				split_str \
@@ -14,7 +15,7 @@ TEST_DIRS	:=	convert_str \
 				config_parse/parser \
 				config_parse \
 				custom_const_iterator \
-				stat \
+				stat
 
 .PHONY	: run
 run:
@@ -24,6 +25,16 @@ run:
 		echo "┃ $$dir"; \
 		echo "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"; \
 		(MAKEFLAGS="-s" make -C $$dir run); \
+		dir_status=$$?; \
+		status=$$((status | dir_status)); \
+	done; \
+	exit $$status;
+
+.PHONY	: fclean
+fclean:
+	@status=0; \
+	for dir in $(TEST_DIRS); do \
+		(MAKEFLAGS="-s" make -C $$dir fclean); \
 		dir_status=$$?; \
 		status=$$((status | dir_status)); \
 	done; \
