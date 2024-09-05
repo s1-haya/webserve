@@ -1,5 +1,6 @@
 #include "http_response.hpp"
 #include "client_infos.hpp"
+#include "http_exception.hpp"
 #include "http_message.hpp"
 #include "http_parse.hpp"
 #include "server_infos.hpp"
@@ -47,7 +48,7 @@ HttpResponseFormat HttpResponse::TmpCreateHttpResponseResult(
 		// -> Internal　Server Errorを投げる可能性あり
 		// result = CgiToServerHandler();
 		// } else {
-		// 	result = MethodHandler();
+		// 	StatusCode status_code = MethodHandler(server_info_result, re);
 		// }
 		//     return CreateSuccessResponseResult();
 		(void)client_info;
@@ -55,7 +56,15 @@ HttpResponseFormat HttpResponse::TmpCreateHttpResponseResult(
 		(void)server_info_result;
 		return result;
 	} catch (const HttpException &e) {
+		// ステータスコードが300番台以上の場合
 		// feature: header_fieldとerror_pageとの関連性がわかり次第変更あり
+		// 返り値: response 引数:error_page, status_code
+		// todo: error_page status_code classに対応
+		// if (server_info.error_page.IsOk() &&
+		// 	status_code.GetEStatusCode() == server_info.error_page.GetValue().first) {
+		// 	response_message = ReadFile(server_info.error_page.GetValue().second);
+		// 	// check the path of error_page
+		// }
 		return CreateErrorHttpResponseResult(e.GetStatusCode());
 	}
 }
