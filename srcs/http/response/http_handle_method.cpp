@@ -8,8 +8,13 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <unistd.h> // access
 
 namespace {
+
+bool IsExistPath(const std::string& path) {
+	return access(path.c_str(), F_OK) == 0;
+}
 
 std::string FileToString(const std::ifstream &file) {
 	std::stringstream ss;
@@ -94,9 +99,9 @@ StatusCode HttpResponse::PostHandler(
 	const std::string &request_body_message,
 	std::string       &response_body_message
 ) {
-	// todo: postの場合はpathが存在していた場合はTryStatを行う
-	// if (!IsExistPath(path))
-	// return FileCreationHandler(path, request_body_message, response_body_message);
+	if (!IsExistPath(path)) {
+		return FileCreationHandler(path, request_body_message, response_body_message);
+	}
 	const Stat &info = TryStat(path, response_body_message);
 	StatusCode  status_code(NO_CONTENT);
 	if (info.IsDirectory()) {
