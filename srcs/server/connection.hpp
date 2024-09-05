@@ -13,9 +13,11 @@ class ClientInfo;
 
 class Connection {
   public:
-	typedef struct addrinfo    AddrInfo;
-	typedef std::set<int>      FdSet;
-	typedef utils::Result<int> BindResult;
+	typedef struct addrinfo                      AddrInfo;
+	typedef std::set<int>                        FdSet;
+	typedef utils::Result<int>                   BindResult;
+	typedef std::pair<std::string, unsigned int> IpPortPair;
+
 	Connection();
 	~Connection();
 	// function
@@ -28,8 +30,9 @@ class Connection {
 	Connection(const Connection &other);
 	Connection &operator=(const Connection &other);
 	// functions
-	AddrInfo  *GetAddrInfoList(const ServerInfo &server_info);
-	BindResult TryBind(AddrInfo *addrinfo) const;
+	AddrInfo         *GetAddrInfoList(const ServerInfo &server_info);
+	BindResult        TryBind(AddrInfo *addrinfo) const;
+	static IpPortPair GetListenIpPort(int client_fd);
 	// const
 	static const int SYSTEM_ERROR = -1;
 	// variable

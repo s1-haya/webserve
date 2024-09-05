@@ -23,6 +23,41 @@ void InitHints(Connection::AddrInfo *hints) {
 	hints->ai_flags    = AI_PASSIVE | AI_NUMERICSERV;
 }
 
+// 32bit(4bytes) -> xxx:xxx:xxx:xxxx
+// struct in_addr addr = {0xc0, 0xa8, 0x01, 0x01}
+// -> 192.168.1.1
+std::string ConvertToIpv4Str(const struct in_addr &addr) {
+	const uint32_t ip_addr = ntohl(addr.s_addr);
+
+	std::ostringstream oss;
+	for (int i = 24; i >= 0; i -= 8) {
+		oss << ((ip_addr >> i) & 0xff);
+		if (i != 0) {
+			oss << '.';
+		}
+	}
+	return oss.str();
+}
+
+// 128bit(16bytes) -> xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx
+// struct in6_addr addr = {0x20, 0x01, 0x0d, 0xb8, 0x85, 0xa3, 0x00, 0x00,
+//                         0x00, 0x00, 0x8a, 0x2e, 0x03, 0x70, 0x73, 0x34}
+// -> 2001:db8:85a3:0:0:8a2e:370:7334
+std::string ConvertToIpv6Str(const struct in6_addr &addr) {
+	const uint8_t *bytes = addr.s6_addr;
+
+	std::ostringstream oss;
+	oss << std::hex;
+	for (unsigned int i = 0; i < 16; i += 2) {
+		if (i != 0) {
+			oss << ':';
+		}
+		oss << ((bytes[i] << 8) | bytes[i + 1]);
+	}
+	oss << std::dec;
+	return oss.str();
+}
+
 } // namespace
 
 // result: dynamic allocated by getaddrinfo()
@@ -91,17 +126,43 @@ int Connection::Connect(ServerInfo &server_info) {
 	return server_fd;
 }
 
+Connection::IpPortPair Connection::GetListenIpPort(int client_fd) {
+	struct sockaddr_storage listen_sock_addr     = {};
+	socklen_t               listen_sock_addr_len = sizeof(listen_sock_addr);
+	if (getsockname(client_fd, (struct sockaddr *)&listen_sock_addr, &listen_sock_addr_len) ==
+		SYSTEM_ERROR) {
+		throw std::runtime_error("getsockname failed");
+	}
+
+	std::string  listen_ip;
+	unsigned int listen_port = 0;
+	if (listen_sock_addr.ss_family == AF_INET) {
+		struct sockaddr_in *sa_in = (struct sockaddr_in *)&listen_sock_addr;
+		listen_ip                 = ConvertToIpv4Str(sa_in->sin_addr);
+		listen_port               = ntohs(sa_in->sin_port);
+	} else if (listen_sock_addr.ss_family == AF_INET6) {
+		struct sockaddr_in6 *sa_in6 = (struct sockaddr_in6 *)&listen_sock_addr;
+		listen_ip                   = ConvertToIpv6Str(sa_in6->sin6_addr);
+		listen_port                 = ntohs(sa_in6->sin6_port);
+	}
+	return std::make_pair(listen_ip, listen_port);
+}
+
 // todo: return ClientInfo *?
 ClientInfo Connection::Accept(int server_fd) {
-	struct sockaddr_storage client_sock_addr;
-	socklen_t               addrlen = sizeof(client_sock_addr);
+	struct sockaddr_storage client_sock_addr = {};
+	socklen_t               addrlen          = sizeof(client_sock_addr);
 	const int client_fd = accept(server_fd, (struct sockaddr *)&client_sock_addr, &addrlen);
 	if (client_fd == SYSTEM_ERROR) {
 		throw std::runtime_error("accept failed");
 	}
 
+	const IpPortPair   listen_ip_port = GetListenIpPort(client_fd);
+	const std::string &listen_ip      = listen_ip_port.first;
+	const unsigned int listen_port    = listen_ip_port.second;
+
 	// create new client struct
-	ClientInfo client_info(client_fd, "0.0.0.0", 8080); // todo: tmp
+	ClientInfo client_info(client_fd, listen_ip, listen_port);
 	utils::Debug("server", "new ClientInfo created. fd", client_fd);
 	return client_info;
 }
