@@ -117,7 +117,7 @@ Result IsSameHttpRequestParsedData(
 }
 
 int Run(int client_fd, const std::string &read_buf, const http::HttpRequestParsedData &expected) {
-	http::TmpHttp http;
+	http::Http http;
 	http.ParseHttpRequestFormat(client_fd, read_buf);
 	const Result &result = IsSameHttpRequestParsedData(http.GetClientData(client_fd), expected);
 	return HandleResult(result);
@@ -249,7 +249,7 @@ int main(void) {
 	);
 
 	// 10.ボディメッセージを追加で送信した場合
-	http::TmpHttp               test4_body_message;
+	http::Http                  test4_body_message;
 	http::HttpRequestParsedData test4_expected_body_message;
 	test4_expected_body_message.request_result.status_code          = http::StatusCode(http::OK);
 	test4_expected_body_message.is_request_format.is_request_line   = true;
@@ -275,7 +275,7 @@ int main(void) {
 
 	// todo: http/http_response/test_http_response.cpp responseを確認、実行、作成のテスト
 	// リクエストのステータスコードが200の場合
-	http::TmpHttp test1_response;
+	http::Http test1_response;
 	test1_response.ParseHttpRequestFormat(
 		1, "GET / HTTP/1.1\r\nHost: test\r\nContent-Length:  3\r\n\r\na"
 	);
@@ -285,7 +285,7 @@ int main(void) {
 	ret_code |= HandleResult(test1_response.CreateHttpResponse(1), test1_expected_response);
 
 	// リクエストのステータスコードが400の場合
-	http::TmpHttp test2_response;
+	http::Http test2_response;
 	test2_response.ParseHttpRequestFormat(
 		1, "GET / HTTP/1.\r\nHost test\r\nContent-Length:  3\r\n\r\na"
 	);

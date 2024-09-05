@@ -28,10 +28,10 @@ namespace http {
 // }
 struct HttpResult;
 
-class TmpHttp {
+class Http {
   public:
-	TmpHttp();
-	~TmpHttp();
+	Http();
+	~Http();
 	HttpResult Run(const MockDtoClientInfos &client_info, const MockDtoServerInfos &server_info);
 	utils::Result<void> ParseHttpRequestFormat(int client_fd, const std::string &read_buf);
 	std::string         CreateHttpResponse(
@@ -43,8 +43,8 @@ class TmpHttp {
 	HttpRequestParsedData GetClientData(int client_fd);
 
   private:
-	TmpHttp(const TmpHttp &other);
-	TmpHttp    &operator=(const TmpHttp &other);
+	Http(const Http &other);
+	Http       &operator=(const Http &other);
 	HttpStorage storage_;
 	bool        IsHttpRequestFormatComplete(int client_fd);
 	// HttpResult CreateBadRequestResponse(int client_fd);

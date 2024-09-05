@@ -8,12 +8,12 @@
 
 namespace http {
 
-TmpHttp::TmpHttp() {}
+Http::Http() {}
 
-TmpHttp::~TmpHttp() {}
+Http::~Http() {}
 
 HttpResult
-TmpHttp::Run(const MockDtoClientInfos &client_info, const MockDtoServerInfos &server_info) {
+Http::Run(const MockDtoClientInfos &client_info, const MockDtoServerInfos &server_info) {
 	HttpResult          result;
 	utils::Result<void> parsed_result =
 		ParseHttpRequestFormat(client_info.fd, client_info.request_buf);
@@ -30,7 +30,7 @@ TmpHttp::Run(const MockDtoClientInfos &client_info, const MockDtoServerInfos &se
 	return result;
 }
 
-utils::Result<void> TmpHttp::ParseHttpRequestFormat(int client_fd, const std::string &read_buf) {
+utils::Result<void> Http::ParseHttpRequestFormat(int client_fd, const std::string &read_buf) {
 	utils::Result<void>   result;
 	HttpRequestParsedData save_data = storage_.GetClientSaveData(client_fd);
 	save_data.current_buf += read_buf;
@@ -68,7 +68,7 @@ utils::Result<void> TmpHttp::ParseHttpRequestFormat(int client_fd, const std::st
 // return result;
 // }
 
-// HttpResult TmpHttp::CreateBadRequestResponse(int client_fd) {
+// HttpResult Http::CreateBadRequestResponse(int client_fd) {
 // 	HttpResult            result;
 // 	HttpRequestParsedData data  = storage_.GetClientSaveData(client_fd);
 // 	result.is_response_complete = true;
@@ -81,7 +81,7 @@ utils::Result<void> TmpHttp::ParseHttpRequestFormat(int client_fd, const std::st
 // 	return result;
 // }
 
-std::string TmpHttp::CreateHttpResponse(
+std::string Http::CreateHttpResponse(
 	const MockDtoClientInfos &client_info, const MockDtoServerInfos &server_info
 ) {
 	HttpRequestParsedData data = storage_.GetClientSaveData(client_info.fd);
@@ -90,7 +90,7 @@ std::string TmpHttp::CreateHttpResponse(
 }
 
 // todo: HTTPRequestの書式が完全かどうか(どのように取得するかは要検討)
-bool TmpHttp::IsHttpRequestFormatComplete(int client_fd) {
+bool Http::IsHttpRequestFormatComplete(int client_fd) {
 	HttpRequestParsedData save_data = storage_.GetClientSaveData(client_fd);
 	return save_data.is_request_format.is_request_line &&
 		   save_data.is_request_format.is_header_fields &&
@@ -98,7 +98,7 @@ bool TmpHttp::IsHttpRequestFormatComplete(int client_fd) {
 }
 
 // For test
-HttpRequestParsedData TmpHttp::GetClientData(int client_fd) {
+HttpRequestParsedData Http::GetClientData(int client_fd) {
 	return storage_.GetClientSaveData(client_fd);
 }
 
