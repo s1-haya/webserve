@@ -20,6 +20,7 @@ TmpHttp::Run(const MockDtoClientInfos &client_info, const MockDtoServerInfos &se
 	if (!parsed_result.IsOk()) {
 		// todo: request_buf, is_connection_keep
 		return result;
+		// return HttpResult CreateBadRequestResponse(int client_fd);
 	}
 	if (IsHttpRequestFormatComplete(client_info.fd)) {
 		// todo: request_buf, is_connection_keep
@@ -67,20 +68,18 @@ utils::Result<void> TmpHttp::ParseHttpRequestFormat(int client_fd, const std::st
 // return result;
 // }
 
-// todo: クライアントのリクエスト情報を読み込む
-void TmpHttp::ParseHttpRequestFormat(int client_fd, const std::string &read_buf) {
-	HttpRequestParsedData save_data = storage_.GetClientSaveData(client_fd);
-	save_data.current_buf += read_buf;
-	HttpParse::TmpRun(save_data);
-	storage_.UpdateClientSaveData(client_fd, save_data);
-}
-
-// todo: レスポンスを作成する
-std::string TmpHttp::CreateHttpResponse(int client_fd) {
-	HttpRequestParsedData data = storage_.GetClientSaveData(client_fd);
-	storage_.DeleteClientSaveData(client_fd);
-	return HttpResponse::Run(data.request_result);
-}
+// HttpResult TmpHttp::CreateBadRequestResponse(int client_fd) {
+// 	HttpResult            result;
+// 	HttpRequestParsedData data  = storage_.GetClientSaveData(client_fd);
+// 	result.is_response_complete = true;
+// 	result.response             = HttpResponse::CreateBadRequestResponse(data.request_result);
+// 	;
+// 	result.request_buf = data.current_buf;
+// 	// todo: HttpResponse::IsConnectionKeep
+// 	// result.is_connection_keep = ;
+// 	storage_.DeleteClientSaveData(client_fd);
+// 	return result;
+// }
 
 std::string TmpHttp::CreateHttpResponse(
 	const MockDtoClientInfos &client_info, const MockDtoServerInfos &server_info

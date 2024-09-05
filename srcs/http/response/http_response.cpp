@@ -109,4 +109,9 @@ std::string HttpResponse::CreateHttpResponse(const HttpResponseFormat &response)
 	return response_stream.str();
 }
 
+// std::string HttpResponse::CreateBadRequestResponse(const HttpRequestResult &request_info) {
+// 	HttpResponseFormat response = CreateDefaultHttpResponseFormat(request_info.status_code);
+// 	return CreateHttpResponse(response);
+// }
+
 } // namespace http

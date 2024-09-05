@@ -54,6 +54,7 @@ class HttpResponse {
 		std::string                  &response_body_message
 	);
 	static std::string CreateDefaultBodyMessageFormat(const StatusCode &status_code);
+	// static std::string CreateBadRequestResponse(const HttpRequestResult &request_info);
 
   private:
 	HttpResponse();

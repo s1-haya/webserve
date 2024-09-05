@@ -47,6 +47,7 @@ class TmpHttp {
 	TmpHttp    &operator=(const TmpHttp &other);
 	HttpStorage storage_;
 	bool        IsHttpRequestFormatComplete(int client_fd);
+	// HttpResult CreateBadRequestResponse(int client_fd);
 };
 
 } // namespace http
