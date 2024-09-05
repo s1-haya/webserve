@@ -134,7 +134,9 @@ void Parser::HandleListen(std::list<context::HostPortPair> &host_ports, NodeItr 
 	}
 	// for listen localhost:8080
 	std::vector<std::string> host_port_vec = utils::SplitStr((*it).token, ":");
-	// 2個ないときは他の部分で例外が投げられる
+	if (host_port_vec.size() != 2) {
+		throw std::runtime_error("listen argument should be formatted 'host:port'");
+	}
 	utils::Result<unsigned int> port_number = utils::ConvertStrToUint(host_port_vec[1]);
 	if (host_port_vec[0] == "" || !port_number.IsOk() || port_number.GetValue() < PORT_MIN ||
 		port_number.GetValue() > PORT_MAX) {
