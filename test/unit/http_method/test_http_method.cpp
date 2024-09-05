@@ -85,8 +85,8 @@ void TryDeleteHandler(const std::string &path, std::string &response_body_messag
 // 		} else {
 // 			StatusCode status_code      = StatusCode(NOT_IMPLEMENTED);
 // 			response_body_message            =
-// HttpResponse::CreateDefaultBodyMessageFormat(status_code); 			throw HttpException("Error: Not
-// Implemented", status_code);
+// HttpResponse::CreateDefaultBodyMessageFormat(status_code); 			throw HttpException("Error:
+// Not Implemented", status_code);
 // 		}
 // 	}
 // 	catch (const HttpException &e) {

@@ -31,7 +31,8 @@ HttpResponseFormat HttpResponse::TmpCreateHttpResponseFormat(
 	const MockDtoServerInfos &server_info,
 	const HttpRequestResult  &request_info
 ) {
-	// todo: InitHeaderFields(最終的にはtryの外側でinitする/try, catch両方header_fieldsを使用するため)
+	// todo: InitHeaderFields(最終的にはtryの外側でinitする/try,
+	// catch両方header_fieldsを使用するため)
 	try {
 		HttpResponseFormat           result;
 		const CheckServerInfoResult &server_info_result =
@@ -53,7 +54,7 @@ HttpResponseFormat HttpResponse::TmpCreateHttpResponseFormat(
 		//     return CreateSuccessResponseResult();
 		(void)client_info;
 		(void)server_info_result;
-		std::string response_body_message;
+		std::string       response_body_message;
 		const StatusCode &status_code = MethodHandler(
 			server_info_result.path,
 			request_info.request.request_line.method,

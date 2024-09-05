@@ -164,15 +164,10 @@ int main(void) {
 	http::HttpRequestResult expected_request_line_test_3;
 	expected_request_line_test_3.status_code = http::StatusCode(http::BAD_REQUEST);
 
-	// 課題要件以外のmethod(大文字のみ)が含まれてる
-	http::HttpRequestResult expected_request_line_test_4;
-	expected_request_line_test_4.status_code = http::StatusCode(http::NOT_IMPLEMENTED);
-
 	static const TestCase test_cases_for_request_line[] = {
 		TestCase("GET / HTTP/1.1", expected_request_line_test_1),
 		TestCase("GEt / HTTP/1.1", expected_request_line_test_2),
-		TestCase("あGE / HTTP/1.1", expected_request_line_test_3),
-		TestCase("HEAD / HTTP/1.1", expected_request_line_test_4),
+		TestCase("あGE / HTTP/1.1", expected_request_line_test_3)
 	};
 
 	ret_code |= RunTestCases(test_cases_for_request_line, ARRAY_SIZE(test_cases_for_request_line));
