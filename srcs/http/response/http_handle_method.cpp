@@ -157,7 +157,20 @@ void HttpResponse::FileCreationHandler(
 		response_body_message = CreateDefaultBodyMessageFormat(StatusCode(FORBIDDEN));
 		return;
 	}
-	response_body_message = CreateDefaultBodyMessageFormat(StatusCode(CREATED));
+
+Stat HttpResponse::TryStat(const std::string &path, std::string &response_body_message) {
+	struct stat stat_buf;
+	try {
+		if (stat(path.c_str(), &stat_buf) == -1) {
+			std::string error_message =
+				"Error: stat on path '" + path + "': " + std::strerror(errno);
+			throw utils::SystemException(error_message, errno);
+		}
+	} catch (const utils::SystemException &e) {
+		SystemExceptionHandler(e, response_body_message);
+	}
+	Stat info(stat_buf);
+	return info;
 }
 
 } // namespace http
