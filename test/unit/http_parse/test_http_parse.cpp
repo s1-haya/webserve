@@ -87,13 +87,13 @@ IsSameHttpRequest(const http::HttpRequestFormat &res, const http::HttpRequestFor
 	return http_request_result;
 }
 
-Result IsSameStatusCode(http::StatusCode status_code, http::StatusCode expected) {
+Result IsSameStatusCode(const http::StatusCode &status_code, const http::StatusCode &expected) {
 	Result status_code_result;
-	if (status_code != expected) {
+	if (status_code.GetEStatusCode() != expected.GetEStatusCode()) {
 		std::ostringstream error_log;
 		error_log << "Error: Status Code\n";
-		error_log << "- Expected: [" << expected << "]\n";
-		error_log << "- Result  : [" << status_code << "]\n";
+		error_log << "- Expected: [" << expected.GetStatusCode() << "]\n";
+		error_log << "- Result  : [" << status_code.GetStatusCode() << "]\n";
 		status_code_result.is_success = false;
 		status_code_result.error_log  = error_log.str();
 	}
@@ -123,7 +123,7 @@ int HandleResult(const Result &result, const std::string &src) {
 int Run(const std::string &src, const http::HttpRequestResult &expected) {
 	const http::HttpRequestResult result = http::HttpParse::Run(src);
 	Result status_code_result = IsSameStatusCode(result.status_code, expected.status_code);
-	if (status_code_result.is_success && result.status_code == http::OK) {
+	if (status_code_result.is_success && result.status_code.GetEStatusCode() == http::OK) {
 		Result http_request_result = IsSameHttpRequest(result.request, expected.request);
 		return HandleResult(http_request_result, src);
 	} else {
@@ -152,21 +152,21 @@ int main(void) {
 	// NGの場合
 	// static const http::RequestLine             expected_request_line_1("GET", "/d", "HTTP/1.1d");
 	expected_request_line_test_1.request.request_line = expected_request_line_1;
-	expected_request_line_test_1.status_code          = http::OK;
+	expected_request_line_test_1.status_code          = http::StatusCode(http::OK);
 	// NGの場合
-	// expected_request_line_test_1.status_code = http::BAD_REQUEST;
+	// expected_request_line_test_1.status_code = http::StatusCode(http::BAD_REQUEST);
 
 	// methodが小文字が含まれてる
 	http::HttpRequestResult expected_request_line_test_2;
-	expected_request_line_test_2.status_code = http::BAD_REQUEST;
+	expected_request_line_test_2.status_code = http::StatusCode(http::BAD_REQUEST);
 
 	// methodがUS-ASCII以外の文字が含まれてる
 	http::HttpRequestResult expected_request_line_test_3;
-	expected_request_line_test_3.status_code = http::BAD_REQUEST;
+	expected_request_line_test_3.status_code = http::StatusCode(http::BAD_REQUEST);
 
 	// 課題要件以外のmethod(大文字のみ)が含まれてる
 	http::HttpRequestResult expected_request_line_test_4;
-	expected_request_line_test_4.status_code = http::NOT_IMPLEMENTED;
+	expected_request_line_test_4.status_code = http::StatusCode(http::NOT_IMPLEMENTED);
 
 	static const TestCase test_cases_for_request_line[] = {
 		TestCase("GET / HTTP/1.1", expected_request_line_test_1),
@@ -180,39 +180,39 @@ int main(void) {
 	std::cout << "Header Fields Test" << std::endl;
 	http::HttpRequestResult expected_header_fields_test_1;
 	expected_header_fields_test_1.request.request_line                = expected_request_line_1;
-	expected_header_fields_test_1.status_code                         = http::OK;
+	expected_header_fields_test_1.status_code                         = http::StatusCode(http::OK);
 	expected_header_fields_test_1.request.header_fields["Host"]       = "www.example.com";
 	expected_header_fields_test_1.request.header_fields["Connection"] = "keep-alive";
 
 	// セミコロン以降に複数OWS(SpaceとHorizontal Tab)が設定の場合
 	http::HttpRequestResult expected_header_fields_test_2;
 	expected_header_fields_test_2.request.request_line                = expected_request_line_1;
-	expected_header_fields_test_2.status_code                         = http::OK;
+	expected_header_fields_test_2.status_code                         = http::StatusCode(http::OK);
 	expected_header_fields_test_2.request.header_fields["Host"]       = "www.example.com";
 	expected_header_fields_test_2.request.header_fields["Connection"] = "keep-alive";
 
 	// セミコロンの後にnameがある設定の場合
 	http::HttpRequestResult expected_header_fields_test_3;
 	expected_header_fields_test_3.request.request_line                = expected_request_line_1;
-	expected_header_fields_test_3.status_code                         = http::OK;
+	expected_header_fields_test_3.status_code                         = http::StatusCode(http::OK);
 	expected_header_fields_test_3.request.header_fields["Host"]       = "www.example.com";
 	expected_header_fields_test_3.request.header_fields["Connection"] = "keep-alive";
 
 	// 存在しないfield_nameの場合
 	http::HttpRequestResult expected_header_fields_test_4;
-	expected_header_fields_test_4.status_code = http::BAD_REQUEST;
+	expected_header_fields_test_4.status_code = http::StatusCode(http::BAD_REQUEST);
 
 	// 複数のヘッダーフィールドの書式が設定の場合
 	http::HttpRequestResult expected_header_fields_test_5;
-	expected_header_fields_test_5.status_code = http::BAD_REQUEST;
+	expected_header_fields_test_5.status_code = http::StatusCode(http::BAD_REQUEST);
 
 	// セミコロンがない場合
 	http::HttpRequestResult expected_header_fileds_test_6;
-	expected_header_fileds_test_6.status_code = http::BAD_REQUEST;
+	expected_header_fileds_test_6.status_code = http::StatusCode(http::BAD_REQUEST);
 
 	// セミコロンが複数ある場合
 	http::HttpRequestResult expected_header_fields_test_7;
-	expected_header_fields_test_7.status_code = http::BAD_REQUEST;
+	expected_header_fields_test_7.status_code = http::StatusCode(http::BAD_REQUEST);
 
 	static const TestCase test_cases_for_header_fields[] = {
 		TestCase(

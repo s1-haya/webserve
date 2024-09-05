@@ -14,8 +14,6 @@ TmpHttp::~TmpHttp() {}
 
 HttpResult
 TmpHttp::Run(const MockDtoClientInfos &client_info, const MockDtoServerInfos &server_info) {
-	// todo: when HttpResponse::Run arguments require server_info.
-	(void)server_info;
 	HttpResult          result;
 	utils::Result<void> parsed_result =
 		TmpParseHttpRequestFormat(client_info.fd, client_info.request_buf);

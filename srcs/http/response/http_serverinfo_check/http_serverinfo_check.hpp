@@ -20,8 +20,11 @@ struct CheckServerInfoResult {
 	std::string            upload_directory;
 
 	utils::Result< std::pair<unsigned int, std::string> > redirect;
-	std::pair<unsigned int, std::string>                  error_page;
-	CheckServerInfoResult() : autoindex(false){};
+	utils::Result< std::pair<unsigned int, std::string> > error_page;
+	CheckServerInfoResult() : autoindex(false) {
+		redirect.Set(false);
+		error_page.Set(false);
+	};
 };
 
 class HttpServerInfoCheck {
@@ -32,7 +35,7 @@ class HttpServerInfoCheck {
 	static void CheckDTOServerInfo(
 		CheckServerInfoResult    &result,
 		const MockDtoServerInfos &server_info,
-		HeaderFields             &header_fields
+		const HeaderFields       &header_fields
 	);
 	static void CheckLocationList(
 		CheckServerInfoResult &result,
@@ -55,7 +58,7 @@ class HttpServerInfoCheck {
 
   public:
 	static CheckServerInfoResult
-	Check(const MockDtoServerInfos &server_info, HttpRequestFormat &request);
+	Check(const MockDtoServerInfos &server_info, const HttpRequestFormat &request);
 };
 
 } // namespace http

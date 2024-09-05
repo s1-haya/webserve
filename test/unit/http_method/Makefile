@@ -19,13 +19,15 @@ WS_HTTP_SERVER_INFO_CHECK_DIR	:=	$(WS_HTTP_RESPONSE_DIR)/http_serverinfo_check
 
 SRCS			+=	$(WS_UTILS_DIR)/color.cpp \
 					$(WS_UTILS_DIR)/system_exception.cpp \
+					$(WS_UTILS_DIR)/convert_str.cpp \
+					$(WS_UTILS_DIR)/isdigit.cpp \
 					$(WS_HTTP_DIR)/http_message.cpp \
 					$(WS_HTTP_DIR)/status_code.cpp \
 					$(WS_HTTP_DIR)/http_exception.cpp \
 					$(WS_HTTP_RESPONSE_DIR)/stat.cpp \
 					$(WS_HTTP_RESPONSE_DIR)/http_response.cpp \
 					$(WS_HTTP_RESPONSE_DIR)/http_handle_method.cpp \
-					$(WS_HTTP_SERVER_INFO_CHECK_DIR)/http_serverinfo_check.cpp \
+					$(WS_HTTP_SERVER_INFO_CHECK_DIR)/http_serverinfo_check.cpp
 
 # 3. Add unit test files
 SRCS	+=	test_http_method.cpp

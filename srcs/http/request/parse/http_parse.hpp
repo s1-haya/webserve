@@ -18,7 +18,7 @@ struct HttpRequestResult {
 
 struct IsHttpRequestFormat {
 	IsHttpRequestFormat()
-		: is_request_line(false), is_header_fields(false), is_body_message(false){};
+		: is_request_line(false), is_header_fields(false), is_body_message(false) {};
 	bool is_request_line;
 	bool is_header_fields;
 	bool is_body_message;

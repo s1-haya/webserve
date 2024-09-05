@@ -31,13 +31,13 @@ struct MockDtoServerInfos;
 
 class HttpResponse {
   public:
-	typedef std::map<StatusCode, std::string> ReasonPhrase;
-	static std::string                        Run(const HttpRequestResult &request_info);
-	static std::string                        TmpRun(
-							   const MockDtoClientInfos &client_info,
-							   const MockDtoServerInfos &server_info,
-							   HttpRequestResult        &request_info
-						   );
+	typedef std::map<EStatusCode, std::string> ReasonPhrase;
+	static std::string                         Run(const HttpRequestResult &request_info);
+	static std::string                         TmpRun(
+								const MockDtoClientInfos &client_info,
+								const MockDtoServerInfos &server_info,
+								const HttpRequestResult  &request_info
+							);
 	static void GetHandler(const std::string &path, std::string &body_message);
 	static void PostHandler(
 		const std::string &path,
@@ -55,14 +55,12 @@ class HttpResponse {
 	static HttpResponseFormat TmpCreateHttpResponseFormat(
 		const MockDtoClientInfos &client_info,
 		const MockDtoServerInfos &server_info,
-		HttpRequestResult        &request_info
+		const HttpRequestResult  &request_info
 	);
 	static HttpResponseFormat CreateSuccessHttpResponseFormat(const HttpRequestResult &request_info
 	);
-	static HttpResponseFormat CreateErrorHttpResponseFormat(const HttpRequestResult &request_info);
-	static std::string        CreateDefaultBodyMessageFormat(
-			   const std::string &status_code, const std::string &reason_phrase
-		   );
+	static HttpResponseFormat CreateErrorHttpResponseFormat(const StatusCode &status_code);
+	static std::string        CreateDefaultBodyMessageFormat(const StatusCode &status_code);
 	static void
 	SystemExceptionHandler(const utils::SystemException &e, std::string &response_body_message);
 	static void FileCreationHandler(
