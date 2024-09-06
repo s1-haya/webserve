@@ -20,6 +20,8 @@ class Method {
 		const std::string            &request_body_message,
 		std::string                  &response_body_message
 	);
+
+  private:
 	static StatusCode GetHandler(const std::string &path, std::string &body_message);
 	static StatusCode PostHandler(
 		const std::string &path,
@@ -27,8 +29,6 @@ class Method {
 		std::string       &response_body_message
 	);
 	static StatusCode DeleteHandler(const std::string &path, std::string &response_body_message);
-
-  private:
 	static Stat TryStat(const std::string &path);
 	static bool
 	IsAllowedMethod(const std::string &method, const std::list<std::string> &allow_methods);
