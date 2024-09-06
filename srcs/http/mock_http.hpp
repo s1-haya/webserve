@@ -24,7 +24,7 @@ class MockHttp : public IHttp {
 	// override
 	HttpResult
 	Run(const ClientInfos &client_infos, const server::VirtualServerAddrList &virtual_servers);
-	std::string GetTimeoutResponse(int client_fd);
+	HttpResult GetErrorResponse(const ClientInfos &client_info, ErrState state);
 
   private:
 	// prohibit copy

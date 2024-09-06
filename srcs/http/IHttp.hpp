@@ -14,6 +14,11 @@ namespace http {
 
 struct HttpResult;
 
+enum ErrState {
+	TIMEOUT,
+	INTERNAL_ERROR
+};
+
 class IHttp {
   public:
 	virtual ~IHttp() {}
@@ -33,7 +38,7 @@ class IHttp {
 	 */
 	virtual HttpResult
 	Run(const ClientInfos &client_infos, const server::VirtualServerAddrList &virtual_servers) = 0;
-	virtual std::string GetTimeoutResponse(int client_fd)                                      = 0;
+	virtual HttpResult GetErrorResponse(const ClientInfos &client_info, ErrState state)        = 0;
 };
 
 } // namespace http

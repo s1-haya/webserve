@@ -234,8 +234,10 @@ void Server::HandleTimeoutMessages() {
 			Disconnect(client_fd);
 			continue;
 		}
-		const std::string &timeout_response = mock_http_.GetTimeoutResponse(client_fd);
-		message_manager_.AddPrimaryResponse(client_fd, message::CLOSE, timeout_response);
+
+		const http::HttpResult http_result =
+			mock_http_.GetErrorResponse(GetClientInfos(client_fd), http::TIMEOUT);
+		message_manager_.AddPrimaryResponse(client_fd, message::CLOSE, http_result.response);
 		event_monitor_.Replace(client_fd, event::EVENT_WRITE);
 		utils::Debug("server", "timeout client", client_fd);
 	}

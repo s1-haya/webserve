@@ -124,8 +124,9 @@ HttpResult MockHttp::Run(
 	return result;
 }
 
-std::string MockHttp::GetTimeoutResponse(int client_fd) {
-	(void)client_fd;
+HttpResult MockHttp::GetErrorResponse(const ClientInfos &client_info, ErrState state) {
+	(void)client_info;
+	(void)state;
 
 	std::ostringstream oss;
 	oss << "HTTP/1.1 408 Request Timeout" << CRLF << "Content-Type: text/html" << SP << CRLF
@@ -133,7 +134,10 @@ std::string MockHttp::GetTimeoutResponse(int client_fd) {
 		<< "<html><head><title>408 Request Timeout</title></head><body><h1>Request "
 		   "Timeout</h1><p>Server timeout waiting for the HTTP request from the "
 		   "client.</p></body></html>";
-	return oss.str();
+
+	HttpResult result;
+	result.response = oss.str();
+	return result;
 }
 
 } // namespace http
