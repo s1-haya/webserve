@@ -1,7 +1,7 @@
+#include "http_method.hpp"
 #include "http_exception.hpp"
 #include "http_message.hpp"
 #include "http_response.hpp"
-#include "http_method.hpp"
 #include "http_serverinfo_check.hpp"
 #include "stat.hpp"
 #include "system_exception.hpp"
@@ -49,8 +49,7 @@ StatusCode Method::Handler(
 	bool       is_allow_method = IsAllowedMethod(method, allow_methods);
 	if (!is_allow_method) {
 		throw HttpException("Error: Not Implemented", StatusCode(NOT_IMPLEMENTED));
-	}
-	else if (method == GET) {
+	} else if (method == GET) {
 		status_code = GetHandler(path, response_body_message);
 	} else if (method == POST) {
 		status_code = PostHandler(path, request_body_message, response_body_message);
@@ -62,7 +61,7 @@ StatusCode Method::Handler(
 
 // todo: refactor
 StatusCode Method::GetHandler(const std::string &path, std::string &response_body_message) {
-	StatusCode status_code(OK);
+	StatusCode  status_code(OK);
 	const Stat &info = TryStat(path);
 	if (info.IsDirectory()) {
 		// No empty string because the path has '/'
@@ -107,8 +106,7 @@ StatusCode Method::PostHandler(
 	return status_code;
 }
 
-StatusCode
-Method::DeleteHandler(const std::string &path, std::string &response_body_message) {
+StatusCode Method::DeleteHandler(const std::string &path, std::string &response_body_message) {
 	const Stat &info        = TryStat(path);
 	StatusCode  status_code = StatusCode(NO_CONTENT);
 	if (info.IsDirectory()) {
@@ -122,7 +120,7 @@ Method::DeleteHandler(const std::string &path, std::string &response_body_messag
 }
 
 void Method::SystemExceptionHandler(const utils::SystemException &e) {
-	int        error_number = e.GetErrorNumber();
+	int error_number = e.GetErrorNumber();
 	if (error_number == EACCES || error_number == EPERM) {
 		throw HttpException("Error: Forbidden", StatusCode(FORBIDDEN));
 	} else if (error_number == ENOENT || error_number == ENOTDIR || error_number == ELOOP ||

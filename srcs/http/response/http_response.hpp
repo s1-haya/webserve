@@ -35,9 +35,9 @@ class HttpResponse {
   public:
 	typedef std::map<EStatusCode, std::string> ReasonPhrase;
 	static std::string
-					  Run(const MockDtoClientInfos &client_info,
-						  const MockDtoServerInfos &server_info,
-						  const HttpRequestResult  &request_info);
+					   Run(const MockDtoClientInfos &client_info,
+						   const MockDtoServerInfos &server_info,
+						   const HttpRequestResult  &request_info);
 	static std::string CreateDefaultBodyMessageFormat(const StatusCode &status_code);
 	// static std::string CreateBadRequestResponse(const HttpRequestResult &request_info);
 
