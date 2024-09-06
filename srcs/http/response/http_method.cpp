@@ -53,16 +53,17 @@ StatusCode Method::Handler(
 ) {
 	StatusCode status_code(OK);
 	bool       is_allow_method = IsAllowedMethod(method, allow_method);
-	if (is_allow_method && method == GET) {
-		status_code = GetHandler(path, response_body_message);
-	} else if (is_allow_method && method == POST) {
-		status_code = PostHandler(path, request_body_message, response_body_message);
-	} else if (is_allow_method && method == DELETE) {
-		status_code = DeleteHandler(path, response_body_message);
-	} else {
+	if (!is_allow_method) {
 		status_code           = StatusCode(NOT_IMPLEMENTED);
 		response_body_message = HttpResponse::CreateDefaultBodyMessageFormat(status_code);
 		throw HttpException("Error: Not Implemented", status_code);
+	}
+	else if (method == GET) {
+		status_code = GetHandler(path, response_body_message);
+	} else if (method == POST) {
+		status_code = PostHandler(path, request_body_message, response_body_message);
+	} else if (method == DELETE) {
+		status_code = DeleteHandler(path, response_body_message);
 	}
 	return status_code;
 }
