@@ -9,24 +9,18 @@
 
 namespace http {
 
-std::string HttpResponse::Run(const HttpRequestResult &request_info) {
-	HttpResponseFormat response = CreateHttpResponseFormat(request_info);
-	return CreateHttpResponse(response);
-}
-
-std::string HttpResponse::TmpRun(
+std::string HttpResponse::Run(
 	const MockDtoClientInfos &client_info,
 	const MockDtoServerInfos &server_info,
 	const HttpRequestResult  &request_info
 ) {
-	HttpResponseFormat response =
-		TmpCreateHttpResponseFormat(client_info, server_info, request_info);
+	HttpResponseFormat response = CreateHttpResponseFormat(client_info, server_info, request_info);
 	return CreateHttpResponse(response);
 }
 
 // todo: HttpResponseFormat HttpResponse::CreateHttpResponseFormat(const HttpRequestResult
 // &request_info) 作成
-HttpResponseFormat HttpResponse::TmpCreateHttpResponseFormat(
+HttpResponseFormat HttpResponse::CreateHttpResponseFormat(
 	const MockDtoClientInfos &client_info,
 	const MockDtoServerInfos &server_info,
 	const HttpRequestResult  &request_info
@@ -77,32 +71,6 @@ HttpResponseFormat HttpResponse::TmpCreateHttpResponseFormat(
 	}
 }
 
-// mock
-HttpResponseFormat HttpResponse::CreateHttpResponseFormat(const HttpRequestResult &request_info) {
-	HttpResponseFormat response;
-	if (request_info.status_code.GetEStatusCode() != http::OK) {
-		response = CreateDefaultHttpResponseFormat(request_info.status_code);
-	} else {
-		response = CreateSuccessHttpResponseFormat(request_info);
-	}
-	return response;
-}
-
-// mock
-HttpResponseFormat
-HttpResponse::CreateSuccessHttpResponseFormat(const HttpRequestResult &request_info) {
-	(void)request_info;
-	HttpResponseFormat response;
-	response.status_line.version         = HTTP_VERSION;
-	response.status_line.status_code     = "200";
-	response.status_line.reason_phrase   = "OK";
-	response.header_fields["Host"]       = "sawa";
-	response.header_fields["Connection"] = "close";
-	response.body_message = "You can't connect the dots looking forward. You can only connect the "
-							"dots looking backwards";
-	return response;
-}
-
 std::string HttpResponse::CreateDefaultBodyMessageFormat(const StatusCode &status_code) {
 	std::ostringstream body_message;
 	body_message << "<html>" << CRLF << "<head><title>" << status_code.GetStatusCode() << SP
@@ -139,5 +107,10 @@ std::string HttpResponse::CreateHttpResponse(const HttpResponseFormat &response)
 	response_stream << response.body_message;
 	return response_stream.str();
 }
+
+// std::string HttpResponse::CreateBadRequestResponse(const HttpRequestResult &request_info) {
+// 	HttpResponseFormat response = CreateDefaultHttpResponseFormat(request_info.status_code);
+// 	return CreateHttpResponse(response);
+// }
 
 } // namespace http
