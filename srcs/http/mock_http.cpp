@@ -102,7 +102,7 @@ bool IsRequestReceivedComplete(const std::string &buffer) {
 } // namespace
 
 HttpResult MockHttp::Run(
-	const server::DtoClientInfos &client_infos, const server::VirtualServerAddrList &virtual_servers
+	const ClientInfos &client_infos, const server::VirtualServerAddrList &virtual_servers
 ) {
 	(void)virtual_servers;
 

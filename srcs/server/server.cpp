@@ -1,6 +1,5 @@
 #include "server.hpp"
 #include "client_info.hpp"
-#include "dto_server_to_http.hpp"
 #include "event.hpp"
 #include "read.hpp"
 #include "send.hpp"
@@ -49,6 +48,7 @@ VirtualServer ConvertToVirtualServer(const config::context::ServerCon &config_se
 		config_server.error_page
 	);
 }
+
 // todo: tmp for debug
 void DebugVirtualServerNames(
 	const VirtualServerStorage::VirtualServerAddrList &virtual_server_addr_list
@@ -62,7 +62,7 @@ void DebugVirtualServerNames(
 }
 
 // todo: tmp for debug
-void DebugDto(const DtoClientInfos &client_infos, const VirtualServerAddrList &virtual_servers) {
+void DebugDto(const http::ClientInfos &client_infos, const VirtualServerAddrList &virtual_servers) {
 	utils::Debug("server", "ClientInfo - fd", client_infos.fd);
 	utils::Debug("server", "received server_names");
 	DebugVirtualServerNames(virtual_servers);
@@ -139,8 +139,8 @@ void Server::HandleExistingConnection(const event::Event &event) {
 	// todo: handle other EventType
 }
 
-DtoClientInfos Server::GetClientInfos(int client_fd) const {
-	DtoClientInfos client_infos;
+http::ClientInfos Server::GetClientInfos(int client_fd) const {
+	http::ClientInfos client_infos;
 	client_infos.fd          = client_fd;
 	client_infos.request_buf = message_manager_.GetRequestBuf(client_fd);
 	return client_infos;
@@ -170,7 +170,7 @@ void Server::RunHttp(const event::Event &event) {
 	const int client_fd = event.fd;
 
 	// Prepare to http.Run()
-	const DtoClientInfos        &client_infos    = GetClientInfos(client_fd);
+	const http::ClientInfos     &client_infos    = GetClientInfos(client_fd);
 	const VirtualServerAddrList &virtual_servers = GetVirtualServerList(client_fd);
 	DebugDto(client_infos, virtual_servers);
 
