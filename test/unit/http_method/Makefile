@@ -26,7 +26,7 @@ SRCS			+=	$(WS_UTILS_DIR)/color.cpp \
 					$(WS_HTTP_DIR)/http_exception.cpp \
 					$(WS_HTTP_RESPONSE_DIR)/stat.cpp \
 					$(WS_HTTP_RESPONSE_DIR)/http_response.cpp \
-					$(WS_HTTP_RESPONSE_DIR)/http_handle_method.cpp \
+					$(WS_HTTP_RESPONSE_DIR)/http_method.cpp \
 					$(WS_HTTP_SERVER_INFO_CHECK_DIR)/http_serverinfo_check.cpp
 
 # 3. Add unit test files
