@@ -3,6 +3,7 @@
 #include "http_message.hpp"
 #include "status_code.hpp"
 #include "utils.hpp"
+#include "virtual_server.hpp"
 #include <cstdlib> // atoi
 #include <iostream>
 
@@ -138,13 +139,14 @@ void HttpServerInfoCheck::CheckUploadDirectory(
 
 /*=====================================================================*/ // 消す
 
-CheckServerInfoResult
-HttpServerInfoCheck::Check(const VirtualServerAddrList &server_infos, const HttpRequestFormat &request) {
+CheckServerInfoResult HttpServerInfoCheck::Check(
+	const server::VirtualServerAddrList &server_infos, const HttpRequestFormat &request
+) {
 	CheckServerInfoResult        result;
-	const server::VirtualServer &vs = CheckVSList(server_infos, request);
+	const server::VirtualServer *vs = CheckVSList(server_infos, request);
 
-	CheckDtoServerInfo(result, vs, request.header_fields);
-	CheckLocationList(result, vs.GetLocations(), request.request_line.request_target);
+	CheckDtoServerInfo(result, *vs, request.header_fields);
+	CheckLocationList(result, vs->GetLocationList(), request.request_line.request_target);
 	return result;
 }
 

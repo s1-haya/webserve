@@ -7,7 +7,11 @@
 #include <list>
 #include <string>
 
-#include "virtual_server.hpp"
+namespace server {
+
+typedef std::list<const VirtualServer *> VirtualServerAddrList;
+
+}
 
 namespace http {
 
@@ -62,11 +66,11 @@ class HttpServerInfoCheck {
 
 	/*====================================================*/ // 消す
 
-	typedef std::list<const server::VirtualServer &> VirtualServerAddrList;
-	static const server::VirtualServer &
-	CheckVSList(const VirtualServerAddrList &server_infos, const HttpRequestFormat &request);
+	static const server::VirtualServer *CheckVSList(
+		const server::VirtualServerAddrList &server_infos, const HttpRequestFormat &request
+	);
 	static CheckServerInfoResult
-				Check(const VirtualServerAddrList &server_infos, const HttpRequestFormat &request);
+	Check(const server::VirtualServerAddrList &server_infos, const HttpRequestFormat &request);
 	static void CheckDtoServerInfo(
 		CheckServerInfoResult       &result,
 		const server::VirtualServer &virtual_server,
