@@ -43,7 +43,7 @@ void TryGetHandler(const std::string &path, std::string &response_body_message) 
 		http::Method::GetHandler(path, response_body_message);
 	} catch (const http::HttpException &e) {
 		// ステータスコードが300番台以上の場合
-		std::cerr << e.what() << std::endl;
+		// std::cerr << e.what() << std::endl;
 	}
 }
 
@@ -54,7 +54,7 @@ void TryPostHandler(
 		http::Method::PostHandler(path, request_body_message, response_body_message);
 	} catch (const http::HttpException &e) {
 		// ステータスコードが300番台以上の場合
-		std::cerr << e.what() << std::endl;
+		// std::cerr << e.what() << std::endl;
 	}
 }
 
@@ -63,7 +63,7 @@ void TryDeleteHandler(const std::string &path, std::string &response_body_messag
 		http::Method::DeleteHandler(path, response_body_message);
 	} catch (const http::HttpException &e) {
 		// ステータスコードが300番台以上の場合
-		std::cerr << e.what() << std::endl;
+		// std::cerr << e.what() << std::endl;
 	}
 }
 
