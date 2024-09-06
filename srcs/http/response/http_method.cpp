@@ -41,12 +41,12 @@ namespace http {
 StatusCode Method::Handler(
 	const std::string            &path,
 	const std::string            &method,
-	const std::list<std::string> &allow_method,
+	const std::list<std::string> &allow_methods,
 	const std::string            &request_body_message,
 	std::string                  &response_body_message
 ) {
 	StatusCode status_code(OK);
-	bool       is_allow_method = IsAllowedMethod(method, allow_method);
+	bool       is_allow_method = IsAllowedMethod(method, allow_methods);
 	if (!is_allow_method) {
 		throw HttpException("Error: Not Implemented", StatusCode(NOT_IMPLEMENTED));
 	}
@@ -171,9 +171,9 @@ Stat Method::TryStat(const std::string &path) {
 }
 
 bool Method::IsAllowedMethod(
-	const std::string &method, const std::list<std::string> &allow_method
+	const std::string &method, const std::list<std::string> &allow_methods
 ) {
-	if (allow_method.empty()) {
+	if (allow_methods.empty()) {
 		// allow_methodがない場合はwebservが許可したメソッドのみ許可する（GETのみ）
 		return std::find(
 				   DEFAULT_ALLOWED_METHODS,
@@ -181,7 +181,7 @@ bool Method::IsAllowedMethod(
 				   method
 			   ) != DEFAULT_ALLOWED_METHODS + DEFAULT_ALLOWED_METHODS_SIZE;
 	} else {
-		return std::find(allow_method.begin(), allow_method.end(), method) != allow_method.end();
+		return std::find(allow_methods.begin(), allow_methods.end(), method) != allow_methods.end();
 	}
 }
 

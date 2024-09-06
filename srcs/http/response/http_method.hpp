@@ -16,7 +16,7 @@ class Method {
 	static StatusCode Handler(
 		const std::string            &path,
 		const std::string            &method,
-		const std::list<std::string> &allow_method,
+		const std::list<std::string> &allow_methods,
 		const std::string            &request_body_message,
 		std::string                  &response_body_message
 	);
@@ -31,7 +31,7 @@ class Method {
   private:
 	static Stat       TryStat(const std::string &path);
 	static bool
-	IsAllowedMethod(const std::string &method, const std::list<std::string> &allow_method);
+	IsAllowedMethod(const std::string &method, const std::list<std::string> &allow_methods);
 	static void
 	SystemExceptionHandler(const utils::SystemException &e);
 	static StatusCode FileCreationHandler(
