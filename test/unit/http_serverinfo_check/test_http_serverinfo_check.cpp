@@ -1,3 +1,4 @@
+#include "http_message.hpp"
 #include "http_serverinfo_check.hpp"
 #include "utils.hpp"
 #include <cstdlib>
@@ -111,9 +112,9 @@ int Test1() {
 	// request
 	const RequestLine request_line = {"GET", "/", "HTTP/1.1"};
 	HttpRequestFormat request;
-	request.request_line                = request_line;
-	request.header_fields["Host"]       = "localhost";
-	request.header_fields["Connection"] = "keep-alive";
+	request.request_line              = request_line;
+	request.header_fields[HOST]       = "localhost";
+	request.header_fields[CONNECTION] = "keep-alive";
 
 	MockDtoServerInfos    server_info = BuildMockDtoServerInfos();
 	CheckServerInfoResult result      = HttpServerInfoCheck::Check(server_info, request);
@@ -127,7 +128,7 @@ int Test1() {
 		COMPARE(result.cgi_extension, location.cgi_extension);
 		COMPARE(result.upload_directory, location.upload_directory);
 		COMPARE(result.redirect.GetValue(), location.redirect);
-		COMPARE(result.error_page, server_info.error_page);
+		COMPARE(result.error_page.GetValue(), server_info.error_page);
 	} catch (const std::exception &e) {
 		PrintNg();
 		std::cerr << e.what() << '\n';
@@ -141,9 +142,9 @@ int Test2() {
 	// request
 	const RequestLine request_line = {"GET", "/www/test.html", "HTTP/1.1"}; // location2(redirect)
 	HttpRequestFormat request;
-	request.request_line                = request_line;
-	request.header_fields["Host"]       = "localhost";
-	request.header_fields["Connection"] = "keep-alive";
+	request.request_line              = request_line;
+	request.header_fields[HOST]       = "localhost";
+	request.header_fields[CONNECTION] = "keep-alive";
 
 	MockDtoServerInfos    server_info = BuildMockDtoServerInfos();
 	CheckServerInfoResult result      = HttpServerInfoCheck::Check(server_info, request);
@@ -156,7 +157,7 @@ int Test2() {
 		COMPARE(result.cgi_extension, location.cgi_extension);
 		COMPARE(result.upload_directory, location.upload_directory);
 		COMPARE(result.redirect.GetValue(), location.redirect);
-		COMPARE(result.error_page, server_info.error_page);
+		COMPARE(result.error_page.GetValue(), server_info.error_page);
 	} catch (const std::exception &e) {
 		PrintNg();
 		std::cerr << e.what() << '\n';
@@ -170,9 +171,9 @@ int Test3() {
 	// request
 	const RequestLine request_line = {"GET", "/www/data/test.html", "HTTP/1.1"};
 	HttpRequestFormat request;
-	request.request_line                = request_line;
-	request.header_fields["Host"]       = "localhost";
-	request.header_fields["Connection"] = "keep-alive";
+	request.request_line              = request_line;
+	request.header_fields[HOST]       = "localhost";
+	request.header_fields[CONNECTION] = "keep-alive";
 
 	MockDtoServerInfos    server_info = BuildMockDtoServerInfos();
 	CheckServerInfoResult result      = HttpServerInfoCheck::Check(server_info, request);
@@ -186,7 +187,7 @@ int Test3() {
 		COMPARE(result.cgi_extension, location.cgi_extension);
 		COMPARE(result.upload_directory, location.upload_directory);
 		COMPARE(result.redirect.GetValue(), location.redirect);
-		COMPARE(result.error_page, server_info.error_page);
+		COMPARE(result.error_page.GetValue(), server_info.error_page);
 	} catch (const std::exception &e) {
 		PrintNg();
 		std::cerr << e.what() << '\n';
@@ -200,9 +201,9 @@ int Test4() {
 	// request
 	const RequestLine request_line = {"GET", "/web/", "HTTP/1.1"};
 	HttpRequestFormat request;
-	request.request_line                = request_line;
-	request.header_fields["Host"]       = "localhost";
-	request.header_fields["Connection"] = "keep-alive";
+	request.request_line              = request_line;
+	request.header_fields[HOST]       = "localhost";
+	request.header_fields[CONNECTION] = "keep-alive";
 
 	MockDtoServerInfos    server_info = BuildMockDtoServerInfos();
 	CheckServerInfoResult result      = HttpServerInfoCheck::Check(server_info, request);
@@ -217,7 +218,7 @@ int Test4() {
 		COMPARE(result.cgi_extension, location.cgi_extension);
 		COMPARE(result.upload_directory, location.upload_directory);
 		COMPARE(result.redirect.GetValue(), location.redirect);
-		COMPARE(result.error_page, server_info.error_page);
+		COMPARE(result.error_page.GetValue(), server_info.error_page);
 	} catch (const std::exception &e) {
 		PrintNg();
 		std::cerr << e.what() << '\n';

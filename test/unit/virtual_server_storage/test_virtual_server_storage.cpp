@@ -5,39 +5,15 @@
 #include <iostream>
 #include <sstream> // ostringstream
 
-// (todo : test_virtual_server.cppと全く同じoverloadを書いてるのでどうにかしても良いかも)
 namespace server {
 
-// テストfail時のLocationListのdebug出力用
-std::ostream &operator<<(std::ostream &os, const VirtualServer::LocationList &locations) {
-	typedef VirtualServer::LocationList::const_iterator It;
-	for (It it = locations.begin(); it != locations.end(); ++it) {
-		const Location &location = *it;
-		os << "location: [" << location.location << "], root: [" << location.root << "], index: ["
-		   << location.index << "]";
-		if (++It(it) != locations.end()) {
-			os << std::endl;
-		}
+// テストfail時のServerNameListのdebug出力用
+std::ostream &operator<<(std::ostream &os, const VirtualServer::ServerNameList &list) {
+	typedef VirtualServer::ServerNameList::const_iterator It;
+	for (It it = list.begin(); it != list.end(); ++it) {
+		os << "[" << *it << "]";
 	}
-	return os;
-}
-
-// std::list<Location>のoperator==が呼ばれる時用にstruct Locationのoperator==の実装
-bool operator==(const Location &lhs, const Location &rhs) {
-	return lhs.location == rhs.location && lhs.root == rhs.root && lhs.index == rhs.index &&
-		   lhs.allowed_method == rhs.allowed_method;
-}
-
-// テストfail時のHostPortListのdebug出力用
-std::ostream &operator<<(std::ostream &os, const VirtualServer::HostPortList &host_port_list) {
-	typedef VirtualServer::HostPortList::const_iterator It;
-	for (It it = host_port_list.begin(); it != host_port_list.end(); ++it) {
-		const VirtualServer::HostPortPair &host_port_pair = *it;
-		os << "host: [" << host_port_pair.first << "], port: [" << host_port_pair.second << "]";
-		if (++It(it) != host_port_list.end()) {
-			os << std::endl;
-		}
-	}
+	os << std::endl;
 	return os;
 }
 
@@ -45,11 +21,13 @@ std::ostream &operator<<(std::ostream &os, const VirtualServer::HostPortList &ho
 
 namespace {
 
-typedef server::Location Location;
+typedef server::Location                    Location;
+typedef server::Location::AllowedMethodList AllowedMethodList;
 
-typedef server::VirtualServer::LocationList LocationList;
-typedef server::VirtualServer::HostPortPair HostPortPair;
-typedef server::VirtualServer::HostPortList HostPortList;
+typedef server::VirtualServer::ServerNameList ServerNameList;
+typedef server::VirtualServer::LocationList   LocationList;
+typedef server::VirtualServer::HostPortList   HostPortList;
+typedef server::VirtualServer::ErrorPage      ErrorPage;
 
 typedef server::VirtualServerStorage::VirtualServerAddrList VirtualServerAddrList;
 
@@ -121,8 +99,8 @@ Result TestIsSameVirtualServer(
 		if (!IsSame(vs, expected_vs)) {
 			result.is_ok = false;
 			oss << "virtual_server_addr" << std::endl;
-			oss << "- result   [" << vs << "],[" << vs->GetServerName() << "]" << std::endl;
-			oss << "- expected [" << expected_vs << "],[" << expected_vs->GetServerName() << "]"
+			oss << "- result   [" << vs << "]," << vs->GetServerNameList() << std::endl;
+			oss << "- expected [" << expected_vs << "]," << expected_vs->GetServerNameList()
 				<< std::endl;
 		}
 	}
@@ -140,48 +118,41 @@ Result RunGetVirtualServer(
 	return TestIsSameVirtualServer(vs_addr_list, expected_vs_addr_list);
 }
 
-Location CreateLocation(
-	const std::string &location,
-	const std::string &root,
-	const std::string &index,
-	const std::string &allowed_method
-) {
-	server::Location location_directive;
-	location_directive.location       = location;
-	location_directive.root           = root;
-	location_directive.index          = index;
-	location_directive.allowed_method = allowed_method;
-	return location_directive;
+server::VirtualServer
+CreateVirtualServer(const ServerNameList &server_names, const HostPortList &host_ports) {
+	const LocationList locations;
+	const std::size_t  client_max_body_size = 1024;
+	const ErrorPage    error_page           = std::make_pair(404, "/error_page.html");
+
+	return server::VirtualServer(
+		server_names, locations, host_ports, client_max_body_size, error_page
+	);
 }
 
 // -----------------------------------------------------------------------------
 // - virtual_serverは以下の想定
-// virtual_server | server_name | locations         | host:port
-// ----------------- ----------------------------------------------
-//       vs1      | localhost   | {"/www/"}         | {host1:8080, host2:12345}
-//       vs2      | localhost2  | {"/", "/static/"} | {host1:8080, host3:9999}
+// virtual_server | server_name          | host:port
+// -----------------------------------------------------------------------------
+//       vs1      | localhost            | {host1:8080, host2:12345}
+//       vs2      | localhost2,test_serv | {host1:8080, host3:9999}
 int RunTestVirtualServerStorage() {
 	int ret_code = EXIT_SUCCESS;
 
 	/* -------------- VirtualServer2個用意 -------------- */
-	std::string  expected_server_name1 = "localhost";
-	LocationList expected_locations1;
-	expected_locations1.push_back(CreateLocation("/www/", "/data/", "index.html", "GET"));
-	HostPortList expected_host_port_list1;
-	expected_host_port_list1.push_back(std::make_pair("host1", 8080));
-	expected_host_port_list1.push_back(std::make_pair("host2", 12345));
-	server::VirtualServer vs1(expected_server_name1, expected_locations1, expected_host_port_list1);
+	ServerNameList server_name1;
+	server_name1.push_back("localhost");
+	HostPortList host_ports;
+	host_ports.push_back(std::make_pair("host1", 8080));
+	host_ports.push_back(std::make_pair("host2", 12345));
+	const server::VirtualServer vs1 = CreateVirtualServer(server_name1, host_ports);
 
-	std::string  expected_server_name2 = "localhost2";
-	LocationList expected_locations2;
-	expected_locations2.push_back(CreateLocation("/", "/data/www/test", "index.html", "GET POST"));
-	expected_locations2.push_back(
-		CreateLocation("/static/", "/data/www", "index.html", "GET POST DELETE")
-	);
-	HostPortList expected_host_port_list2;
-	expected_host_port_list1.push_back(std::make_pair("host1", 8080));
-	expected_host_port_list2.push_back(std::make_pair("host3", 9999));
-	server::VirtualServer vs2(expected_server_name2, expected_locations2, expected_host_port_list2);
+	ServerNameList server_name2;
+	server_name2.push_back("localhost2");
+	server_name2.push_back("test_serv");
+	HostPortList host_ports2;
+	host_ports2.push_back(std::make_pair("host1", 8080));
+	host_ports2.push_back(std::make_pair("host3", 9999));
+	const server::VirtualServer vs2 = CreateVirtualServer(server_name2, host_ports2);
 
 	/* -------------- VirtualServerAddrList用意 -------------- */
 	VirtualServerAddrList expected_vs_addr_list1;

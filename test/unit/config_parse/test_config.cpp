@@ -65,13 +65,13 @@ bool operator!=(const LocationCon &lhs, const LocationCon &rhs) {
 }
 
 bool operator==(const ServerCon &lhs, const ServerCon &rhs) {
-	return lhs.host == rhs.host && lhs.port == rhs.port && lhs.server_names == rhs.server_names &&
+	return lhs.host_ports == rhs.host_ports && lhs.server_names == rhs.server_names &&
 		   lhs.location_con == rhs.location_con &&
 		   lhs.client_max_body_size == rhs.client_max_body_size && lhs.error_page == rhs.error_page;
 }
 
 bool operator!=(const ServerCon &lhs, const ServerCon &rhs) {
-	return lhs.host != rhs.host || lhs.port != rhs.port || lhs.server_names != rhs.server_names ||
+	return lhs.host_ports != rhs.host_ports || lhs.server_names != rhs.server_names ||
 		   lhs.location_con != rhs.location_con ||
 		   lhs.client_max_body_size != rhs.client_max_body_size || lhs.error_page != rhs.error_page;
 }
@@ -117,14 +117,14 @@ context::LocationCon BuildLocationCon(
 
 // 引数付きのFactory Function: 引数ありコンストラクタはここでしか使わないため
 context::ServerCon BuildServerCon(
-	const std::list<unsigned int>              &port,
-	const std::list<std::string>               &server_names,
-	const LocationList                         &location_con,
-	std::size_t                                 client_max_body_size,
-	const std::pair<unsigned int, std::string> &error_page
+	const std::list< std::pair<std::string, unsigned int> > &host_ports,
+	const std::list<std::string>                            &server_names,
+	const LocationList                                      &location_con,
+	std::size_t                                              client_max_body_size,
+	const std::pair<unsigned int, std::string>              &error_page
 ) {
 	context::ServerCon server;
-	server.port                 = port;
+	server.host_ports           = host_ports;
 	server.server_names         = server_names;
 	server.location_con         = location_con;
 	server.client_max_body_size = client_max_body_size;
@@ -145,13 +145,14 @@ std::ostream &operator<<(std::ostream &os, const std::list<std::string> &str_lis
 	return os;
 }
 
-/* For ports */
-std::ostream &operator<<(std::ostream &os, const std::list<unsigned int> &int_list) {
-	std::list<unsigned int>::const_iterator it = int_list.begin();
-	while (it != int_list.end()) {
-		os << *it;
+/* For host_ports */
+std::ostream &
+operator<<(std::ostream &os, const std::list< std::pair<std::string, unsigned int> > &pair_list) {
+	std::list< std::pair<std::string, unsigned int> >::const_iterator it = pair_list.begin();
+	while (it != pair_list.end()) {
+		os << "{" << (*it).first << ":" << (*it).second << "}";
 		++it;
-		if (it != int_list.end()) {
+		if (it != pair_list.end()) {
 			os << ", ";
 		}
 	}
@@ -182,7 +183,7 @@ std::ostream &operator<<(std::ostream &os, const LocationList &locations) {
 }
 
 std::ostream &operator<<(std::ostream &os, const context::ServerCon &server) {
-	os << "{port: " << server.port << ", "
+	os << "{host_ports: " << server.host_ports << ", "
 	   << "server_name: " << server.server_names << ", "
 	   << "location_context: " << server.location_con << ", "
 	   << "client_max_body_size: " << server.client_max_body_size << ", "
@@ -266,12 +267,12 @@ int RunErrorTest(std::string file_path, const std::string &src) {
 
 /* Test1 One Server */
 ServerList MakeExpectedTest1() {
-	ServerList                           expected_result;
-	std::list<unsigned int>              expected_ports_1;
-	std::list<std::string>               server_names_1;
-	LocationList                         expected_locationlist_1;
-	std::pair<unsigned int, std::string> error_page_1;
-	context::ServerCon                   expected_server_1 = BuildServerCon(
+	ServerList                                        expected_result;
+	std::list< std::pair<std::string, unsigned int> > expected_ports_1;
+	std::list<std::string>                            server_names_1;
+	LocationList                                      expected_locationlist_1;
+	std::pair<unsigned int, std::string>              error_page_1;
+	context::ServerCon                                expected_server_1 = BuildServerCon(
         expected_ports_1, server_names_1, expected_locationlist_1, 1024, error_page_1
     );
 	expected_result.push_back(expected_server_1);
@@ -281,13 +282,13 @@ ServerList MakeExpectedTest1() {
 
 /* Test2 One Server, One Location */
 ServerList MakeExpectedTest2() {
-	ServerList                           expected_result;
-	std::list<unsigned int>              expected_ports_1;
-	std::list<std::string>               server_names_1;
-	LocationList                         expected_locationlist_1;
-	std::list<std::string>               allowed_methods_1;
-	std::pair<unsigned int, std::string> redirect_1;
-	context::LocationCon                 expected_location_1_1 =
+	ServerList                                        expected_result;
+	std::list< std::pair<std::string, unsigned int> > expected_ports_1;
+	std::list<std::string>                            server_names_1;
+	LocationList                                      expected_locationlist_1;
+	std::list<std::string>                            allowed_methods_1;
+	std::pair<unsigned int, std::string>              redirect_1;
+	context::LocationCon                              expected_location_1_1 =
 		BuildLocationCon("/", "", "", false, allowed_methods_1, redirect_1);
 	expected_locationlist_1.push_back(expected_location_1_1);
 	std::pair<unsigned int, std::string> error_page_1;
@@ -301,9 +302,9 @@ ServerList MakeExpectedTest2() {
 
 /* Test3 Server, Location Directive */
 ServerList MakeExpectedTest3() {
-	ServerList              expected_result;
-	std::list<unsigned int> expected_ports_1;
-	expected_ports_1.push_back(8080);
+	ServerList                                        expected_result;
+	std::list< std::pair<std::string, unsigned int> > expected_ports_1;
+	expected_ports_1.push_back(std::make_pair("0.0.0.0", 8080));
 	std::list<std::string> server_names_1;
 	server_names_1.push_back("localhost");
 	LocationList                         expected_locationlist_1;
@@ -327,9 +328,9 @@ ServerList MakeExpectedTest4() {
 	std::list<std::string> server_names_1;
 	server_names_1.push_back("server_name");
 	server_names_1.push_back("server");
-	std::list<unsigned int> expected_ports_1;
-	expected_ports_1.push_back(8080);
-	expected_ports_1.push_back(8000);
+	std::list< std::pair<std::string, unsigned int> > expected_ports_1;
+	expected_ports_1.push_back(std::make_pair("0.0.0.0", 8080));
+	expected_ports_1.push_back(std::make_pair("0.0.0.0", 8000));
 	LocationList                         expected_locationlist_1;
 	std::pair<unsigned int, std::string> error_page_1;
 	context::ServerCon                   expected_server_1 = BuildServerCon(
@@ -342,9 +343,9 @@ ServerList MakeExpectedTest4() {
 
 /* Test5 Multiple Locations */
 ServerList MakeExpectedTest5() {
-	ServerList              expected_result;
-	std::list<unsigned int> expected_ports_1;
-	std::list<std::string>  server_names_1;
+	ServerList                                        expected_result;
+	std::list< std::pair<std::string, unsigned int> > expected_ports_1;
+	std::list<std::string>                            server_names_1;
 	server_names_1.push_back("test.serv");
 	LocationList                         expected_locationlist_1;
 	std::list<std::string>               allowed_methods_1_1;
@@ -371,11 +372,11 @@ ServerList MakeExpectedTest6() {
 	ServerList             expected_result;
 	std::list<std::string> server_names_1;
 	server_names_1.push_back("comment.serv");
-	std::list<unsigned int>              expected_ports_1;
-	LocationList                         expected_locationlist_1;
-	std::list<std::string>               allowed_methods_1;
-	std::pair<unsigned int, std::string> redirect_1;
-	context::LocationCon                 expected_location_1_1 =
+	std::list< std::pair<std::string, unsigned int> > expected_ports_1;
+	LocationList                                      expected_locationlist_1;
+	std::list<std::string>                            allowed_methods_1;
+	std::pair<unsigned int, std::string>              redirect_1;
+	context::LocationCon                              expected_location_1_1 =
 		BuildLocationCon("/", "", "index.html", false, allowed_methods_1, redirect_1);
 	expected_locationlist_1.push_back(expected_location_1_1);
 	std::pair<unsigned int, std::string> error_page_1;
@@ -391,8 +392,8 @@ ServerList MakeExpectedTest6() {
 ServerList MakeExpectedTest7() {
 	ServerList expected_result;
 
-	std::list<unsigned int> expected_ports_1;
-	expected_ports_1.push_back(8080);
+	std::list< std::pair<std::string, unsigned int> > expected_ports_1;
+	expected_ports_1.push_back(std::make_pair("0.0.0.0", 8080));
 	std::list<std::string> server_names_1;
 	server_names_1.push_back("localhost");
 	LocationList                         expected_locationlist_1;
@@ -402,8 +403,8 @@ ServerList MakeExpectedTest7() {
     );
 	expected_result.push_back(expected_server_1);
 
-	std::list<unsigned int> expected_ports_2;
-	expected_ports_2.push_back(12345);
+	std::list< std::pair<std::string, unsigned int> > expected_ports_2;
+	expected_ports_2.push_back(std::make_pair("0.0.0.0", 12345));
 	std::list<std::string> server_names_2;
 	server_names_2.push_back("test.www");
 	LocationList                         expected_locationlist_2;
@@ -418,9 +419,9 @@ ServerList MakeExpectedTest7() {
 
 /* Test8 Additional Directives */
 ServerList MakeExpectedTest8() {
-	ServerList              expected_result;
-	std::list<unsigned int> expected_ports_1;
-	expected_ports_1.push_back(8080);
+	ServerList                                        expected_result;
+	std::list< std::pair<std::string, unsigned int> > expected_ports_1;
+	expected_ports_1.push_back(std::make_pair("0.0.0.0", 8080));
 	std::list<std::string> server_names_1;
 	server_names_1.push_back("localhost");
 	LocationList           expected_locationlist_1;
@@ -442,10 +443,10 @@ ServerList MakeExpectedTest8() {
 
 /* Test9 Additional Directives (host, cgi_extension, upload_dir) */
 ServerList MakeExpectedTest9() {
-	ServerList              expected_result;
-	std::list<unsigned int> expected_ports_1;
-	expected_ports_1.push_back(4242);
-	expected_ports_1.push_back(8080);
+	ServerList                                        expected_result;
+	std::list< std::pair<std::string, unsigned int> > expected_ports_1;
+	expected_ports_1.push_back(std::make_pair("localhost", 4242));
+	expected_ports_1.push_back(std::make_pair("0.0.0.0", 8080));
 	std::list<std::string> server_names_1;
 	server_names_1.push_back("localhost");
 	LocationList           expected_locationlist_1;
@@ -462,7 +463,6 @@ ServerList MakeExpectedTest9() {
 	context::ServerCon                   expected_server_1 = BuildServerCon(
         expected_ports_1, server_names_1, expected_locationlist_1, 2024, error_page_1
     );
-	expected_server_1.host = "localhost"; // tmp(Builderに追加したい)
 	expected_result.push_back(expected_server_1);
 
 	return expected_result;
@@ -491,7 +491,8 @@ int ListenDirectiveErrorTests() {
 	ret_code |= RunErrorTest("listen/listen_multi_params.conf", "listen/listen_multi_params.conf");
 	ret_code |=
 		RunErrorTest("listen/listen_duplicated_port.conf", "listen/listen_duplicated_port.conf");
-	ret_code |= RunErrorTest("listen/listen_multi_hosts.conf", "listen/listen_multi_hosts.conf");
+	ret_code |=
+		RunErrorTest("listen/listen_invalid_format.conf", "listen/listen_invalid_format.conf");
 
 	return ret_code;
 }

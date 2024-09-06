@@ -1,41 +1,27 @@
 NAME			:=	a.out
 
 # 1. Set each directory name
-TEST_DIR		:=	http_serverinfo_check
+TEST_DIR		:=	http_status_code
+TEST_CASE_DIR		:=	test
 
 LOG_DIR			:=	log
 LOG_FILE_NAME	:=	$(TEST_DIR).log
 LOG_FILE_PATH	:=	$(LOG_DIR)/$(LOG_FILE_NAME)
 
 # 2. Add target webserv files
-WS_SRCS_DIR				:=	../../../srcs
-WS_UTILS_DIR			:= $(WS_SRCS_DIR)/utils
+WS_SRCS_DIR		:=	../../../srcs
+WS_UTILS_DIR	:=	$(WS_SRCS_DIR)/utils
 WS_HTTP_DIR				:=	$(WS_SRCS_DIR)/http
-WS_HTTP_REQUEST_DIR		:=	$(WS_HTTP_DIR)/request
-WS_HTTP_PARSE_DIR		:=	$(WS_HTTP_REQUEST_DIR)/parse
-WS_HTTP_RESPONSE_DIR	:=	$(WS_HTTP_DIR)/response
-WS_HTTP_SERVERINFO_CHECK_DIR	:=	$(WS_HTTP_RESPONSE_DIR)/http_serverinfo_check
-WS_VIRTUAL_SERVER_DIR			:=	$(WS_SRCS_DIR)/server/context_manager/virtual_server
 
-SRCS				+=	$(WS_HTTP_SERVERINFO_CHECK_DIR)/http_serverinfo_check.cpp \
-						$(WS_UTILS_DIR)/color.cpp \
-						$(WS_UTILS_DIR)/convert_str.cpp \
-						$(WS_UTILS_DIR)/isdigit.cpp \
-						$(WS_HTTP_DIR)/http_message.cpp \
-						$(WS_HTTP_DIR)/http_exception.cpp \
-						$(WS_HTTP_DIR)/status_code.cpp
+SRCS			+=	$(WS_UTILS_DIR)/color.cpp \
+					$(WS_HTTP_DIR)/status_code.cpp
 
 # 3. Add unit test files
-SRCS	+=	test_http_serverinfo_check.cpp
+SRCS	+=	test_http_status_code.cpp
 
 # 4. Add directory for INCLUDE
 SRCS_DIR	:=	$(WS_UTILS_DIR) \
-				$(WS_HTTP_DIR) \
-				$(WS_HTTP_REQUEST_DIR) \
-				$(WS_HTTP_PARSE_DIR) \
-				$(WS_HTTP_RESPONSE_DIR) \
-				$(WS_HTTP_SERVERINFO_CHECK_DIR) \
-				$(WS_VIRTUAL_SERVER_DIR)
+				$(WS_HTTP_DIR)
 
 #--------------------------------------------
 OBJ_DIR		:=	objs
@@ -50,7 +36,7 @@ DEPS		:=	$(OBJS:.o=.d)
 MKDIR		:=	mkdir -p
 
 .PHONY	: all
-all: $(NAME)
+all:  $(NAME)
 
 $(NAME): $(OBJS)
 	$(CXX) -o $@ $^
@@ -61,7 +47,7 @@ $(OBJ_DIR)/%.o: %.cpp
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
 
 .PHONY	: clean
-clean:
+clean: 
 	$(RM) -r $(OBJ_DIR)
 
 .PHONY	: fclean

@@ -86,7 +86,7 @@ HttpRequestResult HttpParse::Run(const std::string &read_buf) {
 }
 
 RequestLine HttpParse::SetRequestLine(
-	const std::vector<std::string> &request_line_info, StatusCode *status_code
+	const std::vector<std::string> &request_line_info, EStatusCode *status_code
 ) {
 	RequestLine request_line;
 	try {
@@ -100,7 +100,7 @@ RequestLine HttpParse::SetRequestLine(
 }
 
 HeaderFields HttpParse::SetHeaderFields(
-	const std::vector<std::string> &header_fields_info, StatusCode *status_code
+	const std::vector<std::string> &header_fields_info, EStatusCode *status_code
 ) {
 	// todo: 各値が正常な値かどうか確認してから作成する（エラーの場合はenumに設定？）
 	HeaderFields                                     header_fields;
@@ -152,9 +152,9 @@ std::string HttpParse::CheckHeaderFieldValue(const std::string &header_field_val
 	return header_field_value;
 }
 
-HttpParse::HttpException::HttpException(StatusCode status_code) : status_code_(status_code) {}
+HttpParse::HttpException::HttpException(EStatusCode status_code) : status_code_(status_code) {}
 
-StatusCode HttpParse::HttpException::GetStatusCode() const {
+EStatusCode HttpParse::HttpException::GetStatusCode() const {
 	return status_code_;
 }
 

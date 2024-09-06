@@ -26,34 +26,28 @@ VirtualServer::LocationList ConvertLocations(const config::context::LocationList
 	typedef config::context::LocationList::const_iterator Itr;
 	for (Itr it = config_locations.begin(); it != config_locations.end(); ++it) {
 		Location location;
-		location.location       = it->request_uri;
-		location.root           = it->alias;
-		location.index          = it->index;
-		location.allowed_method = "GET"; // todo: tmp
+		location.request_uri      = it->request_uri;
+		location.alias            = it->alias;
+		location.index            = it->index;
+		location.autoindex        = it->autoindex;
+		location.allowed_methods  = it->allowed_methods;
+		location.redirect         = it->redirect;
+		location.cgi_extension    = it->cgi_extension;
+		location.upload_directory = it->upload_directory;
+
 		location_list.push_back(location);
 	}
 	return location_list;
 }
 
 VirtualServer ConvertToVirtualServer(const config::context::ServerCon &config_server) {
-	const std::string          &server_name = *(config_server.server_names.begin()); // tmp
-	VirtualServer::LocationList locations   = ConvertLocations(config_server.location_con);
-
-	// todo: tmp
-	static int                  n = 0;
-	VirtualServer::HostPortList host_port_list;
-	if (n == 0) {
-		host_port_list.push_back(std::make_pair("0.0.0.0", 8080));
-		// host_port_list.push_back(std::make_pair("::1", 8080));
-	} else {
-		host_port_list.push_back(std::make_pair("0.0.0.0", 8080));
-		host_port_list.push_back(std::make_pair("0.0.0.0", 9999));
-		host_port_list.push_back(std::make_pair("0.0.0.0", 12345));
-		// host_port_list.push_back(std::make_pair("::1", 8080));
-	}
-	++n;
-
-	return VirtualServer(server_name, locations, host_port_list);
+	return VirtualServer(
+		config_server.server_names,
+		ConvertLocations(config_server.location_con),
+		config_server.host_ports,
+		config_server.client_max_body_size,
+		config_server.error_page
+	);
 }
 // todo: tmp for debug
 void DebugVirtualServerNames(
@@ -63,7 +57,7 @@ void DebugVirtualServerNames(
 	std::cerr << "server_name: ";
 	for (ItVs it = virtual_server_addr_list.begin(); it != virtual_server_addr_list.end(); ++it) {
 		const VirtualServer *virtual_server = *it;
-		std::cerr << "[" << virtual_server->GetServerName() << "]";
+		std::cerr << "[" << *virtual_server->GetServerNameList().begin() << "]"; // todo: tmp
 	}
 	std::cerr << std::endl;
 }

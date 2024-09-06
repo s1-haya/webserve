@@ -9,8 +9,9 @@ namespace http {
 
 class HttpException : public std::runtime_error {
   public:
-	explicit HttpException(const std::string &error_message, StatusCode status_code);
-	StatusCode GetStatusCode() const;
+	HttpException(const std::string &error_message, const StatusCode &status_code);
+	~HttpException() throw();
+	const StatusCode &GetStatusCode() const throw();
 
   private:
 	StatusCode status_code_;

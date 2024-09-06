@@ -28,27 +28,25 @@ namespace http {
 // }
 struct HttpResult;
 
-class TmpHttp {
+class Http {
   public:
-	TmpHttp();
-	~TmpHttp();
+	Http();
+	~Http();
 	HttpResult Run(const MockDtoClientInfos &client_info, const MockDtoServerInfos &server_info);
-	void       ParseHttpRequestFormat(int client_fd, const std::string &read_buf);
-	utils::Result<void> TmpParseHttpRequestFormat(int client_fd, const std::string &read_buf);
-	std::string        CreateHttpResponse(int client_fd);
-	std::string        CreateHttpResponse(
-			   const MockDtoClientInfos &client_info, const MockDtoServerInfos &server_info
-		   );
-	// todo: 408のtimeoutのレスポンス
-
+	//  HttpResult GetErrorResponse(const ClientInfos &client_info, ErrState state);
 	// For test
 	HttpRequestParsedData GetClientData(int client_fd);
 
   private:
-	TmpHttp(const TmpHttp &other);
-	TmpHttp    &operator=(const TmpHttp &other);
-	HttpStorage storage_;
-	bool        IsHttpRequestFormatComplete(int client_fd);
+	Http(const Http &other);
+	Http               &operator=(const Http &other);
+	HttpStorage         storage_;
+	utils::Result<void> ParseHttpRequestFormat(int client_fd, const std::string &read_buf);
+	std::string         CreateHttpResponse(
+				const MockDtoClientInfos &client_info, const MockDtoServerInfos &server_info
+			);
+	bool IsHttpRequestFormatComplete(int client_fd);
+	// HttpResult CreateBadRequestResponse(int client_fd);
 };
 
 } // namespace http

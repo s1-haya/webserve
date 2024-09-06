@@ -22,8 +22,11 @@ struct CheckServerInfoResult {
 	std::string            upload_directory;
 
 	utils::Result< std::pair<unsigned int, std::string> > redirect;
-	std::pair<unsigned int, std::string>                  error_page;
-	CheckServerInfoResult() : autoindex(false) {};
+	utils::Result< std::pair<unsigned int, std::string> > error_page;
+	CheckServerInfoResult() : autoindex(false) {
+		redirect.Set(false);
+		error_page.Set(false);
+	};
 };
 
 class HttpServerInfoCheck {
@@ -36,7 +39,7 @@ class HttpServerInfoCheck {
 	static void CheckDTOServerInfo(
 		CheckServerInfoResult    &result,
 		const MockDtoServerInfos &server_info,
-		HeaderFields             &header_fields
+		const HeaderFields       &header_fields
 	);
 	static void CheckLocationList(
 		CheckServerInfoResult &result,
@@ -61,13 +64,13 @@ class HttpServerInfoCheck {
 
 	typedef std::list<const server::VirtualServer &> VirtualServerAddrList;
 	static const server::VirtualServer &
-	CheckVSList(const VirtualServerAddrList &server_infos, HttpRequestFormat &request);
+	CheckVSList(const VirtualServerAddrList &server_infos, const HttpRequestFormat &request);
 	static CheckServerInfoResult
-				Check(const VirtualServerAddrList &server_infos, HttpRequestFormat &request);
+				Check(const VirtualServerAddrList &server_infos, const HttpRequestFormat &request);
 	static void CheckDtoServerInfo(
 		CheckServerInfoResult       &result,
 		const server::VirtualServer &virtual_server,
-		HeaderFields                &header_fields
+		const HeaderFields          &header_fields
 	);
 
 	typedef std::list<server::Location> VSLocationList;
@@ -93,7 +96,7 @@ class HttpServerInfoCheck {
 
   public:
 	static CheckServerInfoResult
-	Check(const MockDtoServerInfos &server_info, HttpRequestFormat &request);
+	Check(const MockDtoServerInfos &server_info, const HttpRequestFormat &request);
 };
 
 } // namespace http

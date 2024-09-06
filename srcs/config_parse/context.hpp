@@ -3,6 +3,7 @@
 
 #include <list>
 #include <string>
+#include <utility>
 
 namespace config {
 namespace context {
@@ -19,12 +20,11 @@ struct LocationCon {
 	LocationCon() : autoindex(false) {}
 };
 
-typedef std::list<unsigned int> PortList;
-typedef std::list<LocationCon>  LocationList;
+typedef std::list<LocationCon>               LocationList;
+typedef std::pair<std::string, unsigned int> HostPortPair;
 
 struct ServerCon {
-	std::string                          host;
-	PortList                             port;
+	std::list<HostPortPair>              host_ports;
 	std::list<std::string>               server_names;
 	LocationList                         location_con;
 	std::size_t                          client_max_body_size;

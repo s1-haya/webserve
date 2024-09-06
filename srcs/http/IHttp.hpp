@@ -26,7 +26,7 @@ class IHttp {
 	 */
 	virtual HttpResult
 	Run(const server::DtoClientInfos &client_infos, const server::DtoServerInfos &server_infos) = 0;
-	virtual std::string GetTimeoutResponse(int client_fd)                               = 0;
+	virtual std::string GetTimeoutResponse(int client_fd)                                       = 0;
 };
 
 } // namespace http
