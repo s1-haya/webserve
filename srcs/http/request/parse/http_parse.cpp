@@ -202,13 +202,6 @@ void HttpParse::CheckValidMethod(const std::string &method) {
 			StatusCode(BAD_REQUEST)
 		);
 	}
-	// GET, POST, DELETEかどうか ->　501
-	if (std::find(BASIC_METHODS, BASIC_METHODS + BASIC_METHODS_SIZE, method) ==
-		BASIC_METHODS + BASIC_METHODS_SIZE) {
-		throw HttpException(
-			"Error: This method doesn't exist in webserv.", StatusCode(NOT_IMPLEMENTED)
-		);
-	}
 }
 
 void HttpParse::CheckValidRequestTarget(const std::string &request_target) {

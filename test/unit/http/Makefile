@@ -20,12 +20,15 @@ SRCS				+=	$(WS_UTILS_DIR)/color.cpp \
 						$(WS_UTILS_DIR)/split_str.cpp \
 						$(WS_UTILS_DIR)/isdigit.cpp \
 						$(WS_UTILS_DIR)/convert_str.cpp \
+						$(WS_UTILS_DIR)/system_exception.cpp \
 						$(WS_HTTP_DIR)/status_code.cpp \
 						$(WS_HTTP_DIR)/http_message.cpp \
 						$(WS_HTTP_DIR)/http_exception.cpp \
 						$(WS_HTTP_DIR)/tmp_http.cpp \
 						$(WS_HTTP_REQUEST_DIR)/http_storage.cpp \
 						$(WS_HTTP_RESPONSE_DIR)/http_response.cpp \
+						$(WS_HTTP_RESPONSE_DIR)/http_handle_method.cpp \
+						$(WS_HTTP_RESPONSE_DIR)/stat.cpp \
 						$(WS_HTTP_SERVER_INFO_CHECK_DIR)/http_serverinfo_check.cpp \
 						$(WS_HTTP_PARSE_DIR)/http_parse.cpp
 

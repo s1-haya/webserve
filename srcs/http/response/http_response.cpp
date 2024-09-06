@@ -1,8 +1,8 @@
 #include "http_response.hpp"
 #include "client_infos.hpp"
+#include "http_exception.hpp"
 #include "http_message.hpp"
 #include "http_parse.hpp"
-#include "http_serverinfo_check.hpp"
 #include "server_infos.hpp"
 #include <iostream>
 #include <sstream>
@@ -31,9 +31,11 @@ HttpResponseFormat HttpResponse::TmpCreateHttpResponseFormat(
 	const MockDtoServerInfos &server_info,
 	const HttpRequestResult  &request_info
 ) {
+	// todo: InitHeaderFields(最終的にはtryの外側でinitする/try,
+	// catch両方header_fieldsを使用するため)
 	try {
-		HttpResponseFormat    result;
-		CheckServerInfoResult server_info_result =
+		HttpResponseFormat           result;
+		const CheckServerInfoResult &server_info_result =
 			HttpServerInfoCheck::Check(server_info, request_info.request);
 		// todo: if redirect
 		// if (server_info_result.redirect.IsOk()) {
@@ -48,16 +50,30 @@ HttpResponseFormat HttpResponse::TmpCreateHttpResponseFormat(
 		// -> Internal　Server Errorを投げる可能性あり
 		// result = CgiToServerHandler();
 		// } else {
-		// 	result = MethodHandler();
 		// }
 		//     return CreateSuccessResponseResult();
 		(void)client_info;
-		(void)request_info;
 		(void)server_info_result;
+		std::string       response_body_message;
+		const StatusCode &status_code = MethodHandler(
+			server_info_result.path,
+			request_info.request.request_line.method,
+			server_info_result.allowed_methods,
+			request_info.request.body_message,
+			response_body_message
+		);
 		return result;
 	} catch (const HttpException &e) {
+		// ステータスコードが300番台以上の場合
 		// feature: header_fieldとerror_pageとの関連性がわかり次第変更あり
-		return CreateErrorHttpResponseFormat(e.GetStatusCode());
+		// 返り値: response 引数:error_page, status_code
+		// todo: error_page status_code classに対応
+		// if (server_info.error_page.IsOk() &&
+		// 	status_code.GetEStatusCode() == server_info.error_page.GetValue().first) {
+		// 	response_message = ReadFile(server_info.error_page.GetValue().second);
+		// 	// check the path of error_page
+		// }
+		return CreateDefaultHttpResponseFormat(e.GetStatusCode());
 	}
 }
 
@@ -65,7 +81,7 @@ HttpResponseFormat HttpResponse::TmpCreateHttpResponseFormat(
 HttpResponseFormat HttpResponse::CreateHttpResponseFormat(const HttpRequestResult &request_info) {
 	HttpResponseFormat response;
 	if (request_info.status_code.GetEStatusCode() != http::OK) {
-		response = CreateErrorHttpResponseFormat(request_info.status_code);
+		response = CreateDefaultHttpResponseFormat(request_info.status_code);
 	} else {
 		response = CreateSuccessHttpResponseFormat(request_info);
 	}
@@ -98,7 +114,7 @@ std::string HttpResponse::CreateDefaultBodyMessageFormat(const StatusCode &statu
 }
 
 // mock
-HttpResponseFormat HttpResponse::CreateErrorHttpResponseFormat(const StatusCode &status_code) {
+HttpResponseFormat HttpResponse::CreateDefaultHttpResponseFormat(const StatusCode &status_code) {
 	HttpResponseFormat response;
 	response.status_line.version           = HTTP_VERSION;
 	response.status_line.status_code       = status_code.GetStatusCode();

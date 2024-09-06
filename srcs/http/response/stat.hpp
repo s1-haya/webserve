@@ -8,7 +8,7 @@ namespace http {
 
 class Stat {
   public:
-	Stat(const std::string &path);
+	Stat(const struct stat &stat_buf);
 	Stat(const Stat &other);
 	Stat &operator=(const Stat &other);
 	~Stat();
