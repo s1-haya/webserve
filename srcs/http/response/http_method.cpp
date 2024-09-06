@@ -63,7 +63,7 @@ StatusCode Method::Handler(
 // todo: refactor
 StatusCode Method::GetHandler(const std::string &path, std::string &response_body_message) {
 	StatusCode status_code(OK);
-	Stat       info = TryStat(path, response_body_message);
+	const Stat &info = TryStat(path);
 	if (info.IsDirectory()) {
 		// No empty string because the path has '/'
 		if (path[path.size() - 1] != '/') {
@@ -92,7 +92,7 @@ StatusCode Method::PostHandler(
 	if (!IsExistPath(path)) {
 		return FileCreationHandler(path, request_body_message, response_body_message);
 	}
-	const Stat &info = TryStat(path, response_body_message);
+	const Stat &info = TryStat(path);
 	StatusCode  status_code(NO_CONTENT);
 	if (info.IsDirectory()) {
 		throw HttpException("Error: Forbidden", StatusCode(FORBIDDEN));
@@ -109,7 +109,7 @@ StatusCode Method::PostHandler(
 
 StatusCode
 Method::DeleteHandler(const std::string &path, std::string &response_body_message) {
-	const Stat &info        = TryStat(path, response_body_message);
+	const Stat &info        = TryStat(path);
 	StatusCode  status_code = StatusCode(NO_CONTENT);
 	if (info.IsDirectory()) {
 		throw HttpException("Error: Forbidden", StatusCode(FORBIDDEN));
@@ -121,9 +121,7 @@ Method::DeleteHandler(const std::string &path, std::string &response_body_messag
 	return status_code;
 }
 
-void Method::SystemExceptionHandler(
-	const utils::SystemException &e, std::string &response_body_message
-) {
+void Method::SystemExceptionHandler(const utils::SystemException &e) {
 	int        error_number = e.GetErrorNumber();
 	if (error_number == EACCES || error_number == EPERM) {
 		throw HttpException("Error: Forbidden", StatusCode(FORBIDDEN));
@@ -157,7 +155,7 @@ StatusCode Method::FileCreationHandler(
 	return status_code;
 }
 
-Stat Method::TryStat(const std::string &path, std::string &response_body_message) {
+Stat Method::TryStat(const std::string &path) {
 	struct stat stat_buf;
 	try {
 		if (stat(path.c_str(), &stat_buf) == -1) {
@@ -166,7 +164,7 @@ Stat Method::TryStat(const std::string &path, std::string &response_body_message
 			throw utils::SystemException(error_message, errno);
 		}
 	} catch (const utils::SystemException &e) {
-		SystemExceptionHandler(e, response_body_message);
+		SystemExceptionHandler(e);
 	}
 	Stat info(stat_buf);
 	return info;

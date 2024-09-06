@@ -29,11 +29,11 @@ class Method {
 	static StatusCode DeleteHandler(const std::string &path, std::string &response_body_message);
 
   private:
-	static Stat       TryStat(const std::string &path, std::string &response_body_message);
+	static Stat       TryStat(const std::string &path);
 	static bool
 	IsAllowedMethod(const std::string &method, const std::list<std::string> &allow_method);
 	static void
-	SystemExceptionHandler(const utils::SystemException &e, std::string &response_body_message);
+	SystemExceptionHandler(const utils::SystemException &e);
 	static StatusCode FileCreationHandler(
 		const std::string &path,
 		const std::string &request_body_message,
