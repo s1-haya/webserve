@@ -346,6 +346,7 @@ int Test4_() {
 
 /*==========================================================*/ // 消す
 
+/* 以下のテストではメソッドは特に関係ない */
 int Test1() {
 	// request
 	const RequestLine request_line = {"GET", "/", "HTTP/1.1"};
@@ -383,8 +384,8 @@ int Test2() {
 	// request
 	const RequestLine request_line = {"GET", "/www/test.html", "HTTP/1.1"};
 	HttpRequestFormat request;
-	request.request_line              = request_line;
-	request.header_fields[HOST]       = "host1";
+	request.request_line = request_line;
+	request.header_fields[HOST] = "host10"; // hostが見つからない場合がデフォルト(host1)に
 	request.header_fields[CONNECTION] = "keep-alive";
 
 	server::VirtualServerAddrList virtual_servers = BuildVirtualServerAddrList();
@@ -477,6 +478,41 @@ int Test4() {
 	DeleteAddrList(virtual_servers);
 	return EXIT_SUCCESS;
 }
+
+// 仮置き: host3を使ってlocation NOFエラーをチェックしたい
+// int Test5() {
+// 	// request
+// 	const RequestLine request_line = {"GET", "/", "HTTP/1.1"};
+// 	HttpRequestFormat request;
+// 	request.request_line              = request_line;
+// 	request.header_fields[HOST]       = "host3";
+// 	request.header_fields[CONNECTION] = "keep-alive";
+
+// 	server::VirtualServerAddrList virtual_servers = BuildVirtualServerAddrList();
+// 	CheckServerInfoResult         result = HttpServerInfoCheck::Check(virtual_servers, request);
+// 	const server::VirtualServer  *vs     = *(Next(virtual_servers.begin(), 2)); // host3
+// 	server::Location              location =
+// 		vs->GetLocationList().front(); // location1(nothing)
+
+// 	try {
+// 		COMPARE(result.path, location.request_uri);
+// 		COMPARE(result.index, location.index);
+// 		COMPARE(result.autoindex, location.autoindex);
+// 		COMPARE(result.allowed_methods, location.allowed_methods);
+// 		COMPARE(result.cgi_extension, location.cgi_extension);
+// 		COMPARE(result.upload_directory, location.upload_directory);
+// 		COMPARE(result.redirect.GetValue(), location.redirect);
+// 		COMPARE(result.error_page.GetValue(), virtual_servers.front()->GetErrorPage());
+// 	} catch (const std::exception &e) {
+// 		PrintNg();
+// 		std::cerr << e.what() << '\n';
+// 		DeleteAddrList(virtual_servers);
+// 		return EXIT_FAILURE;
+// 	}
+// 	PrintOk();
+// 	DeleteAddrList(virtual_servers);
+// 	return EXIT_SUCCESS;
+// }
 
 } // namespace
 
