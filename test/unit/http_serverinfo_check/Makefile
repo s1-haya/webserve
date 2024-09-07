@@ -23,8 +23,7 @@ SRCS				+=	$(WS_HTTP_SERVERINFO_CHECK_DIR)/http_serverinfo_check.cpp \
 						$(WS_UTILS_DIR)/isdigit.cpp \
 						$(WS_HTTP_DIR)/http_message.cpp \
 						$(WS_HTTP_DIR)/http_exception.cpp \
-						$(WS_HTTP_DIR)/status_code.cpp \
-						$(WS_VIRTUAL_SERVER_DIR)/virtual_server.cpp
+						$(WS_HTTP_DIR)/status_code.cpp
 
 # 3. Add unit test files
 SRCS	+=	test_http_serverinfo_check.cpp

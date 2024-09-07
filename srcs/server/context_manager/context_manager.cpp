@@ -64,10 +64,4 @@ ContextManager::GetServerInfo(const std::string &host, unsigned int port) const 
 	return sock_context_.GetServerInfo(host, port);
 }
 
-// todo: IP以外も必要ならClientContext作って詰めて返す
-const std::string &ContextManager::GetClientIp(int client_fd) const {
-	const ClientInfo &client_info = sock_context_.GetClientInfo(client_fd);
-	return client_info.GetIp();
-}
-
 } // namespace server

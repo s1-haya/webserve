@@ -1,5 +1,6 @@
 #include "http_exception.hpp"
 #include "http_message.hpp"
+#include "http_method.hpp"
 #include "http_response.hpp"
 #include "http_serverinfo_check.hpp"
 #include "stat.hpp"
@@ -43,7 +44,7 @@ std::string ReadFile(const std::string &file_path) {
 
 namespace http {
 
-StatusCode HttpResponse::MethodHandler(
+StatusCode Method::Handler(
 	const std::string            &path,
 	const std::string            &method,
 	const std::list<std::string> &allow_method,
@@ -60,21 +61,21 @@ StatusCode HttpResponse::MethodHandler(
 		status_code = DeleteHandler(path, response_body_message);
 	} else {
 		status_code           = StatusCode(NOT_IMPLEMENTED);
-		response_body_message = CreateDefaultBodyMessageFormat(status_code);
+		response_body_message = HttpResponse::CreateDefaultBodyMessageFormat(status_code);
 		throw HttpException("Error: Not Implemented", status_code);
 	}
 	return status_code;
 }
 
 // todo: refactor
-StatusCode HttpResponse::GetHandler(const std::string &path, std::string &response_body_message) {
+StatusCode Method::GetHandler(const std::string &path, std::string &response_body_message) {
 	StatusCode status_code(OK);
 	Stat       info = TryStat(path, response_body_message);
 	if (info.IsDirectory()) {
 		// No empty string because the path has '/'
 		if (path[path.size() - 1] != '/') {
 			status_code           = StatusCode(MOVED_PERMANENTLY);
-			response_body_message = CreateDefaultBodyMessageFormat(status_code);
+			response_body_message = HttpResponse::CreateDefaultBodyMessageFormat(status_code);
 			throw HttpException("Error: Moved Permanently", status_code);
 		}
 		// todo: Check for index directive and handle ReadFile function
@@ -83,20 +84,20 @@ StatusCode HttpResponse::GetHandler(const std::string &path, std::string &respon
 	} else if (info.IsRegularFile()) {
 		if (!info.IsReadableFile()) {
 			status_code           = StatusCode(FORBIDDEN);
-			response_body_message = CreateDefaultBodyMessageFormat(status_code);
+			response_body_message = HttpResponse::CreateDefaultBodyMessageFormat(status_code);
 			throw HttpException("Error: Forbidden", status_code);
 		} else {
 			response_body_message = ReadFile(path);
 		}
 	} else {
 		status_code           = StatusCode(NOT_FOUND);
-		response_body_message = CreateDefaultBodyMessageFormat(status_code);
+		response_body_message = HttpResponse::CreateDefaultBodyMessageFormat(status_code);
 		throw HttpException("Error: Not Found", status_code);
 	}
 	return status_code;
 }
 
-StatusCode HttpResponse::PostHandler(
+StatusCode Method::PostHandler(
 	const std::string &path,
 	const std::string &request_body_message,
 	std::string       &response_body_message
@@ -108,10 +109,10 @@ StatusCode HttpResponse::PostHandler(
 	StatusCode  status_code(NO_CONTENT);
 	if (info.IsDirectory()) {
 		status_code           = StatusCode(FORBIDDEN);
-		response_body_message = CreateDefaultBodyMessageFormat(status_code);
+		response_body_message = HttpResponse::CreateDefaultBodyMessageFormat(status_code);
 		throw HttpException("Error: Forbidden", status_code);
 	} else if (info.IsRegularFile()) {
-		response_body_message = CreateDefaultBodyMessageFormat(status_code);
+		response_body_message = HttpResponse::CreateDefaultBodyMessageFormat(status_code);
 	} else {
 		// Location header fields: URI-reference
 		// ex) POST /save/test.txt HTTP/1.1
@@ -121,43 +122,42 @@ StatusCode HttpResponse::PostHandler(
 	return status_code;
 }
 
-StatusCode
-HttpResponse::DeleteHandler(const std::string &path, std::string &response_body_message) {
+StatusCode Method::DeleteHandler(const std::string &path, std::string &response_body_message) {
 	const Stat &info        = TryStat(path, response_body_message);
 	StatusCode  status_code = StatusCode(NO_CONTENT);
 	if (info.IsDirectory()) {
 		status_code           = StatusCode(FORBIDDEN);
-		response_body_message = CreateDefaultBodyMessageFormat(status_code);
+		response_body_message = HttpResponse::CreateDefaultBodyMessageFormat(status_code);
 		throw HttpException("Error: Forbidden", status_code);
 	} else if (std::remove(path.c_str()) == 0) {
-		response_body_message = CreateDefaultBodyMessageFormat(status_code);
+		response_body_message = HttpResponse::CreateDefaultBodyMessageFormat(status_code);
 	} else {
 		throw utils::SystemException(std::strerror(errno), errno);
 	}
 	return status_code;
 }
 
-void HttpResponse::SystemExceptionHandler(
+void Method::SystemExceptionHandler(
 	const utils::SystemException &e, std::string &response_body_message
 ) {
 	StatusCode status_code  = StatusCode(INTERNAL_SERVER_ERROR);
 	int        error_number = e.GetErrorNumber();
 	if (error_number == EACCES || error_number == EPERM) {
 		status_code           = StatusCode(FORBIDDEN);
-		response_body_message = CreateDefaultBodyMessageFormat(status_code);
+		response_body_message = HttpResponse::CreateDefaultBodyMessageFormat(status_code);
 		throw HttpException("Error: Forbidden", status_code);
 	} else if (error_number == ENOENT || error_number == ENOTDIR || error_number == ELOOP ||
 			   error_number == ENAMETOOLONG) {
 		status_code           = StatusCode(NOT_FOUND);
-		response_body_message = CreateDefaultBodyMessageFormat(status_code);
+		response_body_message = HttpResponse::CreateDefaultBodyMessageFormat(status_code);
 		throw HttpException("Error: Not Found", status_code);
 	} else {
-		response_body_message = CreateDefaultBodyMessageFormat(status_code);
+		response_body_message = HttpResponse::CreateDefaultBodyMessageFormat(status_code);
 		throw HttpException("Error: Internal Server Error", status_code);
 	}
 }
 
-StatusCode HttpResponse::FileCreationHandler(
+StatusCode Method::FileCreationHandler(
 	const std::string &path,
 	const std::string &request_body_message,
 	std::string       &response_body_message
@@ -166,7 +166,7 @@ StatusCode HttpResponse::FileCreationHandler(
 	std::ofstream file(path.c_str(), std::ios::binary);
 	if (file.fail()) {
 		status_code           = StatusCode(FORBIDDEN);
-		response_body_message = CreateDefaultBodyMessageFormat(status_code);
+		response_body_message = HttpResponse::CreateDefaultBodyMessageFormat(status_code);
 		throw HttpException("Error: Forbidden", status_code);
 	}
 	file.write(request_body_message.c_str(), request_body_message.length());
@@ -176,14 +176,14 @@ StatusCode HttpResponse::FileCreationHandler(
 			throw utils::SystemException(std::strerror(errno), errno);
 		}
 		status_code           = StatusCode(FORBIDDEN);
-		response_body_message = CreateDefaultBodyMessageFormat(status_code);
+		response_body_message = HttpResponse::CreateDefaultBodyMessageFormat(status_code);
 		throw HttpException("Error: Forbidden", status_code);
 	}
-	response_body_message = CreateDefaultBodyMessageFormat(status_code);
+	response_body_message = HttpResponse::CreateDefaultBodyMessageFormat(status_code);
 	return status_code;
 }
 
-Stat HttpResponse::TryStat(const std::string &path, std::string &response_body_message) {
+Stat Method::TryStat(const std::string &path, std::string &response_body_message) {
 	struct stat stat_buf;
 	try {
 		if (stat(path.c_str(), &stat_buf) == -1) {
@@ -198,7 +198,7 @@ Stat HttpResponse::TryStat(const std::string &path, std::string &response_body_m
 	return info;
 }
 
-bool HttpResponse::IsAllowedMethod(
+bool Method::IsAllowedMethod(
 	const std::string &method, const std::list<std::string> &allow_method
 ) {
 	if (allow_method.empty()) {

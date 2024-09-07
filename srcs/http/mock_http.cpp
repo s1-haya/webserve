@@ -102,9 +102,9 @@ bool IsRequestReceivedComplete(const std::string &buffer) {
 } // namespace
 
 HttpResult MockHttp::Run(
-	const server::DtoClientInfos &client_infos, const server::DtoServerInfos &server_infos
+	const server::DtoClientInfos &client_infos, const server::VirtualServerAddrList &virtual_servers
 ) {
-	(void)server_infos;
+	(void)virtual_servers;
 
 	ParseRequest(client_infos.request_buf);
 	ReadPathContent();

@@ -11,15 +11,16 @@ LOG_FILE_PATH	:=	$(LOG_DIR)/$(LOG_FILE_NAME)
 WS_SRCS_DIR		:=	../../../srcs
 WS_UTILS_DIR	:=	$(WS_SRCS_DIR)/utils
 SRCS			+=	$(WS_UTILS_DIR)/color.cpp
-WS_VIRTUAL_SERVER_DIR	:=	$(WS_SRCS_DIR)/server/context_manager/virtual_server
-SRCS					+=	$(WS_VIRTUAL_SERVER_DIR)/virtual_server_storage.cpp \
-							$(WS_VIRTUAL_SERVER_DIR)/virtual_server.cpp
+WS_VIRTUAL_SERVER_DIR			:=	$(WS_SRCS_DIR)/server/virtual_server
+WS_VIRTUAL_SERVER_STORAGE_DIR	:=	$(WS_SRCS_DIR)/server/context_manager/virtual_server_storage
+SRCS			+=	$(WS_VIRTUAL_SERVER_DIR)/virtual_server.cpp \
+					$(WS_VIRTUAL_SERVER_STORAGE_DIR)/virtual_server_storage.cpp
 
 # 3. Add unit test files
 SRCS	+=	test_virtual_server_storage.cpp
 
 # 4. Add directory for INCLUDE
-SRCS_DIR	:=	$(WS_UTILS_DIR) $(WS_VIRTUAL_SERVER_DIR) 
+SRCS_DIR	:=	$(WS_UTILS_DIR) $(WS_VIRTUAL_SERVER_DIR) $(WS_VIRTUAL_SERVER_STORAGE_DIR)
 
 #--------------------------------------------
 OBJ_DIR		:=	objs

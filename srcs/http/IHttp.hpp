@@ -19,14 +19,15 @@ class IHttp {
 	 * operations, and produces an appropriate response.
 	 *
 	 * @param client_infos(tmp)
-	 * @param server_infos(tmp)
+	 * @param virtual_servers(tmp)
 	 *
 	 * @return HttpResult indicating whether the response is complete
 	 *         and containing the response data.
 	 */
 	virtual HttpResult
-	Run(const server::DtoClientInfos &client_infos, const server::DtoServerInfos &server_infos) = 0;
-	virtual std::string GetTimeoutResponse(int client_fd)                                       = 0;
+						Run(const server::DtoClientInfos        &client_infos,
+							const server::VirtualServerAddrList &virtual_servers) = 0;
+	virtual std::string GetTimeoutResponse(int client_fd)                         = 0;
 };
 
 } // namespace http

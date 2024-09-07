@@ -2,6 +2,7 @@
 #include "client_infos.hpp"
 #include "http_exception.hpp"
 #include "http_message.hpp"
+#include "http_method.hpp"
 #include "http_parse.hpp"
 #include "server_infos.hpp"
 #include <iostream>
@@ -49,7 +50,7 @@ HttpResponseFormat HttpResponse::CreateHttpResponseFormat(
 		(void)client_info;
 		(void)server_info_result;
 		std::string       response_body_message;
-		const StatusCode &status_code = MethodHandler(
+		const StatusCode &status_code = Method::Handler(
 			server_info_result.path,
 			request_info.request.request_line.method,
 			server_info_result.allowed_methods,

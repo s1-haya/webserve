@@ -49,8 +49,8 @@ class Server {
 	);
 	void SetNonBlockingMode(int sock_fd);
 	// for Server to Http
-	DtoClientInfos GetClientInfos(int client_fd) const;
-	DtoServerInfos GetServerInfos(int client_fd) const;
+	DtoClientInfos        GetClientInfos(int client_fd) const;
+	VirtualServerAddrList GetVirtualServerList(int client_fd) const;
 
 	// const
 	static const int    SYSTEM_ERROR = -1;
