@@ -82,20 +82,6 @@ std::string HttpResponse::CreateDefaultBodyMessageFormat(const StatusCode &statu
 	return body_message.str();
 }
 
-// mock
-HttpResponseFormat HttpResponse::CreateDefaultHttpResponseFormat(const StatusCode &status_code) {
-	HttpResponseFormat response;
-	response.status_line.version           = HTTP_VERSION;
-	response.status_line.status_code       = status_code.GetStatusCode();
-	response.status_line.reason_phrase     = status_code.GetReasonPhrase();
-	response.header_fields[CONTENT_TYPE]   = "text/html";
-	response.header_fields[SERVER]         = SERVER_VERSION;
-	response.header_fields[CONNECTION]     = "close";
-	response.body_message                  = CreateDefaultBodyMessageFormat(status_code);
-	response.header_fields[CONTENT_LENGTH] = utils::ToString(response.body_message.length());
-	return response;
-}
-
 std::string HttpResponse::CreateHttpResponse(const HttpResponseFormat &response) {
 	std::ostringstream response_stream;
 	response_stream << response.status_line.version << SP << response.status_line.status_code << SP
