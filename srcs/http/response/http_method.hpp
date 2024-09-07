@@ -15,13 +15,14 @@ namespace http {
 
 class Method {
   public:
-	static StatusCode Handler(
-		const std::string            &path,
-		const std::string            &method,
-		const std::list<std::string> &allow_methods,
-		const std::string            &request_body_message,
-		std::string                  &response_body_message
-	);
+	typedef std::list<std::string> AllowMethods;
+	static StatusCode              Handler(
+					 const std::string  &path,
+					 const std::string  &method,
+					 const AllowMethods &allow_methods,
+					 const std::string  &request_body_message,
+					 std::string        &response_body_message
+				 );
 
   private:
 	static StatusCode GetHandler(const std::string &path, std::string &body_message);

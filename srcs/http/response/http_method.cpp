@@ -40,11 +40,11 @@ std::string ReadFile(const std::string &file_path) {
 namespace http {
 
 StatusCode Method::Handler(
-	const std::string            &path,
-	const std::string            &method,
-	const std::list<std::string> &allow_methods,
-	const std::string            &request_body_message,
-	std::string                  &response_body_message
+	const std::string  &path,
+	const std::string  &method,
+	const AllowMethods &allow_methods,
+	const std::string  &request_body_message,
+	std::string        &response_body_message
 ) {
 	StatusCode status_code(OK);
 	bool       is_allow_method = IsAllowedMethod(method, allow_methods);
