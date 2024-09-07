@@ -6,12 +6,6 @@
 #include <iostream>
 #include <sstream>
 
-namespace server {
-
-typedef std::list<const VirtualServer *> VirtualServerAddrList;
-
-}
-
 namespace {
 
 using namespace http;
