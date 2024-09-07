@@ -1,13 +1,22 @@
 #include "http_message.hpp"
 #include "http_serverinfo_check.hpp"
 #include "utils.hpp"
+#include "virtual_server.hpp"
 #include <cstdlib>
 #include <iostream>
 #include <sstream>
 
+namespace server {
+
+typedef std::list<const VirtualServer *> VirtualServerAddrList;
+
+}
+
 namespace {
 
 using namespace http;
+
+/*==========================================================*/ // 消す
 
 MockLocationCon BuildLocationCon(
 	const std::string                          &request_uri,
@@ -66,6 +75,62 @@ MockDtoServerInfos BuildMockDtoServerInfos() {
 	server_info.error_page = error_page;
 
 	return server_info;
+}
+
+/*==========================================================*/ // 消す
+
+server::Location BuildLocation(
+	const std::string                          &request_uri,
+	const std::string                          &alias,
+	const std::string                          &index,
+	bool                                        autoindex,
+	const std::list<std::string>               &allowed_methods,
+	const std::pair<unsigned int, std::string> &redirect,
+	const std::string                          &cgi_extension    = "",
+	const std::string                          &upload_directory = ""
+) {
+	server::Location loc;
+	loc.request_uri      = request_uri;
+	loc.alias            = alias;
+	loc.index            = index;
+	loc.autoindex        = autoindex;
+	loc.allowed_methods  = allowed_methods;
+	loc.redirect         = redirect;
+	loc.cgi_extension    = cgi_extension;
+	loc.upload_directory = upload_directory;
+	return loc;
+}
+
+server::VirtualServer BuildVirtualServer1() {
+	// LocationList
+	typedef std::list<server::Location> LocationList;
+	LocationList                        locationlist;
+	std::list<std::string>              allowed_methods;
+	allowed_methods.push_back("GET");
+	allowed_methods.push_back("POST");
+	std::pair<unsigned int, std::string> redirect;
+	std::pair<unsigned int, std::string> redirect_on(301, "/");
+	server::Location                     location1 =
+		BuildLocation("/", "", "index.html", false, allowed_methods, redirect);
+	server::Location location2 = // redirect_on
+		BuildLocation("/www/", "", "index.html", true, allowed_methods, redirect_on);
+	server::Location location3 = // alias_on
+		BuildLocation("/www/data/", "/var/www/", "index.html", true, allowed_methods, redirect);
+	server::Location location4 = // cgi, upload_directory
+		BuildLocation("/web/", "", "index.htm", false, allowed_methods, redirect, ".php", "/data/");
+	locationlist.push_back(location1);
+	locationlist.push_back(location2);
+	locationlist.push_back(location3);
+	locationlist.push_back(location4);
+
+	server::VirtualServer                 virtual_server;
+	server::VirtualServer::ServerNameList server_names;
+	server_names.push_back("localhost");
+	server::VirtualServer::HostPortList host_ports;
+	host_ports.push_back(std::make_pair("localhost", 8080));
+	server::VirtualServer::ErrorPage error_page(404, "/404.html");
+
+	return server::VirtualServer(server_names, locationlist, host_ports, 1024, error_page);
 }
 
 // ==================== Test汎用 ==================== //
