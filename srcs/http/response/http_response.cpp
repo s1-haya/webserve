@@ -109,7 +109,7 @@ HeaderFields HttpResponse::InitHeaderFields(const HttpRequestResult &request_inf
 	// GetConnection(request_info);
 	header_fields[CONTENT_TYPE] = "test/html";
 	if (IsConnectionKeep(request_info.request.header_fields)) {
-		header_fields[CONNECTION]   = KEEP_ALIVE;
+		header_fields[CONNECTION] = KEEP_ALIVE;
 	} else {
 		header_fields[CONNECTION] = CLOSE;
 	}
