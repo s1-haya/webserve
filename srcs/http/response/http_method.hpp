@@ -13,6 +13,8 @@ class SystemException;
 
 namespace http {
 
+typedef std::map<std::string, std::string> HeaderFields;
+
 class Method {
   public:
 	static StatusCode Handler(
@@ -20,7 +22,8 @@ class Method {
 		const std::string            &method,
 		const std::list<std::string> &allow_methods,
 		const std::string            &request_body_message,
-		std::string                  &response_body_message
+		std::string                  &response_body_message,
+		HeaderFields                 &header_fields
 	);
 
   private:

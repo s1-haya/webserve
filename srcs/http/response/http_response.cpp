@@ -28,6 +28,7 @@ HttpResponseFormat HttpResponse::CreateHttpResponseFormat(
 ) {
 	// todo: InitHeaderFields(最終的にはtryの外側でinitする/try,
 	// catch両方header_fieldsを使用するため)
+	HeaderFields header_fields = InitHeaderFields();
 	try {
 		HttpResponseFormat           result;
 		const CheckServerInfoResult &server_info_result =
@@ -55,7 +56,8 @@ HttpResponseFormat HttpResponse::CreateHttpResponseFormat(
 			request_info.request.request_line.method,
 			server_info_result.allowed_methods,
 			request_info.request.body_message,
-			response_body_message
+			response_body_message,
+			header_fields
 		);
 		return result;
 	} catch (const HttpException &e) {
