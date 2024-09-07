@@ -38,20 +38,6 @@ class HttpResponse {
 					  Run(const MockDtoClientInfos &client_info,
 						  const MockDtoServerInfos &server_info,
 						  const HttpRequestResult  &request_info);
-	static StatusCode GetHandler(const std::string &path, std::string &body_message);
-	static StatusCode PostHandler(
-		const std::string &path,
-		const std::string &request_body_message,
-		std::string       &response_body_message
-	);
-	static StatusCode DeleteHandler(const std::string &path, std::string &response_body_message);
-	static StatusCode MethodHandler(
-		const std::string            &path,
-		const std::string            &method,
-		const std::list<std::string> &allow_method,
-		const std::string            &request_body_message,
-		std::string                  &response_body_message
-	);
 	static std::string CreateDefaultBodyMessageFormat(const StatusCode &status_code);
 	// static std::string CreateBadRequestResponse(const HttpRequestResult &request_info);
 
@@ -66,16 +52,6 @@ class HttpResponse {
 		const HttpRequestResult  &request_info
 	);
 	static HttpResponseFormat CreateDefaultHttpResponseFormat(const StatusCode &status_code);
-	static Stat               TryStat(const std::string &path, std::string &response_body_message);
-	static bool
-	IsAllowedMethod(const std::string &method, const std::list<std::string> &allow_method);
-	static void
-	SystemExceptionHandler(const utils::SystemException &e, std::string &response_body_message);
-	static StatusCode FileCreationHandler(
-		const std::string &path,
-		const std::string &request_body_message,
-		std::string       &response_body_message
-	);
 };
 
 } // namespace http

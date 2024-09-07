@@ -1,6 +1,6 @@
 #include "http_exception.hpp"
 #include "http_message.hpp"
-#include "http_response.hpp"
+#include "http_method.hpp"
 #include "utils.hpp"
 #include <cstdlib>
 #include <fstream>
@@ -40,7 +40,7 @@ int HandleResult(const T &result, const T &expected) {
 
 void TryGetHandler(const std::string &path, std::string &response_body_message) {
 	try {
-		http::HttpResponse::GetHandler(path, response_body_message);
+		http::Method::GetHandler(path, response_body_message);
 	} catch (const http::HttpException &e) {
 		// ステータスコードが300番台以上の場合
 		std::cerr << e.what() << std::endl;
@@ -51,7 +51,7 @@ void TryPostHandler(
 	const std::string &path, std::string &request_body_message, std::string &response_body_message
 ) {
 	try {
-		http::HttpResponse::PostHandler(path, request_body_message, response_body_message);
+		http::Method::PostHandler(path, request_body_message, response_body_message);
 	} catch (const http::HttpException &e) {
 		// ステータスコードが300番台以上の場合
 		std::cerr << e.what() << std::endl;
@@ -60,7 +60,7 @@ void TryPostHandler(
 
 void TryDeleteHandler(const std::string &path, std::string &response_body_message) {
 	try {
-		http::HttpResponse::DeleteHandler(path, response_body_message);
+		http::Method::DeleteHandler(path, response_body_message);
 	} catch (const http::HttpException &e) {
 		// ステータスコードが300番台以上の場合
 		std::cerr << e.what() << std::endl;
