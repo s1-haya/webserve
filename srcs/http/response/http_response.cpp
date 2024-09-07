@@ -109,6 +109,16 @@ std::string HttpResponse::CreateHttpResponse(const HttpResponseFormat &response)
 	return response_stream.str();
 }
 
+HeaderFields HttpResponse::InitHeaderFields() {
+	HeaderFields header_fields;
+	header_fields[SERVER] = SERVER_VERSION;
+	// todo: tmp
+	// Http統合後、どこでHeaderFieldを設定するのかを検討するため
+	header_fields[CONTENT_TYPE] = "test/html";
+	header_fields[CONNECTION] = "keep-alive";
+	return header_fields;
+}
+
 // std::string HttpResponse::CreateBadRequestResponse(const HttpRequestResult &request_info) {
 // 	HttpResponseFormat response = CreateDefaultHttpResponseFormat(request_info.status_code);
 // 	return CreateHttpResponse(response);
