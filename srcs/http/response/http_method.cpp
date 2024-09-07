@@ -47,7 +47,6 @@ StatusCode Method::Handler(
 	std::string                  &response_body_message,
 	HeaderFields                 &header_fields
 ) {
-	(void)header_fields;
 	StatusCode status_code(OK);
 	bool       is_allow_method = IsAllowedMethod(method, allow_methods);
 	if (!is_allow_method) {
