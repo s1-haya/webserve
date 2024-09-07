@@ -26,9 +26,7 @@ HttpResponseFormat HttpResponse::CreateHttpResponseFormat(
 	const MockDtoServerInfos &server_info,
 	const HttpRequestResult  &request_info
 ) {
-	// todo: InitHeaderFields(最終的にはtryの外側でinitする/try,
-	// catch両方header_fieldsを使用するため)
-	HeaderFields header_fields = InitHeaderFields();
+	HeaderFields header_fields = InitHeaderFields(request_info);
 	try {
 		HttpResponseFormat           result;
 		const CheckServerInfoResult &server_info_result =
@@ -111,11 +109,13 @@ std::string HttpResponse::CreateHttpResponse(const HttpResponseFormat &response)
 	return response_stream.str();
 }
 
-HeaderFields HttpResponse::InitHeaderFields() {
+HeaderFields HttpResponse::InitHeaderFields(const HttpRequestResult& request_info) {
 	HeaderFields header_fields;
 	header_fields[SERVER] = SERVER_VERSION;
-	// todo: tmp
-	// Http統合後、どこでHeaderFieldを設定するのかを検討するため
+	(void)request_info;
+	// todo: request_infoから情報取得
+	// GetContentType(request_info);
+	// GetConnection(request_info);
 	header_fields[CONTENT_TYPE] = "test/html";
 	header_fields[CONNECTION] = "keep-alive";
 	return header_fields;
