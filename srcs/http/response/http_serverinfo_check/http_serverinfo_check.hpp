@@ -7,6 +7,8 @@
 #include <list>
 #include <string>
 
+#include "virtual_server.hpp" // なぜcppの方でincludeではダメ？
+
 namespace server {
 
 typedef std::list<const VirtualServer *> VirtualServerAddrList;
