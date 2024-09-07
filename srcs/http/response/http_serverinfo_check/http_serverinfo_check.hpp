@@ -67,8 +67,6 @@ class HttpServerInfoCheck {
 
 	/*====================================================*/ // 消す
 
-	static CheckServerInfoResult
-	Check(const server::VirtualServerAddrList &server_infos, const HttpRequestFormat &request);
 	static const server::VirtualServer *CheckVSList(
 		const server::VirtualServerAddrList &virtual_servers, const HeaderFields &header_fields
 	);
@@ -102,6 +100,8 @@ class HttpServerInfoCheck {
   public:
 	static CheckServerInfoResult
 	Check(const MockDtoServerInfos &server_info, const HttpRequestFormat &request);
+	static CheckServerInfoResult
+	Check(const server::VirtualServerAddrList &server_infos, const HttpRequestFormat &request);
 };
 
 } // namespace http
