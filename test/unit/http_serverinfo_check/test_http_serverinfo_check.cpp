@@ -355,8 +355,9 @@ int Test1() {
 	request.header_fields[CONNECTION] = "keep-alive";
 
 	server::VirtualServerAddrList virtual_servers = BuildVirtualServerAddrList();
-	CheckServerInfoResult         result = HttpServerInfoCheck::Check(virtual_servers, request);
-	server::Location location = (*virtual_servers.begin())->GetLocationList().front(); // location1
+	CheckServerInfoResult         result   = HttpServerInfoCheck::Check(virtual_servers, request);
+	server::VirtualServer         vs       = *virtual_servers.front();     // host1
+	server::Location              location = vs.GetLocationList().front(); // location1
 
 	try {
 		COMPARE(result.path, location.request_uri);
@@ -388,8 +389,8 @@ int Test2() {
 
 	server::VirtualServerAddrList virtual_servers = BuildVirtualServerAddrList();
 	CheckServerInfoResult         result = HttpServerInfoCheck::Check(virtual_servers, request);
-	server::Location              location =
-		*(Next((*virtual_servers.begin())->GetLocationList().begin(), 1)); // location2(redirect)
+	server::VirtualServer         vs     = *virtual_servers.front();      // host1
+	server::Location location = *(Next(vs.GetLocationList().begin(), 1)); // location2(redirect)
 
 	try {
 		COMPARE(result.index, location.index);
