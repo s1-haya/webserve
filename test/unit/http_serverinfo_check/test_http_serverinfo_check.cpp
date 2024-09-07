@@ -103,31 +103,62 @@ server::Location BuildLocation(
 
 server::VirtualServer BuildVirtualServer1() {
 	// LocationList
-	typedef std::list<server::Location> LocationList;
-	LocationList                        locationlist;
-	std::list<std::string>              allowed_methods;
+	server::VirtualServer::LocationList locationlist;
+	server::Location::AllowedMethodList allowed_methods;
 	allowed_methods.push_back("GET");
 	allowed_methods.push_back("POST");
-	std::pair<unsigned int, std::string> redirect;
-	std::pair<unsigned int, std::string> redirect_on(301, "/");
-	server::Location                     location1 =
+	server::Location::Redirect redirect;
+	server::Location::Redirect redirect_on(301, "/");
+	server::Location           location1 =
 		BuildLocation("/", "", "index.html", false, allowed_methods, redirect);
 	server::Location location2 = // redirect_on
 		BuildLocation("/www/", "", "index.html", true, allowed_methods, redirect_on);
-	server::Location location3 = // alias_on
-		BuildLocation("/www/data/", "/var/www/", "index.html", true, allowed_methods, redirect);
-	server::Location location4 = // cgi, upload_directory
-		BuildLocation("/web/", "", "index.htm", false, allowed_methods, redirect, ".php", "/data/");
 	locationlist.push_back(location1);
 	locationlist.push_back(location2);
-	locationlist.push_back(location3);
-	locationlist.push_back(location4);
 
 	server::VirtualServer                 virtual_server;
 	server::VirtualServer::ServerNameList server_names;
-	server_names.push_back("localhost");
+	server_names.push_back("host1");
 	server::VirtualServer::HostPortList host_ports;
 	host_ports.push_back(std::make_pair("localhost", 8080));
+	server::VirtualServer::ErrorPage error_page(404, "/404.html");
+
+	return server::VirtualServer(server_names, locationlist, host_ports, 1024, error_page);
+}
+
+server::VirtualServer BuildVirtualServer2() {
+	// LocationList
+	server::VirtualServer::LocationList locationlist;
+	server::Location::AllowedMethodList allowed_methods;
+	allowed_methods.push_back("GET");
+	allowed_methods.push_back("DELETE");
+	server::Location::Redirect redirect;
+	server::Location           location1 = // alias_on
+		BuildLocation("/www/data/", "/var/www/", "index.html", true, allowed_methods, redirect);
+	server::Location location2 = // cgi, upload_directory
+		BuildLocation("/web/", "", "index.htm", false, allowed_methods, redirect, ".php", "/data/");
+	locationlist.push_back(location1);
+	locationlist.push_back(location2);
+
+	server::VirtualServer                 virtual_server;
+	server::VirtualServer::ServerNameList server_names;
+	server_names.push_back("host2");
+	server::VirtualServer::HostPortList host_ports;
+	host_ports.push_back(std::make_pair("localhost", 8080));
+	server::VirtualServer::ErrorPage error_page(404, "/404.html");
+
+	return server::VirtualServer(server_names, locationlist, host_ports, 2024, error_page);
+}
+
+server::VirtualServer BuildVirtualServer3() {
+	// LocationList
+	server::VirtualServer::LocationList locationlist;
+
+	server::VirtualServer                 virtual_server;
+	server::VirtualServer::ServerNameList server_names;
+	server_names.push_back("host3");
+	server::VirtualServer::HostPortList host_ports;
+	host_ports.push_back(std::make_pair("127.0.0.10", 8090));
 	server::VirtualServer::ErrorPage error_page(404, "/404.html");
 
 	return server::VirtualServer(server_names, locationlist, host_ports, 1024, error_page);
