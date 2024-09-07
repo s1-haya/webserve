@@ -66,23 +66,23 @@ class HttpServerInfoCheck {
 
 	/*====================================================*/ // 消す
 
-	static const server::VirtualServer *CheckVSList(
-		const server::VirtualServerAddrList &server_infos, const HttpRequestFormat &request
-	);
 	static CheckServerInfoResult
 	Check(const server::VirtualServerAddrList &server_infos, const HttpRequestFormat &request);
+	static const server::VirtualServer *CheckVSList(
+		const server::VirtualServerAddrList &virtual_servers, const HeaderFields &header_fields
+	);
 	static void CheckDtoServerInfo(
 		CheckServerInfoResult       &result,
 		const server::VirtualServer &virtual_server,
 		const HeaderFields          &header_fields
 	);
 
-	typedef std::list<server::Location> VSLocationList;
-	static void                         CheckLocationList(
-								CheckServerInfoResult &result,
-								const VSLocationList  &locations,
-								const std::string     &request_target
-							);
+	typedef server::VirtualServer::LocationList VSLocationList;
+	static void                                 CheckLocationList(
+										CheckServerInfoResult &result,
+										const VSLocationList  &locations,
+										const std::string     &request_target
+									);
 	static const server::Location CheckLocation(
 		CheckServerInfoResult &result,
 		const VSLocationList  &locations,

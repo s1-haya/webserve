@@ -139,11 +139,28 @@ void HttpServerInfoCheck::CheckUploadDirectory(
 
 /*=====================================================================*/ // 消す
 
+const server::VirtualServer *CheckVSList(
+	const server::VirtualServerAddrList &virtual_servers, const HeaderFields &header_fields
+) {
+	typedef server::VirtualServerAddrList::const_iterator VSAddrListItr;
+	for (VSAddrListItr it = virtual_servers.begin(); it != virtual_servers.end(); ++it) {
+		if (std::find(
+				(*it)->GetServerNameList().begin(),
+				(*it)->GetServerNameList().end(),
+				header_fields.at(HOST)
+			) != (*it)->GetServerNameList().end()) {
+			return *it;
+		}
+	}
+	return virtual_servers.front();
+	// 見つからなかった場合は一番最初のサーバーを返す（デフォルトサーバー）
+}
+
 CheckServerInfoResult HttpServerInfoCheck::Check(
 	const server::VirtualServerAddrList &server_infos, const HttpRequestFormat &request
 ) {
 	CheckServerInfoResult        result;
-	const server::VirtualServer *vs = CheckVSList(server_infos, request);
+	const server::VirtualServer *vs = CheckVSList(server_infos, request.header_fields);
 
 	CheckDtoServerInfo(result, *vs, request.header_fields);
 	CheckLocationList(result, vs->GetLocationList(), request.request_line.request_target);
