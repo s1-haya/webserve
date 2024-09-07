@@ -164,6 +164,14 @@ server::VirtualServer BuildVirtualServer3() {
 	return server::VirtualServer(server_names, locationlist, host_ports, 1024, error_page);
 }
 
+server::VirtualServerAddrList BuildVirtualServerAddrList() {
+	server::VirtualServerAddrList virtual_servers;
+	virtual_servers.push_back(&BuildVirtualServer1());
+	virtual_servers.push_back(&BuildVirtualServer2());
+	virtual_servers.push_back(&BuildVirtualServer3());
+	return virtual_servers;
+}
+
 // ==================== Test汎用 ==================== //
 
 int GetTestCaseNum() {
