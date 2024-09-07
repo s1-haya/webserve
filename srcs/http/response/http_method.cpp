@@ -47,8 +47,7 @@ StatusCode Method::Handler(
 	std::string        &response_body_message
 ) {
 	StatusCode status_code(OK);
-	bool       is_allow_method = IsAllowedMethod(method, allow_methods);
-	if (!is_allow_method) {
+	if (!IsAllowedMethod(method, allow_methods)) {
 		throw HttpException("Error: Not Implemented", StatusCode(NOT_IMPLEMENTED));
 	} else if (method == GET) {
 		status_code = GetHandler(path, response_body_message);
@@ -173,7 +172,6 @@ bool Method::IsAllowedMethod(
 	const std::string &method, const std::list<std::string> &allow_methods
 ) {
 	if (allow_methods.empty()) {
-		// allow_methodがない場合はwebservが許可したメソッドのみ許可する（GETのみ）
 		return std::find(
 				   DEFAULT_ALLOWED_METHODS,
 				   DEFAULT_ALLOWED_METHODS + DEFAULT_ALLOWED_METHODS_SIZE,
