@@ -67,13 +67,11 @@ HttpResponseFormat HttpResponse::CreateHttpResponseFormat(
 		// 	response_message = ReadFile(server_info.error_page.GetValue().second);
 		// 	// check the path of error_page
 		// }
-		status_code = e.GetStatusCode();
+		status_code           = e.GetStatusCode();
 		response_body_message = CreateDefaultBodyMessageFormat(status_code);
 	}
-	return HttpResponseFormat(StatusLine(
-		HTTP_VERSION,
-		status_code.GetStatusCode(),
-		status_code.GetReasonPhrase()),
+	return HttpResponseFormat(
+		StatusLine(HTTP_VERSION, status_code.GetStatusCode(), status_code.GetReasonPhrase()),
 		header_fields,
 		response_body_message
 	);
