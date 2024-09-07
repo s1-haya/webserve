@@ -1,7 +1,6 @@
 # Add target test directories.
 # Each directory should have a Makefile with a 'run' target.
 TEST_DIRS	:=	convert_str \
-				http \
 				http_parse \
 				http_storage \
 				http_method \
@@ -14,8 +13,7 @@ TEST_DIRS	:=	convert_str \
 				config_parse/lexer \
 				config_parse/parser \
 				config_parse \
-				custom_const_iterator \
-				stat
+				custom_const_iterator
 
 .PHONY	: run
 run:

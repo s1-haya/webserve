@@ -2,6 +2,7 @@
 #define HTTP_RESPONSE_HPP_
 
 #include "http_format.hpp"
+#include "http_serverinfo_check.hpp"
 #include "status_code.hpp"
 #include "utils.hpp"
 #include <map>
@@ -12,6 +13,7 @@ namespace http {
 struct HttpRequestResult;
 struct MockDtoClientInfos;
 struct MockDtoServerInfos;
+class Stat;
 
 // HttpResponse {
 // public:
@@ -23,7 +25,7 @@ struct MockDtoServerInfos;
 //   static HttpResponseFormat CreateHttpResponseFormat(const HttpRequestResult &request_info);
 //   static HttpResponseFormat CreateSuccessHttpResponseFormat(const HttpRequestResult
 //   &request_info);
-//   static HttpResponseFormat CreateErrorHttpResponseFormat(const HttpRequestResult
+//   static HttpResponseFormat CreateDefaultHttpResponseFormat(const HttpRequestResult
 //   &request_info);
 //    GetTimeoutRequestBodyMessage();
 //    GetInternalServerErrorBodyMessage();
@@ -32,42 +34,24 @@ struct MockDtoServerInfos;
 class HttpResponse {
   public:
 	typedef std::map<EStatusCode, std::string> ReasonPhrase;
-	static std::string                         Run(const HttpRequestResult &request_info);
-	static std::string                         TmpRun(
-								const MockDtoClientInfos &client_info,
-								const MockDtoServerInfos &server_info,
-								const HttpRequestResult  &request_info
-							);
-	static void GetHandler(const std::string &path, std::string &body_message);
-	static void PostHandler(
-		const std::string &path,
-		const std::string &request_body_message,
-		std::string       &response_body_message
-	);
-	static void DeleteHandler(const std::string &path, std::string &response_body_message);
+	static std::string
+					  Run(const MockDtoClientInfos &client_info,
+						  const MockDtoServerInfos &server_info,
+						  const HttpRequestResult  &request_info);
+	static std::string CreateDefaultBodyMessageFormat(const StatusCode &status_code);
+	// static std::string CreateBadRequestResponse(const HttpRequestResult &request_info);
 
   private:
 	HttpResponse();
 	~HttpResponse();
 
 	static std::string        CreateHttpResponse(const HttpResponseFormat &response);
-	static HttpResponseFormat CreateHttpResponseFormat(const HttpRequestResult &request_info);
-	static HttpResponseFormat TmpCreateHttpResponseFormat(
+	static HttpResponseFormat CreateHttpResponseFormat(
 		const MockDtoClientInfos &client_info,
 		const MockDtoServerInfos &server_info,
 		const HttpRequestResult  &request_info
 	);
-	static HttpResponseFormat CreateSuccessHttpResponseFormat(const HttpRequestResult &request_info
-	);
-	static HttpResponseFormat CreateErrorHttpResponseFormat(const StatusCode &status_code);
-	static std::string        CreateDefaultBodyMessageFormat(const StatusCode &status_code);
-	static void
-	SystemExceptionHandler(const utils::SystemException &e, std::string &response_body_message);
-	static void FileCreationHandler(
-		const std::string &path,
-		const std::string &request_body_message,
-		std::string       &response_body_message
-	);
+	static HttpResponseFormat CreateDefaultHttpResponseFormat(const StatusCode &status_code);
 };
 
 } // namespace http

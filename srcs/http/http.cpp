@@ -1,4 +1,4 @@
-#include "tmp_http.hpp"
+#include "http.hpp"
 #include "client_infos.hpp"
 #include "http_message.hpp"
 #include "http_result.hpp"
@@ -8,29 +8,28 @@
 
 namespace http {
 
-TmpHttp::TmpHttp() {}
+Http::Http() {}
 
-TmpHttp::~TmpHttp() {}
+Http::~Http() {}
 
-HttpResult
-TmpHttp::Run(const MockDtoClientInfos &client_info, const MockDtoServerInfos &server_info) {
+HttpResult Http::Run(const MockDtoClientInfos &client_info, const MockDtoServerInfos &server_info) {
 	HttpResult          result;
 	utils::Result<void> parsed_result =
-		TmpParseHttpRequestFormat(client_info.fd, client_info.request_buf);
+		ParseHttpRequestFormat(client_info.fd, client_info.request_buf);
 	if (!parsed_result.IsOk()) {
 		// todo: request_buf, is_connection_keep
-		result.response             = CreateHttpResponse(client_info.fd);
-		result.is_response_complete = true;
 		return result;
+		// return HttpResult CreateBadRequestResponse(int client_fd);
 	}
 	if (IsHttpRequestFormatComplete(client_info.fd)) {
+		// todo: request_buf, is_connection_keep
 		result.response             = CreateHttpResponse(client_info, server_info);
 		result.is_response_complete = true;
 	}
 	return result;
 }
 
-utils::Result<void> TmpHttp::TmpParseHttpRequestFormat(int client_fd, const std::string &read_buf) {
+utils::Result<void> Http::ParseHttpRequestFormat(int client_fd, const std::string &read_buf) {
 	utils::Result<void>   result;
 	HttpRequestParsedData save_data = storage_.GetClientSaveData(client_fd);
 	save_data.current_buf += read_buf;
@@ -68,31 +67,29 @@ utils::Result<void> TmpHttp::TmpParseHttpRequestFormat(int client_fd, const std:
 // return result;
 // }
 
-// todo: クライアントのリクエスト情報を読み込む
-void TmpHttp::ParseHttpRequestFormat(int client_fd, const std::string &read_buf) {
-	HttpRequestParsedData save_data = storage_.GetClientSaveData(client_fd);
-	save_data.current_buf += read_buf;
-	HttpParse::TmpRun(save_data);
-	storage_.UpdateClientSaveData(client_fd, save_data);
-}
+// HttpResult Http::CreateBadRequestResponse(int client_fd) {
+// 	HttpResult            result;
+// 	HttpRequestParsedData data  = storage_.GetClientSaveData(client_fd);
+// 	result.is_response_complete = true;
+// 	result.response             = HttpResponse::CreateBadRequestResponse(data.request_result);
+// 	;
+// 	result.request_buf = data.current_buf;
+// 	// todo: HttpResponse::IsConnectionKeep
+// 	// result.is_connection_keep = ;
+// 	storage_.DeleteClientSaveData(client_fd);
+// 	return result;
+// }
 
-// todo: レスポンスを作成する
-std::string TmpHttp::CreateHttpResponse(int client_fd) {
-	HttpRequestParsedData data = storage_.GetClientSaveData(client_fd);
-	storage_.DeleteClientSaveData(client_fd);
-	return HttpResponse::Run(data.request_result);
-}
-
-std::string TmpHttp::CreateHttpResponse(
+std::string Http::CreateHttpResponse(
 	const MockDtoClientInfos &client_info, const MockDtoServerInfos &server_info
 ) {
 	HttpRequestParsedData data = storage_.GetClientSaveData(client_info.fd);
 	storage_.DeleteClientSaveData(client_info.fd);
-	return HttpResponse::TmpRun(client_info, server_info, data.request_result);
+	return HttpResponse::Run(client_info, server_info, data.request_result);
 }
 
 // todo: HTTPRequestの書式が完全かどうか(どのように取得するかは要検討)
-bool TmpHttp::IsHttpRequestFormatComplete(int client_fd) {
+bool Http::IsHttpRequestFormatComplete(int client_fd) {
 	HttpRequestParsedData save_data = storage_.GetClientSaveData(client_fd);
 	return save_data.is_request_format.is_request_line &&
 		   save_data.is_request_format.is_header_fields &&
@@ -100,7 +97,7 @@ bool TmpHttp::IsHttpRequestFormatComplete(int client_fd) {
 }
 
 // For test
-HttpRequestParsedData TmpHttp::GetClientData(int client_fd) {
+HttpRequestParsedData Http::GetClientData(int client_fd) {
 	return storage_.GetClientSaveData(client_fd);
 }
 
