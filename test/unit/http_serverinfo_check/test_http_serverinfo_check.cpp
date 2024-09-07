@@ -212,7 +212,9 @@ InputIt Next(InputIt it, typename std::iterator_traits<InputIt>::difference_type
 
 // ================================================= //
 
-int Test1() {
+/*==========================================================*/ // 消す
+
+int Test1_() {
 	// request
 	const RequestLine request_line = {"GET", "/", "HTTP/1.1"};
 	HttpRequestFormat request;
@@ -242,7 +244,7 @@ int Test1() {
 	return EXIT_SUCCESS;
 }
 
-int Test2() {
+int Test2_() {
 	// request
 	const RequestLine request_line = {"GET", "/www/test.html", "HTTP/1.1"}; // location2(redirect)
 	HttpRequestFormat request;
@@ -271,7 +273,7 @@ int Test2() {
 	return EXIT_SUCCESS;
 }
 
-int Test3() {
+int Test3_() {
 	// request
 	const RequestLine request_line = {"GET", "/www/data/test.html", "HTTP/1.1"};
 	HttpRequestFormat request;
@@ -301,7 +303,7 @@ int Test3() {
 	return EXIT_SUCCESS;
 }
 
-int Test4() {
+int Test4_() {
 	// request
 	const RequestLine request_line = {"GET", "/web/", "HTTP/1.1"};
 	HttpRequestFormat request;
@@ -332,14 +334,16 @@ int Test4() {
 	return EXIT_SUCCESS;
 }
 
+/*==========================================================*/ // 消す
+
 } // namespace
 
 int main() {
 	int ret = EXIT_SUCCESS;
 
-	ret |= Test1();
-	ret |= Test2();
-	ret |= Test3();
-	ret |= Test4();
+	ret |= Test1_();
+	ret |= Test2_();
+	ret |= Test3_();
+	ret |= Test4_();
 	return ret;
 }
