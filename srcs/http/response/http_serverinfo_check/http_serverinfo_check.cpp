@@ -3,7 +3,6 @@
 #include "http_message.hpp"
 #include "status_code.hpp"
 #include "utils.hpp"
-#include "virtual_server.hpp"
 #include <cstdlib> // atoi
 #include <iostream>
 

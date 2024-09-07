@@ -4,10 +4,9 @@
 #include "http_format.hpp"
 #include "result.hpp"
 #include "server_infos.hpp"
+#include "virtual_server.hpp"
 #include <list>
 #include <string>
-
-#include "virtual_server.hpp" // なぜcppの方でincludeではダメ？
 
 namespace server {
 
