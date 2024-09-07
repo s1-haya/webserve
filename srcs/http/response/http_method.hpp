@@ -38,7 +38,7 @@ class Method {
 	static StatusCode DeleteHandler(
 		const std::string &path, std::string &response_body_message, HeaderFields &header_fields
 	);
-	static Stat       TryStat(const std::string &path);
+	static Stat TryStat(const std::string &path);
 	static bool
 	IsAllowedMethod(const std::string &method, const std::list<std::string> &allow_methods);
 	static void       SystemExceptionHandler(const utils::SystemException &e);

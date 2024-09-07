@@ -45,7 +45,7 @@ StatusCode Method::Handler(
 	const std::list<std::string> &allow_methods,
 	const std::string            &request_body_message,
 	std::string                  &response_body_message,
-	HeaderFields                  &header_fields
+	HeaderFields                 &header_fields
 ) {
 	(void)header_fields;
 	StatusCode status_code(OK);
@@ -80,7 +80,7 @@ StatusCode Method::GetHandler(
 		if (!info.IsReadableFile()) {
 			throw HttpException("Error: Forbidden", StatusCode(FORBIDDEN));
 		} else {
-			response_body_message = ReadFile(path);
+			response_body_message         = ReadFile(path);
 			header_fields[CONTENT_LENGTH] = utils::ToString(response_body_message.length());
 		}
 	} else {
@@ -103,7 +103,7 @@ StatusCode Method::PostHandler(
 	if (info.IsDirectory()) {
 		throw HttpException("Error: Forbidden", StatusCode(FORBIDDEN));
 	} else if (info.IsRegularFile()) {
-		response_body_message = HttpResponse::CreateDefaultBodyMessageFormat(status_code);
+		response_body_message         = HttpResponse::CreateDefaultBodyMessageFormat(status_code);
 		header_fields[CONTENT_LENGTH] = utils::ToString(response_body_message.length());
 	} else {
 		// Location header fields: URI-reference
@@ -122,7 +122,7 @@ StatusCode Method::DeleteHandler(
 	if (info.IsDirectory()) {
 		throw HttpException("Error: Forbidden", StatusCode(FORBIDDEN));
 	} else if (std::remove(path.c_str()) == 0) {
-		response_body_message = HttpResponse::CreateDefaultBodyMessageFormat(status_code);
+		response_body_message         = HttpResponse::CreateDefaultBodyMessageFormat(status_code);
 		header_fields[CONTENT_LENGTH] = utils::ToString(response_body_message.length());
 	} else {
 		throw utils::SystemException(std::strerror(errno), errno);

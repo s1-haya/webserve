@@ -109,7 +109,7 @@ std::string HttpResponse::CreateHttpResponse(const HttpResponseFormat &response)
 	return response_stream.str();
 }
 
-HeaderFields HttpResponse::InitHeaderFields(const HttpRequestResult& request_info) {
+HeaderFields HttpResponse::InitHeaderFields(const HttpRequestResult &request_info) {
 	HeaderFields header_fields;
 	header_fields[SERVER] = SERVER_VERSION;
 	(void)request_info;
@@ -117,7 +117,7 @@ HeaderFields HttpResponse::InitHeaderFields(const HttpRequestResult& request_inf
 	// GetContentType(request_info);
 	// GetConnection(request_info);
 	header_fields[CONTENT_TYPE] = "test/html";
-	header_fields[CONNECTION] = "keep-alive";
+	header_fields[CONNECTION]   = "keep-alive";
 	return header_fields;
 }
 
