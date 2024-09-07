@@ -26,9 +26,10 @@ HttpResponseFormat HttpResponse::CreateHttpResponseFormat(
 	const MockDtoServerInfos &server_info,
 	const HttpRequestResult  &request_info
 ) {
+	StatusCode   status_code(OK);
 	HeaderFields header_fields = InitHeaderFields(request_info);
+	std::string  response_body_message;
 	try {
-		HttpResponseFormat           result;
 		const CheckServerInfoResult &server_info_result =
 			HttpServerInfoCheck::Check(server_info, request_info.request);
 		// todo: if redirect
@@ -48,8 +49,7 @@ HttpResponseFormat HttpResponse::CreateHttpResponseFormat(
 		//     return CreateSuccessResponseResult();
 		(void)client_info;
 		(void)server_info_result;
-		std::string       response_body_message;
-		const StatusCode &status_code = Method::Handler(
+		status_code = Method::Handler(
 			server_info_result.path,
 			request_info.request.request_line.method,
 			server_info_result.allowed_methods,
@@ -57,7 +57,6 @@ HttpResponseFormat HttpResponse::CreateHttpResponseFormat(
 			response_body_message,
 			header_fields
 		);
-		return result;
 	} catch (const HttpException &e) {
 		// ステータスコードが300番台以上の場合
 		// feature: header_fieldとerror_pageとの関連性がわかり次第変更あり
@@ -68,8 +67,16 @@ HttpResponseFormat HttpResponse::CreateHttpResponseFormat(
 		// 	response_message = ReadFile(server_info.error_page.GetValue().second);
 		// 	// check the path of error_page
 		// }
-		return CreateDefaultHttpResponseFormat(e.GetStatusCode());
+		status_code = e.GetStatusCode();
+		response_body_message = CreateDefaultBodyMessageFormat(status_code);
 	}
+	return HttpResponseFormat(StatusLine(
+		HTTP_VERSION,
+		status_code.GetStatusCode(),
+		status_code.GetReasonPhrase()),
+		header_fields,
+		response_body_message
+	);
 }
 
 std::string HttpResponse::CreateDefaultBodyMessageFormat(const StatusCode &status_code) {
