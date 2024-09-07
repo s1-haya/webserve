@@ -1,6 +1,7 @@
 #ifndef SERVER_CONTEXTMANAGER_VIRTUALSERVER_VIRTUALSERVER_HPP_
 #define SERVER_CONTEXTMANAGER_VIRTUALSERVER_VIRTUALSERVER_HPP_
 
+#include <cstddef> // size_t
 #include <list>
 #include <string>
 
@@ -8,40 +9,57 @@ namespace server {
 
 // todo: in VirtualServer class?
 struct Location {
-	std::string location;
-	std::string root;
-	std::string index;
-	std::string allowed_method;
+	typedef std::list<std::string>               AllowedMethodList;
+	typedef std::pair<unsigned int, std::string> Redirect;
+
+	Location() : autoindex(false), redirect(std::make_pair(0, "")) {}
+
+	std::string       request_uri;
+	std::string       alias;
+	std::string       index;
+	bool              autoindex;
+	AllowedMethodList allowed_methods;
+	Redirect          redirect;
+	std::string       cgi_extension;
+	std::string       upload_directory;
 };
 
 // virtual serverとして必要な情報を保持・取得する
 class VirtualServer {
   public:
+	typedef std::list<std::string>               ServerNameList;
 	typedef std::list<Location>                  LocationList;
 	typedef std::pair<std::string, unsigned int> HostPortPair;
 	typedef std::list<HostPortPair>              HostPortList;
+	typedef std::pair<unsigned int, std::string> ErrorPage;
 
 	// default constructor: necessary for map's insert/[]
 	VirtualServer();
-	// todo: configもらう？
 	VirtualServer(
-		const std::string  &server_name,
-		const LocationList &locations,
-		const HostPortList &host_port_list
+		const ServerNameList &server_names,
+		const LocationList   &locations,
+		const HostPortList   &host_ports,
+		std::size_t           client_max_body_size,
+		const ErrorPage      &error_page
 	);
 	~VirtualServer();
 	VirtualServer(const VirtualServer &other);
 	VirtualServer &operator=(const VirtualServer &other);
 	// getter
-	const std::string  &GetServerName() const;
-	const LocationList &GetLocations() const;
-	const HostPortList &GetHostPortList() const;
+	const ServerNameList &GetServerNameList() const;
+	const LocationList   &GetLocationList() const;
+	const HostPortList   &GetHostPortList() const;
+	std::size_t           GetClientMaxBodySize() const;
+	const ErrorPage      &GetErrorPage() const;
 
   private:
-	// todo: add member(& operator=)
-	std::string  server_name_;
-	LocationList locations_; // todo
-	HostPortList host_port_list_;
+	static const std::size_t DEFAULT_CLIENT_MAX_BODY_SIZE = 1024;
+	// variables
+	ServerNameList server_names_;
+	LocationList   locations_;
+	HostPortList   host_ports_;
+	std::size_t    client_max_body_size_;
+	ErrorPage      error_page_;
 };
 
 } // namespace server

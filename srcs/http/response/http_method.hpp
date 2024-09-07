@@ -6,7 +6,9 @@
 #include <list>
 
 namespace utils {
+
 class SystemException;
+
 }
 
 namespace http {

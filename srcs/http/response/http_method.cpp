@@ -2,6 +2,7 @@
 #include "http_exception.hpp"
 #include "http_message.hpp"
 #include "http_response.hpp"
+#include "http_method.hpp"
 #include "http_serverinfo_check.hpp"
 #include "stat.hpp"
 #include "system_exception.hpp"
