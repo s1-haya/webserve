@@ -2,6 +2,7 @@
 #define HTTP_RESPONSE_HPP_
 
 #include "http_format.hpp"
+#include "http_method.hpp" 
 #include "http_serverinfo_check.hpp"
 #include "status_code.hpp"
 #include "utils.hpp"
@@ -53,6 +54,13 @@ class HttpResponse {
 	);
 	static HeaderFields InitHeaderFields(const HttpRequestResult &request_info);
 	static bool         IsConnectionKeep(const HeaderFields &request_header_fields);
+	bool                IsCgi(
+        const std::string          &cgi_extension,
+        const std::string          &path,
+        const std::string          &method,
+        const Method::AllowMethods &allowed_methods,
+        const std::string          &upload_directory
+    );
 };
 
 } // namespace http
