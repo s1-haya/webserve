@@ -124,7 +124,10 @@ bool HttpResponse::IsCgi(
 	const std::string          &upload_directory
 ) {
 	// todo:
-	// cgi_extensionがあるかどうか、またpathがcgi_extensionで設定された拡張子かどうか
+	// cgi_extensionがあるかどうか
+	if (cgi_extension.empty()) {
+		return false;
+	}
 	// methodがGETかPOSTかつallow_methodかどうか
 	// upload_directory内にpathが存在するかどうか
 	(void)cgi_extension;
