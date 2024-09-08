@@ -49,7 +49,8 @@ StatusCode Method::Handler(
 	StatusCode status_code(OK);
 	if (!IsAllowedMethod(method, allow_methods)) {
 		throw HttpException("Error: Not Implemented", StatusCode(NOT_IMPLEMENTED));
-	} else if (method == GET) {
+	}
+	if (method == GET) {
 		status_code = GetHandler(path, response_body_message);
 	} else if (method == POST) {
 		status_code = PostHandler(path, request_body_message, response_body_message);
