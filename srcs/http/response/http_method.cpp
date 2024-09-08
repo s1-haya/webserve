@@ -1,7 +1,8 @@
+#include "http_method.hpp"
 #include "http_exception.hpp"
 #include "http_message.hpp"
-#include "http_response.hpp"
 #include "http_method.hpp"
+#include "http_response.hpp"
 #include "http_serverinfo_check.hpp"
 #include "stat.hpp"
 #include "system_exception.hpp"
@@ -36,63 +37,49 @@ std::string ReadFile(const std::string &file_path) {
 
 } // namespace
 
-// todo: 各メソッドを実行する関数
-// returnがある場合、設定する
-// - メソッドの権限の確認
-//  -> 権限がない場合405 Not Allowed
-// - 各メソッドを実行
-
 namespace http {
 
 StatusCode Method::Handler(
-	const std::string            &path,
-	const std::string            &method,
-	const std::list<std::string> &allow_method,
-	const std::string            &request_body_message,
-	std::string                  &response_body_message
+	const std::string  &path,
+	const std::string  &method,
+	const AllowMethods &allow_methods,
+	const std::string  &request_body_message,
+	std::string        &response_body_message
 ) {
 	StatusCode status_code(OK);
-	bool       is_allow_method = IsAllowedMethod(method, allow_method);
-	if (is_allow_method && method == GET) {
+	if (!IsAllowedMethod(method, allow_methods)) {
+		throw HttpException("Error: Not Implemented", StatusCode(NOT_IMPLEMENTED));
+	}
+	if (method == GET) {
 		status_code = GetHandler(path, response_body_message);
-	} else if (is_allow_method && method == POST) {
+	} else if (method == POST) {
 		status_code = PostHandler(path, request_body_message, response_body_message);
-	} else if (is_allow_method && method == DELETE) {
+	} else if (method == DELETE) {
 		status_code = DeleteHandler(path, response_body_message);
-	} else {
-		status_code           = StatusCode(NOT_IMPLEMENTED);
-		response_body_message = HttpResponse::CreateDefaultBodyMessageFormat(status_code);
-		throw HttpException("Error: Not Implemented", status_code);
 	}
 	return status_code;
 }
 
 // todo: refactor
 StatusCode Method::GetHandler(const std::string &path, std::string &response_body_message) {
-	StatusCode status_code(OK);
-	Stat       info = TryStat(path, response_body_message);
+	StatusCode  status_code(OK);
+	const Stat &info = TryStat(path);
 	if (info.IsDirectory()) {
 		// No empty string because the path has '/'
 		if (path[path.size() - 1] != '/') {
-			status_code           = StatusCode(MOVED_PERMANENTLY);
-			response_body_message = HttpResponse::CreateDefaultBodyMessageFormat(status_code);
-			throw HttpException("Error: Moved Permanently", status_code);
+			throw HttpException("Error: Moved Permanently", StatusCode(MOVED_PERMANENTLY));
 		}
 		// todo: Check for index directive and handle ReadFile function
 		// todo: Check for autoindex directive and handle AutoindexHandler function
 		// todo: Return 403 Forbidden if neither index nor autoindex directives exist
 	} else if (info.IsRegularFile()) {
 		if (!info.IsReadableFile()) {
-			status_code           = StatusCode(FORBIDDEN);
-			response_body_message = HttpResponse::CreateDefaultBodyMessageFormat(status_code);
-			throw HttpException("Error: Forbidden", status_code);
+			throw HttpException("Error: Forbidden", StatusCode(FORBIDDEN));
 		} else {
 			response_body_message = ReadFile(path);
 		}
 	} else {
-		status_code           = StatusCode(NOT_FOUND);
-		response_body_message = HttpResponse::CreateDefaultBodyMessageFormat(status_code);
-		throw HttpException("Error: Not Found", status_code);
+		throw HttpException("Error: Not Found", StatusCode(NOT_FOUND));
 	}
 	return status_code;
 }
@@ -105,12 +92,10 @@ StatusCode Method::PostHandler(
 	if (!IsExistPath(path)) {
 		return FileCreationHandler(path, request_body_message, response_body_message);
 	}
-	const Stat &info = TryStat(path, response_body_message);
+	const Stat &info = TryStat(path);
 	StatusCode  status_code(NO_CONTENT);
 	if (info.IsDirectory()) {
-		status_code           = StatusCode(FORBIDDEN);
-		response_body_message = HttpResponse::CreateDefaultBodyMessageFormat(status_code);
-		throw HttpException("Error: Forbidden", status_code);
+		throw HttpException("Error: Forbidden", StatusCode(FORBIDDEN));
 	} else if (info.IsRegularFile()) {
 		response_body_message = HttpResponse::CreateDefaultBodyMessageFormat(status_code);
 	} else {
@@ -122,14 +107,11 @@ StatusCode Method::PostHandler(
 	return status_code;
 }
 
-StatusCode
-Method::DeleteHandler(const std::string &path, std::string &response_body_message) {
-	const Stat &info        = TryStat(path, response_body_message);
+StatusCode Method::DeleteHandler(const std::string &path, std::string &response_body_message) {
+	const Stat &info        = TryStat(path);
 	StatusCode  status_code = StatusCode(NO_CONTENT);
 	if (info.IsDirectory()) {
-		status_code           = StatusCode(FORBIDDEN);
-		response_body_message = HttpResponse::CreateDefaultBodyMessageFormat(status_code);
-		throw HttpException("Error: Forbidden", status_code);
+		throw HttpException("Error: Forbidden", StatusCode(FORBIDDEN));
 	} else if (std::remove(path.c_str()) == 0) {
 		response_body_message = HttpResponse::CreateDefaultBodyMessageFormat(status_code);
 	} else {
@@ -138,23 +120,15 @@ Method::DeleteHandler(const std::string &path, std::string &response_body_messag
 	return status_code;
 }
 
-void Method::SystemExceptionHandler(
-	const utils::SystemException &e, std::string &response_body_message
-) {
-	StatusCode status_code  = StatusCode(INTERNAL_SERVER_ERROR);
-	int        error_number = e.GetErrorNumber();
+void Method::SystemExceptionHandler(const utils::SystemException &e) {
+	int error_number = e.GetErrorNumber();
 	if (error_number == EACCES || error_number == EPERM) {
-		status_code           = StatusCode(FORBIDDEN);
-		response_body_message = HttpResponse::CreateDefaultBodyMessageFormat(status_code);
-		throw HttpException("Error: Forbidden", status_code);
+		throw HttpException("Error: Forbidden", StatusCode(FORBIDDEN));
 	} else if (error_number == ENOENT || error_number == ENOTDIR || error_number == ELOOP ||
 			   error_number == ENAMETOOLONG) {
-		status_code           = StatusCode(NOT_FOUND);
-		response_body_message = HttpResponse::CreateDefaultBodyMessageFormat(status_code);
-		throw HttpException("Error: Not Found", status_code);
+		throw HttpException("Error: Not Found", StatusCode(NOT_FOUND));
 	} else {
-		response_body_message = HttpResponse::CreateDefaultBodyMessageFormat(status_code);
-		throw HttpException("Error: Internal Server Error", status_code);
+		throw HttpException("Error: Internal Server Error", StatusCode(INTERNAL_SERVER_ERROR));
 	}
 }
 
@@ -166,25 +140,21 @@ StatusCode Method::FileCreationHandler(
 	StatusCode    status_code(CREATED);
 	std::ofstream file(path.c_str(), std::ios::binary);
 	if (file.fail()) {
-		status_code           = StatusCode(FORBIDDEN);
-		response_body_message = HttpResponse::CreateDefaultBodyMessageFormat(status_code);
-		throw HttpException("Error: Forbidden", status_code);
+		throw HttpException("Error: Forbidden", StatusCode(FORBIDDEN));
 	}
 	file.write(request_body_message.c_str(), request_body_message.length());
-	file.close();
 	if (file.fail()) {
+		file.close();
 		if (std::remove(path.c_str()) != 0) {
 			throw utils::SystemException(std::strerror(errno), errno);
 		}
-		status_code           = StatusCode(FORBIDDEN);
-		response_body_message = HttpResponse::CreateDefaultBodyMessageFormat(status_code);
-		throw HttpException("Error: Forbidden", status_code);
+		throw HttpException("Error: Forbidden", StatusCode(FORBIDDEN));
 	}
 	response_body_message = HttpResponse::CreateDefaultBodyMessageFormat(status_code);
 	return status_code;
 }
 
-Stat Method::TryStat(const std::string &path, std::string &response_body_message) {
+Stat Method::TryStat(const std::string &path) {
 	struct stat stat_buf;
 	try {
 		if (stat(path.c_str(), &stat_buf) == -1) {
@@ -193,24 +163,23 @@ Stat Method::TryStat(const std::string &path, std::string &response_body_message
 			throw utils::SystemException(error_message, errno);
 		}
 	} catch (const utils::SystemException &e) {
-		SystemExceptionHandler(e, response_body_message);
+		SystemExceptionHandler(e);
 	}
 	Stat info(stat_buf);
 	return info;
 }
 
 bool Method::IsAllowedMethod(
-	const std::string &method, const std::list<std::string> &allow_method
+	const std::string &method, const std::list<std::string> &allow_methods
 ) {
-	if (allow_method.empty()) {
-		// allow_methodがない場合はwebservが許可したメソッドのみ許可する（GETのみ）
+	if (allow_methods.empty()) {
 		return std::find(
 				   DEFAULT_ALLOWED_METHODS,
 				   DEFAULT_ALLOWED_METHODS + DEFAULT_ALLOWED_METHODS_SIZE,
 				   method
 			   ) != DEFAULT_ALLOWED_METHODS + DEFAULT_ALLOWED_METHODS_SIZE;
 	} else {
-		return std::find(allow_method.begin(), allow_method.end(), method) != allow_method.end();
+		return std::find(allow_methods.begin(), allow_methods.end(), method) != allow_methods.end();
 	}
 }
 
