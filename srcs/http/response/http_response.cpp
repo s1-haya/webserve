@@ -156,6 +156,7 @@ bool HttpResponse::IsCgi(
 } // namespace http
 
 namespace {
+
 std::string GetExtension(const std::string &path) {
 	size_t pos = path.find_last_of('.');
 
