@@ -133,6 +133,9 @@ bool HttpResponse::IsCgi(
 		return false;
 	}
 	// methodがGETかPOSTかつallow_methodかどうか
+	if (!(Method::IsAllowedMethod(method, allowed_methods)) || (method != GET && method != POST)) {
+		return false;
+	}
 	// upload_directory内にpathが存在するかどうか
 	(void)cgi_extension;
 	(void)path;
