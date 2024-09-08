@@ -26,8 +26,7 @@ HttpResponseFormat HttpResponse::CreateHttpResponseFormat(
 	const MockDtoServerInfos &server_info,
 	const HttpRequestResult  &request_info
 ) {
-	// todo: InitHeaderFields(最終的にはtryの外側でinitする/try,
-	// catch両方header_fieldsを使用するため)
+	HeaderFields header_fields = InitHeaderFields(request_info);
 	try {
 		HttpResponseFormat           result;
 		const CheckServerInfoResult &server_info_result =
@@ -55,7 +54,8 @@ HttpResponseFormat HttpResponse::CreateHttpResponseFormat(
 			request_info.request.request_line.method,
 			server_info_result.allowed_methods,
 			request_info.request.body_message,
-			response_body_message
+			response_body_message,
+			header_fields
 		);
 		return result;
 	} catch (const HttpException &e) {
@@ -107,6 +107,18 @@ std::string HttpResponse::CreateHttpResponse(const HttpResponseFormat &response)
 	response_stream << CRLF;
 	response_stream << response.body_message;
 	return response_stream.str();
+}
+
+HeaderFields HttpResponse::InitHeaderFields(const HttpRequestResult &request_info) {
+	HeaderFields header_fields;
+	header_fields[SERVER] = SERVER_VERSION;
+	(void)request_info;
+	// todo: request_infoから情報取得
+	// GetContentType(request_info);
+	// GetConnection(request_info);
+	header_fields[CONTENT_TYPE] = "test/html";
+	header_fields[CONNECTION]   = "keep-alive";
+	return header_fields;
 }
 
 // std::string HttpResponse::CreateBadRequestResponse(const HttpRequestResult &request_info) {
