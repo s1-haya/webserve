@@ -2,7 +2,6 @@
 #include "client_infos.hpp"
 #include "http_exception.hpp"
 #include "http_message.hpp"
-#include "http_method.hpp"
 #include "http_parse.hpp"
 #include "server_infos.hpp"
 #include <iostream>
@@ -36,27 +35,30 @@ HttpResponseFormat HttpResponse::CreateHttpResponseFormat(
 		// if (server_info_result.redirect.IsOk()) {
 		// 	result = RedirectHandler();
 		// todo: IsCgi()
-		// - path
-		// - cgi_extension
-		// - method allowed
-		// } else if (IsCgi()) {
-		// todo: cgi実行
-		// cgi::Run()
-		// -> Internal　Server Errorを投げる可能性あり
-		// result = CgiToServerHandler();
-		// } else {
-		// }
-		//     return CreateSuccessResponseResult();
-		(void)client_info;
-		(void)server_info_result;
-		status_code = Method::Handler(
-			server_info_result.path,
-			request_info.request.request_line.method,
-			server_info_result.allowed_methods,
-			request_info.request.body_message,
-			response_body_message,
-			header_fields
-		);
+		if (IsCgi(
+				server_info_result.cgi_extension,
+				server_info_result.path,
+				request_info.request.request_line.method,
+				server_info_result.allowed_methods,
+				server_info_result.upload_directory
+			)) {
+			// todo: cgi実行
+			// cgi::Run()
+			// -> Internal　Server Errorを投げる可能性あり
+			// status_code = CgiToServerHandler();
+			(void)client_info;
+			(void)server_info_result;
+			(void)status_code;
+		} else {
+			status_code = Method::Handler(
+				server_info_result.path,
+				request_info.request.request_line.method,
+				server_info_result.allowed_methods,
+				request_info.request.body_message,
+				response_body_message,
+				header_fields
+			);
+		}
 	} catch (const HttpException &e) {
 		// ステータスコードが300番台以上の場合
 		// feature: header_fieldとerror_pageとの関連性がわかり次第変更あり
@@ -119,6 +121,25 @@ HeaderFields HttpResponse::InitHeaderFields(const HttpRequestResult &request_inf
 bool HttpResponse::IsConnectionKeep(const HeaderFields &request_header_fields) {
 	HeaderFields::const_iterator it = request_header_fields.find(CONNECTION);
 	return it == request_header_fields.end() || it->second == KEEP_ALIVE;
+}
+
+bool HttpResponse::IsCgi(
+	const std::string         &cgi_extension,
+	const std::string         &path,
+	const std::string         &method,
+	const Method::AllowMethods &allowed_methods,
+	const std::string         &upload_directory
+) {
+	// todo:
+	// cgi_extensionがあるかどうか、またpathがcgi_extensionで設定された拡張子かどうか
+	// methodがGETかPOSTかつallow_methodかどうか
+	// upload_directory内にpathが存在するかどうか
+	(void)cgi_extension;
+	(void)path;
+	(void)method;
+	(void)allowed_methods;
+	(void)upload_directory;
+	return true;
 }
 
 // std::string HttpResponse::CreateBadRequestResponse(const HttpRequestResult &request_info) {
