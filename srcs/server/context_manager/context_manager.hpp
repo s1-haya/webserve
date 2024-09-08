@@ -9,11 +9,6 @@
 
 namespace server {
 
-struct ServerContext {
-	int                                         fd;
-	VirtualServerStorage::VirtualServerAddrList virtual_server_addr_list;
-};
-
 // holds and manages virtual server info and socket context(server socket info, client socket info).
 class ContextManager {
   public:
@@ -29,8 +24,9 @@ class ContextManager {
 	void AddClientInfo(const ClientInfo &client_info, int server_fd);
 	void DeleteClientInfo(int client_fd);
 	// getter
-	const VirtualServerStorage::VirtualServerList &GetAllVirtualServer() const;
-	ServerContext                                  GetServerContext(int client_fd) const;
+	const VirtualServerStorage::VirtualServerList     &GetAllVirtualServer() const;
+	const VirtualServerStorage::VirtualServerAddrList &GetVirtualServerAddrList(int client_fd
+	) const;
 	GetServerInfoResult GetServerInfo(const std::string &host, unsigned int port) const;
 
   private:

@@ -48,15 +48,12 @@ const VirtualServerStorage::VirtualServerList &ContextManager::GetAllVirtualServ
 	return virtual_servers_.GetAllVirtualServerList();
 }
 
-ServerContext ContextManager::GetServerContext(int client_fd) const {
+const VirtualServerStorage::VirtualServerAddrList &
+ContextManager::GetVirtualServerAddrList(int client_fd) const {
 	const ServerInfo &server_info = sock_context_.GetConnectedServerInfo(client_fd);
 	const int         server_fd   = server_info.GetFd();
 
-	// create ServerContext
-	ServerContext server_infos;
-	server_infos.fd                       = server_fd;
-	server_infos.virtual_server_addr_list = virtual_servers_.GetVirtualServerAddrList(server_fd);
-	return server_infos;
+	return virtual_servers_.GetVirtualServerAddrList(server_fd);
 }
 
 ContextManager::GetServerInfoResult

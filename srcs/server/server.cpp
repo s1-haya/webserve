@@ -182,9 +182,7 @@ http::ClientInfos Server::GetClientInfos(int client_fd) const {
 }
 
 VirtualServerAddrList Server::GetVirtualServerList(int client_fd) const {
-	const ServerContext &server_context = context_.GetServerContext(client_fd);
-
-	return server_context.virtual_server_addr_list;
+	return context_.GetVirtualServerAddrList(client_fd);
 }
 
 void Server::ReadRequest(int client_fd) {
