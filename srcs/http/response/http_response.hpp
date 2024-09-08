@@ -52,7 +52,7 @@ class HttpResponse {
 		const HttpRequestResult  &request_info
 	);
 	static HttpResponseFormat CreateDefaultHttpResponseFormat(const StatusCode &status_code);
-	static HeaderFields       InitHeaderFields(const HttpRequestResult &request_info);
+	static HeaderFields       InitResponseHeaderFields(const HttpRequestResult &request_info);
 };
 
 } // namespace http
