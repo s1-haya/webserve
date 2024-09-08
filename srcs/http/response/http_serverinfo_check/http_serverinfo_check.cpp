@@ -143,18 +143,18 @@ CheckServerInfoResult HttpServerInfoCheck::Check(
 	const server::VirtualServerAddrList &server_infos, const HttpRequestFormat &request
 ) {
 	CheckServerInfoResult        result;
-	const server::VirtualServer *vs = CheckVSList(server_infos, request.header_fields);
+	const server::VirtualServer *vs = CheckVsList(server_infos, request.header_fields);
 
-	CheckDtoServerInfo(result, *vs, request.header_fields);
+	CheckVirtualServer(result, *vs, request.header_fields);
 	CheckLocationList(result, vs->GetLocationList(), request.request_line.request_target);
 	return result;
 }
 
-const server::VirtualServer *HttpServerInfoCheck::CheckVSList(
+const server::VirtualServer *HttpServerInfoCheck::CheckVsList(
 	const server::VirtualServerAddrList &virtual_servers, const HeaderFields &header_fields
 ) {
-	typedef server::VirtualServerAddrList::const_iterator VSAddrListItr;
-	for (VSAddrListItr it = virtual_servers.begin(); it != virtual_servers.end(); ++it) {
+	typedef server::VirtualServerAddrList::const_iterator VsAddrListItr;
+	for (VsAddrListItr it = virtual_servers.begin(); it != virtual_servers.end(); ++it) {
 		if (std::find(
 				(*it)->GetServerNameList().begin(),
 				(*it)->GetServerNameList().end(),
@@ -168,7 +168,7 @@ const server::VirtualServer *HttpServerInfoCheck::CheckVSList(
 }
 
 // Check VirtualServer
-void HttpServerInfoCheck::CheckDtoServerInfo(
+void HttpServerInfoCheck::CheckVirtualServer(
 	CheckServerInfoResult       &result,
 	const server::VirtualServer &virtual_server,
 	const HeaderFields          &header_fields
@@ -189,7 +189,7 @@ void HttpServerInfoCheck::CheckDtoServerInfo(
 // Check LocationList
 void HttpServerInfoCheck::CheckLocationList(
 	CheckServerInfoResult &result,
-	const VSLocationList  &locations,
+	const VsLocationList  &locations,
 	const std::string     &request_target
 ) {
 	const server::Location &match_location = CheckLocation(result, locations, request_target);
@@ -206,7 +206,7 @@ void HttpServerInfoCheck::CheckLocationList(
 
 const server::Location HttpServerInfoCheck::CheckLocation(
 	CheckServerInfoResult &result,
-	const VSLocationList  &locations,
+	const VsLocationList  &locations,
 	const std::string     &request_target
 ) {
 	server::Location match_loc;
@@ -218,7 +218,7 @@ const server::Location HttpServerInfoCheck::CheckLocation(
 	// location2 /
 	// -> /www/
 	result.path = request_target;
-	for (VSLocationList::const_iterator it = locations.begin(); it != locations.end(); ++it) {
+	for (VsLocationList::const_iterator it = locations.begin(); it != locations.end(); ++it) {
 		if (request_target.find((*it).request_uri) == 0 &&
 			(*it).request_uri.length() > match_loc.request_uri.length()) { // Longest Match
 			match_loc = *it;
