@@ -34,7 +34,13 @@ HttpResponseFormat HttpResponse::CreateHttpResponseFormat(
 		// todo: if redirect
 		// if (server_info_result.redirect.IsOk()) {
 		// 	result = RedirectHandler();
-		if (IsCgi(server_info_result.cgi_extension, server_info_result.path, request_info.request.request_line.method, server_info_result.allowed_methods, server_info_result.upload_directory)) {
+		if (IsCgi(
+				server_info_result.cgi_extension,
+				server_info_result.path,
+				request_info.request.request_line.method,
+				server_info_result.allowed_methods,
+				server_info_result.upload_directory
+			)) {
 			// todo: cgi実行
 			// cgi::Run()
 			// -> Internal　Server Errorを投げる可能性あり
