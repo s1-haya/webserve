@@ -128,6 +128,9 @@ bool HttpResponse::IsCgi(
 	if (cgi_extension.empty()) {
 		return false;
 	}
+	// upload_directory内にpathが存在するかどうか
+	// -> pathがaliasで設定される場合どうなるんだろう。
+	(void)upload_directory;
 	// pathがcgi_extensionで設定された拡張子かどうか
 	if (cgi_extension != GetExtension(path)) {
 		return false;
@@ -136,12 +139,6 @@ bool HttpResponse::IsCgi(
 	if (!(Method::IsAllowedMethod(method, allowed_methods)) || (method != GET && method != POST)) {
 		return false;
 	}
-	// upload_directory内にpathが存在するかどうか
-	(void)cgi_extension;
-	(void)path;
-	(void)method;
-	(void)allowed_methods;
-	(void)upload_directory;
 	return true;
 }
 
