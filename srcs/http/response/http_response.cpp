@@ -26,7 +26,7 @@ HttpResponseFormat HttpResponse::CreateHttpResponseFormat(
 	const MockDtoServerInfos &server_info,
 	const HttpRequestResult  &request_info
 ) {
-	HeaderFields header_fields = InitHeaderFields(request_info);
+	HeaderFields response_header_fields = InitResponseHeaderFields(request_info);
 	try {
 		HttpResponseFormat           result;
 		const CheckServerInfoResult &server_info_result =
@@ -55,7 +55,7 @@ HttpResponseFormat HttpResponse::CreateHttpResponseFormat(
 			server_info_result.allowed_methods,
 			request_info.request.body_message,
 			response_body_message,
-			header_fields
+			response_header_fields
 		);
 		return result;
 	} catch (const HttpException &e) {
@@ -109,16 +109,16 @@ std::string HttpResponse::CreateHttpResponse(const HttpResponseFormat &response)
 	return response_stream.str();
 }
 
-HeaderFields HttpResponse::InitHeaderFields(const HttpRequestResult &request_info) {
-	HeaderFields header_fields;
-	header_fields[SERVER] = SERVER_VERSION;
+HeaderFields HttpResponse::InitResponseHeaderFields(const HttpRequestResult &request_info) {
+	HeaderFields response_header_fields;
+	response_header_fields[SERVER] = SERVER_VERSION;
 	(void)request_info;
 	// todo: request_infoから情報取得
 	// GetContentType(request_info);
 	// GetConnection(request_info);
-	header_fields[CONTENT_TYPE] = "test/html";
-	header_fields[CONNECTION]   = "keep-alive";
-	return header_fields;
+	response_header_fields[CONTENT_TYPE] = "test/html";
+	response_header_fields[CONNECTION]   = "keep-alive";
+	return response_header_fields;
 }
 
 // std::string HttpResponse::CreateBadRequestResponse(const HttpRequestResult &request_info) {

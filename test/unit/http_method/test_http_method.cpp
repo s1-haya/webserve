@@ -16,20 +16,20 @@ struct MethodArgument {
 		const http::Method::AllowMethods &allow_methods,
 		const std::string                &request_body_message,
 		std::string                      &response_body_message,
-		http::HeaderFields               &header_fields
+		http::HeaderFields               &response_header_fields
 	)
 		: path(path),
 		  method(method),
 		  allow_methods(allow_methods),
 		  request_body_message(request_body_message),
 		  response_body_message(response_body_message),
-		  header_fields(header_fields) {}
+		  response_header_fields(response_header_fields) {}
 	const std::string                &path;
 	const std::string                &method;
 	const http::Method::AllowMethods &allow_methods;
 	const std::string                &request_body_message;
 	std::string                      &response_body_message;
-	http::HeaderFields               &header_fields;
+	http::HeaderFields               &response_header_fields;
 };
 
 std::string LoadFileContent(const std::string &file_path) {
@@ -71,7 +71,7 @@ int MethodHandlerResult(const MethodArgument &srcs, const std::string &expected_
 			srcs.allow_methods,
 			srcs.request_body_message,
 			srcs.response_body_message,
-			srcs.header_fields
+			srcs.response_header_fields
 		);
 		result = HandleResult(srcs.response_body_message, expected_body_message);
 
@@ -96,7 +96,7 @@ int main(void) {
 	allow_methods.push_back(http::DELETE);
 	std::string        request;
 	std::string        response;
-	http::HeaderFields header_fields;
+	http::HeaderFields response_header_fields;
 
 	// http_method/expected
 	// LF:   exist target resourse file
@@ -111,20 +111,20 @@ int main(void) {
 	// GET test
 	// ファイルが存在する場合
 	ret_code |= MethodHandlerResult(
-		MethodArgument("test/file.txt", http::GET, allow_methods, request, response, header_fields),
+		MethodArgument("test/file.txt", http::GET, allow_methods, request, response, response_header_fields),
 		expected_file
 	);
 
 	// ファイルが存在しない場合
 	ret_code |= MethodHandlerResult(
-		MethodArgument("test/a", http::GET, allow_methods, request, response, header_fields),
+		MethodArgument("test/a", http::GET, allow_methods, request, response, response_header_fields),
 		expected_not_found
 	);
 
 	// ディレクトリの場合かつ'/'がない場合
 	ret_code |= MethodHandlerResult(
 		MethodArgument(
-			"test/directory", http::GET, allow_methods, request, response, header_fields
+			"test/directory", http::GET, allow_methods, request, response, response_header_fields
 		),
 		expected_redirect
 	);
@@ -132,7 +132,7 @@ int main(void) {
 	// ファイルが権限ない場合
 	ret_code |= MethodHandlerResult(
 		MethodArgument(
-			"test/no_authority_file", http::GET, allow_methods, request, response, header_fields
+			"test/no_authority_file", http::GET, allow_methods, request, response, response_header_fields
 		),
 		expected_forbidden
 	);
@@ -147,7 +147,7 @@ int main(void) {
 			allow_methods,
 			post_test1_request_body_message,
 			response,
-			header_fields
+			response_header_fields
 		),
 		expected_created
 	);
@@ -161,7 +161,7 @@ int main(void) {
 			allow_methods,
 			post_test2_request_body_message,
 			response,
-			header_fields
+			response_header_fields
 		),
 		expected_no_content
 	);
@@ -169,7 +169,7 @@ int main(void) {
 	// ディレクトリの場合
 	ret_code |= MethodHandlerResult(
 		MethodArgument(
-			"test/directory", http::POST, allow_methods, request, response, header_fields
+			"test/directory", http::POST, allow_methods, request, response, response_header_fields
 		),
 		expected_forbidden
 	);
@@ -177,34 +177,34 @@ int main(void) {
 	// DELETE test
 	// ファイルが存在するかつ親ディレクトリが書き込み権限あるとき
 	ret_code |= MethodHandlerResult(
-		MethodArgument("ok.txt", http::DELETE, allow_methods, request, response, header_fields),
+		MethodArgument("ok.txt", http::DELETE, allow_methods, request, response, response_header_fields),
 		expected_no_content
 	);
 
 	// ファイルが存在しない場合
 	ret_code |= MethodHandlerResult(
 		MethodArgument(
-			"not_found.txt", http::DELETE, allow_methods, request, response, header_fields
+			"not_found.txt", http::DELETE, allow_methods, request, response, response_header_fields
 		),
 		expected_not_found
 	);
 
 	// ディレクトリ内にファイルが存在してる場合
 	ret_code |= MethodHandlerResult(
-		MethodArgument("test", http::DELETE, allow_methods, request, response, header_fields),
+		MethodArgument("test", http::DELETE, allow_methods, request, response, response_header_fields),
 		expected_forbidden
 	);
 
 	// ディレクトリ内にファイルが存在してない場合
 	ret_code |= MethodHandlerResult(
-		MethodArgument("test/s", http::DELETE, allow_methods, request, response, header_fields),
+		MethodArgument("test/s", http::DELETE, allow_methods, request, response, response_header_fields),
 		expected_forbidden
 	);
 
 	// 存在しないディレクトリの場合
 	ret_code |= MethodHandlerResult(
 		MethodArgument(
-			"not_found_directory", http::DELETE, allow_methods, request, response, header_fields
+			"not_found_directory", http::DELETE, allow_methods, request, response, response_header_fields
 		),
 		expected_not_found
 	);
@@ -217,7 +217,7 @@ int main(void) {
 			allow_methods,
 			request,
 			response,
-			header_fields
+			response_header_fields
 		),
 		expected_forbidden
 	);

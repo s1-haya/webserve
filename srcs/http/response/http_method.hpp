@@ -24,20 +24,20 @@ class Method {
 					 const AllowMethods &allow_methods,
 					 const std::string  &request_body_message,
 					 std::string        &response_body_message,
-					 HeaderFields       &header_fields
+					 HeaderFields       &response_header_fields
 				 );
 
   private:
 	static StatusCode
-	GetHandler(const std::string &path, std::string &body_message, HeaderFields &header_fields);
+	GetHandler(const std::string &path, std::string &body_message, HeaderFields &response_header_fields);
 	static StatusCode PostHandler(
 		const std::string &path,
 		const std::string &request_body_message,
 		std::string       &response_body_message,
-		HeaderFields      &header_fields
+		HeaderFields      &response_header_fields
 	);
 	static StatusCode DeleteHandler(
-		const std::string &path, std::string &response_body_message, HeaderFields &header_fields
+		const std::string &path, std::string &response_body_message, HeaderFields &response_header_fields
 	);
 	static Stat TryStat(const std::string &path);
 	static bool
@@ -47,7 +47,7 @@ class Method {
 		const std::string &path,
 		const std::string &request_body_message,
 		std::string       &response_body_message,
-		HeaderFields      &header_fields
+		HeaderFields      &response_header_fields
 	);
 };
 
