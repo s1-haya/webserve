@@ -51,8 +51,7 @@ class HttpResponse {
 		const MockDtoServerInfos &server_info,
 		const HttpRequestResult  &request_info
 	);
-	static HttpResponseFormat CreateDefaultHttpResponseFormat(const StatusCode &status_code);
-	static HeaderFields       InitHeaderFields(const HttpRequestResult &request_info);
+	static HeaderFields InitHeaderFields(const HttpRequestResult &request_info);
 };
 
 } // namespace http
