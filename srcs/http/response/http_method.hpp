@@ -17,14 +17,15 @@ typedef std::map<std::string, std::string> HeaderFields;
 
 class Method {
   public:
-	static StatusCode Handler(
-		const std::string            &path,
-		const std::string            &method,
-		const std::list<std::string> &allow_methods,
-		const std::string            &request_body_message,
-		std::string                  &response_body_message,
-		HeaderFields                 &header_fields
-	);
+	typedef std::list<std::string> AllowMethods;
+	static StatusCode              Handler(
+					 const std::string  &path,
+					 const std::string  &method,
+					 const AllowMethods &allow_methods,
+					 const std::string  &request_body_message,
+					 std::string        &response_body_message,
+					 HeaderFields       &header_fields
+				 );
 
   private:
 	static StatusCode
@@ -45,7 +46,8 @@ class Method {
 	static StatusCode FileCreationHandler(
 		const std::string &path,
 		const std::string &request_body_message,
-		std::string       &response_body_message
+		std::string       &response_body_message,
+		HeaderFields      &header_fields
 	);
 };
 

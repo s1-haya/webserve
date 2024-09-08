@@ -9,16 +9,14 @@
 
 namespace {
 
-typedef std::list<std::string> AllowMethods;
-
 struct MethodArgument {
 	MethodArgument(
-		const std::string  &path,
-		const std::string  &method,
-		const AllowMethods &allow_methods,
-		const std::string  &request_body_message,
-		std::string        &response_body_message,
-		http::HeaderFields &header_fields
+		const std::string                &path,
+		const std::string                &method,
+		const http::Method::AllowMethods &allow_methods,
+		const std::string                &request_body_message,
+		std::string                      &response_body_message,
+		http::HeaderFields               &header_fields
 	)
 		: path(path),
 		  method(method),
@@ -26,12 +24,12 @@ struct MethodArgument {
 		  request_body_message(request_body_message),
 		  response_body_message(response_body_message),
 		  header_fields(header_fields) {}
-	const std::string  &path;
-	const std::string  &method;
-	const AllowMethods &allow_methods;
-	const std::string  &request_body_message;
-	std::string        &response_body_message;
-	http::HeaderFields &header_fields;
+	const std::string                &path;
+	const std::string                &method;
+	const http::Method::AllowMethods &allow_methods;
+	const std::string                &request_body_message;
+	std::string                      &response_body_message;
+	http::HeaderFields               &header_fields;
 };
 
 std::string LoadFileContent(const std::string &file_path) {
@@ -92,7 +90,7 @@ int main(void) {
 	int ret_code = EXIT_SUCCESS;
 
 	// method test init
-	AllowMethods allow_methods;
+	http::Method::AllowMethods allow_methods;
 	allow_methods.push_back(http::GET);
 	allow_methods.push_back(http::POST);
 	allow_methods.push_back(http::DELETE);

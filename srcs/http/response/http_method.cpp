@@ -40,18 +40,18 @@ std::string ReadFile(const std::string &file_path) {
 namespace http {
 
 StatusCode Method::Handler(
-	const std::string            &path,
-	const std::string            &method,
-	const std::list<std::string> &allow_methods,
-	const std::string            &request_body_message,
-	std::string                  &response_body_message,
-	HeaderFields                 &header_fields
+	const std::string  &path,
+	const std::string  &method,
+	const AllowMethods &allow_methods,
+	const std::string  &request_body_message,
+	std::string        &response_body_message,
+	HeaderFields       &header_fields
 ) {
 	StatusCode status_code(OK);
-	bool       is_allow_method = IsAllowedMethod(method, allow_methods);
-	if (!is_allow_method) {
+	if (!IsAllowedMethod(method, allow_methods)) {
 		throw HttpException("Error: Not Implemented", StatusCode(NOT_IMPLEMENTED));
-	} else if (method == GET) {
+	}
+	if (method == GET) {
 		status_code = GetHandler(path, response_body_message, header_fields);
 	} else if (method == POST) {
 		status_code = PostHandler(path, request_body_message, response_body_message, header_fields);
@@ -95,7 +95,9 @@ StatusCode Method::PostHandler(
 	HeaderFields      &header_fields
 ) {
 	if (!IsExistPath(path)) {
-		return FileCreationHandler(path, request_body_message, response_body_message);
+		return FileCreationHandler(
+			path, request_body_message, response_body_message, header_fields
+		);
 	}
 	const Stat &info = TryStat(path);
 	StatusCode  status_code(NO_CONTENT);
@@ -108,7 +110,8 @@ StatusCode Method::PostHandler(
 		// Location header fields: URI-reference
 		// ex) POST /save/test.txt HTTP/1.1
 		// Location: /save/test.txt;
-		status_code = FileCreationHandler(path, request_body_message, response_body_message);
+		status_code =
+			FileCreationHandler(path, request_body_message, response_body_message, header_fields);
 	}
 	return status_code;
 }
@@ -144,7 +147,8 @@ void Method::SystemExceptionHandler(const utils::SystemException &e) {
 StatusCode Method::FileCreationHandler(
 	const std::string &path,
 	const std::string &request_body_message,
-	std::string       &response_body_message
+	std::string       &response_body_message,
+	HeaderFields      &header_fields
 ) {
 	StatusCode    status_code(CREATED);
 	std::ofstream file(path.c_str(), std::ios::binary);
@@ -159,7 +163,8 @@ StatusCode Method::FileCreationHandler(
 		}
 		throw HttpException("Error: Forbidden", StatusCode(FORBIDDEN));
 	}
-	response_body_message = HttpResponse::CreateDefaultBodyMessageFormat(status_code);
+	response_body_message         = HttpResponse::CreateDefaultBodyMessageFormat(status_code);
+	header_fields[CONTENT_LENGTH] = utils::ToString(response_body_message.length());
 	return status_code;
 }
 
@@ -182,7 +187,6 @@ bool Method::IsAllowedMethod(
 	const std::string &method, const std::list<std::string> &allow_methods
 ) {
 	if (allow_methods.empty()) {
-		// allow_methodがない場合はwebservが許可したメソッドのみ許可する（GETのみ）
 		return std::find(
 				   DEFAULT_ALLOWED_METHODS,
 				   DEFAULT_ALLOWED_METHODS + DEFAULT_ALLOWED_METHODS_SIZE,
