@@ -2,7 +2,6 @@
 #include "client_infos.hpp"
 #include "http_exception.hpp"
 #include "http_message.hpp"
-#include "http_method.hpp"
 #include "http_parse.hpp"
 #include "server_infos.hpp"
 #include <iostream>
@@ -119,6 +118,25 @@ HeaderFields HttpResponse::InitHeaderFields(const HttpRequestResult &request_inf
 bool HttpResponse::IsConnectionKeep(const HeaderFields &request_header_fields) {
 	HeaderFields::const_iterator it = request_header_fields.find(CONNECTION);
 	return it == request_header_fields.end() || it->second == KEEP_ALIVE;
+}
+
+bool HttpResponse::IsCgi(
+	const std::string          &cgi_extension,
+	const std::string          &path,
+	const std::string          &method,
+	const Method::AllowMethods &allowed_methods,
+	const std::string          &upload_directory
+) {
+	// todo:
+	// cgi_extensionがあるかどうか、またpathがcgi_extensionで設定された拡張子かどうか
+	// methodがGETかPOSTかつallow_methodかどうか
+	// upload_directory内にpathが存在するかどうか
+	(void)cgi_extension;
+	(void)path;
+	(void)method;
+	(void)allowed_methods;
+	(void)upload_directory;
+	return true;
 }
 
 // std::string HttpResponse::CreateBadRequestResponse(const HttpRequestResult &request_info) {
