@@ -111,13 +111,17 @@ int main(void) {
 	// GET test
 	// ファイルが存在する場合
 	ret_code |= MethodHandlerResult(
-		MethodArgument("test/file.txt", http::GET, allow_methods, request, response, response_header_fields),
+		MethodArgument(
+			"test/file.txt", http::GET, allow_methods, request, response, response_header_fields
+		),
 		expected_file
 	);
 
 	// ファイルが存在しない場合
 	ret_code |= MethodHandlerResult(
-		MethodArgument("test/a", http::GET, allow_methods, request, response, response_header_fields),
+		MethodArgument(
+			"test/a", http::GET, allow_methods, request, response, response_header_fields
+		),
 		expected_not_found
 	);
 
@@ -132,7 +136,12 @@ int main(void) {
 	// ファイルが権限ない場合
 	ret_code |= MethodHandlerResult(
 		MethodArgument(
-			"test/no_authority_file", http::GET, allow_methods, request, response, response_header_fields
+			"test/no_authority_file",
+			http::GET,
+			allow_methods,
+			request,
+			response,
+			response_header_fields
 		),
 		expected_forbidden
 	);
@@ -177,7 +186,9 @@ int main(void) {
 	// DELETE test
 	// ファイルが存在するかつ親ディレクトリが書き込み権限あるとき
 	ret_code |= MethodHandlerResult(
-		MethodArgument("ok.txt", http::DELETE, allow_methods, request, response, response_header_fields),
+		MethodArgument(
+			"ok.txt", http::DELETE, allow_methods, request, response, response_header_fields
+		),
 		expected_no_content
 	);
 
@@ -191,20 +202,29 @@ int main(void) {
 
 	// ディレクトリ内にファイルが存在してる場合
 	ret_code |= MethodHandlerResult(
-		MethodArgument("test", http::DELETE, allow_methods, request, response, response_header_fields),
+		MethodArgument(
+			"test", http::DELETE, allow_methods, request, response, response_header_fields
+		),
 		expected_forbidden
 	);
 
 	// ディレクトリ内にファイルが存在してない場合
 	ret_code |= MethodHandlerResult(
-		MethodArgument("test/s", http::DELETE, allow_methods, request, response, response_header_fields),
+		MethodArgument(
+			"test/s", http::DELETE, allow_methods, request, response, response_header_fields
+		),
 		expected_forbidden
 	);
 
 	// 存在しないディレクトリの場合
 	ret_code |= MethodHandlerResult(
 		MethodArgument(
-			"not_found_directory", http::DELETE, allow_methods, request, response, response_header_fields
+			"not_found_directory",
+			http::DELETE,
+			allow_methods,
+			request,
+			response,
+			response_header_fields
 		),
 		expected_not_found
 	);

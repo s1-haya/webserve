@@ -28,8 +28,9 @@ class Method {
 				 );
 
   private:
-	static StatusCode
-	GetHandler(const std::string &path, std::string &body_message, HeaderFields &response_header_fields);
+	static StatusCode GetHandler(
+		const std::string &path, std::string &body_message, HeaderFields &response_header_fields
+	);
 	static StatusCode PostHandler(
 		const std::string &path,
 		const std::string &request_body_message,
@@ -37,7 +38,9 @@ class Method {
 		HeaderFields      &response_header_fields
 	);
 	static StatusCode DeleteHandler(
-		const std::string &path, std::string &response_body_message, HeaderFields &response_header_fields
+		const std::string &path,
+		std::string       &response_body_message,
+		HeaderFields      &response_header_fields
 	);
 	static Stat TryStat(const std::string &path);
 	static bool
