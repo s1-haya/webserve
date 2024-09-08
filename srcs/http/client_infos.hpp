@@ -11,6 +11,11 @@ struct MockDtoClientInfos {
 	std::string ip;
 };
 
+struct ClientInfos {
+	int         fd;
+	std::string request_buf;
+};
+
 } // namespace http
 
 #endif

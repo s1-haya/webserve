@@ -69,7 +69,7 @@ Result RunGetClientInfo(
 		std::ostringstream oss;
 		oss << "client_fd  : result   [" << a.GetFd() << "]" << std::endl;
 		oss << "             expected [" << b.GetFd() << "]" << std::endl;
-		oss << "listen_IP  : result   [" << a.GetListenPort() << "]" << std::endl;
+		oss << "listen_ip  : result   [" << a.GetListenPort() << "]" << std::endl;
 		oss << "             expected [" << b.GetListenPort() << "]" << std::endl;
 		oss << "listen_port: result   [" << a.GetListenPort() << "]" << std::endl;
 		oss << "             expected [" << b.GetListenPort() << "]" << std::endl;
