@@ -54,7 +54,7 @@ class HttpResponse {
 	);
 	static HeaderFields InitHeaderFields(const HttpRequestResult &request_info);
 	static bool         IsConnectionKeep(const HeaderFields &request_header_fields);
-	bool                IsCgi(
+	static bool                IsCgi(
         const std::string          &cgi_extension,
         const std::string          &path,
         const std::string          &method,

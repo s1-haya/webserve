@@ -34,28 +34,24 @@ HttpResponseFormat HttpResponse::CreateHttpResponseFormat(
 		// todo: if redirect
 		// if (server_info_result.redirect.IsOk()) {
 		// 	result = RedirectHandler();
-		// todo: IsCgi()
-		// - path
-		// - cgi_extension
-		// - method allowed
-		// } else if (IsCgi()) {
-		// todo: cgi実行
-		// cgi::Run()
-		// -> Internal　Server Errorを投げる可能性あり
-		// result = CgiToServerHandler();
-		// } else {
-		// }
-		//     return CreateSuccessResponseResult();
-		(void)client_info;
-		(void)server_info_result;
-		status_code = Method::Handler(
-			server_info_result.path,
-			request_info.request.request_line.method,
-			server_info_result.allowed_methods,
-			request_info.request.body_message,
-			response_body_message,
-			header_fields
-		);
+		if (IsCgi(server_info_result.cgi_extension, server_info_result.path, request_info.request.request_line.method, server_info_result.allowed_methods, server_info_result.upload_directory)) {
+			// todo: cgi実行
+			// cgi::Run()
+			// -> Internal　Server Errorを投げる可能性あり
+			// status_code = CgiToServerHandler(header_fields, response_body_message);
+			(void)client_info;
+			(void)server_info_result;
+			(void)status_code;
+		} else {
+			status_code = Method::Handler(
+				server_info_result.path,
+				request_info.request.request_line.method,
+				server_info_result.allowed_methods,
+				request_info.request.body_message,
+				response_body_message,
+				header_fields
+			);
+		}
 	} catch (const HttpException &e) {
 		// ステータスコードが300番台以上の場合
 		// feature: header_fieldとerror_pageとの関連性がわかり次第変更あり
