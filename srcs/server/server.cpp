@@ -18,6 +18,8 @@ const double Server::REQUEST_TIMEOUT = 3.0;
 
 namespace {
 
+typedef std::set<VirtualServer::HostPortPair> HostPortSet;
+
 VirtualServer::LocationList ConvertLocations(const config::context::LocationList &config_locations
 ) {
 	VirtualServer::LocationList location_list;
@@ -39,16 +41,6 @@ VirtualServer::LocationList ConvertLocations(const config::context::LocationList
 	return location_list;
 }
 
-VirtualServer ConvertToVirtualServer(const config::context::ServerCon &config_server) {
-	return VirtualServer(
-		config_server.server_names,
-		ConvertLocations(config_server.location_con),
-		config_server.host_ports,
-		config_server.client_max_body_size,
-		config_server.error_page
-	);
-}
-
 // todo: tmp for debug
 void DebugVirtualServerNames(
 	const VirtualServerStorage::VirtualServerAddrList &virtual_server_addr_list
@@ -66,6 +58,49 @@ void DebugDto(const http::ClientInfos &client_infos, const VirtualServerAddrList
 	utils::Debug("server", "ClientInfo - fd", client_infos.fd);
 	utils::Debug("server", "received server_names");
 	DebugVirtualServerNames(virtual_servers);
+}
+
+void AddResolvedHostPort(
+	HostPortSet &host_port_set, const Connection::IpList &ip_list, unsigned int port
+) {
+	typedef Connection::IpList::const_iterator Itr;
+	for (Itr it = ip_list.begin(); it != ip_list.end(); ++it) {
+		const VirtualServer::HostPortPair host_port = std::make_pair(*it, port);
+
+		typedef std::pair<HostPortSet::const_iterator, bool> InsertResult;
+		const InsertResult result = host_port_set.insert(host_port);
+		if (result.second == false) {
+			// duplicate host:port
+			throw std::invalid_argument("invalid host:port");
+		}
+	}
+}
+
+VirtualServer::HostPortList ConvertHostPortSetToList(const HostPortSet &host_ports_set) {
+	return VirtualServer::HostPortList(host_ports_set.begin(), host_ports_set.end());
+}
+
+VirtualServer::HostPortList ConvertHostPorts(const config::context::HostPortList &config_host_ports
+) {
+	// Temporary std::set for checking duplicates of host:port for each virtual server.
+	HostPortSet host_ports_set;
+
+	typedef config::context::HostPortList::const_iterator Itr;
+	for (Itr it = config_host_ports.begin(); it != config_host_ports.end(); ++it) {
+		const Connection::IpList ip_list = Connection::ResolveHostName(it->first);
+		AddResolvedHostPort(host_ports_set, ip_list, it->second);
+	}
+	return ConvertHostPortSetToList(host_ports_set);
+}
+
+VirtualServer ConvertToVirtualServer(const config::context::ServerCon &config_server) {
+	return VirtualServer(
+		config_server.server_names,
+		ConvertLocations(config_server.location_con),
+		ConvertHostPorts(config_server.host_ports),
+		config_server.client_max_body_size,
+		config_server.error_page
+	);
 }
 
 } // namespace
