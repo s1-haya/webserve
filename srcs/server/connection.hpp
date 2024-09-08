@@ -2,6 +2,7 @@
 #define SERVER_CONNECTION_HPP_
 
 #include "result.hpp"
+#include <list>
 #include <netdb.h> // struct addrinfo,gai_strerror
 #include <set>
 #include <string>
@@ -15,12 +16,14 @@ class Connection {
   public:
 	typedef struct addrinfo                      AddrInfo;
 	typedef std::set<int>                        FdSet;
+	typedef std::list<std::string>               IpList;
 	typedef utils::Result<int>                   BindResult;
 	typedef std::pair<std::string, unsigned int> IpPortPair;
 
 	Connection();
 	~Connection();
 	// function
+	static IpList     ResolveHostName(const std::string &hostname);
 	int               Connect(ServerInfo &server_info);
 	static ClientInfo Accept(int server_fd);
 	bool              IsListenServerFd(int sock_fd) const;
