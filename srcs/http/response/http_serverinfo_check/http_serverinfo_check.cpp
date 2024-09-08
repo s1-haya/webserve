@@ -4,7 +4,7 @@
 #include "status_code.hpp"
 #include "utils.hpp"
 #include <algorithm>
-#include <cstdlib> // atoi
+#include <cstdlib>
 #include <iostream>
 
 namespace http {
@@ -143,14 +143,14 @@ CheckServerInfoResult HttpServerInfoCheck::Check(
 	const server::VirtualServerAddrList &server_infos, const HttpRequestFormat &request
 ) {
 	CheckServerInfoResult        result;
-	const server::VirtualServer *vs = CheckVsList(server_infos, request.header_fields);
+	const server::VirtualServer *vs = FindVirtualServer(server_infos, request.header_fields);
 
 	CheckVirtualServer(result, *vs, request.header_fields);
 	CheckLocationList(result, vs->GetLocationList(), request.request_line.request_target);
 	return result;
 }
 
-const server::VirtualServer *HttpServerInfoCheck::CheckVsList(
+const server::VirtualServer *HttpServerInfoCheck::FindVirtualServer(
 	const server::VirtualServerAddrList &virtual_servers, const HeaderFields &header_fields
 ) {
 	typedef server::VirtualServerAddrList::const_iterator VsAddrListItr;
@@ -192,7 +192,7 @@ void HttpServerInfoCheck::CheckLocationList(
 	const VsLocationList  &locations,
 	const std::string     &request_target
 ) {
-	const server::Location &match_location = CheckLocation(result, locations, request_target);
+	const server::Location &match_location = FindLocation(result, locations, request_target);
 	// std::cout << match_location.request_uri << std::endl; // for debug
 	CheckIndex(result, match_location);
 	CheckAutoIndex(result, match_location);
@@ -204,7 +204,7 @@ void HttpServerInfoCheck::CheckLocationList(
 	return;
 }
 
-const server::Location HttpServerInfoCheck::CheckLocation(
+const server::Location HttpServerInfoCheck::FindLocation(
 	CheckServerInfoResult &result,
 	const VsLocationList  &locations,
 	const std::string     &request_target

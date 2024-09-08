@@ -67,7 +67,7 @@ class HttpServerInfoCheck {
 
 	/*====================================================*/ // 消す
 
-	static const server::VirtualServer *CheckVsList(
+	static const server::VirtualServer *FindVirtualServer(
 		const server::VirtualServerAddrList &virtual_servers, const HeaderFields &header_fields
 	);
 	static void CheckVirtualServer(
@@ -82,7 +82,7 @@ class HttpServerInfoCheck {
 										const VsLocationList  &locations,
 										const std::string     &request_target
 									);
-	static const server::Location CheckLocation(
+	static const server::Location FindLocation(
 		CheckServerInfoResult &result,
 		const VsLocationList  &locations,
 		const std::string     &request_target
