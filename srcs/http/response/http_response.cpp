@@ -128,6 +128,10 @@ bool HttpResponse::IsCgi(
 	if (cgi_extension.empty()) {
 		return false;
 	}
+	// pathがcgi_extensionで設定された拡張子かどうか
+	if (cgi_extension != GetExtension(path)) {
+		return false;
+	}
 	// methodがGETかPOSTかつallow_methodかどうか
 	// upload_directory内にpathが存在するかどうか
 	(void)cgi_extension;
@@ -144,3 +148,15 @@ bool HttpResponse::IsCgi(
 // }
 
 } // namespace http
+
+namespace {
+std::string GetExtension(const std::string &path) {
+	size_t pos = path.find_last_of('.');
+
+	if (pos == std::string::npos || pos == path.length() - 1) {
+		return "";
+	}
+	return path.substr(pos + 1);
+}
+
+} // namespace
