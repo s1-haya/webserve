@@ -42,16 +42,16 @@ namespace http {
 StatusCode Method::Handler(
 	const std::string            &path,
 	const std::string            &method,
-	const std::list<std::string> &allow_methods,
+	const AllowMethods &allow_methods,
 	const std::string            &request_body_message,
 	std::string                  &response_body_message,
 	HeaderFields                 &header_fields
 ) {
 	StatusCode status_code(OK);
-	bool       is_allow_method = IsAllowedMethod(method, allow_methods);
-	if (!is_allow_method) {
+	if (!IsAllowedMethod(method, allow_methods)) {
 		throw HttpException("Error: Not Implemented", StatusCode(NOT_IMPLEMENTED));
-	} else if (method == GET) {
+	}
+	if (method == GET) {
 		status_code = GetHandler(path, response_body_message, header_fields);
 	} else if (method == POST) {
 		status_code = PostHandler(path, request_body_message, response_body_message, header_fields);
@@ -182,7 +182,6 @@ bool Method::IsAllowedMethod(
 	const std::string &method, const std::list<std::string> &allow_methods
 ) {
 	if (allow_methods.empty()) {
-		// allow_methodがない場合はwebservが許可したメソッドのみ許可する（GETのみ）
 		return std::find(
 				   DEFAULT_ALLOWED_METHODS,
 				   DEFAULT_ALLOWED_METHODS + DEFAULT_ALLOWED_METHODS_SIZE,
