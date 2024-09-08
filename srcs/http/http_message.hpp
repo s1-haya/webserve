@@ -24,6 +24,8 @@ extern const std::string USER_AGENT;
 extern const std::string ACCEPT;
 extern const std::string ACCEPT_ENCODING;
 extern const std::string CONNECTION;
+extern const std::string KEEP_ALIVE;
+extern const std::string CLOSE;
 extern const std::string CONTENT_TYPE;
 extern const std::string CONTENT_LENGTH;
 extern const std::string TRANSFER_ENCODING;
