@@ -48,7 +48,8 @@ int Test(Result result) {
 
 // -----------------------------------------------------------------------------
 bool IsSameClientInfo(const server::ClientInfo &a, const server::ClientInfo &b) {
-	return a.GetFd() == b.GetFd() && a.GetIp() == b.GetIp();
+	return a.GetFd() == b.GetFd() && a.GetListenIp() == b.GetListenIp() &&
+		   a.GetListenPort() == b.GetListenPort();
 }
 
 // ClientInfo同士のメンバが全て等しいことを期待するテスト
@@ -66,10 +67,12 @@ Result RunGetClientInfo(
 	if (!IsSameClientInfo(a, b)) {
 		result.is_success = false;
 		std::ostringstream oss;
-		oss << "client_fd : result   [" << a.GetFd() << "]" << std::endl;
-		oss << "            expected [" << b.GetFd() << "]" << std::endl;
-		oss << "client_IP : result   [" << a.GetIp() << "]" << std::endl;
-		oss << "            expected [" << b.GetIp() << "]" << std::endl;
+		oss << "client_fd  : result   [" << a.GetFd() << "]" << std::endl;
+		oss << "             expected [" << b.GetFd() << "]" << std::endl;
+		oss << "listen_IP  : result   [" << a.GetListenPort() << "]" << std::endl;
+		oss << "             expected [" << b.GetListenPort() << "]" << std::endl;
+		oss << "listen_port: result   [" << a.GetListenPort() << "]" << std::endl;
+		oss << "             expected [" << b.GetListenPort() << "]" << std::endl;
 		result.error_log = oss.str();
 	}
 	return result;
