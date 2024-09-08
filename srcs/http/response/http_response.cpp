@@ -26,10 +26,10 @@ HttpResponseFormat HttpResponse::CreateHttpResponseFormat(
 	const MockDtoServerInfos &server_info,
 	const HttpRequestResult  &request_info
 ) {
-	// todo: InitHeaderFields(最終的にはtryの外側でinitする/try,
-	// catch両方header_fieldsを使用するため)
+	StatusCode   status_code(OK);
+	HeaderFields header_fields = InitHeaderFields(request_info);
+	std::string  response_body_message;
 	try {
-		HttpResponseFormat           result;
 		const CheckServerInfoResult &server_info_result =
 			HttpServerInfoCheck::Check(server_info, request_info.request);
 		// todo: if redirect
@@ -49,15 +49,14 @@ HttpResponseFormat HttpResponse::CreateHttpResponseFormat(
 		//     return CreateSuccessResponseResult();
 		(void)client_info;
 		(void)server_info_result;
-		std::string       response_body_message;
-		const StatusCode &status_code = Method::Handler(
+		status_code = Method::Handler(
 			server_info_result.path,
 			request_info.request.request_line.method,
 			server_info_result.allowed_methods,
 			request_info.request.body_message,
-			response_body_message
+			response_body_message,
+			header_fields
 		);
-		return result;
 	} catch (const HttpException &e) {
 		// ステータスコードが300番台以上の場合
 		// feature: header_fieldとerror_pageとの関連性がわかり次第変更あり
@@ -68,8 +67,14 @@ HttpResponseFormat HttpResponse::CreateHttpResponseFormat(
 		// 	response_message = ReadFile(server_info.error_page.GetValue().second);
 		// 	// check the path of error_page
 		// }
-		return CreateDefaultHttpResponseFormat(e.GetStatusCode());
+		status_code           = e.GetStatusCode();
+		response_body_message = CreateDefaultBodyMessageFormat(status_code);
 	}
+	return HttpResponseFormat(
+		StatusLine(HTTP_VERSION, status_code.GetStatusCode(), status_code.GetReasonPhrase()),
+		header_fields,
+		response_body_message
+	);
 }
 
 std::string HttpResponse::CreateDefaultBodyMessageFormat(const StatusCode &status_code) {
@@ -80,20 +85,6 @@ std::string HttpResponse::CreateDefaultBodyMessageFormat(const StatusCode &statu
 				 << status_code.GetReasonPhrase() << "</h1></center>" << CRLF << "<hr><center>"
 				 << SERVER_VERSION << "</center>" << CRLF << "</body>" << CRLF << "</html>" << CRLF;
 	return body_message.str();
-}
-
-// mock
-HttpResponseFormat HttpResponse::CreateDefaultHttpResponseFormat(const StatusCode &status_code) {
-	HttpResponseFormat response;
-	response.status_line.version           = HTTP_VERSION;
-	response.status_line.status_code       = status_code.GetStatusCode();
-	response.status_line.reason_phrase     = status_code.GetReasonPhrase();
-	response.header_fields[CONTENT_TYPE]   = "text/html";
-	response.header_fields[SERVER]         = SERVER_VERSION;
-	response.header_fields[CONNECTION]     = "close";
-	response.body_message                  = CreateDefaultBodyMessageFormat(status_code);
-	response.header_fields[CONTENT_LENGTH] = utils::ToString(response.body_message.length());
-	return response;
 }
 
 std::string HttpResponse::CreateHttpResponse(const HttpResponseFormat &response) {
@@ -107,6 +98,18 @@ std::string HttpResponse::CreateHttpResponse(const HttpResponseFormat &response)
 	response_stream << CRLF;
 	response_stream << response.body_message;
 	return response_stream.str();
+}
+
+HeaderFields HttpResponse::InitHeaderFields(const HttpRequestResult &request_info) {
+	HeaderFields header_fields;
+	header_fields[SERVER] = SERVER_VERSION;
+	(void)request_info;
+	// todo: request_infoから情報取得
+	// GetContentType(request_info);
+	// GetConnection(request_info);
+	header_fields[CONTENT_TYPE] = "test/html";
+	header_fields[CONNECTION]   = "keep-alive";
+	return header_fields;
 }
 
 // std::string HttpResponse::CreateBadRequestResponse(const HttpRequestResult &request_info) {

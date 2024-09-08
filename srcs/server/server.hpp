@@ -13,9 +13,6 @@
 
 namespace server {
 
-struct DtoClientInfos;
-struct DtoServerInfos;
-
 class Server {
   public:
 	typedef std::list<config::context::ServerCon> ConfigServers;
@@ -49,7 +46,7 @@ class Server {
 	);
 	void SetNonBlockingMode(int sock_fd);
 	// for Server to Http
-	DtoClientInfos        GetClientInfos(int client_fd) const;
+	http::ClientInfos     GetClientInfos(int client_fd) const;
 	VirtualServerAddrList GetVirtualServerList(int client_fd) const;
 
 	// const

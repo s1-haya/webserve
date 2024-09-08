@@ -1,11 +1,23 @@
 #ifndef IHTTP_HPP_
 #define IHTTP_HPP_
 
-#include "server/dto/dto_server_to_http.hpp"
+#include "client_infos.hpp"
+#include "virtual_server.hpp"
+
+namespace server {
+
+typedef std::list<const VirtualServer *> VirtualServerAddrList;
+
+}
 
 namespace http {
 
 struct HttpResult;
+
+enum ErrState {
+	TIMEOUT,
+	INTERNAL_ERROR
+};
 
 class IHttp {
   public:
@@ -25,9 +37,8 @@ class IHttp {
 	 *         and containing the response data.
 	 */
 	virtual HttpResult
-						Run(const server::DtoClientInfos        &client_infos,
-							const server::VirtualServerAddrList &virtual_servers) = 0;
-	virtual std::string GetTimeoutResponse(int client_fd)                         = 0;
+	Run(const ClientInfos &client_infos, const server::VirtualServerAddrList &virtual_servers) = 0;
+	virtual HttpResult GetErrorResponse(const ClientInfos &client_info, ErrState state)        = 0;
 };
 
 } // namespace http
