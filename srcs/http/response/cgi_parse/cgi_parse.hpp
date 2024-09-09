@@ -1,8 +1,6 @@
 #include "http_format.hpp"
 #include "result.hpp"
-#include <iostream>
 #include <map>
-#include <sstream>
 #include <string>
 
 namespace http {
