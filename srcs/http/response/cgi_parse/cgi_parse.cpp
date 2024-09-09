@@ -1,5 +1,6 @@
 #include "cgi_parse.hpp"
 
+namespace http {
 namespace cgi {
 
 Cgi::MetaMap CgiParse::CreateRequestMetaVariables() {
@@ -38,3 +39,4 @@ CgiRequest CgiParse::Parse(const std::string &http_request) {
 }
 
 } // namespace cgi
+} // namespace http

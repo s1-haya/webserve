@@ -1,9 +1,11 @@
 #include "cgi.hpp"
+#include "http_format.hpp"
 #include <iostream>
 #include <map>
 #include <sstream>
 #include <string>
 
+namespace http {
 namespace cgi {
 
 struct CgiRequest {
@@ -13,8 +15,7 @@ struct CgiRequest {
 
 class CgiParse {
   public:
-	// todo 引数は要相談（クライアントとサーバーの情報を追加するかも）
-	static CgiRequest Parse(const std::string &http_request);
+	static CgiRequest Parse(const HttpRequestFormat &request);
 
   private:
 	CgiParse();
@@ -26,3 +27,4 @@ class CgiParse {
 }; // namespace cgi class CgiParse
 
 } // namespace cgi
+} // namespace http

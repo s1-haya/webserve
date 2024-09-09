@@ -4,6 +4,7 @@
 #include <map>
 #include <string>
 
+namespace http {
 namespace cgi {
 
 struct CgiRequest;
@@ -17,25 +18,26 @@ class Cgi {
 
   private:
 	Cgi(const Cgi &cgi);
-	Cgi   &operator=(const Cgi &cgi);
-	void   SetCgiMember(cgi::CgiRequest request);
-	char *const* SetCgiEnv(const MetaMap &meta_variables);
-	char *const* SetCgiArgv();
-	void   Execve();
-	void   ExecveCgiScript();
-	void   Free();
+	Cgi         &operator=(const Cgi &cgi);
+	void         SetCgiMember(cgi::CgiRequest request);
+	char *const *SetCgiEnv(const MetaMap &meta_variables);
+	char *const *SetCgiArgv();
+	void         Execve();
+	void         ExecveCgiScript();
+	void         Free();
 	// cgi info;
-	std::string method_;
-	std::string cgi_script_;
-	std::string body_message_;
-	char      *const* argv_;
-	char      *const* env_;
-	int         exit_status_;
+	std::string  method_;
+	std::string  cgi_script_;
+	std::string  body_message_;
+	char *const *argv_;
+	char *const *env_;
+	int          exit_status_;
 
-	static const int READ = 0;
+	static const int READ  = 0;
 	static const int WRITE = 1;
 };
 
 } // namespace cgi
+} // namespace http
 
 #endif
