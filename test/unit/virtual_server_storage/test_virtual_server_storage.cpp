@@ -130,13 +130,14 @@ CreateVirtualServer(const ServerNameList &server_names, const HostPortList &host
 	);
 }
 
+// 同じhost:portが複数VirtualServerにある場合
 // -----------------------------------------------------------------------------
 // - virtual_serverは以下の想定
 // virtual_server | server_name          | host:port
 // -----------------------------------------------------------------------------
 //       vs1      | localhost            | {host1:8080, host2:12345}
 //       vs2      | localhost2,test_serv | {host1:8080, host3:9999}
-int RunTestVirtualServerStorage() {
+int RunTestVirtualServerStorage1() {
 	int ret_code = EXIT_SUCCESS;
 
 	/* -------------- HostPortPair3個用意 -------------- */
@@ -178,12 +179,17 @@ int RunTestVirtualServerStorage() {
 	vs_storage.AddVirtualServer(vs1);
 	vs_storage.AddVirtualServer(vs2);
 
+	// 初期化
+	vs_storage.InitHostPortPair(host_port1);
+	vs_storage.InitHostPortPair(host_port2);
+	vs_storage.InitHostPortPair(host_port3);
+
 	// - socket通信した結果のserver_fdとvirtual_serverは以下の想定
-	// fd | virtual_server  | host:port
-	// ----------------------------
-	//  4 |     vs1, vs2    | host1:8080
-	//  5 |       vs1       | host2:12345
-	//  6 |       vs2       | host3:9999
+	// host:port   | virtual_server*
+	// -----------------------------
+	// host1:8080  |   vs1, vs2
+	// host2:12345 |     vs1
+	// host3:9999  |     vs2
 
 	// server_fdとvirtual_serverの紐づけをvirtual_server_storageに追加
 	vs_storage.AddMapping(host_port1, &vs1);
@@ -217,7 +223,7 @@ int RunTestVirtualServerStorage() {
 int main() {
 	int ret_code = EXIT_SUCCESS;
 
-	ret_code |= RunTestVirtualServerStorage();
+	ret_code |= RunTestVirtualServerStorage1();
 
 	return ret_code;
 }
