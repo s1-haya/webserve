@@ -275,6 +275,81 @@ int RunTestVirtualServerStorage2() {
 	return ret_code;
 }
 
+// 0.0.0.0がある &&
+// 0.0.0.0のportと同じportで異なるhostのhost:portが、同じVirtualServerに存在する場合
+// -----------------------------------------------------------------------------
+// - virtual_serverは以下の想定
+// virtual_server | server_name           | host:port
+// -----------------------------------------------------------------------------
+//       vs1      | localhost1            | {127.0.0.1:8080, 0.0.0.0:8080}
+//       vs2      | localhost2,serv_name2 | {172.19.0.1:8080, 127.0.0.1:8080}
+int RunTestVirtualServerStorage3() {
+	PrintTitle(__func__);
+
+	int ret_code = EXIT_SUCCESS;
+
+	/* -------------- HostPortPair3個用意 -------------- */
+	const HostPortPair host_port1 = std::make_pair("127.0.0.1", 8080);
+	const HostPortPair host_port2 = std::make_pair("0.0.0.0", 8080);
+	const HostPortPair host_port3 = std::make_pair("172.19.0.1", 8080);
+
+	/* -------------- VirtualServer2個用意 -------------- */
+	ServerNameList server_name1;
+	server_name1.push_back("localhost1");
+	HostPortList host_ports;
+	host_ports.push_back(host_port1);
+	host_ports.push_back(host_port2);
+	const server::VirtualServer vs1 = CreateVirtualServer(server_name1, host_ports);
+
+	ServerNameList server_name2;
+	server_name2.push_back("localhost2");
+	server_name2.push_back("serv_name2");
+	HostPortList host_ports2;
+	host_ports2.push_back(host_port3);
+	host_ports2.push_back(host_port1);
+	const server::VirtualServer vs2 = CreateVirtualServer(server_name2, host_ports2);
+
+	/* -------------- VirtualServerAddrList用意 -------------- */
+	VirtualServerAddrList expected_vs_addr_list1;
+	expected_vs_addr_list1.push_back(&vs1);
+	expected_vs_addr_list1.push_back(&vs2);
+
+	VirtualServerAddrList expected_vs_addr_list2;
+	expected_vs_addr_list2.push_back(&vs1);
+
+	/* -------------- VirtualServerStorage -------------- */
+	server::VirtualServerStorage vs_storage;
+
+	// virtual_server2個をvirtual_server_storageに追加
+	vs_storage.AddVirtualServer(vs1);
+	vs_storage.AddVirtualServer(vs2);
+
+	// 初期化
+	vs_storage.InitHostPortPair(host_port1);
+	vs_storage.InitHostPortPair(host_port2);
+	vs_storage.InitHostPortPair(host_port3);
+
+	// - socket通信した結果のserver_fdとvirtual_serverは以下の想定
+	// host:port       | virtual_server*
+	// ---------------------------------
+	// 127.0.0.1:8080  |   vs1, vs2
+	// 0.0.0.0:8080    |     vs1
+	// 172.19.0.1:8080 |   vs1, vs2
+
+	// server_fdとvirtual_serverの紐づけをvirtual_server_storageに追加(vs順に呼ぶ)
+	vs_storage.AddMapping(host_port1, &vs1);
+	vs_storage.AddMapping(host_port2, &vs1);
+	vs_storage.AddMapping(host_port3, &vs2);
+	vs_storage.AddMapping(host_port1, &vs2);
+
+	// getterを使用して期待通りvirtual_serverが追加されてるか・紐づけられているかテスト
+	ret_code |= Test(RunGetVirtualServer(vs_storage, host_port1, expected_vs_addr_list1));
+	ret_code |= Test(RunGetVirtualServer(vs_storage, host_port2, expected_vs_addr_list2));
+	ret_code |= Test(RunGetVirtualServer(vs_storage, host_port3, expected_vs_addr_list1));
+
+	return ret_code;
+}
+
 } // namespace
 
 int main() {
@@ -282,6 +357,7 @@ int main() {
 
 	ret_code |= RunTestVirtualServerStorage1();
 	ret_code |= RunTestVirtualServerStorage2();
+	ret_code |= RunTestVirtualServerStorage3();
 
 	return ret_code;
 }
