@@ -105,7 +105,7 @@ std::ostream &operator<<(std::ostream &os, const ResponseDeque &dq) {
 bool IsSameResponseDeque(
 	server::MessageManager &manager,
 	ResponseDeque          &result_responses,
-	ResponseDeque           expected_responses,
+	const ResponseDeque    &expected_responses,
 	int                     client_fd
 ) {
 	// 単純なgetterがないので比較対象のResponseDequeの中身を取り出す
