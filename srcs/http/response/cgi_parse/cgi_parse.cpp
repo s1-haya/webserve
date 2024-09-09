@@ -14,7 +14,7 @@ std::string CreatePathInfo(const std::string &cgi_extension, const std::string &
 
 std::string TranslateToCgiPath(const std::string &request_target) {
 	// from cgi_parse dir to cgi dir
-	return "../../../../cgi" + request_target;
+	return "../../../../cgi-bin" + request_target;
 }
 
 std::string TranslateToHtmlPath(const std::string &request_target) {
@@ -27,7 +27,8 @@ std::string TranslateToHtmlPath(const std::string &request_target) {
 Cgi::MetaMap CgiParse::CreateRequestMetaVariables(
 	const HttpRequestFormat &request,
 	const std::string       &cgi_script,
-	const std::string       &cgi_extension
+	const std::string       &cgi_extension,
+	const std::string       &server_port
 ) {
 	Cgi::MetaMap request_meta_variables;
 	request_meta_variables["AUTH_TYPE"]         = "";
@@ -39,14 +40,14 @@ Cgi::MetaMap CgiParse::CreateRequestMetaVariables(
 	request_meta_variables["PATH_TRANSLATED"] =
 		TranslateToHtmlPath(request_meta_variables["PATH_INFO"]);
 	request_meta_variables["QUERY_STRING"]    = "";
-	request_meta_variables["REMOTE_ADDR"]     = "";
-	request_meta_variables["REMOTE_HOST"]     = ""; // 追加する？
+	request_meta_variables["REMOTE_ADDR"]     = ""; // 追加する？
+	request_meta_variables["REMOTE_HOST"]     = "";
 	request_meta_variables["REMOTE_IDENT"]    = "";
 	request_meta_variables["REMOTE_USER"]     = "";
 	request_meta_variables["REQUEST_METHOD"]  = request.request_line.method;
 	request_meta_variables["SCRIPT_NAME"]     = TranslateToCgiPath(cgi_script);
 	request_meta_variables["SERVER_NAME"]     = request.header_fields.at("Host");
-	request_meta_variables["SERVER_PORT"]     = "8080";
+	request_meta_variables["SERVER_PORT"]     = server_port;
 	request_meta_variables["SERVER_PROTOCOL"] = request.request_line.version;
 	request_meta_variables["SERVER_SOFTWARE"] = "Webserv/1.1";
 	return request_meta_variables;
@@ -55,14 +56,16 @@ Cgi::MetaMap CgiParse::CreateRequestMetaVariables(
 utils::Result<CgiRequest> CgiParse::Parse(
 	const HttpRequestFormat &request,
 	const std::string       &cgi_script,
-	const std::string       &cgi_extension
+	const std::string       &cgi_extension,
+	const std::string       &server_port
 ) {
 	CgiRequest                cgi_request;
 	utils::Result<CgiRequest> result;
 
 	try {
-		cgi_request.meta_variables = CreateRequestMetaVariables(request, cgi_script, cgi_extension);
-		cgi_request.body_message   = request.body_message;
+		cgi_request.meta_variables =
+			CreateRequestMetaVariables(request, cgi_script, cgi_extension, server_port);
+		cgi_request.body_message = request.body_message;
 		result.SetValue(cgi_request);
 	} catch (const std::exception &e) {
 		result.Set(false); // atで例外が投げられる

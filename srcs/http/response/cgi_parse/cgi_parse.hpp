@@ -19,7 +19,8 @@ class CgiParse {
 	static utils::Result<CgiRequest> Parse(
 		const HttpRequestFormat &request,
 		const std::string       &cgi_script,
-		const std::string       &cgi_extension
+		const std::string       &cgi_extension,
+		const std::string       &server_port
 	);
 
   private:
@@ -30,7 +31,8 @@ class CgiParse {
 	static Cgi::MetaMap CreateRequestMetaVariables(
 		const HttpRequestFormat &request,
 		const std::string       &cgi_script,
-		const std::string       &cgi_extension
+		const std::string       &cgi_extension,
+		const std::string       &server_port
 	); // alias等を通過したパスが必要なため
 };
 
