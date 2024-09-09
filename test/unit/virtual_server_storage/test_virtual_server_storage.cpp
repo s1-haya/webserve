@@ -26,6 +26,7 @@ typedef server::Location::AllowedMethodList AllowedMethodList;
 
 typedef server::VirtualServer::ServerNameList ServerNameList;
 typedef server::VirtualServer::LocationList   LocationList;
+typedef server::VirtualServer::HostPortPair   HostPortPair;
 typedef server::VirtualServer::HostPortList   HostPortList;
 typedef server::VirtualServer::ErrorPage      ErrorPage;
 
@@ -110,10 +111,10 @@ Result TestIsSameVirtualServer(
 
 Result RunGetVirtualServer(
 	const server::VirtualServerStorage &vs_storage,
-	int                                 server_fd,
+	const HostPortPair                 &host_port,
 	const VirtualServerAddrList        &expected_vs_addr_list
 ) {
-	const VirtualServerAddrList &vs_addr_list = vs_storage.GetVirtualServerAddrList(server_fd);
+	const VirtualServerAddrList &vs_addr_list = vs_storage.GetVirtualServerAddrList(host_port);
 
 	return TestIsSameVirtualServer(vs_addr_list, expected_vs_addr_list);
 }
@@ -138,20 +139,25 @@ CreateVirtualServer(const ServerNameList &server_names, const HostPortList &host
 int RunTestVirtualServerStorage() {
 	int ret_code = EXIT_SUCCESS;
 
+	/* -------------- HostPortPair3個用意 -------------- */
+	HostPortPair host_port1 = std::make_pair("host1", 8080);
+	HostPortPair host_port2 = std::make_pair("host2", 12345);
+	HostPortPair host_port3 = std::make_pair("host3", 9999);
+
 	/* -------------- VirtualServer2個用意 -------------- */
 	ServerNameList server_name1;
 	server_name1.push_back("localhost");
 	HostPortList host_ports;
-	host_ports.push_back(std::make_pair("host1", 8080));
-	host_ports.push_back(std::make_pair("host2", 12345));
+	host_ports.push_back(host_port1);
+	host_ports.push_back(host_port2);
 	const server::VirtualServer vs1 = CreateVirtualServer(server_name1, host_ports);
 
 	ServerNameList server_name2;
 	server_name2.push_back("localhost2");
 	server_name2.push_back("test_serv");
 	HostPortList host_ports2;
-	host_ports2.push_back(std::make_pair("host1", 8080));
-	host_ports2.push_back(std::make_pair("host3", 9999));
+	host_ports2.push_back(host_port1);
+	host_ports2.push_back(host_port3);
 	const server::VirtualServer vs2 = CreateVirtualServer(server_name2, host_ports2);
 
 	/* -------------- VirtualServerAddrList用意 -------------- */
@@ -180,28 +186,28 @@ int RunTestVirtualServerStorage() {
 	//  6 |       vs2       | host3:9999
 
 	// server_fdとvirtual_serverの紐づけをvirtual_server_storageに追加
-	vs_storage.AddMapping(4, &vs1);
-	vs_storage.AddMapping(4, &vs2);
-	vs_storage.AddMapping(5, &vs1);
-	vs_storage.AddMapping(6, &vs2);
+	vs_storage.AddMapping(host_port1, &vs1);
+	vs_storage.AddMapping(host_port1, &vs2);
+	vs_storage.AddMapping(host_port2, &vs1);
+	vs_storage.AddMapping(host_port3, &vs2);
 
 	// getterを使用して期待通りvirtual_serverが追加されてるか・紐づけられているかテスト
-	ret_code |= Test(RunGetVirtualServer(vs_storage, 4, expected_vs_addr_list1));
-	ret_code |= Test(RunGetVirtualServer(vs_storage, 5, expected_vs_addr_list2));
-	ret_code |= Test(RunGetVirtualServer(vs_storage, 6, expected_vs_addr_list3));
+	ret_code |= Test(RunGetVirtualServer(vs_storage, host_port1, expected_vs_addr_list1));
+	ret_code |= Test(RunGetVirtualServer(vs_storage, host_port2, expected_vs_addr_list2));
+	ret_code |= Test(RunGetVirtualServer(vs_storage, host_port3, expected_vs_addr_list3));
 
 	// virtual_server_storageのcopyのテスト
 	// copy constructor
 	server::VirtualServerStorage copy_vs_storage1(vs_storage);
-	ret_code |= Test(RunGetVirtualServer(copy_vs_storage1, 4, expected_vs_addr_list1));
-	ret_code |= Test(RunGetVirtualServer(copy_vs_storage1, 5, expected_vs_addr_list2));
-	ret_code |= Test(RunGetVirtualServer(copy_vs_storage1, 6, expected_vs_addr_list3));
+	ret_code |= Test(RunGetVirtualServer(copy_vs_storage1, host_port1, expected_vs_addr_list1));
+	ret_code |= Test(RunGetVirtualServer(copy_vs_storage1, host_port2, expected_vs_addr_list2));
+	ret_code |= Test(RunGetVirtualServer(copy_vs_storage1, host_port3, expected_vs_addr_list3));
 
 	// copy assignment operator=
 	server::VirtualServerStorage copy_vs_storage2 = vs_storage;
-	ret_code |= Test(RunGetVirtualServer(copy_vs_storage2, 4, expected_vs_addr_list1));
-	ret_code |= Test(RunGetVirtualServer(copy_vs_storage2, 5, expected_vs_addr_list2));
-	ret_code |= Test(RunGetVirtualServer(copy_vs_storage2, 6, expected_vs_addr_list3));
+	ret_code |= Test(RunGetVirtualServer(copy_vs_storage2, host_port1, expected_vs_addr_list1));
+	ret_code |= Test(RunGetVirtualServer(copy_vs_storage2, host_port2, expected_vs_addr_list2));
+	ret_code |= Test(RunGetVirtualServer(copy_vs_storage2, host_port3, expected_vs_addr_list3));
 
 	return ret_code;
 }
