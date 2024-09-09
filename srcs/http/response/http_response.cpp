@@ -7,6 +7,19 @@
 #include <iostream>
 #include <sstream>
 
+namespace {
+
+std::string GetExtension(const std::string &path) {
+	size_t pos = path.find_last_of('.');
+
+	if (pos == std::string::npos || pos == path.length() - 1) {
+		return "";
+	}
+	return path.substr(pos + 1);
+}
+
+} // namespace
+
 namespace http {
 
 std::string HttpResponse::Run(
@@ -154,16 +167,3 @@ bool HttpResponse::IsCgi(
 // }
 
 } // namespace http
-
-namespace {
-
-std::string GetExtension(const std::string &path) {
-	size_t pos = path.find_last_of('.');
-
-	if (pos == std::string::npos || pos == path.length() - 1) {
-		return "";
-	}
-	return path.substr(pos + 1);
-}
-
-} // namespace
