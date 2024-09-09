@@ -1,5 +1,6 @@
 #include "cgi.hpp"
 #include "http_format.hpp"
+#include "result.hpp"
 #include <iostream>
 #include <map>
 #include <sstream>
@@ -15,7 +16,7 @@ struct CgiRequest {
 
 class CgiParse {
   public:
-	static CgiRequest Parse(const HttpRequestFormat &request);
+	static utils::Result<CgiRequest> Parse(const HttpRequestFormat &request);
 
   private:
 	CgiParse();

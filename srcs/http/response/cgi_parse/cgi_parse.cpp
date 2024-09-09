@@ -25,17 +25,16 @@ Cgi::MetaMap CgiParse::CreateRequestMetaVariables() {
 	return request_meta_variables;
 }
 
-CgiRequest CgiParse::Parse(const std::string &http_request) {
-	CgiRequest request;
+utils::Result<CgiRequest> CgiParse::Parse(const HttpRequestFormat &request) {
+	utils::Result<CgiRequest> result;
 
-	(void)http_request;
 	// todo: メタ変数とボディメッセージをHTTPリクエスト情報か取得する
 	// -
 	// メタ変数（要相談:引数は現在HTTPリクエストの文字列やけどクライアントとサーバーの情報もいるから構造体がいい）
 	// - ボディメッセージ（定数）
-	request.meta_variables = CreateRequestMetaVariables();
-	request.body_message   = "name=ChatGPT&message=Hello";
-	return request;
+	// request.meta_variables = CreateRequestMetaVariables();
+	// request.body_message   = "name=ChatGPT&message=Hello";
+	return result;
 }
 
 } // namespace cgi
