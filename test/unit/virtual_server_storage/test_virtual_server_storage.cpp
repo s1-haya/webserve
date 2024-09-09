@@ -57,6 +57,10 @@ void PrintError(const std::string &message) {
 	std::cerr << utils::color::RED << message << utils::color::RESET << std::endl;
 }
 
+void PrintTitle(const std::string &title) {
+	std::cout << utils::color::BLUE << title << utils::color::RESET << std::endl;
+}
+
 template <typename T>
 bool IsSame(const T &result, const T &expected) {
 	return result == expected;
@@ -138,6 +142,8 @@ CreateVirtualServer(const ServerNameList &server_names, const HostPortList &host
 //       vs1      | localhost            | {host1:8080, host2:12345}
 //       vs2      | localhost2,test_serv | {host1:8080, host3:9999}
 int RunTestVirtualServerStorage1() {
+	PrintTitle(__func__);
+
 	int ret_code = EXIT_SUCCESS;
 
 	/* -------------- HostPortPair3個用意 -------------- */
