@@ -224,12 +224,64 @@ int RunTestVirtualServerStorage1() {
 	return ret_code;
 }
 
+// 0.0.0.0でlistenし、0.0.0.0以外のhostからrequestが来た場合 -> 0.0.0.0のvirtual_server*を返す
+// -----------------------------------------------------------------------------
+// - virtual_serverは以下の想定
+// virtual_server | server_name | host:port
+// -----------------------------------------------------------------------------
+//       vs1      | localhost   | {0.0.0.0:8080}
+int RunTestVirtualServerStorage2() {
+	PrintTitle(__func__);
+
+	int ret_code = EXIT_SUCCESS;
+
+	/* -------------- HostPortPair2個用意 -------------- */
+	const HostPortPair host_port1 = std::make_pair("0.0.0.0", 8080);
+	const HostPortPair host_port2 = std::make_pair("other", 8080);
+
+	/* -------------- VirtualServer1個用意 -------------- */
+	ServerNameList server_name1;
+	server_name1.push_back("localhost");
+	HostPortList host_ports;
+	host_ports.push_back(host_port1);
+	const server::VirtualServer vs1 = CreateVirtualServer(server_name1, host_ports);
+
+	/* -------------- VirtualServerAddrList用意 -------------- */
+	VirtualServerAddrList expected_vs_addr_list1;
+	expected_vs_addr_list1.push_back(&vs1);
+
+	/* -------------- VirtualServerStorage -------------- */
+	server::VirtualServerStorage vs_storage;
+
+	// virtual_server1個をvirtual_server_storageに追加
+	vs_storage.AddVirtualServer(vs1);
+
+	// 初期化
+	vs_storage.InitHostPortPair(host_port1);
+
+	// - socket通信した結果のserver_fdとvirtual_serverは以下の想定
+	// host:port    | virtual_server*
+	// ------------------------------
+	// 0.0.0.0:8080 |     vs1
+	// other:8080   |     vs1
+
+	// server_fdとvirtual_serverの紐づけをvirtual_server_storageに追加(vs順に呼ぶ)
+	vs_storage.AddMapping(host_port1, &vs1);
+
+	// getterを使用して期待通りvirtual_serverが追加されてるか・紐づけられているかテスト
+	ret_code |= Test(RunGetVirtualServer(vs_storage, host_port1, expected_vs_addr_list1));
+	ret_code |= Test(RunGetVirtualServer(vs_storage, host_port2, expected_vs_addr_list1));
+
+	return ret_code;
+}
+
 } // namespace
 
 int main() {
 	int ret_code = EXIT_SUCCESS;
 
 	ret_code |= RunTestVirtualServerStorage1();
+	ret_code |= RunTestVirtualServerStorage2();
 
 	return ret_code;
 }
