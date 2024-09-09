@@ -10,7 +10,10 @@ LOG_FILE_PATH	:=	$(LOG_DIR)/$(LOG_FILE_NAME)
 # 2. Add target webserv files
 WS_SRCS_DIR		:=	../../../srcs
 
-WS_SOCK_CONTEXT_DIR	:=	$(WS_SRCS_DIR)/server/context_manager/sock_context
+WS_SERVER_DIR	:=	$(WS_SRCS_DIR)/server
+SRCS			+= $(WS_SERVER_DIR)/define.cpp
+
+WS_SOCK_CONTEXT_DIR	:=	$(WS_SERVER_DIR)/context_manager/sock_context
 SRCS			+=	$(WS_SRCS_DIR)/client_info.cpp \
 					$(WS_SRCS_DIR)/server_info.cpp \
 					$(WS_SRCS_DIR)/sock_context.cpp
@@ -22,7 +25,7 @@ SRCS			+=	$(WS_UTILS_DIR)/color.cpp
 SRCS		+=	test_sock_context.cpp
 
 # 4. Add directory for INCLUDE
-SRCS_DIR	:=	$(WS_SRCS_DIR) $(WS_UTILS_DIR) $(WS_SOCK_CONTEXT_DIR)
+SRCS_DIR	:=	$(WS_SRCS_DIR) $(WS_SERVER_DIR) $(WS_UTILS_DIR) $(WS_SOCK_CONTEXT_DIR)
 
 #--------------------------------------------
 OBJ_DIR		:=	objs
