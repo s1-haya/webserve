@@ -350,9 +350,9 @@ void Server::Init() {
 		typedef VirtualServer::HostPortList::const_iterator ItHostPort;
 		for (ItHostPort it_host_port = host_port_list.begin(); it_host_port != host_port_list.end();
 			 ++it_host_port) {
-			const ServerInfo listen_server_info = Listen(*it_host_port);
+			Listen(*it_host_port);
 			// Whether new or existing server_info, add a link to the virtual_server.
-			context_.AddServerInfo(listen_server_info);
+			context_.AddServerInfo(*it_host_port);
 		}
 	}
 }

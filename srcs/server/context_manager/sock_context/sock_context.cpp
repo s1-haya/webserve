@@ -21,13 +21,13 @@ SockContext &SockContext::operator=(const SockContext &other) {
 	return *this;
 }
 
-// todo: update
-void SockContext::AddServerInfo(int server_fd, const ServerInfo &server_info) {
-	typedef std::pair<ServerInfoMap::const_iterator, bool> InsertResult;
-	InsertResult result = server_context_.insert(std::make_pair(server_fd, server_info));
-	if (result.second == false) {
-		throw std::logic_error("ServerInfo already exists");
+// todo: server_context_無駄なことしてる
+void SockContext::AddServerInfo(const HostPortPair &host_port) {
+	if (server_context_.count(host_port) > 0) {
+		return;
 	}
+	const ServerInfo server_info(host_port);
+	server_context_[host_port] = server_info;
 }
 
 // todo: update

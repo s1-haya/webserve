@@ -10,13 +10,15 @@ namespace server {
 // holds and manages virtual server info and socket context(server socket info, client socket info).
 class ContextManager {
   public:
+	typedef VirtualServer::HostPortPair HostPortPair;
+
 	ContextManager();
 	~ContextManager();
 	ContextManager(const ContextManager &other);
 	ContextManager &operator=(const ContextManager &other);
 	// functions
 	void AddVirtualServer(const VirtualServer &virtual_server);
-	void AddServerInfo(const ServerInfo &server_info);
+	void AddServerInfo(const HostPortPair &host_port);
 	void AddClientInfo(const ClientInfo &client_info);
 	void DeleteClientInfo(int client_fd);
 	// getter
