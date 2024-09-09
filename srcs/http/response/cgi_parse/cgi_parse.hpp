@@ -32,7 +32,7 @@ class CgiParse {
 		const std::string       &cgi_script,
 		const std::string       &cgi_extension,
 		const std::string       &server_port
-	); // alias等を通過したパスが必要なため
+	); // alias等を通過したパスが必要なため、requestのpathではなくcgi_scriptをpathとして使用する
 };
 
 } // namespace cgi
