@@ -32,7 +32,10 @@ void IsSame(const T &a, const T &b, const char *file, int line) {
 	if (a != b) {
 		std::stringstream ss;
 		ss << line;
-		throw std::logic_error(std::string("Error at ") + file + ":" + ss.str());
+		throw std::logic_error(
+			std::string("Error at ") + file + ":" + ss.str() + " - Expected: " + std::string(b) +
+			", Got: " + std::string(a)
+		);
 	}
 }
 
