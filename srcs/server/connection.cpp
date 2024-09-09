@@ -83,13 +83,13 @@ Connection::IpList Connection::ResolveHostName(const std::string &hostname) {
 }
 
 // result: dynamic allocated by getaddrinfo()
-Connection::AddrInfo *Connection::GetAddrInfoList(const ServerInfo &server_info) {
-	const std::string &port  = utils::ConvertUintToStr(server_info.GetPort());
+Connection::AddrInfo *Connection::GetAddrInfoList(const HostPortPair &host_port) const {
+	const std::string &port  = utils::ConvertUintToStr(host_port.second);
 	AddrInfo           hints = {};
 	InitHints(&hints);
 
 	AddrInfo *result = NULL;
-	const int status = getaddrinfo(server_info.GetHost().c_str(), port.c_str(), &hints, &result);
+	const int status = getaddrinfo(host_port.first.c_str(), port.c_str(), &hints, &result);
 	// EAI_MEMORY is also included in status != 0
 	if (status != 0) {
 		throw std::runtime_error("getaddrinfo failed: " + std::string(gai_strerror(status)));
@@ -128,8 +128,8 @@ Connection::BindResult Connection::TryBind(AddrInfo *addrinfo) const {
 	return bind_result;
 }
 
-int Connection::Connect(ServerInfo &server_info) {
-	AddrInfo        *addrinfo_list = GetAddrInfoList(server_info);
+int Connection::Connect(const HostPortPair &host_port) {
+	AddrInfo        *addrinfo_list = GetAddrInfoList(host_port);
 	const BindResult bind_result   = TryBind(addrinfo_list);
 	freeaddrinfo(addrinfo_list);
 	if (!bind_result.IsOk()) {

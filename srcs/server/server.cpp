@@ -332,7 +332,7 @@ ServerInfo Server::Listen(const VirtualServer::HostPortPair &host_port) {
 
 	// create ServerInfo & listen the first host:port
 	ServerInfo server_info(host_port);
-	const int  server_fd = connection_.Connect(server_info);
+	const int  server_fd = connection_.Connect(host_port);
 	server_info.SetSockFd(server_fd);
 	SetNonBlockingMode(server_fd);
 
