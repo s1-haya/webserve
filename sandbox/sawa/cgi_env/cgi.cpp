@@ -5,7 +5,6 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-namespace http {
 namespace cgi {
 
 Cgi::Cgi() : argv_(NULL), env_(NULL), exit_status_(0) {}
@@ -122,4 +121,3 @@ char *const *Cgi::SetCgiEnv(const MetaMap &meta_variables) {
 }
 
 } // namespace cgi
-} // namespace http

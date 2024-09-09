@@ -4,7 +4,6 @@
 #include <map>
 #include <string>
 
-namespace http {
 namespace cgi {
 
 struct CgiRequest;
@@ -38,6 +37,5 @@ class Cgi {
 };
 
 } // namespace cgi
-} // namespace http
 
 #endif
