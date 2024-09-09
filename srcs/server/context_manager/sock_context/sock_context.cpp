@@ -30,12 +30,10 @@ void SockContext::AddServerInfo(const HostPortPair &host_port) {
 	server_context_[host_port] = server_info;
 }
 
-// todo: update
 void SockContext::AddClientInfo(int client_fd, const ClientInfo &client_info) {
-	typedef std::pair<ClientInfoMap::const_iterator, bool> ResultInsertToClientContext;
-	ResultInsertToClientContext                            result_client_context =
-		client_context_.insert(std::make_pair(client_fd, client_info));
-	if (result_client_context.second == false) {
+	typedef std::pair<ClientInfoMap::const_iterator, bool> InsertResult;
+	const InsertResult result = client_context_.insert(std::make_pair(client_fd, client_info));
+	if (result.second == false) {
 		throw std::logic_error("ClientInfo already exists");
 	}
 }
