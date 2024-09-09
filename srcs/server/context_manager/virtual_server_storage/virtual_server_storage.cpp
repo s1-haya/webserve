@@ -64,14 +64,12 @@ void VirtualServerStorage::AddMapping(
 	}
 }
 
-// todo: update
 const VirtualServerStorage::VirtualServerAddrList &
 VirtualServerStorage::GetVirtualServerAddrList(const HostPortPair &host_port) const {
-	try {
-		return virtual_server_addr_list_map_.at(host_port);
-	} catch (const std::exception &e) {
-		throw std::logic_error("VirtualServerAddrList doesn't exists");
+	if (virtual_server_addr_list_map_.count(host_port) == 0) {
+		return virtual_server_addr_list_map_.at(std::make_pair(IPV4_ADDR_ANY, host_port.second));
 	}
+	return virtual_server_addr_list_map_.at(host_port);
 }
 
 const VirtualServerStorage::VirtualServerList &
