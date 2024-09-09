@@ -28,7 +28,7 @@ class Server {
 	Server &operator=(const Server &other);
 	// functions
 	void       AddVirtualServers(const ConfigServers &config_servers);
-	ServerInfo Listen(const std::string &host, unsigned int port);
+	ServerInfo Listen(const VirtualServer::HostPortPair &host_port);
 	void       HandleEvent(const event::Event &event);
 	void       HandleNewConnection(int server_fd);
 	void       HandleExistingConnection(const event::Event &event);
