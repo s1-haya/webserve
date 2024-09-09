@@ -24,13 +24,13 @@ std::string TranslateToHtmlPath(const std::string &request_target) {
 
 } // namespace
 
-Cgi::MetaMap CgiParse::CreateRequestMetaVariables(
+MetaMap CgiParse::CreateRequestMetaVariables(
 	const HttpRequestFormat &request,
 	const std::string       &cgi_script,
 	const std::string       &cgi_extension,
 	const std::string       &server_port
 ) {
-	Cgi::MetaMap request_meta_variables;
+	MetaMap request_meta_variables;
 	request_meta_variables["AUTH_TYPE"]         = "";
 	request_meta_variables["CONTENT_LENGTH"]    = request.header_fields.at("Content-Length");
 	request_meta_variables["CONTENT_TYPE"]      = request.header_fields.at("Content-Type");
