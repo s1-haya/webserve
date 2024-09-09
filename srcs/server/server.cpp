@@ -152,7 +152,7 @@ void Server::HandleNewConnection(int server_fd) {
 	SetNonBlockingMode(client_fd);
 
 	// add client_info, event, message
-	context_.AddClientInfo(new_client_info, server_fd);
+	context_.AddClientInfo(new_client_info);
 	event_monitor_.Add(client_fd, event::EVENT_READ);
 	message_manager_.AddNewMessage(client_fd);
 	utils::Debug(
@@ -323,14 +323,8 @@ void Server::UpdateConnectionAfterSendResponse(
 	}
 }
 
+// todo: update
 ServerInfo Server::Listen(const VirtualServer::HostPortPair &host_port) {
-	const ContextManager::GetServerInfoResult result =
-		context_.GetServerInfo(host_port.first, host_port.second);
-	if (result.IsOk()) {
-		return result.GetValue();
-	}
-
-	// create ServerInfo & listen the first host:port
 	ServerInfo server_info(host_port);
 	const int  server_fd = connection_.Connect(host_port);
 	server_info.SetSockFd(server_fd);
@@ -343,6 +337,7 @@ ServerInfo Server::Listen(const VirtualServer::HostPortPair &host_port) {
 	return server_info;
 }
 
+// todo: update
 void Server::Init() {
 	const VirtualServerList &all_virtual_server = context_.GetAllVirtualServer();
 
@@ -357,7 +352,7 @@ void Server::Init() {
 			 ++it_host_port) {
 			const ServerInfo listen_server_info = Listen(*it_host_port);
 			// Whether new or existing server_info, add a link to the virtual_server.
-			context_.AddServerInfo(listen_server_info, &virtual_server);
+			context_.AddServerInfo(listen_server_info);
 		}
 	}
 }

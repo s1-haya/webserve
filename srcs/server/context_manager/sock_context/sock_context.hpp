@@ -1,9 +1,7 @@
 #ifndef SERVER_CONTEXTMANAGER_SOCKCONTEXT_SOCKCONTEXT_HPP_
 #define SERVER_CONTEXTMANAGER_SOCKCONTEXT_SOCKCONTEXT_HPP_
 
-#include "utils.hpp"
 #include <map>
-#include <string>
 
 namespace server {
 
@@ -13,11 +11,8 @@ class ClientInfo;
 // Store socket informations for each fd
 class SockContext {
   public:
-	typedef std::map<int, ServerInfo>         ServerInfoMap;
-	typedef std::map<int, ClientInfo>         ClientInfoMap;
-	typedef std::map<int, const ServerInfo *> HostServerInfoMap;
-
-	typedef utils::Result<ServerInfo> GetServerInfoResult;
+	typedef std::map<int, ServerInfo> ServerInfoMap;
+	typedef std::map<int, ClientInfo> ClientInfoMap;
 
 	SockContext();
 	~SockContext();
@@ -25,23 +20,17 @@ class SockContext {
 	SockContext &operator=(const SockContext &other);
 	// functions
 	void AddServerInfo(int server_fd, const ServerInfo &server_info);
-	bool IsServerInfoExist(int server_fd) const;
-	void AddClientInfo(int client_fd, const ClientInfo &client_info, int server_fd);
+	void AddClientInfo(int client_fd, const ClientInfo &client_info);
 	void DeleteClientInfo(int client_fd);
 	// getter
-	GetServerInfoResult GetServerInfo(const std::string &host, unsigned int port) const;
-	const ClientInfo   &GetClientInfo(int client_fd) const;
-	const ServerInfo   &GetConnectedServerInfo(int client_fd) const;
+	const ClientInfo &GetClientInfo(int client_fd) const;
 
   private:
-	// function
-	const ServerInfo *GetServerInfo(int server_fd) const;
 	// const
 	static const int SYSTEM_ERROR = -1;
 	// variables
-	ServerInfoMap     server_context_;
-	ClientInfoMap     client_context_;
-	HostServerInfoMap host_servers_;
+	ServerInfoMap server_context_;
+	ClientInfoMap client_context_;
 };
 
 } // namespace server
