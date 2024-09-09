@@ -346,8 +346,7 @@ Server::PortIpMap Server::CreatePortIpMap(const VirtualServerList &virtual_serve
 			 ++it_host_port) {
 			const VirtualServer::HostPortPair &host_port = *it_host_port;
 			port_ip_map[host_port.second].insert(host_port.first);
-			// todo: add
-			// context_.AddMapping(host_port, &virtual_server);
+			context_.AddMapping(host_port, &virtual_server);
 		}
 	}
 	return port_ip_map;

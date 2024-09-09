@@ -29,6 +29,12 @@ void ContextManager::AddServerInfo(const HostPortPair &host_port) {
 	virtual_servers_.InitHostPortPair(host_port);
 }
 
+void ContextManager::AddMapping(
+	const HostPortPair &host_port, const VirtualServer *virtual_server
+) {
+	virtual_servers_.AddMapping(host_port, virtual_server);
+}
+
 void ContextManager::AddClientInfo(const ClientInfo &client_info) {
 	const int client_fd = client_info.GetFd();
 	sock_context_.AddClientInfo(client_fd, client_info);

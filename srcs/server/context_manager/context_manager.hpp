@@ -18,6 +18,7 @@ class ContextManager {
 	ContextManager &operator=(const ContextManager &other);
 	// functions
 	void AddVirtualServer(const VirtualServer &virtual_server);
+	void AddMapping(const HostPortPair &host_port, const VirtualServer *virtual_server);
 	void AddServerInfo(const HostPortPair &host_port);
 	void AddClientInfo(const ClientInfo &client_info);
 	void DeleteClientInfo(int client_fd);

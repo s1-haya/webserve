@@ -29,6 +29,11 @@ class VirtualServerStorage {
 	const VirtualServerList     &GetAllVirtualServerList() const;
 
   private:
+	// function
+	void AddVirtualServerAddr(
+		VirtualServerAddrList &virtual_server_addr_list, const VirtualServer *virtual_server
+	);
+
 	// 全VirtualServerを保持
 	VirtualServerList virtual_servers_;
 	// host:portが属するVirtualServerAddrのlistを保持
