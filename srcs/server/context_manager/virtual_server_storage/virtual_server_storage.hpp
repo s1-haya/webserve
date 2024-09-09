@@ -22,6 +22,7 @@ class VirtualServerStorage {
 	VirtualServerStorage &operator=(const VirtualServerStorage &other);
 	// functions
 	void AddVirtualServer(const VirtualServer &virtual_server);
+	void InitHostPortPair(const HostPortPair &host_port);
 	void AddMapping(const HostPortPair &host_port, const VirtualServer *virtual_server);
 	// getter
 	const VirtualServerAddrList &GetVirtualServerAddrList(const HostPortPair &host_port) const;

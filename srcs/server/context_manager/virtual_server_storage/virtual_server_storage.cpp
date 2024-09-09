@@ -23,6 +23,11 @@ void VirtualServerStorage::AddVirtualServer(const VirtualServer &virtual_server)
 	virtual_servers_.push_back(virtual_server);
 }
 
+// For 0.0.0.0, initialize all host_port_pair keys here before mapping virtual_server* to each.
+void VirtualServerStorage::InitHostPortPair(const VirtualServer::HostPortPair &host_port) {
+	virtual_server_addr_list_map_[host_port] = VirtualServerAddrList();
+}
+
 // todo: update
 // server_fdが新規なら作成して良いのでmap[]を使用
 // e.g., VirtualServerAddrListMap -> {{127.0.0.1:8080  : List{vs1*, vs2*, vs3*}},

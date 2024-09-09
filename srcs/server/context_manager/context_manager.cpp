@@ -24,9 +24,9 @@ void ContextManager::AddVirtualServer(const VirtualServer &virtual_server) {
 	virtual_servers_.AddVirtualServer(virtual_server);
 }
 
-// todo: update
 void ContextManager::AddServerInfo(const HostPortPair &host_port) {
 	sock_context_.AddServerInfo(host_port);
+	virtual_servers_.InitHostPortPair(host_port);
 }
 
 void ContextManager::AddClientInfo(const ClientInfo &client_info) {
