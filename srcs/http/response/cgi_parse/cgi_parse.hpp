@@ -24,7 +24,7 @@ class CgiParse {
 	CgiParse(const CgiParse &other);
 	CgiParse &operator=(const CgiParse &other);
 	// todo メタ変数を作成するにはサーバーの情報、クライアントの情報、HTTPリクエスト情報が必要
-	static Cgi::MetaMap CreateRequestMetaVariables();
+	static Cgi::MetaMap CreateRequestMetaVariables(const HttpRequestFormat &request);
 }; // namespace cgi class CgiParse
 
 } // namespace cgi
