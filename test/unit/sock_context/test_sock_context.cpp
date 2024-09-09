@@ -82,14 +82,9 @@ Result RunGetClientInfo(
 
 // test_funcを実行したらthrowされることを期待するテスト(todo: テスト共通化？)
 template <typename TestFunc>
-int TestThrow(
-	TestFunc                  test_func,
-	server::SockContext      &context,
-	int                       server_fd,
-	const server::ServerInfo &server_info
-) {
+int TestThrow(TestFunc test_func, server::SockContext &context, const HostPortPair &host_port) {
 	try {
-		(context.*test_func)(server_fd, server_info);
+		(context.*test_func)(host_port, 50);
 		PrintNg();
 		PrintError("throw failed");
 		return EXIT_FAILURE;
@@ -201,6 +196,11 @@ int RunTestSockContext() {
 
 	// contextに既に追加済みのServerInfo2を再度追加してみる(期待: 何も起きない。一度だけ追加される)
 	AddServerInfoForTest(context, expected_server_info, host_port2, server_info2);
+
+	// contextにないhost:portにserver_fdを追加してみる(期待: throw)
+	ret_code |= TestThrow(
+		&server::SockContext::SetSockFd, context, std::make_pair("not-exist-host", 11111)
+	);
 
 	// contextにClientInfo1とそれに紐づくserver_fd1を追加
 	// - ServerInfoMap = {{host_port1: ServerInfo1}, {host_port2: ServerInfo2}}
