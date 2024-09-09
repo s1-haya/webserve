@@ -15,6 +15,7 @@ WS_HTTP_REQUEST_DIR		:=	$(WS_HTTP_DIR)/request
 WS_HTTP_PARSE_DIR		:=	$(WS_HTTP_REQUEST_DIR)/parse
 WS_HTTP_RESPONSE_DIR	:=	$(WS_HTTP_DIR)/response
 WS_HTTP_SERVERINFO_CHECK_DIR	:=	$(WS_HTTP_RESPONSE_DIR)/http_serverinfo_check
+WS_VIRTUAL_SERVER_DIR			:=	$(WS_SRCS_DIR)/server/virtual_server
 
 SRCS				+=	$(WS_HTTP_SERVERINFO_CHECK_DIR)/http_serverinfo_check.cpp \
 						$(WS_UTILS_DIR)/color.cpp \
@@ -22,7 +23,8 @@ SRCS				+=	$(WS_HTTP_SERVERINFO_CHECK_DIR)/http_serverinfo_check.cpp \
 						$(WS_UTILS_DIR)/isdigit.cpp \
 						$(WS_HTTP_DIR)/http_message.cpp \
 						$(WS_HTTP_DIR)/http_exception.cpp \
-						$(WS_HTTP_DIR)/status_code.cpp
+						$(WS_HTTP_DIR)/status_code.cpp \
+						$(WS_VIRTUAL_SERVER_DIR)/virtual_server.cpp
 
 # 3. Add unit test files
 SRCS	+=	test_http_serverinfo_check.cpp
@@ -33,7 +35,8 @@ SRCS_DIR	:=	$(WS_UTILS_DIR) \
 				$(WS_HTTP_REQUEST_DIR) \
 				$(WS_HTTP_PARSE_DIR) \
 				$(WS_HTTP_RESPONSE_DIR) \
-				$(WS_HTTP_SERVERINFO_CHECK_DIR)
+				$(WS_HTTP_SERVERINFO_CHECK_DIR) \
+				$(WS_VIRTUAL_SERVER_DIR)
 
 #--------------------------------------------
 OBJ_DIR		:=	objs
