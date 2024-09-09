@@ -1,20 +1,20 @@
 #ifndef SERVER_CONTEXTMANAGER_VIRTUALSERVERSTORAGE_HPP_
 #define SERVER_CONTEXTMANAGER_VIRTUALSERVERSTORAGE_HPP_
 
+#include "virtual_server.hpp"
 #include <list>
 #include <map>
 
 namespace server {
-
-class VirtualServer;
 
 // fdとVirtualServerを紐づけて全VirtualServerを保持・取得する
 class VirtualServerStorage {
   public:
 	typedef std::list<VirtualServer> VirtualServerList;
 
-	typedef std::list<const VirtualServer *>     VirtualServerAddrList;
-	typedef std::map<int, VirtualServerAddrList> VirtualServerAddrListMap;
+	typedef VirtualServer::HostPortPair                   HostPortPair;
+	typedef std::list<const VirtualServer *>              VirtualServerAddrList;
+	typedef std::map<HostPortPair, VirtualServerAddrList> VirtualServerAddrListMap;
 
 	VirtualServerStorage();
 	~VirtualServerStorage();
@@ -22,15 +22,15 @@ class VirtualServerStorage {
 	VirtualServerStorage &operator=(const VirtualServerStorage &other);
 	// functions
 	void AddVirtualServer(const VirtualServer &virtual_server);
-	void AddMapping(int server_fd, const VirtualServer *virtual_server);
+	void AddMapping(const HostPortPair &host_port, const VirtualServer *virtual_server);
 	// getter
-	const VirtualServerAddrList &GetVirtualServerAddrList(int server_fd) const;
+	const VirtualServerAddrList &GetVirtualServerAddrList(const HostPortPair &host_port) const;
 	const VirtualServerList     &GetAllVirtualServerList() const;
 
   private:
 	// 全VirtualServerを保持
 	VirtualServerList virtual_servers_;
-	// server_fd(host:port)が属するVirtualServerAddrのlistを保持
+	// host:portが属するVirtualServerAddrのlistを保持
 	VirtualServerAddrListMap virtual_server_addr_list_map_;
 };
 

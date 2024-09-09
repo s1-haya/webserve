@@ -1,5 +1,4 @@
 #include "virtual_server_storage.hpp"
-#include "virtual_server.hpp"
 #include <stdexcept> // logic_error
 
 namespace server {
@@ -24,25 +23,28 @@ void VirtualServerStorage::AddVirtualServer(const VirtualServer &virtual_server)
 	virtual_servers_.push_back(virtual_server);
 }
 
+// todo: update
 // server_fdが新規なら作成して良いのでmap[]を使用
-// e.g., VirtualServerAddrListMap -> {{fd 4 : List{virtual_server1*, virtual_server2*}},
-//                                    {fd 5 : List{virtual_server3*}},
-//                                    {fd 6 : List{virtual_server2*, virtual_server3*}}}
-void VirtualServerStorage::AddMapping(int server_fd, const VirtualServer *virtual_server) {
-	VirtualServerAddrList &virtual_server_addr_list = virtual_server_addr_list_map_[server_fd];
+// e.g., VirtualServerAddrListMap -> {{127.0.0.1:8080  : List{vs1*, vs2*, vs3*}},
+//                                    {0.0.0.0:8080    : List{vs2*}},
+//                                    {172.19.0.1:8080 : List{vs2*, vs3*}}}
+void VirtualServerStorage::AddMapping(
+	const HostPortPair &host_port, const VirtualServer *virtual_server
+) {
+	VirtualServerAddrList &virtual_server_addr_list = virtual_server_addr_list_map_[host_port];
 	virtual_server_addr_list.push_back(virtual_server);
 }
 
+// todo: update
 const VirtualServerStorage::VirtualServerAddrList &
-VirtualServerStorage::GetVirtualServerAddrList(int server_fd) const {
+VirtualServerStorage::GetVirtualServerAddrList(const HostPortPair &host_port) const {
 	try {
-		return virtual_server_addr_list_map_.at(server_fd);
+		return virtual_server_addr_list_map_.at(host_port);
 	} catch (const std::exception &e) {
 		throw std::logic_error("VirtualServerAddrList doesn't exists");
 	}
 }
 
-// todo: tmp. need?
 const VirtualServerStorage::VirtualServerList &
 VirtualServerStorage::GetAllVirtualServerList() const {
 	return virtual_servers_;
