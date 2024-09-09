@@ -108,8 +108,17 @@ HeaderFields HttpResponse::InitResponseHeaderFields(const HttpRequestResult &req
 	// GetContentType(request_info);
 	// GetConnection(request_info);
 	response_header_fields[CONTENT_TYPE] = "test/html";
-	response_header_fields[CONNECTION]   = "keep-alive";
+	if (IsConnectionKeep(request_info.request.header_fields)) {
+		response_header_fields[CONNECTION] = KEEP_ALIVE;
+	} else {
+		response_header_fields[CONNECTION] = CLOSE;
+	}
 	return response_header_fields;
+}
+
+bool HttpResponse::IsConnectionKeep(const HeaderFields &request_header_fields) {
+	HeaderFields::const_iterator it = request_header_fields.find(CONNECTION);
+	return it == request_header_fields.end() || it->second == KEEP_ALIVE;
 }
 
 // std::string HttpResponse::CreateBadRequestResponse(const HttpRequestResult &request_info) {
