@@ -1,8 +1,9 @@
 #include "server_info.hpp"
+#include "define.hpp"
 
 namespace server {
 
-ServerInfo::ServerInfo() : fd_(0), host_("0.0.0.0"), port_(0) {}
+ServerInfo::ServerInfo() : fd_(0), host_(IPV4_ADDR_ANY), port_(0) {}
 
 ServerInfo::ServerInfo(const std::string &host, unsigned int port)
 	: fd_(0), host_(host), port_(port) {}
