@@ -16,7 +16,11 @@ struct CgiRequest {
 
 class CgiParse {
   public:
-	static utils::Result<CgiRequest> Parse(const HttpRequestFormat &request);
+	static utils::Result<CgiRequest> Parse(
+		const HttpRequestFormat &request,
+		const std::string       &cgi_script,
+		const std::string       &cgi_extension
+	);
 
   private:
 	CgiParse();
@@ -27,8 +31,7 @@ class CgiParse {
 		const HttpRequestFormat &request,
 		const std::string       &cgi_script,
 		const std::string       &cgi_extension
-	);
-	// alias等を通過したパスが必要なため
+	); // alias等を通過したパスが必要なため
 };
 
 } // namespace cgi

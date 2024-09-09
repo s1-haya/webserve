@@ -41,7 +41,7 @@ Cgi::MetaMap CgiParse::CreateRequestMetaVariables(
 		TranslateToHtmlPath(request_meta_variables["PATH_INFO"]);
 	request_meta_variables["QUERY_STRING"]    = "";
 	request_meta_variables["REMOTE_ADDR"]     = "";
-	request_meta_variables["REMOTE_HOST"]     = "";
+	request_meta_variables["REMOTE_HOST"]     = ""; // 追加する？
 	request_meta_variables["REMOTE_IDENT"]    = "";
 	request_meta_variables["REMOTE_USER"]     = "";
 	request_meta_variables["REQUEST_METHOD"]  = request.request_line.method;
@@ -53,12 +53,16 @@ Cgi::MetaMap CgiParse::CreateRequestMetaVariables(
 	return request_meta_variables;
 }
 
-utils::Result<CgiRequest> CgiParse::Parse(const HttpRequestFormat &request) {
-	utils::Result<CgiRequest> result;
-	CgiRequest                cgi_request;
+utils::Result<CgiRequest> CgiParse::Parse(
+	const HttpRequestFormat &request,
+	const std::string       &cgi_script,
+	const std::string       &cgi_extension
+) {
+	CgiRequest cgi_request;
 
-	// cgi_request.meta_variables = CreateRequestMetaVariables(request);
-	// request.body_message   = "name=ChatGPT&message=Hello";
+	cgi_request.meta_variables = CreateRequestMetaVariables(request, cgi_script, cgi_extension);
+	cgi_request.body_message   = request.body_message;
+	utils::Result<CgiRequest> result(cgi_request);
 	return result;
 }
 
