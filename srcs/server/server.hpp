@@ -16,6 +16,7 @@ namespace server {
 class Server {
   public:
 	typedef std::list<config::context::ServerCon>   ConfigServers;
+	typedef VirtualServer::HostPortPair             HostPortPair;
 	typedef VirtualServerStorage::VirtualServerList VirtualServerList;
 	typedef std::set<std::string>                   IpSet;
 	typedef std::map<unsigned int, IpSet>           PortIpMap;
@@ -35,7 +36,7 @@ class Server {
 	void      AddServerInfoToContext(const VirtualServerList &virtual_server_list);
 	void      ListenAllHostPorts(const VirtualServerList &virtual_server_list);
 	PortIpMap CreatePortIpMap(const VirtualServerList &virtual_server_list);
-	void      Listen(const VirtualServer::HostPortPair &host_port);
+	void      Listen(const HostPortPair &host_port);
 	void      HandleEvent(const event::Event &event);
 	void      HandleNewConnection(int server_fd);
 	void      HandleExistingConnection(const event::Event &event);

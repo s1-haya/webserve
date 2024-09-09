@@ -18,7 +18,7 @@ const double Server::REQUEST_TIMEOUT = 3.0;
 
 namespace {
 
-typedef std::set<VirtualServer::HostPortPair> HostPortSet;
+typedef std::set<Server::HostPortPair> HostPortSet;
 
 typedef Server::VirtualServerList::const_iterator   ItVirtualServer;
 typedef VirtualServer::HostPortList::const_iterator ItHostPort;
@@ -68,7 +68,7 @@ void AddResolvedHostPort(
 ) {
 	typedef Connection::IpList::const_iterator Itr;
 	for (Itr it = ip_list.begin(); it != ip_list.end(); ++it) {
-		const VirtualServer::HostPortPair host_port = std::make_pair(*it, port);
+		const Server::HostPortPair host_port = std::make_pair(*it, port);
 
 		typedef std::pair<HostPortSet::const_iterator, bool> InsertResult;
 		const InsertResult result = host_port_set.insert(host_port);
@@ -344,7 +344,7 @@ Server::PortIpMap Server::CreatePortIpMap(const VirtualServerList &virtual_serve
 		const VirtualServer::HostPortList &host_ports     = virtual_server.GetHostPortList();
 		for (ItHostPort it_host_port = host_ports.begin(); it_host_port != host_ports.end();
 			 ++it_host_port) {
-			const VirtualServer::HostPortPair &host_port = *it_host_port;
+			const HostPortPair &host_port = *it_host_port;
 			port_ip_map[host_port.second].insert(host_port.first);
 			context_.AddMapping(host_port, &virtual_server);
 		}
@@ -352,7 +352,7 @@ Server::PortIpMap Server::CreatePortIpMap(const VirtualServerList &virtual_serve
 	return port_ip_map;
 }
 
-void Server::Listen(const VirtualServer::HostPortPair &host_port) {
+void Server::Listen(const HostPortPair &host_port) {
 	const int server_fd = connection_.Connect(host_port);
 	SetNonBlockingMode(server_fd);
 
