@@ -22,10 +22,14 @@ class CgiParse {
 	CgiParse();
 	~CgiParse();
 	CgiParse(const CgiParse &other);
-	CgiParse &operator=(const CgiParse &other);
-	// todo メタ変数を作成するにはサーバーの情報、クライアントの情報、HTTPリクエスト情報が必要
-	static Cgi::MetaMap CreateRequestMetaVariables(const HttpRequestFormat &request);
-}; // namespace cgi class CgiParse
+	CgiParse           &operator=(const CgiParse &other);
+	static Cgi::MetaMap CreateRequestMetaVariables(
+		const HttpRequestFormat &request,
+		const std::string       &cgi_script,
+		const std::string       &cgi_extension
+	);
+	// alias等を通過したパスが必要なため
+};
 
 } // namespace cgi
 } // namespace http
