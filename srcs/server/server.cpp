@@ -356,8 +356,7 @@ void Server::Listen(const VirtualServer::HostPortPair &host_port) {
 	const int server_fd = connection_.Connect(host_port);
 	SetNonBlockingMode(server_fd);
 
-	// todo: add
-	// context_.SetListenSockFd(host_port, server_fd);
+	context_.SetListenSockFd(host_port, server_fd);
 	event_monitor_.Add(server_fd, event::EVENT_READ);
 	utils::Debug(
 		"server", "listen " + host_port.first + ":" + utils::ToString(host_port.second), server_fd

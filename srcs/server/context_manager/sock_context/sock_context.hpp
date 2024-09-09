@@ -22,6 +22,7 @@ class SockContext {
 	SockContext &operator=(const SockContext &other);
 	// functions
 	void AddServerInfo(const HostPortPair &host_port);
+	void SetSockFd(const HostPortPair &host_port, int server_fd);
 	void AddClientInfo(int client_fd, const ClientInfo &client_info);
 	void DeleteClientInfo(int client_fd);
 	// getter

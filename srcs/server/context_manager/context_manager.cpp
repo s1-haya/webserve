@@ -35,6 +35,10 @@ void ContextManager::AddMapping(
 	virtual_servers_.AddMapping(host_port, virtual_server);
 }
 
+void ContextManager::SetListenSockFd(const HostPortPair &host_port, int server_fd) {
+	sock_context_.SetSockFd(host_port, server_fd);
+}
+
 void ContextManager::AddClientInfo(const ClientInfo &client_info) {
 	const int client_fd = client_info.GetFd();
 	sock_context_.AddClientInfo(client_fd, client_info);
