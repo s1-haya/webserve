@@ -4,7 +4,6 @@
 #include "utils.hpp"
 #include <cstdlib>
 #include <iostream>
-#include <sstream>
 
 namespace {
 
@@ -60,7 +59,6 @@ int Test1() {
 	HttpRequestFormat request;
 	request.request_line                  = request_line;
 	request.header_fields[HOST]           = "host1";
-	request.header_fields[CONNECTION]     = "keep-alive";
 	request.header_fields[CONTENT_LENGTH] = "0";
 	request.header_fields[CONTENT_TYPE]   = "text/plain";
 
@@ -92,12 +90,50 @@ int Test1() {
 	return EXIT_SUCCESS;
 }
 
+/* 不足しているフィールドがある場合 */
+int Test2() {
+	// request
+	const RequestLine request_line = {"GET", "/", "HTTP/1.1"};
+	HttpRequestFormat request;
+	request.request_line                  = request_line;
+	request.header_fields[CONTENT_LENGTH] = "0";
+	request.header_fields[CONTENT_TYPE]   = "text/plain";
+
+	std::string cgi_script    = "/test.cgi";
+	std::string cgi_path_info = "/aa/b";
+	std::string cgi_extension = ".cgi";
+	std::string server_port   = "8080";
+
+	utils::Result<cgi::CgiRequest> parse_result =
+		cgi::CgiParse::Parse(request, cgi_script + cgi_path_info, cgi_extension, server_port);
+	cgi::MetaMap meta_variables = parse_result.GetValue().meta_variables;
+
+	try {
+		COMPARE(meta_variables.at("CONTENT_LENGTH"), request.header_fields.at("Content-Length"));
+		COMPARE(meta_variables.at("CONTENT_TYPE"), request.header_fields.at("Content-Type"));
+		COMPARE(meta_variables.at("PATH_INFO"), cgi_path_info);
+		COMPARE(meta_variables.at("PATH_TRANSLATED"), html_dir_path + cgi_path_info);
+		COMPARE(meta_variables.at("REQUEST_METHOD"), request_line.method);
+		COMPARE(meta_variables.at("SCRIPT_NAME"), cgi_bin_dir_path + cgi_script);
+		COMPARE(meta_variables.at("SERVER_NAME"), request.header_fields.at("Host"));
+		COMPARE(meta_variables.at("SERVER_PORT"), server_port);
+		COMPARE(meta_variables.at("SERVER_PROTOCOL"), request_line.version);
+	} catch (const std::exception &e) {
+		PrintOk();
+		utils::Debug("Test2", e.what());
+		return EXIT_SUCCESS;
+	}
+	PrintNg();
+	return EXIT_FAILURE;
+}
+
 } // namespace
 
 int main() {
 	int ret = EXIT_SUCCESS;
 
 	ret |= Test1();
+	ret |= Test2();
 
 	return ret;
 }
