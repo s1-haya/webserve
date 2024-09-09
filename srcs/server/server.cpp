@@ -1,9 +1,9 @@
 #include "server.hpp"
 #include "client_info.hpp"
+#include "define.hpp"
 #include "event.hpp"
 #include "read.hpp"
 #include "send.hpp"
-#include "server_info.hpp"
 #include "utils.hpp"
 #include "virtual_server.hpp"
 #include <errno.h>
@@ -19,6 +19,9 @@ const double Server::REQUEST_TIMEOUT = 3.0;
 namespace {
 
 typedef std::set<VirtualServer::HostPortPair> HostPortSet;
+
+typedef Server::VirtualServerList::const_iterator   ItVirtualServer;
+typedef VirtualServer::HostPortList::const_iterator ItHostPort;
 
 VirtualServer::LocationList ConvertLocations(const config::context::LocationList &config_locations
 ) {
@@ -323,38 +326,68 @@ void Server::UpdateConnectionAfterSendResponse(
 	}
 }
 
-// todo: update
-ServerInfo Server::Listen(const VirtualServer::HostPortPair &host_port) {
-	ServerInfo server_info(host_port);
-	const int  server_fd = connection_.Connect(host_port);
-	server_info.SetSockFd(server_fd);
+void Server::AddServerInfoToContext(const VirtualServerList &virtual_server_list) {
+	for (ItVirtualServer it = virtual_server_list.begin(); it != virtual_server_list.end(); ++it) {
+		const VirtualServer::HostPortList &host_ports = it->GetHostPortList();
+		for (ItHostPort it_host_port = host_ports.begin(); it_host_port != host_ports.end();
+			 ++it_host_port) {
+			context_.AddServerInfo(*it_host_port);
+		}
+	}
+}
+
+// PortIpMap -> port1:{ip1, ip2}, port2:{ip1, 0.0.0.0}, ...
+Server::PortIpMap Server::CreatePortIpMap(const VirtualServerList &virtual_server_list) {
+	PortIpMap port_ip_map;
+	for (ItVirtualServer it = virtual_server_list.begin(); it != virtual_server_list.end(); ++it) {
+		const VirtualServer               &virtual_server = *it;
+		const VirtualServer::HostPortList &host_ports     = virtual_server.GetHostPortList();
+		for (ItHostPort it_host_port = host_ports.begin(); it_host_port != host_ports.end();
+			 ++it_host_port) {
+			const VirtualServer::HostPortPair &host_port = *it_host_port;
+			port_ip_map[host_port.second].insert(host_port.first);
+			// todo: add
+			// context_.AddMapping(host_port, &virtual_server);
+		}
+	}
+	return port_ip_map;
+}
+
+void Server::Listen(const VirtualServer::HostPortPair &host_port) {
+	const int server_fd = connection_.Connect(host_port);
 	SetNonBlockingMode(server_fd);
 
+	// todo: add
+	// context_.SetListenSockFd(host_port, server_fd);
 	event_monitor_.Add(server_fd, event::EVENT_READ);
 	utils::Debug(
 		"server", "listen " + host_port.first + ":" + utils::ToString(host_port.second), server_fd
 	);
-	return server_info;
 }
 
-// todo: update
-void Server::Init() {
-	const VirtualServerList &all_virtual_server = context_.GetAllVirtualServer();
+void Server::ListenAllHostPorts(const VirtualServerList &virtual_server_list) {
+	const PortIpMap port_ip_map = CreatePortIpMap(virtual_server_list);
 
-	typedef VirtualServerList::const_iterator ItVirtualServer;
-	for (ItVirtualServer it = all_virtual_server.begin(); it != all_virtual_server.end(); ++it) {
-		const VirtualServer               &virtual_server = *it;
-		const VirtualServer::HostPortList &host_port_list = virtual_server.GetHostPortList();
-
-		// Socket communication for all host:port pairs of each virtual server.
-		typedef VirtualServer::HostPortList::const_iterator ItHostPort;
-		for (ItHostPort it_host_port = host_port_list.begin(); it_host_port != host_port_list.end();
-			 ++it_host_port) {
-			Listen(*it_host_port);
-			// Whether new or existing server_info, add a link to the virtual_server.
-			context_.AddServerInfo(*it_host_port);
+	typedef PortIpMap::const_iterator ItMap;
+	for (ItMap it_map = port_ip_map.begin(); it_map != port_ip_map.end(); ++it_map) {
+		const unsigned int port   = it_map->first;
+		const IpSet       &ip_set = it_map->second;
+		if (ip_set.find(IPV4_ADDR_ANY) != ip_set.end()) {
+			Listen(std::make_pair(IPV4_ADDR_ANY, port));
+			continue;
+		}
+		typedef IpSet::const_iterator ItSet;
+		for (ItSet it_set = ip_set.begin(); it_set != ip_set.end(); ++it_set) {
+			Listen(std::make_pair(*it_set, port));
 		}
 	}
+}
+
+void Server::Init() {
+	const VirtualServerList &virtual_server_list = context_.GetAllVirtualServer();
+
+	AddServerInfoToContext(virtual_server_list);
+	ListenAllHostPorts(virtual_server_list);
 }
 
 void Server::SetNonBlockingMode(int sock_fd) {
