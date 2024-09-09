@@ -344,10 +344,9 @@ ServerInfo Server::Listen(const VirtualServer::HostPortPair &host_port) {
 }
 
 void Server::Init() {
-	const VirtualServerStorage::VirtualServerList &all_virtual_server =
-		context_.GetAllVirtualServer();
+	const VirtualServerList &all_virtual_server = context_.GetAllVirtualServer();
 
-	typedef VirtualServerStorage::VirtualServerList::const_iterator ItVirtualServer;
+	typedef VirtualServerList::const_iterator ItVirtualServer;
 	for (ItVirtualServer it = all_virtual_server.begin(); it != all_virtual_server.end(); ++it) {
 		const VirtualServer               &virtual_server = *it;
 		const VirtualServer::HostPortList &host_port_list = virtual_server.GetHostPortList();

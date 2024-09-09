@@ -15,7 +15,9 @@ namespace server {
 
 class Server {
   public:
-	typedef std::list<config::context::ServerCon> ConfigServers;
+	typedef std::list<config::context::ServerCon>   ConfigServers;
+	typedef VirtualServerStorage::VirtualServerList VirtualServerList;
+
 	explicit Server(const ConfigServers &config_servers);
 	~Server();
 	void Init();
