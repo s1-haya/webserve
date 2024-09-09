@@ -51,7 +51,7 @@ class HttpResponse {
 		const MockDtoServerInfos &server_info,
 		const HttpRequestResult  &request_info
 	);
-	static HeaderFields InitHeaderFields(const HttpRequestResult &request_info);
+	static HeaderFields InitResponseHeaderFields(const HttpRequestResult &request_info);
 	static bool         IsConnectionKeep(const HeaderFields &request_header_fields);
 };
 
