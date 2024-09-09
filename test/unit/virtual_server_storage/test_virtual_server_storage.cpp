@@ -147,9 +147,9 @@ int RunTestVirtualServerStorage1() {
 	int ret_code = EXIT_SUCCESS;
 
 	/* -------------- HostPortPair3個用意 -------------- */
-	HostPortPair host_port1 = std::make_pair("host1", 8080);
-	HostPortPair host_port2 = std::make_pair("host2", 12345);
-	HostPortPair host_port3 = std::make_pair("host3", 9999);
+	const HostPortPair host_port1 = std::make_pair("host1", 8080);
+	const HostPortPair host_port2 = std::make_pair("host2", 12345);
+	const HostPortPair host_port3 = std::make_pair("host3", 9999);
 
 	/* -------------- VirtualServer2個用意 -------------- */
 	ServerNameList server_name1;
