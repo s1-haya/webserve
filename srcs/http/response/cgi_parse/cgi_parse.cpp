@@ -30,7 +30,6 @@ Cgi::MetaMap CgiParse::CreateRequestMetaVariables(
 	const std::string       &cgi_extension
 ) {
 	Cgi::MetaMap request_meta_variables;
-	// at()の要素がない場合どこかで弾く
 	request_meta_variables["AUTH_TYPE"]         = "";
 	request_meta_variables["CONTENT_LENGTH"]    = request.header_fields.at("Content-Length");
 	request_meta_variables["CONTENT_TYPE"]      = request.header_fields.at("Content-Type");
@@ -58,11 +57,16 @@ utils::Result<CgiRequest> CgiParse::Parse(
 	const std::string       &cgi_script,
 	const std::string       &cgi_extension
 ) {
-	CgiRequest cgi_request;
+	CgiRequest                cgi_request;
+	utils::Result<CgiRequest> result;
 
-	cgi_request.meta_variables = CreateRequestMetaVariables(request, cgi_script, cgi_extension);
-	cgi_request.body_message   = request.body_message;
-	utils::Result<CgiRequest> result(cgi_request);
+	try {
+		cgi_request.meta_variables = CreateRequestMetaVariables(request, cgi_script, cgi_extension);
+		cgi_request.body_message   = request.body_message;
+		result.SetValue(cgi_request);
+	} catch (const std::exception &e) {
+		result.Set(false); // atで例外が投げられる
+	}
 	return result;
 }
 
