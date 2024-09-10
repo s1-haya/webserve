@@ -25,16 +25,16 @@ void Cgi::Execve() {
 	int cgi_request[2];
 	int cgi_response[2];
 
-	if (method_ == "POST" && pipe(cgi_request) == -1) {
+	if (method_ == "POST" && pipe(cgi_request) == SYSTEM_ERROR) {
 		std::cerr << "Error: pipe" << std::endl;
 		return;
 	}
-	if (pipe(cgi_response) == -1) {
+	if (pipe(cgi_response) == SYSTEM_ERROR) {
 		std::cerr << "Error: pipe" << std::endl;
 		return;
 	}
 	pid_t p = fork();
-	if (p < -1) {
+	if (p == SYSTEM_ERROR) {
 		std::cerr << "Error: fork\n" << std::endl;
 		return;
 	} else if (p == 0) {
@@ -48,20 +48,19 @@ void Cgi::Execve() {
 		dup2(cgi_response[WRITE], STDOUT_FILENO);
 		close(cgi_response[WRITE]);
 		ExecveCgiScript();
-	} else {
-		if (method_ == "POST") {
-			close(cgi_request[READ]);
-			write(cgi_request[WRITE], body_message_.c_str(), body_message_.length());
-			close(cgi_request[WRITE]);
-		}
-		close(cgi_response[WRITE]);
-		wait(NULL);
-		char buf;
-		while (read(cgi_response[READ], &buf, 1) > 0) {
-			write(STDOUT_FILENO, &buf, 1);
-		}
-		close(cgi_response[READ]);
 	}
+	if (method_ == "POST") {
+		close(cgi_request[READ]);
+		write(cgi_request[WRITE], body_message_.c_str(), body_message_.length());
+		close(cgi_request[WRITE]);
+	}
+	close(cgi_response[WRITE]);
+	wait(NULL);
+	char buf;
+	while (read(cgi_response[READ], &buf, 1) > 0) {
+		write(STDOUT_FILENO, &buf, 1);
+	}
+	close(cgi_response[READ]);
 }
 
 void Cgi::Free() {
