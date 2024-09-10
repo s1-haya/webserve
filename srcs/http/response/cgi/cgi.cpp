@@ -13,7 +13,7 @@ namespace http {
 namespace cgi {
 
 // 他のところでチェックしてここのatではthrowされない様にする
-Cgi::Cgi(const cgi::CgiRequest &request)
+Cgi::Cgi(const CgiRequest &request)
 	: argv_(SetCgiArgv()),
 	  env_(SetCgiEnv(request.meta_variables)),
 	  exit_status_(0),

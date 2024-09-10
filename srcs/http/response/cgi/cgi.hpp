@@ -11,6 +11,7 @@ class StatusCode;
 namespace cgi {
 
 struct CgiRequest;
+typedef std::map<std::string, std::string> MetaMap;
 
 class Cgi {
   public:
@@ -30,13 +31,13 @@ class Cgi {
 	void         Free();
 
 	// cgi info;
+	char *const *argv_;
+	char *const *env_;
+	int          exit_status_;
 	std::string  method_;
 	std::string  cgi_script_;
 	std::string  request_body_message_;
 	std::string  response_body_message_;
-	char *const *argv_;
-	char *const *env_;
-	int          exit_status_;
 
 	static const int READ         = 0;
 	static const int WRITE        = 1;

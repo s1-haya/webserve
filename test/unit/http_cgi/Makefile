@@ -16,6 +16,7 @@ WS_HTTP_CGI_PARSE		:=	$(WS_HTTP_RESPONSE_DIR)/cgi_parse
 WS_HTTP_CGI				:=	$(WS_HTTP_RESPONSE_DIR)/cgi
 
 SRCS				+=	$(WS_HTTP_CGI)/cgi.cpp \
+						$(WS_HTTP_CGI_PARSE)/cgi_parse.cpp \
 						$(WS_HTTP_DIR)/http_message.cpp \
 						$(WS_HTTP_DIR)/http_exception.cpp \
 						$(WS_HTTP_DIR)/status_code.cpp \
