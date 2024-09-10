@@ -65,13 +65,13 @@ void Cgi::Execve() {
 		close(cgi_request[WRITE]);
 	}
 	close(cgi_response[WRITE]);
-	wait(NULL);
 	char    buffer[1024]; // 読み取りバッファ
 	ssize_t bytes_read;
 	while ((bytes_read = read(cgi_response[READ], buffer, sizeof(buffer))) > 0) {
 		response_body_message_.append(buffer, bytes_read);
 	}
 	close(cgi_response[READ]);
+	waitpid(p, &exit_status_, WNOHANG);
 }
 
 void Cgi::Free() {
