@@ -57,9 +57,10 @@ void Cgi::Execve() {
 	}
 	close(cgi_response[WRITE]);
 	wait(NULL);
-	char buf;
-	while (read(cgi_response[READ], &buf, 1) > 0) {
-		write(STDOUT_FILENO, &buf, 1);
+	char    buffer[1024]; // 読み取りバッファ
+	ssize_t bytes_read;
+	while ((bytes_read = read(cgi_response[READ], buffer, sizeof(buffer))) > 0) {
+		response_body_message_.append(buffer, bytes_read);
 	}
 	close(cgi_response[READ]);
 }
@@ -80,7 +81,7 @@ void Cgi::Free() {
 }
 
 void Cgi::ExecveCgiScript() {
-	this->exit_status_ = execve(cgi_script_.c_str(), argv_, env_);
+	exit_status_ = execve(cgi_script_.c_str(), argv_, env_);
 	// perror("execve"); // execveが失敗した場合のエラーメッセージ出力
 }
 
