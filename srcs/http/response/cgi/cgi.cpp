@@ -4,22 +4,22 @@
 #include "http_message.hpp"
 #include "status_code.hpp"
 #include "system_exception.hpp"
+#include <cerrno>
 #include <cstring>
 #include <iostream>
 #include <sys/wait.h>
 #include <unistd.h>
-#include <cerrno>
 
 namespace http {
 namespace cgi {
 
 // 他のところでチェックしてここのatではthrowされない様にする
 Cgi::Cgi(const CgiRequest &request)
-	: argv_(SetCgiArgv()),
+	: method_(request.meta_variables.at("REQUEST_METHOD")),
+	  cgi_script_(request.meta_variables.at("SCRIPT_NAME")),
+	  argv_(SetCgiArgv()),
 	  env_(SetCgiEnv(request.meta_variables)),
 	  exit_status_(0),
-	  method_(request.meta_variables.at("REQUEST_METHOD")),
-	  cgi_script_(request.meta_variables.at("SCRIPT_NAME")),
 	  request_body_message_(request.body_message) {}
 
 Cgi::~Cgi() {
