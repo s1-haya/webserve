@@ -75,15 +75,15 @@ int Test1() {
 	cgi::MetaMap meta_variables = parse_result.GetValue().meta_variables;
 
 	try {
-		COMPARE(meta_variables.at("CONTENT_LENGTH"), request.header_fields.at("Content-Length"));
-		COMPARE(meta_variables.at("CONTENT_TYPE"), request.header_fields.at("Content-Type"));
-		COMPARE(meta_variables.at("PATH_INFO"), cgi_path_info);
-		COMPARE(meta_variables.at("PATH_TRANSLATED"), html_dir_path + cgi_path_info);
-		COMPARE(meta_variables.at("REQUEST_METHOD"), request_line.method);
-		COMPARE(meta_variables.at("SCRIPT_NAME"), cgi_bin_dir_path + cgi_script);
-		COMPARE(meta_variables.at("SERVER_NAME"), request.header_fields.at("Host"));
-		COMPARE(meta_variables.at("SERVER_PORT"), server_port);
-		COMPARE(meta_variables.at("SERVER_PROTOCOL"), request_line.version);
+		COMPARE(meta_variables.at(cgi::CONTENT_LENGTH), request.header_fields.at(CONTENT_LENGTH));
+		COMPARE(meta_variables.at(cgi::CONTENT_TYPE), request.header_fields.at(CONTENT_TYPE));
+		COMPARE(meta_variables.at(cgi::PATH_INFO), cgi_path_info);
+		COMPARE(meta_variables.at(cgi::PATH_TRANSLATED), html_dir_path + cgi_path_info);
+		COMPARE(meta_variables.at(cgi::REQUEST_METHOD), request_line.method);
+		COMPARE(meta_variables.at(cgi::SCRIPT_NAME), cgi_bin_dir_path + cgi_script);
+		COMPARE(meta_variables.at(cgi::SERVER_NAME), request.header_fields.at(HOST));
+		COMPARE(meta_variables.at(cgi::SERVER_PORT), server_port);
+		COMPARE(meta_variables.at(cgi::SERVER_PROTOCOL), request_line.version);
 	} catch (const std::exception &e) {
 		PrintNg();
 		std::cerr << e.what() << '\n';
@@ -112,15 +112,15 @@ int Test2() {
 	cgi::MetaMap meta_variables = parse_result.GetValue().meta_variables;
 
 	try {
-		COMPARE(meta_variables.at("CONTENT_LENGTH"), request.header_fields.at("Content-Length"));
-		COMPARE(meta_variables.at("CONTENT_TYPE"), request.header_fields.at("Content-Type"));
-		COMPARE(meta_variables.at("PATH_INFO"), cgi_path_info);
-		COMPARE(meta_variables.at("PATH_TRANSLATED"), html_dir_path + cgi_path_info);
-		COMPARE(meta_variables.at("REQUEST_METHOD"), request_line.method);
-		COMPARE(meta_variables.at("SCRIPT_NAME"), cgi_bin_dir_path + cgi_script);
-		COMPARE(meta_variables.at("SERVER_NAME"), request.header_fields.at("Host"));
-		COMPARE(meta_variables.at("SERVER_PORT"), server_port);
-		COMPARE(meta_variables.at("SERVER_PROTOCOL"), request_line.version);
+		COMPARE(meta_variables.at(cgi::CONTENT_LENGTH), request.header_fields.at(CONTENT_LENGTH));
+		COMPARE(meta_variables.at(cgi::CONTENT_TYPE), request.header_fields.at(CONTENT_TYPE));
+		COMPARE(meta_variables.at(cgi::PATH_INFO), cgi_path_info);
+		COMPARE(meta_variables.at(cgi::PATH_TRANSLATED), html_dir_path + cgi_path_info);
+		COMPARE(meta_variables.at(cgi::REQUEST_METHOD), request_line.method);
+		COMPARE(meta_variables.at(cgi::SCRIPT_NAME), cgi_bin_dir_path + cgi_script);
+		COMPARE(meta_variables.at(cgi::SERVER_NAME), request.header_fields.at(HOST));
+		COMPARE(meta_variables.at(cgi::SERVER_PORT), server_port);
+		COMPARE(meta_variables.at(cgi::SERVER_PROTOCOL), request_line.version);
 	} catch (const std::exception &e) {
 		PrintOk();
 		utils::Debug("Test2", e.what());
