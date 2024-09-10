@@ -8,6 +8,7 @@
 #include <iostream>
 #include <sys/wait.h>
 #include <unistd.h>
+#include <cerrno>
 
 namespace http {
 namespace cgi {
@@ -91,7 +92,7 @@ void Cgi::Free() {
 
 void Cgi::ExecveCgiScript() {
 	exit_status_ = execve(cgi_script_.c_str(), argv_, env_);
-	perror("execve"); // execveが失敗した場合のエラーメッセージ出力
+	std::cerr << std::strerror(errno) << std::endl; // execveが失敗した場合のエラーメッセージ出力
 }
 
 char *const *Cgi::SetCgiArgv() {
