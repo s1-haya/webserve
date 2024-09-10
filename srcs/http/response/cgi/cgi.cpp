@@ -35,7 +35,6 @@ void Cgi::Execve() {
 	if (p == SYSTEM_ERROR) {
 		throw utils::SystemException(std::strerror(errno), errno);
 	} else if (p == 0) {
-		// 親と子でプロセス空間が違うため、親プロセス自体の標準出力に影響はない。
 		if (method_ == "POST") {
 			close(cgi_request[WRITE]);
 			dup2(cgi_request[READ], STDIN_FILENO);
@@ -48,7 +47,7 @@ void Cgi::Execve() {
 	}
 	if (method_ == "POST") {
 		close(cgi_request[READ]);
-		write(cgi_request[WRITE], body_message_.c_str(), body_message_.length());
+		write(cgi_request[WRITE], request_body_message_.c_str(), request_body_message_.length());
 		close(cgi_request[WRITE]);
 	}
 	close(cgi_response[WRITE]);
@@ -81,11 +80,11 @@ void Cgi::ExecveCgiScript() {
 }
 
 void Cgi::SetCgiMember(cgi::CgiRequest request) {
-	this->method_       = request.meta_variables["REQUEST_METHOD"];
-	this->cgi_script_   = request.meta_variables["SCRIPT_NAME"];
-	this->body_message_ = request.body_message;
-	this->argv_         = SetCgiArgv();
-	this->env_          = SetCgiEnv(request.meta_variables);
+	method_               = request.meta_variables.at("REQUEST_METHOD");
+	cgi_script_           = request.meta_variables.at("SCRIPT_NAME");
+	request_body_message_ = request.body_message;
+	argv_                 = SetCgiArgv();
+	env_                  = SetCgiEnv(request.meta_variables);
 }
 
 char *const *Cgi::SetCgiArgv() {

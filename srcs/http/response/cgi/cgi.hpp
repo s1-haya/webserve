@@ -32,7 +32,7 @@ class Cgi {
 	// cgi info;
 	std::string  method_;
 	std::string  cgi_script_;
-	std::string  body_message_;
+	std::string  request_body_message_;
 	char *const *argv_;
 	char *const *env_;
 	int          exit_status_;
