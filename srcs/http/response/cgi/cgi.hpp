@@ -5,21 +5,25 @@
 #include <string>
 
 namespace http {
+
+class StatusCode;
+
 namespace cgi {
 
 struct CgiRequest;
 
 class Cgi {
   public:
-	typedef std::map<std::string, std::string> MetaMap;
 	Cgi();
 	~Cgi();
-	int Run(const cgi::CgiRequest &request);
+	StatusCode Run(const CgiRequest &request, std::string &response_body_message);
 
   private:
+	// prohibit copy constructor and assignment operator
 	Cgi(const Cgi &cgi);
-	Cgi         &operator=(const Cgi &cgi);
-	void         SetCgiMember(cgi::CgiRequest request);
+	Cgi &operator=(const Cgi &cgi);
+
+	void         SetCgiMember(CgiRequest request);
 	char *const *SetCgiEnv(const MetaMap &meta_variables);
 	char *const *SetCgiArgv();
 	void         Execve();

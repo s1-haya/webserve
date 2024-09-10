@@ -1,5 +1,6 @@
 #include "cgi.hpp"
 #include "cgi_parse.hpp"
+#include "status_code.hpp"
 #include <cstring>
 #include <iostream>
 #include <sys/wait.h>
@@ -10,15 +11,13 @@ namespace cgi {
 
 Cgi::Cgi() : argv_(NULL), env_(NULL), exit_status_(0) {}
 
-// CGIリクエストの構造体の場合、Freeは削除する。んでデストラクターでfree
 Cgi::~Cgi() {}
 
-// CGIリクエストの情報を持つ構造体を引数に渡す。返り値enumを返す
-int Cgi::Run(const cgi::CgiRequest &request) {
+StatusCode Cgi::Run(const cgi::CgiRequest &request, std::string &response_body_message) {
 	SetCgiMember(request);
 	Execve();
 	Free();
-	return this->exit_status_;
+	return StatusCode(OK);
 }
 
 void Cgi::Execve() {
