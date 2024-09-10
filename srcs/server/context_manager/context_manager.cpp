@@ -24,20 +24,24 @@ void ContextManager::AddVirtualServer(const VirtualServer &virtual_server) {
 	virtual_servers_.AddVirtualServer(virtual_server);
 }
 
-void ContextManager::AddServerInfo(
-	const ServerInfo &server_info, const VirtualServer *virtual_server
-) {
-	const int server_fd = server_info.GetFd();
-	virtual_servers_.AddMapping(server_fd, virtual_server);
-	if (sock_context_.IsServerInfoExist(server_fd)) {
-		return;
-	}
-	sock_context_.AddServerInfo(server_fd, server_info);
+void ContextManager::AddServerInfo(const HostPortPair &host_port) {
+	sock_context_.AddServerInfo(host_port);
+	virtual_servers_.InitHostPortPair(host_port);
 }
 
-void ContextManager::AddClientInfo(const ClientInfo &client_info, int server_fd) {
+void ContextManager::AddMapping(
+	const HostPortPair &host_port, const VirtualServer *virtual_server
+) {
+	virtual_servers_.AddMapping(host_port, virtual_server);
+}
+
+void ContextManager::SetListenSockFd(const HostPortPair &host_port, int server_fd) {
+	sock_context_.SetSockFd(host_port, server_fd);
+}
+
+void ContextManager::AddClientInfo(const ClientInfo &client_info) {
 	const int client_fd = client_info.GetFd();
-	sock_context_.AddClientInfo(client_fd, client_info, server_fd);
+	sock_context_.AddClientInfo(client_fd, client_info);
 }
 
 void ContextManager::DeleteClientInfo(int client_fd) {
@@ -48,20 +52,13 @@ const VirtualServerStorage::VirtualServerList &ContextManager::GetAllVirtualServ
 	return virtual_servers_.GetAllVirtualServerList();
 }
 
-ServerContext ContextManager::GetServerContext(int client_fd) const {
-	const ServerInfo &server_info = sock_context_.GetConnectedServerInfo(client_fd);
-	const int         server_fd   = server_info.GetFd();
+const VirtualServerStorage::VirtualServerAddrList &
+ContextManager::GetVirtualServerAddrList(int client_fd) const {
+	const ClientInfo                 &client_info = sock_context_.GetClientInfo(client_fd);
+	const VirtualServer::HostPortPair host_port =
+		std::make_pair(client_info.GetListenIp(), client_info.GetListenPort());
 
-	// create ServerContext
-	ServerContext server_infos;
-	server_infos.fd                       = server_fd;
-	server_infos.virtual_server_addr_list = virtual_servers_.GetVirtualServerAddrList(server_fd);
-	return server_infos;
-}
-
-ContextManager::GetServerInfoResult
-ContextManager::GetServerInfo(const std::string &host, unsigned int port) const {
-	return sock_context_.GetServerInfo(host, port);
+	return virtual_servers_.GetVirtualServerAddrList(host_port);
 }
 
 } // namespace server

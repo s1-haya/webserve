@@ -7,9 +7,11 @@ namespace server {
 
 class ServerInfo {
   public:
+	typedef std::pair<std::string, unsigned int> HostPortPair;
+
 	// default constructor: necessary for map's insert/[]
 	ServerInfo();
-	ServerInfo(const std::string &host, unsigned int port);
+	explicit ServerInfo(const HostPortPair &host_port);
 	~ServerInfo();
 	ServerInfo(const ServerInfo &other);
 	ServerInfo &operator=(const ServerInfo &other);
@@ -22,8 +24,7 @@ class ServerInfo {
 
   private:
 	int          fd_;
-	std::string  host_;
-	unsigned int port_;
+	HostPortPair host_port_;
 };
 
 } // namespace server

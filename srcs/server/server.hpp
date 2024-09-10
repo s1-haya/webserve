@@ -15,7 +15,12 @@ namespace server {
 
 class Server {
   public:
-	typedef std::list<config::context::ServerCon> ConfigServers;
+	typedef std::list<config::context::ServerCon>   ConfigServers;
+	typedef VirtualServer::HostPortPair             HostPortPair;
+	typedef VirtualServerStorage::VirtualServerList VirtualServerList;
+	typedef std::set<std::string>                   IpSet;
+	typedef std::map<unsigned int, IpSet>           PortIpMap;
+
 	explicit Server(const ConfigServers &config_servers);
 	~Server();
 	void Init();
@@ -27,20 +32,23 @@ class Server {
 	Server(const Server &other);
 	Server &operator=(const Server &other);
 	// functions
-	void       AddVirtualServers(const ConfigServers &config_servers);
-	ServerInfo Listen(const std::string &host, unsigned int port);
-	void       HandleEvent(const event::Event &event);
-	void       HandleNewConnection(int server_fd);
-	void       HandleExistingConnection(const event::Event &event);
-	void       ReadRequest(int client_fd);
-	void       RunHttp(const event::Event &event);
-	void       SendResponse(int client_fd);
-	void       HandleTimeoutMessages();
-	void       KeepConnection(int client_fd);
-	void       Disconnect(int client_fd);
-	void       UpdateEventInResponseComplete(
-			  const message::ConnectionState connection_state, const event::Event &event
-		  );
+	void      AddVirtualServers(const ConfigServers &config_servers);
+	void      AddServerInfoToContext(const VirtualServerList &virtual_server_list);
+	void      ListenAllHostPorts(const VirtualServerList &virtual_server_list);
+	PortIpMap CreatePortIpMap(const VirtualServerList &virtual_server_list);
+	void      Listen(const HostPortPair &host_port);
+	void      HandleEvent(const event::Event &event);
+	void      HandleNewConnection(int server_fd);
+	void      HandleExistingConnection(const event::Event &event);
+	void      ReadRequest(int client_fd);
+	void      RunHttp(const event::Event &event);
+	void      SendResponse(int client_fd);
+	void      HandleTimeoutMessages();
+	void      KeepConnection(int client_fd);
+	void      Disconnect(int client_fd);
+	void      UpdateEventInResponseComplete(
+			 const message::ConnectionState connection_state, const event::Event &event
+		 );
 	void UpdateConnectionAfterSendResponse(
 		int client_fd, const message::ConnectionState connection_state
 	);

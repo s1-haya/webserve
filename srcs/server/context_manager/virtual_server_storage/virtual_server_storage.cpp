@@ -1,5 +1,5 @@
 #include "virtual_server_storage.hpp"
-#include "virtual_server.hpp"
+#include "define.hpp"
 #include <stdexcept> // logic_error
 
 namespace server {
@@ -24,28 +24,67 @@ void VirtualServerStorage::AddVirtualServer(const VirtualServer &virtual_server)
 	virtual_servers_.push_back(virtual_server);
 }
 
-// server_fdが新規なら作成して良いのでmap[]を使用
-// e.g., VirtualServerAddrListMap -> {{fd 4 : List{virtual_server1*, virtual_server2*}},
-//                                    {fd 5 : List{virtual_server3*}},
-//                                    {fd 6 : List{virtual_server2*, virtual_server3*}}}
-void VirtualServerStorage::AddMapping(int server_fd, const VirtualServer *virtual_server) {
-	VirtualServerAddrList &virtual_server_addr_list = virtual_server_addr_list_map_[server_fd];
-	virtual_server_addr_list.push_back(virtual_server);
+// For 0.0.0.0, initialize all host_port_pair keys here before mapping virtual_server* to each.
+void VirtualServerStorage::InitHostPortPair(const VirtualServer::HostPortPair &host_port) {
+	virtual_server_addr_list_map_[host_port] = VirtualServerAddrList();
 }
 
-const VirtualServerStorage::VirtualServerAddrList &
-VirtualServerStorage::GetVirtualServerAddrList(int server_fd) const {
-	try {
-		return virtual_server_addr_list_map_.at(server_fd);
-	} catch (const std::exception &e) {
-		throw std::logic_error("VirtualServerAddrList doesn't exists");
+// e.g.,
+// server {
+// 	  listen 127.0.0.1:8080;
+// }
+// server {
+// 	  listen 0.0.0.0:8080;
+// }
+// server {
+// 	  listen 127.0.0.1:8080;
+// 	  listen 172.19.0.1:8080;
+// }
+// VirtualServerAddrListMap -> {{127.0.0.1:8080  : List{vs1*, vs2*, vs3*}},
+//                              {0.0.0.0:8080    : List{vs2*}},
+//                              {172.19.0.1:8080 : List{vs2*, vs3*}}}
+void VirtualServerStorage::AddMapping(
+	const HostPortPair &host_port, const VirtualServer *virtual_server
+) {
+	if (host_port.first != IPV4_ADDR_ANY) {
+		// Add to the specific host:port mapping
+		VirtualServerAddrList &virtual_server_addr_list = virtual_server_addr_list_map_[host_port];
+		AddVirtualServerAddr(virtual_server_addr_list, virtual_server);
+		return;
+	}
+	// For "0.0.0.0", add the virtual_server* to all host:port pairs with the same port
+	typedef VirtualServerAddrListMap::iterator Itr;
+	for (Itr it = virtual_server_addr_list_map_.begin(); it != virtual_server_addr_list_map_.end();
+		 ++it) {
+		const unsigned int exist_port = it->first.second;
+		if (exist_port == host_port.second) {
+			VirtualServerAddrList &virtual_server_addr_list = it->second;
+			AddVirtualServerAddr(virtual_server_addr_list, virtual_server);
+		}
 	}
 }
 
-// todo: tmp. need?
+const VirtualServerStorage::VirtualServerAddrList &
+VirtualServerStorage::GetVirtualServerAddrList(const HostPortPair &host_port) const {
+	if (virtual_server_addr_list_map_.count(host_port) == 0) {
+		return virtual_server_addr_list_map_.at(std::make_pair(IPV4_ADDR_ANY, host_port.second));
+	}
+	return virtual_server_addr_list_map_.at(host_port);
+}
+
 const VirtualServerStorage::VirtualServerList &
 VirtualServerStorage::GetAllVirtualServerList() const {
 	return virtual_servers_;
+}
+
+void VirtualServerStorage::AddVirtualServerAddr(
+	VirtualServerAddrList &virtual_server_addr_list, const VirtualServer *virtual_server
+) {
+	if (virtual_server_addr_list.size() > 0 && virtual_server_addr_list.back() == virtual_server) {
+		// The virtual_server* is already added.
+		return;
+	}
+	virtual_server_addr_list.push_back(virtual_server);
 }
 
 } // namespace server

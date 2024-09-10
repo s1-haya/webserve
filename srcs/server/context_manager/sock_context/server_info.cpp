@@ -1,11 +1,11 @@
 #include "server_info.hpp"
+#include "define.hpp"
 
 namespace server {
 
-ServerInfo::ServerInfo() : fd_(0), host_("0.0.0.0"), port_(0) {}
+ServerInfo::ServerInfo() : fd_(0), host_port_(std::make_pair(IPV4_ADDR_ANY, 0)) {}
 
-ServerInfo::ServerInfo(const std::string &host, unsigned int port)
-	: fd_(0), host_(host), port_(port) {}
+ServerInfo::ServerInfo(const HostPortPair &host_port) : fd_(0), host_port_(host_port) {}
 
 ServerInfo::~ServerInfo() {}
 
@@ -15,9 +15,8 @@ ServerInfo::ServerInfo(const ServerInfo &other) {
 
 ServerInfo &ServerInfo::operator=(const ServerInfo &other) {
 	if (this != &other) {
-		fd_   = other.fd_;
-		host_ = other.host_;
-		port_ = other.port_;
+		fd_        = other.fd_;
+		host_port_ = other.host_port_;
 	}
 	return *this;
 }
@@ -27,11 +26,11 @@ int ServerInfo::GetFd() const {
 }
 
 const std::string &ServerInfo::GetHost() const {
-	return host_;
+	return host_port_.first;
 }
 
 unsigned int ServerInfo::GetPort() const {
-	return port_;
+	return host_port_.second;
 }
 
 void ServerInfo::SetSockFd(int fd) {

@@ -1,9 +1,9 @@
 #include "server.hpp"
 #include "client_info.hpp"
+#include "define.hpp"
 #include "event.hpp"
 #include "read.hpp"
 #include "send.hpp"
-#include "server_info.hpp"
 #include "utils.hpp"
 #include "virtual_server.hpp"
 #include <errno.h>
@@ -17,6 +17,11 @@ namespace server {
 const double Server::REQUEST_TIMEOUT = 3.0;
 
 namespace {
+
+typedef std::set<Server::HostPortPair> HostPortSet;
+
+typedef Server::VirtualServerList::const_iterator   ItVirtualServer;
+typedef VirtualServer::HostPortList::const_iterator ItHostPort;
 
 VirtualServer::LocationList ConvertLocations(const config::context::LocationList &config_locations
 ) {
@@ -39,16 +44,6 @@ VirtualServer::LocationList ConvertLocations(const config::context::LocationList
 	return location_list;
 }
 
-VirtualServer ConvertToVirtualServer(const config::context::ServerCon &config_server) {
-	return VirtualServer(
-		config_server.server_names,
-		ConvertLocations(config_server.location_con),
-		config_server.host_ports,
-		config_server.client_max_body_size,
-		config_server.error_page
-	);
-}
-
 // todo: tmp for debug
 void DebugVirtualServerNames(
 	const VirtualServerStorage::VirtualServerAddrList &virtual_server_addr_list
@@ -66,6 +61,49 @@ void DebugDto(const http::ClientInfos &client_infos, const VirtualServerAddrList
 	utils::Debug("server", "ClientInfo - fd", client_infos.fd);
 	utils::Debug("server", "received server_names");
 	DebugVirtualServerNames(virtual_servers);
+}
+
+void AddResolvedHostPort(
+	HostPortSet &host_port_set, const Connection::IpList &ip_list, unsigned int port
+) {
+	typedef Connection::IpList::const_iterator Itr;
+	for (Itr it = ip_list.begin(); it != ip_list.end(); ++it) {
+		const Server::HostPortPair host_port = std::make_pair(*it, port);
+
+		typedef std::pair<HostPortSet::const_iterator, bool> InsertResult;
+		const InsertResult result = host_port_set.insert(host_port);
+		if (result.second == false) {
+			// duplicate host:port
+			throw std::invalid_argument("invalid host:port");
+		}
+	}
+}
+
+VirtualServer::HostPortList ConvertHostPortSetToList(const HostPortSet &host_ports_set) {
+	return VirtualServer::HostPortList(host_ports_set.begin(), host_ports_set.end());
+}
+
+VirtualServer::HostPortList ConvertHostPorts(const config::context::HostPortList &config_host_ports
+) {
+	// Temporary std::set for checking duplicates of host:port for each virtual server.
+	HostPortSet host_ports_set;
+
+	typedef config::context::HostPortList::const_iterator Itr;
+	for (Itr it = config_host_ports.begin(); it != config_host_ports.end(); ++it) {
+		const Connection::IpList ip_list = Connection::ResolveHostName(it->first);
+		AddResolvedHostPort(host_ports_set, ip_list, it->second);
+	}
+	return ConvertHostPortSetToList(host_ports_set);
+}
+
+VirtualServer ConvertToVirtualServer(const config::context::ServerCon &config_server) {
+	return VirtualServer(
+		config_server.server_names,
+		ConvertLocations(config_server.location_con),
+		ConvertHostPorts(config_server.host_ports),
+		config_server.client_max_body_size,
+		config_server.error_page
+	);
 }
 
 } // namespace
@@ -117,7 +155,7 @@ void Server::HandleNewConnection(int server_fd) {
 	SetNonBlockingMode(client_fd);
 
 	// add client_info, event, message
-	context_.AddClientInfo(new_client_info, server_fd);
+	context_.AddClientInfo(new_client_info);
 	event_monitor_.Add(client_fd, event::EVENT_READ);
 	message_manager_.AddNewMessage(client_fd);
 	utils::Debug(
@@ -147,9 +185,7 @@ http::ClientInfos Server::GetClientInfos(int client_fd) const {
 }
 
 VirtualServerAddrList Server::GetVirtualServerList(int client_fd) const {
-	const ServerContext &server_context = context_.GetServerContext(client_fd);
-
-	return server_context.virtual_server_addr_list;
+	return context_.GetVirtualServerAddrList(client_fd);
 }
 
 void Server::ReadRequest(int client_fd) {
@@ -290,41 +326,66 @@ void Server::UpdateConnectionAfterSendResponse(
 	}
 }
 
-ServerInfo Server::Listen(const std::string &host, unsigned int port) {
-	const ContextManager::GetServerInfoResult result = context_.GetServerInfo(host, port);
-	if (result.IsOk()) {
-		return result.GetValue();
+void Server::AddServerInfoToContext(const VirtualServerList &virtual_server_list) {
+	for (ItVirtualServer it = virtual_server_list.begin(); it != virtual_server_list.end(); ++it) {
+		const VirtualServer::HostPortList &host_ports = it->GetHostPortList();
+		for (ItHostPort it_host_port = host_ports.begin(); it_host_port != host_ports.end();
+			 ++it_host_port) {
+			context_.AddServerInfo(*it_host_port);
+		}
 	}
+}
 
-	// create ServerInfo & listen the first host:port
-	ServerInfo server_info(host, port);
-	const int  server_fd = connection_.Connect(server_info);
-	server_info.SetSockFd(server_fd);
+// PortIpMap -> port1:{ip1, ip2}, port2:{ip1, 0.0.0.0}, ...
+Server::PortIpMap Server::CreatePortIpMap(const VirtualServerList &virtual_server_list) {
+	PortIpMap port_ip_map;
+	for (ItVirtualServer it = virtual_server_list.begin(); it != virtual_server_list.end(); ++it) {
+		const VirtualServer               &virtual_server = *it;
+		const VirtualServer::HostPortList &host_ports     = virtual_server.GetHostPortList();
+		for (ItHostPort it_host_port = host_ports.begin(); it_host_port != host_ports.end();
+			 ++it_host_port) {
+			const HostPortPair &host_port = *it_host_port;
+			port_ip_map[host_port.second].insert(host_port.first);
+			context_.AddMapping(host_port, &virtual_server);
+		}
+	}
+	return port_ip_map;
+}
+
+void Server::Listen(const HostPortPair &host_port) {
+	const int server_fd = connection_.Connect(host_port);
 	SetNonBlockingMode(server_fd);
 
+	context_.SetListenSockFd(host_port, server_fd);
 	event_monitor_.Add(server_fd, event::EVENT_READ);
-	utils::Debug("server", "listen " + host + ":" + utils::ToString(port), server_fd);
-	return server_info;
+	utils::Debug(
+		"server", "listen " + host_port.first + ":" + utils::ToString(host_port.second), server_fd
+	);
+}
+
+void Server::ListenAllHostPorts(const VirtualServerList &virtual_server_list) {
+	const PortIpMap port_ip_map = CreatePortIpMap(virtual_server_list);
+
+	typedef PortIpMap::const_iterator ItMap;
+	for (ItMap it_map = port_ip_map.begin(); it_map != port_ip_map.end(); ++it_map) {
+		const unsigned int port   = it_map->first;
+		const IpSet       &ip_set = it_map->second;
+		if (ip_set.find(IPV4_ADDR_ANY) != ip_set.end()) {
+			Listen(std::make_pair(IPV4_ADDR_ANY, port));
+			continue;
+		}
+		typedef IpSet::const_iterator ItSet;
+		for (ItSet it_set = ip_set.begin(); it_set != ip_set.end(); ++it_set) {
+			Listen(std::make_pair(*it_set, port));
+		}
+	}
 }
 
 void Server::Init() {
-	const VirtualServerStorage::VirtualServerList &all_virtual_server =
-		context_.GetAllVirtualServer();
+	const VirtualServerList &virtual_server_list = context_.GetAllVirtualServer();
 
-	typedef VirtualServerStorage::VirtualServerList::const_iterator ItVirtualServer;
-	for (ItVirtualServer it = all_virtual_server.begin(); it != all_virtual_server.end(); ++it) {
-		const VirtualServer               &virtual_server = *it;
-		const VirtualServer::HostPortList &host_port_list = virtual_server.GetHostPortList();
-
-		// Socket communication for all host:port pairs of each virtual server.
-		typedef VirtualServer::HostPortList::const_iterator ItHostPort;
-		for (ItHostPort it_host_port = host_port_list.begin(); it_host_port != host_port_list.end();
-			 ++it_host_port) {
-			const ServerInfo listen_server_info = Listen(it_host_port->first, it_host_port->second);
-			// Whether new or existing server_info, add a link to the virtual_server.
-			context_.AddServerInfo(listen_server_info, &virtual_server);
-		}
-	}
+	AddServerInfoToContext(virtual_server_list);
+	ListenAllHostPorts(virtual_server_list);
 }
 
 void Server::SetNonBlockingMode(int sock_fd) {

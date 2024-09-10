@@ -19,7 +19,7 @@ namespace {
 
 void InitHints(Connection::AddrInfo *hints) {
 	hints->ai_socktype = SOCK_STREAM;
-	hints->ai_family   = AF_UNSPEC;
+	hints->ai_family   = AF_INET; // IPv4
 	hints->ai_flags    = AI_PASSIVE | AI_NUMERICSERV;
 }
 
@@ -39,6 +39,7 @@ std::string ConvertToIpv4Str(const struct in_addr &addr) {
 	return oss.str();
 }
 
+// todo: remove
 // 128bit(16bytes) -> xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx
 // struct in6_addr addr = {0x20, 0x01, 0x0d, 0xb8, 0x85, 0xa3, 0x00, 0x00,
 //                         0x00, 0x00, 0x8a, 0x2e, 0x03, 0x70, 0x73, 0x34}
@@ -60,14 +61,35 @@ std::string ConvertToIpv6Str(const struct in6_addr &addr) {
 
 } // namespace
 
+// "localhost" -> IpList{"127.0.0.1", other..}
+Connection::IpList Connection::ResolveHostName(const std::string &hostname) {
+	AddrInfo hints = {};
+	InitHints(&hints);
+
+	AddrInfo *result = NULL;
+	const int status = getaddrinfo(hostname.c_str(), NULL, &hints, &result);
+	if (status != 0) {
+		throw std::runtime_error("getaddrinfo failed: " + std::string(gai_strerror(status)));
+	}
+
+	IpList ip_list;
+	for (; result != NULL; result = result->ai_next) {
+		struct sockaddr_in *sa_in = (struct sockaddr_in *)result->ai_addr;
+		const std::string   ip    = ConvertToIpv4Str(sa_in->sin_addr);
+		ip_list.push_back(ip);
+	}
+	freeaddrinfo(result);
+	return ip_list;
+}
+
 // result: dynamic allocated by getaddrinfo()
-Connection::AddrInfo *Connection::GetAddrInfoList(const ServerInfo &server_info) {
-	const std::string &port  = utils::ConvertUintToStr(server_info.GetPort());
+Connection::AddrInfo *Connection::GetAddrInfoList(const HostPortPair &host_port) const {
+	const std::string &port  = utils::ConvertUintToStr(host_port.second);
 	AddrInfo           hints = {};
 	InitHints(&hints);
 
-	AddrInfo *result;
-	const int status = getaddrinfo(server_info.GetHost().c_str(), port.c_str(), &hints, &result);
+	AddrInfo *result = NULL;
+	const int status = getaddrinfo(host_port.first.c_str(), port.c_str(), &hints, &result);
 	// EAI_MEMORY is also included in status != 0
 	if (status != 0) {
 		throw std::runtime_error("getaddrinfo failed: " + std::string(gai_strerror(status)));
@@ -106,8 +128,8 @@ Connection::BindResult Connection::TryBind(AddrInfo *addrinfo) const {
 	return bind_result;
 }
 
-int Connection::Connect(ServerInfo &server_info) {
-	AddrInfo        *addrinfo_list = GetAddrInfoList(server_info);
+int Connection::Connect(const HostPortPair &host_port) {
+	AddrInfo        *addrinfo_list = GetAddrInfoList(host_port);
 	const BindResult bind_result   = TryBind(addrinfo_list);
 	freeaddrinfo(addrinfo_list);
 	if (!bind_result.IsOk()) {
