@@ -58,6 +58,7 @@ void PrintNg() {
 const std::string html_dir_path    = "../../../html";
 const std::string cgi_bin_dir_path = "../../../cgi-bin";
 
+/* exec /cgi-bin/env.py */
 int Test1() {
 	// request
 	CgiRequest cgi_request;
@@ -72,17 +73,46 @@ int Test1() {
 	cgi_request.meta_variables[SERVER_PORT]     = "8080";
 	cgi_request.meta_variables[SERVER_PROTOCOL] = "HTTP/1.1";
 
+	std::string response_body_message;
 	try {
-		Cgi         cgi(cgi_request);
-		std::string response_body_message;
+		Cgi cgi(cgi_request);
 		cgi.Run(response_body_message);
-		std::cout << "response_body_message: " << response_body_message << std::endl;
 	} catch (const std::exception &e) {
 		PrintNg();
 		std::cerr << e.what() << '\n';
 		return EXIT_FAILURE;
 	}
 	PrintOk();
+	utils::Debug(response_body_message);
+	return EXIT_SUCCESS;
+}
+
+/* exec /cgi-bin/test.sh */
+int Test2() {
+	// request
+	CgiRequest cgi_request;
+	cgi_request.meta_variables[CONTENT_LENGTH] = "";
+	cgi_request.meta_variables[CONTENT_TYPE]   = "";
+	cgi_request.meta_variables[PATH_INFO]      = "/aa/b";
+	cgi_request.meta_variables[PATH_TRANSLATED] =
+		html_dir_path + cgi_request.meta_variables.at(PATH_INFO);
+	cgi_request.meta_variables[REQUEST_METHOD]  = "GET";
+	cgi_request.meta_variables[SCRIPT_NAME]     = cgi_bin_dir_path + "/test.sh";
+	cgi_request.meta_variables[SERVER_NAME]     = "localhost";
+	cgi_request.meta_variables[SERVER_PORT]     = "8080";
+	cgi_request.meta_variables[SERVER_PROTOCOL] = "HTTP/1.1";
+
+	std::string response_body_message;
+	try {
+		Cgi cgi(cgi_request);
+		cgi.Run(response_body_message);
+	} catch (const std::exception &e) {
+		PrintNg();
+		std::cerr << e.what() << '\n';
+		return EXIT_FAILURE;
+	}
+	PrintOk();
+	utils::Debug(response_body_message);
 	return EXIT_SUCCESS;
 }
 
@@ -92,6 +122,7 @@ int main() {
 	int ret = EXIT_SUCCESS;
 
 	ret |= Test1();
+	ret |= Test2();
 
 	return ret;
 }
