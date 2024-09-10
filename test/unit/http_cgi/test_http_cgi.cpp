@@ -55,8 +55,8 @@ void PrintNg() {
 // ================================================= //
 
 // cgi_parseから見た相対パス
-const std::string html_dir_path    = "../../../../html";
-const std::string cgi_bin_dir_path = "../../../../cgi-bin";
+const std::string html_dir_path    = "../../../html";
+const std::string cgi_bin_dir_path = "../../../cgi-bin";
 
 int Test1() {
 	// request
@@ -67,7 +67,7 @@ int Test1() {
 	cgi_request.meta_variables[PATH_TRANSLATED] =
 		html_dir_path + cgi_request.meta_variables.at(PATH_INFO);
 	cgi_request.meta_variables[REQUEST_METHOD]  = "GET";
-	cgi_request.meta_variables[SCRIPT_NAME]     = cgi_bin_dir_path + "/test.py";
+	cgi_request.meta_variables[SCRIPT_NAME]     = cgi_bin_dir_path + "/env.py";
 	cgi_request.meta_variables[SERVER_NAME]     = "localhost";
 	cgi_request.meta_variables[SERVER_PORT]     = "8080";
 	cgi_request.meta_variables[SERVER_PROTOCOL] = "HTTP/1.1";
