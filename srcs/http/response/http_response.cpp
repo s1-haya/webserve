@@ -39,7 +39,7 @@ HttpResponseFormat HttpResponse::CreateHttpResponseFormat(
 	const HttpRequestResult  &request_info
 ) {
 	StatusCode   status_code(OK);
-	HeaderFields header_fields = InitHeaderFields(request_info);
+	HeaderFields response_header_fields = InitResponseHeaderFields(request_info);
 	std::string  response_body_message;
 	try {
 		const CheckServerInfoResult &server_info_result =
@@ -68,7 +68,7 @@ HttpResponseFormat HttpResponse::CreateHttpResponseFormat(
 				server_info_result.allowed_methods,
 				request_info.request.body_message,
 				response_body_message,
-				header_fields
+				response_header_fields
 			);
 		}
 	} catch (const HttpException &e) {
@@ -86,7 +86,7 @@ HttpResponseFormat HttpResponse::CreateHttpResponseFormat(
 	}
 	return HttpResponseFormat(
 		StatusLine(HTTP_VERSION, status_code.GetStatusCode(), status_code.GetReasonPhrase()),
-		header_fields,
+		response_header_fields,
 		response_body_message
 	);
 }
@@ -114,20 +114,20 @@ std::string HttpResponse::CreateHttpResponse(const HttpResponseFormat &response)
 	return response_stream.str();
 }
 
-HeaderFields HttpResponse::InitHeaderFields(const HttpRequestResult &request_info) {
-	HeaderFields header_fields;
-	header_fields[SERVER] = SERVER_VERSION;
+HeaderFields HttpResponse::InitResponseHeaderFields(const HttpRequestResult &request_info) {
+	HeaderFields response_header_fields;
+	response_header_fields[SERVER] = SERVER_VERSION;
 	(void)request_info;
 	// todo: request_infoから情報取得
 	// GetContentType(request_info);
 	// GetConnection(request_info);
-	header_fields[CONTENT_TYPE] = "test/html";
+	response_header_fields[CONTENT_TYPE] = "test/html";
 	if (IsConnectionKeep(request_info.request.header_fields)) {
-		header_fields[CONNECTION] = KEEP_ALIVE;
+		response_header_fields[CONNECTION] = KEEP_ALIVE;
 	} else {
-		header_fields[CONNECTION] = CLOSE;
+		response_header_fields[CONNECTION] = CLOSE;
 	}
-	return header_fields;
+	return response_header_fields;
 }
 
 bool HttpResponse::IsConnectionKeep(const HeaderFields &request_header_fields) {

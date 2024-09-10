@@ -52,7 +52,7 @@ class HttpResponse {
 		const MockDtoServerInfos &server_info,
 		const HttpRequestResult  &request_info
 	);
-	static HeaderFields InitHeaderFields(const HttpRequestResult &request_info);
+	static HeaderFields InitResponseHeaderFields(const HttpRequestResult &request_info);
 	static bool         IsConnectionKeep(const HeaderFields &request_header_fields);
 	static bool         IsCgi(
 				const std::string          &cgi_extension,
