@@ -1,5 +1,6 @@
 #include "cgi.hpp"
 #include "cgi_parse.hpp"
+#include "http_exception.hpp"
 #include "status_code.hpp"
 #include "system_exception.hpp"
 #include <cstring>
@@ -15,9 +16,13 @@ Cgi::Cgi() : argv_(NULL), env_(NULL), exit_status_(0) {}
 Cgi::~Cgi() {}
 
 StatusCode Cgi::Run(const cgi::CgiRequest &request, std::string &response_body_message) {
-	SetCgiMember(request);
-	Execve();
-	Free();
+	try {
+		SetCgiMember(request);
+		Execve();
+		Free();
+	} catch (const utils::SystemException &e) {
+		throw HttpException(e.what(), StatusCode(INTERNAL_SERVER_ERROR));
+	}
 	return StatusCode(OK);
 }
 
@@ -80,6 +85,7 @@ void Cgi::ExecveCgiScript() {
 }
 
 void Cgi::SetCgiMember(cgi::CgiRequest request) {
+	// 他のところでチェックしてここのatではthrowされない様にする
 	method_               = request.meta_variables.at("REQUEST_METHOD");
 	cgi_script_           = request.meta_variables.at("SCRIPT_NAME");
 	request_body_message_ = request.body_message;
@@ -99,8 +105,9 @@ char *const *Cgi::SetCgiArgv() {
 }
 
 char *const *Cgi::SetCgiEnv(const MetaMap &meta_variables) {
-	char                          **cgi_env = new char *[meta_variables.size() + 1];
-	size_t                          i       = 0;
+	char **cgi_env = new char *[meta_variables.size() + 1];
+	size_t i       = 0;
+
 	typedef MetaMap::const_iterator It;
 	for (It it = meta_variables.begin(); it != meta_variables.end(); it++) {
 		const std::string element = it->first + "=" + it->second;
