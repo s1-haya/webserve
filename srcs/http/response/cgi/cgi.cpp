@@ -11,15 +11,23 @@
 namespace http {
 namespace cgi {
 
-Cgi::Cgi() : argv_(NULL), env_(NULL), exit_status_(0) {}
+// 他のところでチェックしてここのatではthrowされない様にする
+Cgi::Cgi(const cgi::CgiRequest &request)
+	: argv_(SetCgiArgv()),
+	  env_(SetCgiEnv(request.meta_variables)),
+	  exit_status_(0),
+	  method_(request.meta_variables.at("REQUEST_METHOD")),
+	  cgi_script_(request.meta_variables.at("SCRIPT_NAME")),
+	  request_body_message_(request.body_message) {}
 
-Cgi::~Cgi() {}
+Cgi::~Cgi() {
+	Free();
+}
 
-StatusCode Cgi::Run(const cgi::CgiRequest &request, std::string &response_body_message) {
+StatusCode Cgi::Run(std::string &response_body_message) {
 	try {
-		SetCgiMember(request);
 		Execve();
-		Free();
+		response_body_message = response_body_message_;
 	} catch (const utils::SystemException &e) {
 		throw HttpException(e.what(), StatusCode(INTERNAL_SERVER_ERROR));
 	}
@@ -83,15 +91,6 @@ void Cgi::Free() {
 void Cgi::ExecveCgiScript() {
 	exit_status_ = execve(cgi_script_.c_str(), argv_, env_);
 	// perror("execve"); // execveが失敗した場合のエラーメッセージ出力
-}
-
-void Cgi::SetCgiMember(cgi::CgiRequest request) {
-	// 他のところでチェックしてここのatではthrowされない様にする
-	method_               = request.meta_variables.at("REQUEST_METHOD");
-	cgi_script_           = request.meta_variables.at("SCRIPT_NAME");
-	request_body_message_ = request.body_message;
-	argv_                 = SetCgiArgv();
-	env_                  = SetCgiEnv(request.meta_variables);
 }
 
 char *const *Cgi::SetCgiArgv() {

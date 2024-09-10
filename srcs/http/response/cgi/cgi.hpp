@@ -14,21 +14,21 @@ struct CgiRequest;
 
 class Cgi {
   public:
-	Cgi();
+	Cgi(const cgi::CgiRequest &request);
 	~Cgi();
-	StatusCode Run(const CgiRequest &request, std::string &response_body_message);
+	StatusCode Run(std::string &response_body_message);
 
   private:
 	// prohibit copy constructor and assignment operator
 	Cgi(const Cgi &cgi);
 	Cgi &operator=(const Cgi &cgi);
 
-	void         SetCgiMember(CgiRequest request);
 	char *const *SetCgiEnv(const MetaMap &meta_variables);
 	char *const *SetCgiArgv();
 	void         Execve();
 	void         ExecveCgiScript();
 	void         Free();
+
 	// cgi info;
 	std::string  method_;
 	std::string  cgi_script_;
