@@ -1,6 +1,7 @@
 #include "cgi.hpp"
 #include "cgi_parse.hpp"
 #include "status_code.hpp"
+#include "system_exception.hpp"
 #include <cstring>
 #include <iostream>
 #include <sys/wait.h>
@@ -25,17 +26,14 @@ void Cgi::Execve() {
 	int cgi_response[2];
 
 	if (method_ == "POST" && pipe(cgi_request) == SYSTEM_ERROR) {
-		std::cerr << "Error: pipe" << std::endl;
-		return;
+		throw utils::SystemException(std::strerror(errno), errno);
 	}
 	if (pipe(cgi_response) == SYSTEM_ERROR) {
-		std::cerr << "Error: pipe" << std::endl;
-		return;
+		throw utils::SystemException(std::strerror(errno), errno);
 	}
 	pid_t p = fork();
 	if (p == SYSTEM_ERROR) {
-		std::cerr << "Error: fork\n" << std::endl;
-		return;
+		throw utils::SystemException(std::strerror(errno), errno);
 	} else if (p == 0) {
 		// 親と子でプロセス空間が違うため、親プロセス自体の標準出力に影響はない。
 		if (method_ == "POST") {
