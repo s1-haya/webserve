@@ -14,7 +14,7 @@ struct CgiRequest;
 
 class Cgi {
   public:
-	Cgi(const cgi::CgiRequest &request);
+	Cgi(const CgiRequest &request);
 	~Cgi();
 	StatusCode Run(std::string &response_body_message);
 

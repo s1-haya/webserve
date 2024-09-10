@@ -1,6 +1,7 @@
 #include "cgi.hpp"
 #include "cgi_parse.hpp"
 #include "http_exception.hpp"
+#include "http_message.hpp"
 #include "status_code.hpp"
 #include "system_exception.hpp"
 #include <cstring>
@@ -38,7 +39,7 @@ void Cgi::Execve() {
 	int cgi_request[2];
 	int cgi_response[2];
 
-	if (method_ == "POST" && pipe(cgi_request) == SYSTEM_ERROR) {
+	if (method_ == POST && pipe(cgi_request) == SYSTEM_ERROR) {
 		throw utils::SystemException(std::strerror(errno), errno);
 	}
 	if (pipe(cgi_response) == SYSTEM_ERROR) {
@@ -48,7 +49,7 @@ void Cgi::Execve() {
 	if (p == SYSTEM_ERROR) {
 		throw utils::SystemException(std::strerror(errno), errno);
 	} else if (p == 0) {
-		if (method_ == "POST") {
+		if (method_ == POST) {
 			close(cgi_request[WRITE]);
 			dup2(cgi_request[READ], STDIN_FILENO);
 			close(cgi_request[READ]);
@@ -58,7 +59,7 @@ void Cgi::Execve() {
 		close(cgi_response[WRITE]);
 		ExecveCgiScript();
 	}
-	if (method_ == "POST") {
+	if (method_ == POST) {
 		close(cgi_request[READ]);
 		write(cgi_request[WRITE], request_body_message_.c_str(), request_body_message_.length());
 		close(cgi_request[WRITE]);
