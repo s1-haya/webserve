@@ -2,11 +2,23 @@
 #include "client_infos.hpp"
 #include "http_exception.hpp"
 #include "http_message.hpp"
-#include "http_method.hpp"
 #include "http_parse.hpp"
 #include "server_infos.hpp"
 #include <iostream>
 #include <sstream>
+
+namespace {
+
+std::string GetExtension(const std::string &path) {
+	size_t pos = path.find_last_of('.');
+
+	if (pos == std::string::npos || pos == path.length() - 1) {
+		return "";
+	}
+	return path.substr(pos + 1);
+}
+
+} // namespace
 
 namespace http {
 
@@ -35,28 +47,30 @@ HttpResponseFormat HttpResponse::CreateHttpResponseFormat(
 		// todo: if redirect
 		// if (server_info_result.redirect.IsOk()) {
 		// 	result = RedirectHandler();
-		// todo: IsCgi()
-		// - path
-		// - cgi_extension
-		// - method allowed
-		// } else if (IsCgi()) {
-		// todo: cgi実行
-		// cgi::Run()
-		// -> Internal　Server Errorを投げる可能性あり
-		// result = CgiToServerHandler();
-		// } else {
-		// }
-		//     return CreateSuccessResponseResult();
-		(void)client_info;
-		(void)server_info_result;
-		status_code = Method::Handler(
-			server_info_result.path,
-			request_info.request.request_line.method,
-			server_info_result.allowed_methods,
-			request_info.request.body_message,
-			response_body_message,
-			response_header_fields
-		);
+		if (IsCgi(
+				server_info_result.cgi_extension,
+				server_info_result.path,
+				request_info.request.request_line.method,
+				server_info_result.allowed_methods,
+				server_info_result.upload_directory
+			)) {
+			// todo: cgi実行
+			// cgi::Run()
+			// -> Internal　Server Errorを投げる可能性あり
+			// status_code = CgiToServerHandler(header_fields, response_body_message);
+			(void)client_info;
+			(void)server_info_result;
+			(void)status_code;
+		} else {
+			status_code = Method::Handler(
+				server_info_result.path,
+				request_info.request.request_line.method,
+				server_info_result.allowed_methods,
+				request_info.request.body_message,
+				response_body_message,
+				response_header_fields
+			);
+		}
 	} catch (const HttpException &e) {
 		// ステータスコードが300番台以上の場合
 		// feature: header_fieldとerror_pageとの関連性がわかり次第変更あり
@@ -119,6 +133,32 @@ HeaderFields HttpResponse::InitResponseHeaderFields(const HttpRequestResult &req
 bool HttpResponse::IsConnectionKeep(const HeaderFields &request_header_fields) {
 	HeaderFields::const_iterator it = request_header_fields.find(CONNECTION);
 	return it == request_header_fields.end() || it->second == KEEP_ALIVE;
+}
+
+bool HttpResponse::IsCgi(
+	const std::string          &cgi_extension,
+	const std::string          &path,
+	const std::string          &method,
+	const Method::AllowMethods &allowed_methods,
+	const std::string          &upload_directory
+) {
+	// todo:
+	// cgi_extensionがあるかどうか
+	if (cgi_extension.empty()) {
+		return false;
+	}
+	// upload_directory内にpathが存在するかどうか
+	// -> pathがaliasで設定される場合どうなるんだろう。
+	(void)upload_directory;
+	// pathがcgi_extensionで設定された拡張子かどうか
+	if (cgi_extension != GetExtension(path)) {
+		return false;
+	}
+	// methodがGETかPOSTかつallow_methodかどうか
+	if (!(Method::IsAllowedMethod(method, allowed_methods)) || (method != GET && method != POST)) {
+		return false;
+	}
+	return true;
 }
 
 // std::string HttpResponse::CreateBadRequestResponse(const HttpRequestResult &request_info) {

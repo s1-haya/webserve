@@ -26,6 +26,8 @@ class Method {
 					 std::string        &response_body_message,
 					 HeaderFields       &response_header_fields
 				 );
+	static bool
+	IsAllowedMethod(const std::string &method, const std::list<std::string> &allow_methods);
 
   private:
 	static StatusCode GetHandler(
@@ -42,9 +44,7 @@ class Method {
 		std::string       &response_body_message,
 		HeaderFields      &response_header_fields
 	);
-	static Stat TryStat(const std::string &path);
-	static bool
-	IsAllowedMethod(const std::string &method, const std::list<std::string> &allow_methods);
+	static Stat       TryStat(const std::string &path);
 	static void       SystemExceptionHandler(const utils::SystemException &e);
 	static StatusCode FileCreationHandler(
 		const std::string &path,
