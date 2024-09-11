@@ -154,9 +154,10 @@ void Cgi::ExecveCgiScript() {
 
 char *const *Cgi::SetCgiArgv() {
 	char **argv = new char *[2];
-	// todo error(new(std::nothrow))
-	char *dest = new char[cgi_script_.size() + 1];
-	// todo error(new(std::nothrow))
+	char  *dest = new char[cgi_script_.size() + 1];
+	if (argv == NULL || dest == NULL) {
+		throw utils::SystemException(std::strerror(errno), errno);
+	}
 	std::strcpy(dest, cgi_script_.c_str());
 	argv[0] = dest;
 	argv[1] = NULL;
@@ -165,15 +166,17 @@ char *const *Cgi::SetCgiArgv() {
 
 char *const *Cgi::SetCgiEnv(const MetaMap &meta_variables) {
 	char **cgi_env = new char *[meta_variables.size() + 1];
-	size_t i       = 0;
+	if (cgi_env == NULL) {
+		throw utils::SystemException(std::strerror(errno), errno);
+	}
+	size_t i = 0;
 
 	typedef MetaMap::const_iterator It;
 	for (It it = meta_variables.begin(); it != meta_variables.end(); it++) {
 		const std::string element = it->first + "=" + it->second;
 		char             *dest    = new char[element.size() + 1];
-		// todo error(new(std::nothrow))
 		if (dest == NULL) {
-			return NULL;
+			throw utils::SystemException(std::strerror(errno), errno);
 		}
 		std::strcpy(dest, element.c_str());
 		cgi_env[i] = dest;
