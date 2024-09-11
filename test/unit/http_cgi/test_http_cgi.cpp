@@ -126,6 +126,35 @@ int Test3() {
 	return EXIT_SUCCESS;
 }
 
+/* ErrorTest: exec /cgi-bin/not_exist */
+int Test4() {
+	// request
+	CgiRequest cgi_request;
+	cgi_request.body_message                   = "test test";
+	cgi_request.meta_variables[CONTENT_LENGTH] = utils::ToString(cgi_request.body_message.length());
+	cgi_request.meta_variables[CONTENT_TYPE]   = "text/plain";
+	cgi_request.meta_variables[PATH_INFO]      = "/aa/b";
+	cgi_request.meta_variables[PATH_TRANSLATED] =
+		html_dir_path + cgi_request.meta_variables.at(PATH_INFO);
+	cgi_request.meta_variables[REQUEST_METHOD]  = "POST";
+	cgi_request.meta_variables[SCRIPT_NAME]     = cgi_bin_dir_path + "/not_exist";
+	cgi_request.meta_variables[SERVER_NAME]     = "localhost";
+	cgi_request.meta_variables[SERVER_PORT]     = "8080";
+	cgi_request.meta_variables[SERVER_PROTOCOL] = "HTTP/1.1";
+
+	std::string response_body_message;
+	try {
+		Cgi cgi(cgi_request);
+		cgi.Run(response_body_message);
+	} catch (const std::exception &e) {
+		PrintOk();
+		utils::Debug(e.what());
+		return EXIT_SUCCESS;
+	}
+	PrintNg();
+	return EXIT_FAILURE;
+}
+
 } // namespace
 
 int main() {
@@ -134,6 +163,7 @@ int main() {
 	ret |= Test1();
 	ret |= Test2();
 	ret |= Test3();
+	ret |= Test4();
 
 	return ret;
 }

@@ -129,7 +129,15 @@ void Cgi::Execve() {
 		response_body_message_.append(buffer, bytes_read);
 	}
 	Close(cgi_response[READ]);
-	Waitpid(p, &exit_status_, WNOHANG);
+	Waitpid(p, &exit_status_, 0);
+	if (WIFEXITED(exit_status_)) {
+		if (WEXITSTATUS(exit_status_) != 0) {
+			throw utils::SystemException("CGI script failed", WEXITSTATUS(exit_status_));
+		}
+	} else {
+		throw utils::SystemException("CGI script did not exit normally", exit_status_);
+		// exit_status_にはシグナル番号が入っている
+	}
 }
 
 void Cgi::Free() {
@@ -149,7 +157,7 @@ void Cgi::Free() {
 
 void Cgi::ExecveCgiScript() {
 	exit_status_ = execve(cgi_script_.c_str(), argv_, env_);
-	std::cerr << std::strerror(errno) << std::endl; // execveが失敗した場合のエラーメッセージ出力
+	std::exit(errno);
 }
 
 char *const *Cgi::SetCgiArgv() {
