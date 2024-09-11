@@ -4,6 +4,7 @@
 #include "http_response.hpp"
 #include "utils.hpp"
 #include <cstdlib>
+#include <ctime>
 #include <dirent.h>
 #include <fstream>
 #include <iostream>

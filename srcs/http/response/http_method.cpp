@@ -8,6 +8,7 @@
 #include "system_exception.hpp"
 #include <algorithm> // std::find
 #include <cstring>
+#include <ctime>    // ctime
 #include <dirent.h> // opendir, readdir, closedir
 #include <fstream>
 #include <iostream>
