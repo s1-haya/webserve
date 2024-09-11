@@ -221,6 +221,7 @@ bool Method::IsAllowedMethod(
 	}
 }
 
+// ./と../はいらないかも？
 utils::Result<void>
 Method::AutoindexHandler(const std::string &path, std::string &response_body_message) {
 	utils::Result<void> result;
