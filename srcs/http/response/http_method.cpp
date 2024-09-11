@@ -94,9 +94,6 @@ StatusCode Method::GetHandler(
 		} else {
 			throw HttpException("Error: Forbidden", StatusCode(FORBIDDEN));
 		}
-		// todo: Check for index directive and handle ReadFile function -> ok
-		// todo: Check for autoindex directive and handle AutoindexHandler function -> ok
-		// todo: Return 403 Forbidden if neither index nor autoindex directives exist -> ok
 	} else if (info.IsRegularFile()) {
 		if (!info.IsReadableFile()) {
 			throw HttpException("Error: Forbidden", StatusCode(FORBIDDEN));
@@ -234,10 +231,10 @@ Method::AutoindexHandler(const std::string &path, std::string &response_body_mes
 	}
 
 	struct dirent *entry;
-	response_body_message += "<html>"
-							 "<head><title>Index of /</title></head>"
+	response_body_message += "<html>\n"
+							 "<head><title>Index of /</title></head>\n"
 							 "<body><h1>Index of /</h1><hr><pre>"
-							 "<a href=\"../\">../</a>";
+							 "<a href=\"../\">../</a>\n";
 	while ((entry = readdir(dir)) != NULL) {
 		std::string fullPath = std::string(path) + "/" + entry->d_name;
 		struct stat fileStat;
