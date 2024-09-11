@@ -29,34 +29,13 @@ void PrintNg() {
 			  << std::endl;
 }
 
-// template <typename T>
-// void IsSame(const T &a, const T &b, const char *file, int line) {
-// 	if (a != b) {
-// 		std::stringstream ss;
-// 		ss << line;
-// 		throw std::logic_error(
-// 			std::string("Error at ") + file + ":" + ss.str() + " - Expected: " + std::string(b) +
-// 			", Got: " + std::string(a)
-// 		);
-// 	}
-// }
-
-// /**
-//  * @brief Output where is the error
-//  */
-// #define COMPARE(a, b) IsSame(a, b, __FILE__, __LINE__)
-
-// template <class InputIt>
-// InputIt Next(InputIt it, typename std::iterator_traits<InputIt>::difference_type n = 1) {
-// 	std::advance(it, n);
-// 	return it;
-// } // std::next for c++98
-
 // ================================================= //
 
 // cgi_parseから見た相対パス
 const std::string html_dir_path    = "../../../html";
 const std::string cgi_bin_dir_path = "../../../cgi-bin";
+
+// 出力は目で見て確認(実行が成功していたらテストはOKとしている)
 
 /* exec /cgi-bin/env.py */
 int Test1() {
@@ -116,6 +95,37 @@ int Test2() {
 	return EXIT_SUCCESS;
 }
 
+/* exec /cgi-bin/print_stdin.pl */
+/* Test for POST method */
+int Test3() {
+	// request
+	CgiRequest cgi_request;
+	cgi_request.body_message                   = "test test";
+	cgi_request.meta_variables[CONTENT_LENGTH] = utils::ToString(cgi_request.body_message.length());
+	cgi_request.meta_variables[CONTENT_TYPE]   = "text/plain";
+	cgi_request.meta_variables[PATH_INFO]      = "/aa/b";
+	cgi_request.meta_variables[PATH_TRANSLATED] =
+		html_dir_path + cgi_request.meta_variables.at(PATH_INFO);
+	cgi_request.meta_variables[REQUEST_METHOD]  = "POST";
+	cgi_request.meta_variables[SCRIPT_NAME]     = cgi_bin_dir_path + "/print_stdin.pl";
+	cgi_request.meta_variables[SERVER_NAME]     = "localhost";
+	cgi_request.meta_variables[SERVER_PORT]     = "8080";
+	cgi_request.meta_variables[SERVER_PROTOCOL] = "HTTP/1.1";
+
+	std::string response_body_message;
+	try {
+		Cgi cgi(cgi_request);
+		cgi.Run(response_body_message);
+	} catch (const std::exception &e) {
+		PrintNg();
+		std::cerr << e.what() << '\n';
+		return EXIT_FAILURE;
+	}
+	PrintOk();
+	utils::Debug(response_body_message);
+	return EXIT_SUCCESS;
+}
+
 } // namespace
 
 int main() {
@@ -123,6 +133,7 @@ int main() {
 
 	ret |= Test1();
 	ret |= Test2();
+	ret |= Test3();
 
 	return ret;
 }
