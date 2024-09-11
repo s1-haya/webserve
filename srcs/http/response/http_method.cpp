@@ -45,14 +45,16 @@ StatusCode Method::Handler(
 	const AllowMethods &allow_methods,
 	const std::string  &request_body_message,
 	std::string        &response_body_message,
-	HeaderFields       &response_header_fields
+	HeaderFields       &response_header_fields,
+	const std::string  &index_file_path
 ) {
 	StatusCode status_code(OK);
 	if (!IsAllowedMethod(method, allow_methods)) {
 		throw HttpException("Error: Not Implemented", StatusCode(NOT_IMPLEMENTED));
 	}
 	if (method == GET) {
-		status_code = GetHandler(path, response_body_message, response_header_fields);
+		status_code =
+			GetHandler(path, response_body_message, response_header_fields, index_file_path);
 	} else if (method == POST) {
 		status_code =
 			PostHandler(path, request_body_message, response_body_message, response_header_fields);
@@ -66,7 +68,8 @@ StatusCode Method::Handler(
 StatusCode Method::GetHandler(
 	const std::string &path,
 	std::string       &response_body_message,
-	HeaderFields      &response_header_fields
+	HeaderFields      &response_header_fields,
+	const std::string &index_file_path
 ) {
 	StatusCode  status_code(OK);
 	const Stat &info = TryStat(path);
@@ -74,8 +77,12 @@ StatusCode Method::GetHandler(
 		// No empty string because the path has '/'
 		if (path[path.size() - 1] != '/') {
 			throw HttpException("Error: Moved Permanently", StatusCode(MOVED_PERMANENTLY));
+		} else if (!index_file_path.empty()) {
+			response_body_message = ReadFile(index_file_path);
+			response_header_fields[CONTENT_LENGTH] =
+				utils::ToString(response_body_message.length());
 		}
-		// todo: Check for index directive and handle ReadFile function
+		// todo: Check for index directive and handle ReadFile function -> ok
 		// todo: Check for autoindex directive and handle AutoindexHandler function
 		// todo: Return 403 Forbidden if neither index nor autoindex directives exist
 	} else if (info.IsRegularFile()) {
