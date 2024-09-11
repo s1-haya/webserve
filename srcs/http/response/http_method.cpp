@@ -8,9 +8,11 @@
 #include "system_exception.hpp"
 #include <algorithm> // std::find
 #include <cstring>
+#include <dirent.h> // opendir, readdir, closedir
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <sys/stat.h>
 #include <unistd.h> // access
 
 namespace {
@@ -85,10 +87,16 @@ StatusCode Method::GetHandler(
 			response_header_fields[CONTENT_LENGTH] =
 				utils::ToString(response_body_message.length());
 		} else if (autoindex_on) {
+			utils::Result<void> result = AutoindexHandler(path, response_body_message);
+			if (!result.IsOk()) {
+				throw HttpException("Error: Forbidden", StatusCode(FORBIDDEN)); // system exception?
+			}
+		} else {
+			throw HttpException("Error: Forbidden", StatusCode(FORBIDDEN));
 		}
 		// todo: Check for index directive and handle ReadFile function -> ok
-		// todo: Check for autoindex directive and handle AutoindexHandler function
-		// todo: Return 403 Forbidden if neither index nor autoindex directives exist
+		// todo: Check for autoindex directive and handle AutoindexHandler function -> ok
+		// todo: Return 403 Forbidden if neither index nor autoindex directives exist -> ok
 	} else if (info.IsRegularFile()) {
 		if (!info.IsReadableFile()) {
 			throw HttpException("Error: Forbidden", StatusCode(FORBIDDEN));
@@ -215,6 +223,39 @@ bool Method::IsAllowedMethod(
 	}
 }
 
-utils::Result<void> AutoindexHandler() {}
+utils::Result<void>
+Method::AutoindexHandler(const std::string &path, std::string &response_body_message) {
+	utils::Result<void> result;
+	DIR                *dir = opendir(path.c_str());
+
+	if (dir == NULL) { // system exception?
+		result.Set(false);
+		return result;
+	}
+
+	struct dirent *entry;
+	response_body_message += "<html>"
+							 "<head><title>Index of /</title></head>"
+							 "<body><h1>Index of /</h1><hr><pre>"
+							 "<a href=\"../\">../</a>";
+	while ((entry = readdir(dir)) != NULL) {
+		std::string fullPath = std::string(path) + "/" + entry->d_name;
+		struct stat fileStat;
+		if (stat(fullPath.c_str(), &fileStat) == 0) {
+			response_body_message += "<a href=\"" + std::string(entry->d_name) + "\">" +
+									 std::string(entry->d_name) + "</a> ";
+			response_body_message += utils::ToString(fileStat.st_size) + " bytes ";
+			response_body_message += std::ctime(&fileStat.st_mtime);
+		} else {
+			response_body_message += "<a href=\"" + std::string(entry->d_name) + "\">" +
+									 std::string(entry->d_name) + "</a> ";
+			response_body_message += "Error getting file stats\n";
+			result.Set(false);
+		}
+	}
+	response_body_message += "</pre><hr></body></html>";
+
+	return utils::Result<void>();
+}
 
 } // namespace http

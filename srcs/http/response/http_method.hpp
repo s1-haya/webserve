@@ -3,6 +3,7 @@
 
 #include "stat.hpp"
 #include "status_code.hpp"
+#include "utils.hpp"
 #include <list>
 
 namespace utils {
@@ -58,6 +59,8 @@ class Method {
 		std::string       &response_body_message,
 		HeaderFields      &response_header_fields
 	);
+	static utils::Result<void>
+	AutoindexHandler(const std::string &path, std::string &response_body_message);
 };
 
 } // namespace http
