@@ -52,6 +52,7 @@ StatusCode Method::Handler(
 	const bool         &autoindex_on
 ) {
 	StatusCode status_code(OK);
+	response_body_message.clear();
 	if (!IsAllowedMethod(method, allow_methods)) {
 		throw HttpException("Error: Not Implemented", StatusCode(NOT_IMPLEMENTED));
 	}
@@ -83,7 +84,7 @@ StatusCode Method::GetHandler(
 		if (path[path.size() - 1] != '/') {
 			throw HttpException("Error: Moved Permanently", StatusCode(MOVED_PERMANENTLY));
 		} else if (!index_file_path.empty()) {
-			response_body_message = ReadFile(index_file_path);
+			response_body_message = ReadFile(path + index_file_path);
 			response_header_fields[CONTENT_LENGTH] =
 				utils::ToString(response_body_message.length());
 		} else if (autoindex_on) {
