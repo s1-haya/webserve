@@ -76,8 +76,8 @@ pid_t Waitpid(pid_t pid, int *stat_loc, int options) {
 
 // 他のところでチェックしてここのatではthrowされない様にする
 Cgi::Cgi(const CgiRequest &request)
-	: method_(request.meta_variables.at("REQUEST_METHOD")),
-	  cgi_script_(request.meta_variables.at("SCRIPT_NAME")),
+	: method_(request.meta_variables.at(REQUEST_METHOD)),
+	  cgi_script_(request.meta_variables.at(SCRIPT_NAME)),
 	  argv_(SetCgiArgv()),
 	  env_(SetCgiEnv(request.meta_variables)),
 	  exit_status_(0),
