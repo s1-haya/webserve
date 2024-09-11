@@ -16,20 +16,23 @@ struct MethodArgument {
 		const http::Method::AllowMethods &allow_methods,
 		const std::string                &request_body_message,
 		std::string                      &response_body_message,
-		http::HeaderFields               &response_header_fields
+		http::HeaderFields               &response_header_fields,
+		const std::string                &index_file_path = ""
 	)
 		: path(path),
 		  method(method),
 		  allow_methods(allow_methods),
 		  request_body_message(request_body_message),
 		  response_body_message(response_body_message),
-		  response_header_fields(response_header_fields) {}
+		  response_header_fields(response_header_fields),
+		  index_file_path(index_file_path) {}
 	const std::string                &path;
 	const std::string                &method;
 	const http::Method::AllowMethods &allow_methods;
 	const std::string                &request_body_message;
 	std::string                      &response_body_message;
 	http::HeaderFields               &response_header_fields;
+	const std::string                &index_file_path;
 };
 
 std::string LoadFileContent(const std::string &file_path) {
@@ -71,7 +74,8 @@ int MethodHandlerResult(const MethodArgument &srcs, const std::string &expected_
 			srcs.allow_methods,
 			srcs.request_body_message,
 			srcs.response_body_message,
-			srcs.response_header_fields
+			srcs.response_header_fields,
+			srcs.index_file_path
 		);
 		result = HandleResult(srcs.response_body_message, expected_body_message);
 
@@ -100,7 +104,8 @@ int main(void) {
 
 	// http_method/expected
 	// LF:   exist target resourse file
-	std::string expected_file = LoadFileContent("expected/file.txt");
+	std::string expected_file       = LoadFileContent("expected/file.txt");
+	std::string expected_index_file = LoadFileContent("expected/index.txt");
 	// CRLF: use default status code file
 	std::string expected_created    = LoadFileContent("expected/created.txt");
 	std::string expected_no_content = LoadFileContent("expected/no_content.txt");
@@ -144,6 +149,20 @@ int main(void) {
 			response_header_fields
 		),
 		expected_forbidden
+	);
+
+	// ディレクトリで'/'があり、indexがある場合
+	ret_code |= MethodHandlerResult(
+		MethodArgument(
+			"test/",
+			http::GET,
+			allow_methods,
+			request,
+			response,
+			response_header_fields,
+			"index.txt"
+		),
+		expected_index_file
 	);
 
 	// POST test
