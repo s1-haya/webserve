@@ -69,7 +69,8 @@ HttpResponseFormat HttpResponse::CreateHttpResponseFormat(
 				request_info.request.body_message,
 				response_body_message,
 				response_header_fields,
-				"" // tmp for index
+				"",   // tmp for index
+				false // tmp for autoindex
 			);
 		}
 	} catch (const HttpException &e) {

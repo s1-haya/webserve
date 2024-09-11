@@ -4,8 +4,10 @@
 #include "http_response.hpp"
 #include "utils.hpp"
 #include <cstdlib>
+#include <dirent.h>
 #include <fstream>
 #include <iostream>
+#include <sys/stat.h>
 
 namespace {
 
@@ -17,7 +19,8 @@ struct MethodArgument {
 		const std::string                &request_body_message,
 		std::string                      &response_body_message,
 		http::HeaderFields               &response_header_fields,
-		const std::string                &index_file_path = ""
+		const std::string                &index_file_path = "",
+		const bool                       &autoindex_on    = false
 	)
 		: path(path),
 		  method(method),
@@ -25,7 +28,8 @@ struct MethodArgument {
 		  request_body_message(request_body_message),
 		  response_body_message(response_body_message),
 		  response_header_fields(response_header_fields),
-		  index_file_path(index_file_path) {}
+		  index_file_path(index_file_path),
+		  autoindex_on(autoindex_on) {}
 	const std::string                &path;
 	const std::string                &method;
 	const http::Method::AllowMethods &allow_methods;
@@ -33,6 +37,7 @@ struct MethodArgument {
 	std::string                      &response_body_message;
 	http::HeaderFields               &response_header_fields;
 	const std::string                &index_file_path;
+	const bool                       &autoindex_on;
 };
 
 std::string LoadFileContent(const std::string &file_path) {
@@ -44,6 +49,34 @@ std::string LoadFileContent(const std::string &file_path) {
 	std::ostringstream file_content;
 	file_content << file.rdbuf();
 	return file_content.str();
+}
+
+std::string CreateAutoIndexContent(const std::string &path) {
+	DIR        *dir = opendir(path.c_str());
+	std::string content;
+
+	struct dirent *entry;
+	content += "<html>\n"
+			   "<head><title>Index of /</title></head>\n"
+			   "<body><h1>Index of /</h1><hr><pre>"
+			   "<a href=\"../\">../</a>\n";
+	while ((entry = readdir(dir)) != NULL) {
+		std::string fullPath = std::string(path) + "/" + entry->d_name;
+		struct stat fileStat;
+		if (stat(fullPath.c_str(), &fileStat) == 0) {
+			content += "<a href=\"" + std::string(entry->d_name) + "\">" +
+					   std::string(entry->d_name) + "</a> ";
+			content += utils::ToString(fileStat.st_size) + " bytes ";
+			content += std::ctime(&fileStat.st_mtime);
+		} else {
+			content += "<a href=\"" + std::string(entry->d_name) + "\">" +
+					   std::string(entry->d_name) + "</a> ";
+			content += "Error getting file stats\n";
+		}
+	}
+	content += "</pre><hr></body></html>";
+
+	return content;
 }
 
 int GetTestCaseNum() {
@@ -75,7 +108,8 @@ int MethodHandlerResult(const MethodArgument &srcs, const std::string &expected_
 			srcs.request_body_message,
 			srcs.response_body_message,
 			srcs.response_header_fields,
-			srcs.index_file_path
+			srcs.index_file_path,
+			srcs.autoindex_on
 		);
 		result = HandleResult(srcs.response_body_message, expected_body_message);
 
@@ -106,6 +140,7 @@ int main(void) {
 	// LF:   exist target resourse file
 	std::string expected_file       = LoadFileContent("expected/file.txt");
 	std::string expected_index_file = LoadFileContent("expected/index.txt");
+	std::string expected_autoindex  = CreateAutoIndexContent("test/");
 	// CRLF: use default status code file
 	std::string expected_created    = LoadFileContent("expected/created.txt");
 	std::string expected_no_content = LoadFileContent("expected/no_content.txt");
@@ -163,6 +198,14 @@ int main(void) {
 			"index.txt"
 		),
 		expected_index_file
+	);
+
+	// ディレクトリで'/'があり、autoindexがある場合
+	ret_code |= MethodHandlerResult(
+		MethodArgument(
+			"test/", http::GET, allow_methods, request, response, response_header_fields, "", true
+		),
+		expected_autoindex
 	);
 
 	// POST test
