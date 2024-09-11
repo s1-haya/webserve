@@ -1,5 +1,6 @@
 #include <dirent.h>
 #include <iostream>
+#include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
 
@@ -13,8 +14,16 @@ int main() {
 	}
 
 	struct dirent *entry;
-	while ((entry = readdir(dir)) != nullptr) {  // ディレクトリの内容を読み込む
-		std::cout << entry->d_name << std::endl; // ファイル名を表示
+	while ((entry = readdir(dir)) != nullptr) { // ディレクトリの内容を読み込む
+		std::string fullPath = std::string(path) + "/" + entry->d_name;
+		struct stat fileStat;
+		if (stat(fullPath.c_str(), &fileStat) == 0) {
+			std::cout << "File: " << entry->d_name << std::endl;
+			std::cout << "Size: " << fileStat.st_size << " bytes" << std::endl;
+			std::cout << "Last modified: " << std::ctime(&fileStat.st_mtime);
+		} else {
+			std::cerr << "Error getting stats for " << entry->d_name << std::endl;
+		}
 	}
 
 	if (access("main.cpp", F_OK) == 0)
