@@ -32,7 +32,7 @@ class Http {
   public:
 	Http();
 	~Http();
-	HttpResult Run(const MockDtoClientInfos &client_info, const MockDtoServerInfos &server_info);
+	HttpResult Run(const MockDtoClientInfos &client_info, const server::VirtualServerAddrList &server_info);
 	//  HttpResult GetErrorResponse(const ClientInfos &client_info, ErrState state);
 	// For test
 	HttpRequestParsedData GetClientData(int client_fd);
@@ -43,7 +43,7 @@ class Http {
 	HttpStorage         storage_;
 	utils::Result<void> ParseHttpRequestFormat(int client_fd, const std::string &read_buf);
 	std::string         CreateHttpResponse(
-				const MockDtoClientInfos &client_info, const MockDtoServerInfos &server_info
+				const MockDtoClientInfos &client_info, const server::VirtualServerAddrList &server_info
 			);
 	bool IsHttpRequestFormatComplete(int client_fd);
 	// HttpResult CreateBadRequestResponse(int client_fd);
