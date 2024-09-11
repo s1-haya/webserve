@@ -46,15 +46,17 @@ StatusCode Method::Handler(
 	const std::string  &request_body_message,
 	std::string        &response_body_message,
 	HeaderFields       &response_header_fields,
-	const std::string  &index_file_path
+	const std::string  &index_file_path,
+	const bool         &autoindex_on
 ) {
 	StatusCode status_code(OK);
 	if (!IsAllowedMethod(method, allow_methods)) {
 		throw HttpException("Error: Not Implemented", StatusCode(NOT_IMPLEMENTED));
 	}
 	if (method == GET) {
-		status_code =
-			GetHandler(path, response_body_message, response_header_fields, index_file_path);
+		status_code = GetHandler(
+			path, response_body_message, response_header_fields, index_file_path, autoindex_on
+		);
 	} else if (method == POST) {
 		status_code =
 			PostHandler(path, request_body_message, response_body_message, response_header_fields);
@@ -69,7 +71,8 @@ StatusCode Method::GetHandler(
 	const std::string &path,
 	std::string       &response_body_message,
 	HeaderFields      &response_header_fields,
-	const std::string &index_file_path
+	const std::string &index_file_path,
+	const bool        &autoindex_on
 ) {
 	StatusCode  status_code(OK);
 	const Stat &info = TryStat(path);
@@ -81,6 +84,7 @@ StatusCode Method::GetHandler(
 			response_body_message = ReadFile(index_file_path);
 			response_header_fields[CONTENT_LENGTH] =
 				utils::ToString(response_body_message.length());
+		} else if (autoindex_on) {
 		}
 		// todo: Check for index directive and handle ReadFile function -> ok
 		// todo: Check for autoindex directive and handle AutoindexHandler function
@@ -210,5 +214,7 @@ bool Method::IsAllowedMethod(
 		return std::find(allow_methods.begin(), allow_methods.end(), method) != allow_methods.end();
 	}
 }
+
+utils::Result<void> AutoindexHandler() {}
 
 } // namespace http
