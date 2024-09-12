@@ -32,7 +32,8 @@ class Http {
   public:
 	Http();
 	~Http();
-	HttpResult Run(const MockDtoClientInfos &client_info, const server::VirtualServerAddrList &server_info);
+	HttpResult
+	Run(const MockDtoClientInfos &client_info, const server::VirtualServerAddrList &server_info);
 	//  HttpResult GetErrorResponse(const ClientInfos &client_info, ErrState state);
 	// For test
 	HttpRequestParsedData GetClientData(int client_fd);

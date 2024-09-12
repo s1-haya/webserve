@@ -22,9 +22,9 @@ std::string GetExtension(const std::string &path) {
 namespace http {
 
 std::string HttpResponse::Run(
-	const MockDtoClientInfos &client_info,
+	const MockDtoClientInfos            &client_info,
 	const server::VirtualServerAddrList &server_info,
-	const HttpRequestResult  &request_info
+	const HttpRequestResult             &request_info
 ) {
 	HttpResponseFormat response = CreateHttpResponseFormat(client_info, server_info, request_info);
 	return CreateHttpResponse(response);
@@ -33,9 +33,9 @@ std::string HttpResponse::Run(
 // todo: HttpResponseFormat HttpResponse::CreateHttpResponseFormat(const HttpRequestResult
 // &request_info) 作成
 HttpResponseFormat HttpResponse::CreateHttpResponseFormat(
-	const MockDtoClientInfos &client_info,
+	const MockDtoClientInfos            &client_info,
 	const server::VirtualServerAddrList &server_info,
-	const HttpRequestResult  &request_info
+	const HttpRequestResult             &request_info
 ) {
 	StatusCode   status_code(OK);
 	HeaderFields response_header_fields = InitResponseHeaderFields(request_info);
@@ -81,9 +81,10 @@ HttpResponseFormat HttpResponse::CreateHttpResponseFormat(
 		// 	// check the path of error_page
 		// }
 		// for debug
-		std::cout << utils::color::GRAY << "Debug [" << e.what() << "]" << utils::color::RESET << std::endl;
-		status_code           = e.GetStatusCode();
-		response_body_message = CreateDefaultBodyMessageFormat(status_code);
+		std::cout << utils::color::GRAY << "Debug [" << e.what() << "]" << utils::color::RESET
+				  << std::endl;
+		status_code                            = e.GetStatusCode();
+		response_body_message                  = CreateDefaultBodyMessageFormat(status_code);
 		response_header_fields[CONTENT_LENGTH] = utils::ToString(response_body_message.length());
 	}
 	return HttpResponseFormat(
