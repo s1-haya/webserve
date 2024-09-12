@@ -80,8 +80,11 @@ HttpResponseFormat HttpResponse::CreateHttpResponseFormat(
 		// 	response_message = ReadFile(server_info.error_page.GetValue().second);
 		// 	// check the path of error_page
 		// }
+		// for debug
+		std::cout << utils::color::GRAY << "Debug [" << e.what() << "]" << utils::color::RESET << std::endl;
 		status_code           = e.GetStatusCode();
 		response_body_message = CreateDefaultBodyMessageFormat(status_code);
+		response_header_fields[CONTENT_LENGTH] = utils::ToString(response_body_message.length());
 	}
 	return HttpResponseFormat(
 		StatusLine(HTTP_VERSION, status_code.GetStatusCode(), status_code.GetReasonPhrase()),

@@ -100,6 +100,32 @@ server::VirtualServer *BuildVirtualServer1() {
 server::VirtualServer *BuildVirtualServer2() {
 	// LocationList
 	server::VirtualServer::LocationList locationlist;
+	// リソースの取得位置によって(srcs/http/response/http_method.cpp)によって出力結果が決まる
+	std::string                         alias = "../../../html/index.html";
+	server::Location::AllowedMethodList allowed_methods;
+	allowed_methods.push_back("POST");
+	server::Location::Redirect redirect;
+	server::Location::Redirect redirect_on(301, "/");
+	server::Location           location1 =
+		BuildLocation("/", alias, "index.html", false, allowed_methods, redirect);
+	server::Location location2 = // redirect_on
+		BuildLocation("/www/", alias, "index.html", true, allowed_methods, redirect_on);
+	locationlist.push_back(location1);
+	locationlist.push_back(location2);
+
+	server::VirtualServer                 virtual_server;
+	server::VirtualServer::ServerNameList server_names;
+	server_names.push_back("host2");
+	server::VirtualServer::HostPortList host_ports;
+	host_ports.push_back(std::make_pair("localhost", 8080));
+	server::VirtualServer::ErrorPage error_page(404, "/404.html");
+
+	return new server::VirtualServer(server_names, locationlist, host_ports, 1024, error_page);
+}
+
+server::VirtualServer *BuildVirtualServer3() {
+	// LocationList
+	server::VirtualServer::LocationList locationlist;
 	server::Location::AllowedMethodList allowed_methods;
 	allowed_methods.push_back("DELETE");
 	server::Location::Redirect redirect;
@@ -112,7 +138,7 @@ server::VirtualServer *BuildVirtualServer2() {
 
 	server::VirtualServer                 virtual_server;
 	server::VirtualServer::ServerNameList server_names;
-	server_names.push_back("host2");
+	server_names.push_back("host3");
 	server::VirtualServer::HostPortList host_ports;
 	host_ports.push_back(std::make_pair("localhost", 8080));
 	server::VirtualServer::ErrorPage error_page(404, "/404.html");
@@ -120,13 +146,13 @@ server::VirtualServer *BuildVirtualServer2() {
 	return new server::VirtualServer(server_names, locationlist, host_ports, 2024, error_page);
 }
 
-server::VirtualServer *BuildVirtualServer3() {
+server::VirtualServer *BuildVirtualServer4() {
 	// LocationList
 	server::VirtualServer::LocationList locationlist;
 
 	server::VirtualServer                 virtual_server;
 	server::VirtualServer::ServerNameList server_names;
-	server_names.push_back("host3");
+	server_names.push_back("host4");
 	server::VirtualServer::HostPortList host_ports;
 	host_ports.push_back(std::make_pair("127.0.0.10", 8090));
 	server::VirtualServer::ErrorPage error_page(404, "/404.html");
@@ -139,9 +165,11 @@ server::VirtualServerAddrList BuildVirtualServerAddrList() {
 	server::VirtualServer        *vs1 = BuildVirtualServer1();
 	server::VirtualServer        *vs2 = BuildVirtualServer2();
 	server::VirtualServer        *vs3 = BuildVirtualServer3();
+	server::VirtualServer        *vs4 = BuildVirtualServer4();
 	virtual_servers.push_back(vs1);
 	virtual_servers.push_back(vs2);
 	virtual_servers.push_back(vs3);
+	virtual_servers.push_back(vs4);
 	return virtual_servers;
 }
 
@@ -190,7 +218,7 @@ int main(void) {
 
 	ret_code = HandleResult(response1, expected1_response);
 
-	// host2に/html/index.htmlを取得するリクエスト
+	// GETメソッドの許可がないhost2に/html/index.htmlを取得するリクエスト
 	request_info.request.header_fields[http::HOST] = "host2";
 	std::string response2 = http::HttpResponse::Run(client_info, server_info, request_info);
 
