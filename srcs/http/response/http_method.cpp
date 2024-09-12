@@ -53,7 +53,6 @@ StatusCode Method::Handler(
 	bool                autoindex_on
 ) {
 	StatusCode status_code(OK);
-	response_body_message.clear();
 	if (!IsAllowedMethod(method, allow_methods)) {
 		throw HttpException("Error: Not Implemented", StatusCode(NOT_IMPLEMENTED));
 	}

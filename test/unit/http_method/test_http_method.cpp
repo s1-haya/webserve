@@ -30,7 +30,9 @@ struct MethodArgument {
 		  response_body_message(response_body_message),
 		  response_header_fields(response_header_fields),
 		  index_file_path(index_file_path),
-		  autoindex_on(autoindex_on) {}
+		  autoindex_on(autoindex_on) {
+		response_body_message.clear();
+	}
 	const std::string                &path;
 	const std::string                &method;
 	const http::Method::AllowMethods &allow_methods;
