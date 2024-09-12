@@ -62,7 +62,7 @@ std::string CreateAutoIndexContent(const std::string &path) {
 			   "<body><h1>Index of /</h1><hr><pre>"
 			   "<a href=\"../\">../</a>\n";
 	while ((entry = readdir(dir)) != NULL) {
-		std::string full_path = std::string(path) + "/" + entry->d_name;
+		std::string full_path = path + "/" + entry->d_name;
 		struct stat file_stat;
 		if (stat(full_path.c_str(), &file_stat) == 0) {
 			content += "<a href=\"" + std::string(entry->d_name) + "\">" +
