@@ -5,6 +5,7 @@
 #include "status_code.hpp"
 #include "system_exception.hpp"
 #include <cerrno>
+#include <cstdlib>
 #include <cstring>
 #include <iostream>
 #include <sys/wait.h>
@@ -142,13 +143,13 @@ void Cgi::Execve() {
 
 void Cgi::Free() {
 	if (this->argv_ != NULL) {
-		for (size_t i = 0; this->argv_[i] != NULL; ++i) {
+		for (std::size_t i = 0; this->argv_[i] != NULL; ++i) {
 			delete[] this->argv_[i];
 		}
 		delete[] this->argv_;
 	}
 	if (this->env_ != NULL) {
-		for (size_t i = 0; this->env_[i] != NULL; ++i) {
+		for (std::size_t i = 0; this->env_[i] != NULL; ++i) {
 			delete[] this->env_[i];
 		}
 		delete[] this->env_;
@@ -177,7 +178,7 @@ char *const *Cgi::SetCgiEnv(const MetaMap &meta_variables) {
 	if (cgi_env == NULL) {
 		throw utils::SystemException(std::strerror(errno), errno);
 	}
-	size_t i = 0;
+	std::size_t i = 0;
 
 	typedef MetaMap::const_iterator It;
 	for (It it = meta_variables.begin(); it != meta_variables.end(); it++) {
