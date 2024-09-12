@@ -76,6 +76,7 @@ std::string CreateAutoIndexContent(const std::string &path) {
 		}
 	}
 	content += "</pre><hr></body></html>";
+	closedir(dir);
 
 	return content;
 }
