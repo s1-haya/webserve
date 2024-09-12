@@ -13,6 +13,8 @@
 !*.cpp
 !*.hpp
 !*.py
+!*.sh
+!*.pl
 
 !Dockerfile
 !.github/workflows/*
