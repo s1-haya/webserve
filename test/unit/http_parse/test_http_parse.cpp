@@ -1,20 +1,17 @@
-#include "color.hpp"
 #include "http_parse.hpp"
-#include <cstdlib> //EXIT_SUCCESS, EXIT_FAILURE
+#include "utils.hpp"
+#include <cstdlib>
+#include <fstream>
 #include <iostream>
-#include <ostream>
-#include <sstream> //stringstream
+#include <sstream>
 
 namespace {
 
-#define ARRAY_SIZE(array) (sizeof(array) / sizeof(array[0]))
-
-// expected
 struct TestCase {
-	TestCase(const std::string &tmp_input, const http::HttpRequestResult &tmp_expected)
-		: input(tmp_input), expected(tmp_expected) {}
-	const std::string             input;
-	const http::HttpRequestResult expected;
+	TestCase(const std::string &read_buf, const http::HttpRequestParsedData &expected)
+		: read_buf(read_buf), expected(expected) {}
+	const std::string                 read_buf;
+	const http::HttpRequestParsedData expected;
 };
 
 struct Result {
@@ -27,6 +24,74 @@ int GetTestCaseNum() {
 	static unsigned int test_case_num = 0;
 	++test_case_num;
 	return test_case_num;
+}
+
+template <typename T>
+bool IsSame(const T &result, const T &expected) {
+	return result == expected;
+}
+
+template <typename T>
+int HandleResult(const T &result, const T &expected) {
+	if (result == expected) {
+		std::cout << utils::color::GREEN << GetTestCaseNum() << ".[OK]" << utils::color::RESET
+				  << std::endl;
+		return EXIT_SUCCESS;
+	} else {
+		std::cerr << utils::color::RED << GetTestCaseNum() << ".[NG] " << utils::color::RESET
+				  << std::endl;
+		return EXIT_FAILURE;
+	}
+}
+
+int HandleResult(const Result &result) {
+	if (result.is_success) {
+		std::cout << utils::color::GREEN << GetTestCaseNum() << ".[OK]" << utils::color::RESET
+				  << std::endl;
+		return EXIT_SUCCESS;
+	} else {
+		std::cerr << utils::color::RED << GetTestCaseNum() << ".[NG] " << utils::color::RESET
+				  << std::endl;
+		std::cerr << result.error_log;
+		return EXIT_FAILURE;
+	}
+}
+
+Result IsSameHttpRequestFormat(
+	const http::IsHttpRequestFormat &result, const http::IsHttpRequestFormat &expected
+) {
+	Result request_format_result;
+	if (!(IsSame(result.is_request_line, expected.is_request_line) &&
+		  IsSame(result.is_header_fields, expected.is_header_fields) &&
+		  IsSame(result.is_body_message, expected.is_body_message))) {
+		std::ostringstream error_log;
+		error_log << "Error: Is Http Request Format\n";
+		error_log << "Request Line\n";
+		error_log << "- Expected: [" << std::boolalpha << expected.is_request_line << "]\n";
+		error_log << "- Result  : [" << std::boolalpha << result.is_request_line << "]\n";
+		error_log << "Header Fields\n";
+		error_log << "- Expected: [" << std::boolalpha << expected.is_header_fields << "]\n";
+		error_log << "- Result  : [" << std::boolalpha << result.is_header_fields << "]\n";
+		error_log << "Body Message\n";
+		error_log << "- Expected: [" << std::boolalpha << expected.is_body_message << "]\n";
+		error_log << "- Result  : [" << std::boolalpha << result.is_body_message << "]\n";
+		request_format_result.is_success = false;
+		request_format_result.error_log  = error_log.str();
+	}
+	return request_format_result;
+}
+
+Result IsSameStatusCode(const http::StatusCode &status_code, const http::StatusCode &expected) {
+	Result status_code_result;
+	if (status_code.GetEStatusCode() != expected.GetEStatusCode()) {
+		std::ostringstream error_log;
+		error_log << "Error: Status Code\n";
+		error_log << "- Expected: [" << expected.GetStatusCode() << "]\n";
+		error_log << "- Result  : [" << status_code.GetStatusCode() << "]\n";
+		status_code_result.is_success = false;
+		status_code_result.error_log  = error_log.str();
+	}
+	return status_code_result;
 }
 
 Result IsSameRequestLine(const http::RequestLine &res, const http::RequestLine &expected) {
@@ -87,48 +152,44 @@ IsSameHttpRequest(const http::HttpRequestFormat &res, const http::HttpRequestFor
 	return http_request_result;
 }
 
-Result IsSameStatusCode(const http::StatusCode &status_code, const http::StatusCode &expected) {
-	Result status_code_result;
-	if (status_code.GetEStatusCode() != expected.GetEStatusCode()) {
-		std::ostringstream error_log;
-		error_log << "Error: Status Code\n";
-		error_log << "- Expected: [" << expected.GetStatusCode() << "]\n";
-		error_log << "- Result  : [" << status_code.GetStatusCode() << "]\n";
-		status_code_result.is_success = false;
-		status_code_result.error_log  = error_log.str();
+Result IsSameHttpRequestParsedData(
+	const http::HttpRequestParsedData &result, const http::HttpRequestParsedData &expected
+) {
+	Result status_code_result =
+		IsSameStatusCode(result.request_result.status_code, expected.request_result.status_code);
+	if (!status_code_result.is_success) {
+		return status_code_result;
 	}
-	return status_code_result;
+	Result is_http_request_format_result =
+		IsSameHttpRequestFormat(result.is_request_format, expected.is_request_format);
+	if (!is_http_request_format_result.is_success) {
+		return is_http_request_format_result;
+	}
+	Result http_request_result;
+	bool   is_response_complete = result.is_request_format.is_request_line &&
+								result.is_request_format.is_header_fields &&
+								result.is_request_format.is_body_message;
+	if (is_response_complete) {
+		http_request_result =
+			IsSameHttpRequest(result.request_result.request, expected.request_result.request);
+	}
+	return http_request_result;
 }
 
-int HandleResult(const Result &result, const std::string &src) {
-	if (result.is_success) {
-		std::cout << utils::color::GREEN << GetTestCaseNum() << ".[OK] " << utils::color::RESET
-				  << std::endl;
-		return EXIT_SUCCESS;
-	} else {
-		std::cerr << utils::color::RED << GetTestCaseNum() << ".[NG] " << utils::color::RESET
-				  << std::endl;
-		std::cerr << utils::color::RED << "HttpParseClass failed:" << utils::color::RESET
-				  << std::endl;
-		std::cerr << "src:\n[" << src << "]" << std::endl;
-		std::cerr << "- - - - - - - - " << std::endl;
-		std::cerr << result.error_log;
-		return EXIT_FAILURE;
+http::HttpRequestParsedData ParseHttpRequestFormat(const std::string &read_buf) {
+	http::HttpRequestParsedData save_data;
+	save_data.current_buf += read_buf;
+	try {
+		http::HttpParse::TmpRunHttpResultVersion(save_data);
+	} catch (const http::HttpException &e) {
+		save_data.request_result.status_code = e.GetStatusCode();
 	}
+	return save_data;
 }
 
-// HTTPリクエストの書式
-// - 期待したステータスコードかどうかテスト
-// 	- ステータスコードがOKの場合はHTTPリクエストの中身もテスト（今回はステータスラインのみ）
-int Run(const std::string &src, const http::HttpRequestResult &expected) {
-	const http::HttpRequestResult result = http::HttpParse::Run(src);
-	Result status_code_result = IsSameStatusCode(result.status_code, expected.status_code);
-	if (status_code_result.is_success && result.status_code.GetEStatusCode() == http::OK) {
-		Result http_request_result = IsSameHttpRequest(result.request, expected.request);
-		return HandleResult(http_request_result, src);
-	} else {
-		return HandleResult(status_code_result, src);
-	}
+int Run(const std::string &read_buf, const http::HttpRequestParsedData &expected) {
+	const Result &result = IsSameHttpRequestParsedData(ParseHttpRequestFormat(read_buf), expected);
+	return HandleResult(result);
 }
 
 int RunTestCases(const TestCase test_cases[], std::size_t num_test_cases) {
@@ -136,7 +197,7 @@ int RunTestCases(const TestCase test_cases[], std::size_t num_test_cases) {
 
 	for (std::size_t i = 0; i < num_test_cases; i++) {
 		const TestCase test_case = test_cases[i];
-		ret_code |= Run(test_case.input, test_case.expected);
+		ret_code |= Run(test_case.read_buf, test_case.expected);
 	}
 	return ret_code;
 }
@@ -146,104 +207,119 @@ int RunTestCases(const TestCase test_cases[], std::size_t num_test_cases) {
 int main(void) {
 	int ret_code = 0;
 
-	std::cout << "Request Line Test" << std::endl;
-	http::HttpRequestResult        expected_request_line_test_1;
-	static const http::RequestLine expected_request_line_1 = {"GET", "/", "HTTP/1.1"};
-	// NGの場合
-	// static const http::RequestLine             expected_request_line_1("GET", "/d", "HTTP/1.1d");
-	expected_request_line_test_1.request.request_line = expected_request_line_1;
-	expected_request_line_test_1.status_code          = http::StatusCode(http::OK);
-	// NGの場合
-	// expected_request_line_test_1.status_code = http::StatusCode(http::BAD_REQUEST);
+	// todo: http/http_response/test_http_request.cpp HttpRequestParsedData関数のテストケース
 
-	// methodが小文字が含まれてる
-	http::HttpRequestResult expected_request_line_test_2;
-	expected_request_line_test_2.status_code = http::StatusCode(http::BAD_REQUEST);
+	// 1.リクエストラインの書式が正しい場合
+	http::HttpRequestParsedData test1_request_line;
+	test1_request_line.request_result.status_code        = http::StatusCode(http::OK);
+	test1_request_line.is_request_format.is_request_line = true;
 
-	// methodがUS-ASCII以外の文字が含まれてる
-	http::HttpRequestResult expected_request_line_test_3;
-	expected_request_line_test_3.status_code = http::StatusCode(http::BAD_REQUEST);
+	// 2.リクエストラインの書式が正しいくない場合
+	http::HttpRequestParsedData test2_request_line;
+	test2_request_line.request_result.status_code        = http::StatusCode(http::BAD_REQUEST);
+	test2_request_line.is_request_format.is_request_line = false;
 
-	static const TestCase test_cases_for_request_line[] = {
-		TestCase("GET / HTTP/1.1", expected_request_line_test_1),
-		TestCase("GEt / HTTP/1.1", expected_request_line_test_2),
-		TestCase("あGE / HTTP/1.1", expected_request_line_test_3)
+	// 3.CRLNがない場合
+	http::HttpRequestParsedData test3_request_line;
+	// 本来のステータスコードはRequest Timeout
+	test3_request_line.request_result.status_code        = http::StatusCode(http::OK);
+	test3_request_line.is_request_format.is_request_line = false;
+
+	static const TestCase test_case_http_request_line_format[] = {
+		TestCase("GET / HTTP/1.1\r\n", test1_request_line),
+		TestCase("GET / HTTP/1.\r\n", test2_request_line),
+		TestCase("GET / HTTP/1.1", test3_request_line)
 	};
 
-	ret_code |= RunTestCases(test_cases_for_request_line, ARRAY_SIZE(test_cases_for_request_line));
+	ret_code |= RunTestCases(
+		test_case_http_request_line_format,
+		sizeof(test_case_http_request_line_format) / sizeof(test_case_http_request_line_format[0])
+	);
 
-	std::cout << "Header Fields Test" << std::endl;
-	http::HttpRequestResult expected_header_fields_test_1;
-	expected_header_fields_test_1.request.request_line                = expected_request_line_1;
-	expected_header_fields_test_1.status_code                         = http::StatusCode(http::OK);
-	expected_header_fields_test_1.request.header_fields["Host"]       = "www.example.com";
-	expected_header_fields_test_1.request.header_fields["Connection"] = "keep-alive";
+	// 4.ヘッダフィールドの書式が正しい場合
+	http::HttpRequestParsedData test1_header_fields;
+	test1_header_fields.request_result.status_code = http::StatusCode(http::OK);
+	test1_header_fields.request_result.request.request_line =
+		http::RequestLine("GET", "/", "HTTP/1.1");
+	test1_header_fields.is_request_format.is_request_line  = true;
+	test1_header_fields.is_request_format.is_header_fields = true;
+	test1_header_fields.is_request_format.is_body_message  = true;
 
-	// セミコロン以降に複数OWS(SpaceとHorizontal Tab)が設定の場合
-	http::HttpRequestResult expected_header_fields_test_2;
-	expected_header_fields_test_2.request.request_line                = expected_request_line_1;
-	expected_header_fields_test_2.status_code                         = http::StatusCode(http::OK);
-	expected_header_fields_test_2.request.header_fields["Host"]       = "www.example.com";
-	expected_header_fields_test_2.request.header_fields["Connection"] = "keep-alive";
+	// 5.ヘッダフィールドの書式が正しくない場合
+	http::HttpRequestParsedData test2_header_fields;
+	test2_header_fields.request_result.status_code         = http::StatusCode(http::BAD_REQUEST);
+	test2_header_fields.is_request_format.is_request_line  = true;
+	test2_header_fields.is_request_format.is_header_fields = false;
+	test2_header_fields.is_request_format.is_body_message  = false;
 
-	// セミコロンの後にnameがある設定の場合
-	http::HttpRequestResult expected_header_fields_test_3;
-	expected_header_fields_test_3.request.request_line                = expected_request_line_1;
-	expected_header_fields_test_3.status_code                         = http::StatusCode(http::OK);
-	expected_header_fields_test_3.request.header_fields["Host"]       = "www.example.com";
-	expected_header_fields_test_3.request.header_fields["Connection"] = "keep-alive";
+	// 6.ヘッダフィールドにContent-Lengthがあるがボディメッセージがない場合
+	http::HttpRequestParsedData test3_header_fields;
+	// 本来のステータスコードはRequest Timeout
+	test3_header_fields.request_result.status_code = http::StatusCode(http::OK);
+	test3_header_fields.request_result.request.request_line =
+		http::RequestLine("GET", "/", "HTTP/1.1");
+	test3_header_fields.is_request_format.is_request_line  = true;
+	test3_header_fields.is_request_format.is_header_fields = true;
+	test3_header_fields.is_request_format.is_body_message  = false;
 
-	// 存在しないfield_nameの場合
-	http::HttpRequestResult expected_header_fields_test_4;
-	expected_header_fields_test_4.status_code = http::StatusCode(http::BAD_REQUEST);
-
-	// 複数のヘッダーフィールドの書式が設定の場合
-	http::HttpRequestResult expected_header_fields_test_5;
-	expected_header_fields_test_5.status_code = http::StatusCode(http::BAD_REQUEST);
-
-	// セミコロンがない場合
-	http::HttpRequestResult expected_header_fileds_test_6;
-	expected_header_fileds_test_6.status_code = http::StatusCode(http::BAD_REQUEST);
-
-	// セミコロンが複数ある場合
-	http::HttpRequestResult expected_header_fields_test_7;
-	expected_header_fields_test_7.status_code = http::StatusCode(http::BAD_REQUEST);
-
-	static const TestCase test_cases_for_header_fields[] = {
-		TestCase(
-			"GET / HTTP/1.1\r\nHost: www.example.com\r\nConnection: keep-alive\r\n\r\n",
-			expected_header_fields_test_1
-		),
-		TestCase(
-			"GET / HTTP/1.1\r\nHost:    \twww.example.com\r\nConnection: keep-alive\r\n\r\n",
-			expected_header_fields_test_2
-		),
-		TestCase(
-			"GET / HTTP/1.1\r\nHost:www.example.com\r\nConnection: keep-alive\r\n\r\n",
-			expected_header_fields_test_3
-		),
-		TestCase(
-			"GET / HTTP/1.1\r\nGold: www.example.com\r\nConnection: keep-alive\r\n\r\n",
-			expected_header_fields_test_4
-		),
-		TestCase(
-			"GET / HTTP/1.1\r\nHost: www.example.com\r\nHost: www.example.com\r\nConnection: "
-			"keep-alive\r\n\r\n",
-			expected_header_fields_test_5
-		),
-		TestCase(
-			"GET / HTTP/1.1\r\nHost\r\nConnection: "
-			"keep-alive\r\n\r\n",
-			expected_header_fileds_test_6
-		),
-		TestCase(
-			"GET / HTTP/1.1\r\nHost:kkk:kk\r\nConnection: "
-			"keep-alive\r\n\r\n",
-			expected_header_fields_test_7
-		)
+	static const TestCase test_case_http_request_header_fields_format[] = {
+		TestCase("GET / HTTP/1.1\r\nHost: a\r\n\r\n", test1_header_fields),
+		TestCase("GET / HTTP/1.1\r\nHost :\r\n\r\n", test2_header_fields),
+		TestCase("GET / HTTP/1.1\r\nHost: test\r\nContent-Length: 2\r\n\r\n", test3_header_fields),
 	};
 
-	ret_code |=
-		RunTestCases(test_cases_for_header_fields, ARRAY_SIZE(test_cases_for_header_fields));
+	ret_code |= RunTestCases(
+		test_case_http_request_header_fields_format,
+		sizeof(test_case_http_request_header_fields_format) /
+			sizeof(test_case_http_request_header_fields_format[0])
+	);
+
+	// 7.ボディメッセージが正しい場合
+	http::HttpRequestParsedData test1_body_message;
+	test1_body_message.request_result.status_code = http::StatusCode(http::OK);
+	test1_body_message.request_result.request.request_line =
+		http::RequestLine("GET", "/", "HTTP/1.1");
+	test1_body_message.is_request_format.is_request_line  = true;
+	test1_body_message.is_request_format.is_header_fields = true;
+	test1_body_message.is_request_format.is_body_message  = true;
+
+	// 8.Content-Lengthの数値以上にボディメッセージがある場合
+	http::HttpRequestParsedData test2_body_message;
+	test2_body_message.request_result.status_code = http::StatusCode(http::OK);
+	test2_body_message.request_result.request.request_line =
+		http::RequestLine("GET", "/", "HTTP/1.1");
+	test2_body_message.is_request_format.is_request_line   = true;
+	test2_body_message.is_request_format.is_header_fields  = true;
+	test2_body_message.is_request_format.is_body_message   = true;
+	test2_body_message.request_result.request.body_message = "ab";
+
+	// 9.Content-Lengthの値の書式が間違ってる場合
+	http::HttpRequestParsedData test3_body_message;
+	test3_body_message.request_result.status_code          = http::StatusCode(http::BAD_REQUEST);
+	test3_body_message.is_request_format.is_request_line   = true;
+	test3_body_message.is_request_format.is_header_fields  = true;
+	test3_body_message.is_request_format.is_body_message   = false;
+	test3_body_message.request_result.request.body_message = "ab";
+
+	static const TestCase test_case_http_request_body_message_format[] = {
+		TestCase(
+			"GET / HTTP/1.1\r\nHost: a\r\n\r\nContent-Length:  3\r\n\r\nabc", test1_body_message
+		),
+		TestCase(
+			"GET / HTTP/1.1\r\nHost: test\r\nContent-Length: 2\r\n\r\nabccccccccc",
+			test2_body_message
+		),
+		TestCase(
+			"GET / HTTP/1.1\r\nHost: test\r\nContent-Length: dddd\r\n\r\nabccccccccc",
+			test3_body_message
+		),
+	};
+
+	ret_code |= RunTestCases(
+		test_case_http_request_body_message_format,
+		sizeof(test_case_http_request_body_message_format) /
+			sizeof(test_case_http_request_body_message_format[0])
+	);
+
 	return ret_code;
 }
