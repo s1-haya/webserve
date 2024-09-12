@@ -24,6 +24,28 @@ std::string LoadFileContent(const char *file_path) {
 	return file_content.str();
 }
 
+int GetTestCaseNum() {
+	static unsigned int test_case_num = 0;
+	++test_case_num;
+	return test_case_num;
+}
+
+template <typename T>
+int HandleResult(const T &result, const T &expected) {
+	if (result == expected) {
+		std::cout << utils::color::GREEN << GetTestCaseNum() << ".[OK]" << utils::color::RESET
+				  << std::endl;
+		return EXIT_SUCCESS;
+	} else {
+		std::cerr << utils::color::RED << GetTestCaseNum() << ".[NG] " << utils::color::RESET
+				  << std::endl;
+		std::cerr << "Error: Http Response\n";
+		std::cerr << "- Expected:\n[" << expected << "]\n";
+		std::cerr << "- Result  :\n[" << result << "]\n";
+		return EXIT_FAILURE;
+	}
+}
+
 } // namespace
 
 server::Location BuildLocation(
