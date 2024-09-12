@@ -101,7 +101,6 @@ server::VirtualServer *BuildVirtualServer2() {
 	// LocationList
 	server::VirtualServer::LocationList locationlist;
 	server::Location::AllowedMethodList allowed_methods;
-	allowed_methods.push_back("GET");
 	allowed_methods.push_back("DELETE");
 	server::Location::Redirect redirect;
 	server::Location           location1 = // alias_on
@@ -174,27 +173,35 @@ int main(void) {
 	// header_fields[HOST]がないとAborted what():  map::at
 	// VirtualServerLAddrListがないとセグフォ
 
-	// /html/index.htmlを取得するリクエスト
+	// host1に/html/index.htmlを取得するリクエスト
 	request_info.request.request_line.method         = http::GET;
 	request_info.request.request_line.request_target = "/";
 	request_info.request.request_line.version        = http::HTTP_VERSION;
 	request_info.request.header_fields[http::HOST]   = "sawa";
-	std::string response = http::HttpResponse::Run(client_info, server_info, request_info);
+	std::string response1 = http::HttpResponse::Run(client_info, server_info, request_info);
 
-	std::string expected_status_line   = LoadFileContent("expected/status_line/ok.txt");
-	std::string expected_body_message  = LoadFileContent("../../../html/index.html");
-	std::string expected_header_fields = SetDefaultHeaderFields(
-		http::KEEP_ALIVE, utils::ToString(expected_body_message.length()), "test/html"
+	std::string expected1_status_line   = LoadFileContent("expected/status_line/ok.txt");
+	std::string expected1_body_message  = LoadFileContent("../../../html/index.html");
+	std::string expected1_header_fields = SetDefaultHeaderFields(
+		http::KEEP_ALIVE, utils::ToString(expected1_body_message.length()), "test/html"
 	);
-	const std::string &expected_response =
-		expected_status_line + expected_header_fields + http::CRLF + expected_body_message;
+	const std::string &expected1_response =
+		expected1_status_line + expected1_header_fields + http::CRLF + expected1_body_message;
 
-	if (response == expected_response) {
-		std::cout << "OK" << std::endl;
-	} else {
-		std::cout << "KO" << std::endl;
-		std::cout << response << std::endl;
-		std::cout << expected_response << std::endl;
-	}
+	ret_code = HandleResult(response1, expected1_response);
+
+	// host2に/html/index.htmlを取得するリクエスト
+	request_info.request.header_fields[http::HOST] = "host2";
+	std::string response2 = http::HttpResponse::Run(client_info, server_info, request_info);
+
+	std::string expected2_status_line = LoadFileContent("expected/status_line/not_implemented.txt");
+	std::string expected2_body_message =
+		LoadFileContent("expected/body_message/not_implemented.txt");
+	std::string expected2_header_fields = SetDefaultHeaderFields(
+		http::KEEP_ALIVE, utils::ToString(expected2_body_message.length()), "test/html"
+	);
+	const std::string &expected2_response =
+		expected2_status_line + expected2_header_fields + http::CRLF + expected2_body_message;
+	ret_code = HandleResult(response2, expected2_response);
 	return ret_code;
 }
