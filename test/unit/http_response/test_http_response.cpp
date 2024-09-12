@@ -4,13 +4,6 @@
 #include "http_response.hpp"
 #include <fstream>
 
-namespace http {
-
-struct MockDtoClientInfos;
-struct HttpRequestResult;
-
-} // namespace http
-
 namespace {
 
 std::string LoadFileContent(const char *file_path) {
@@ -45,8 +38,6 @@ int HandleResult(const T &result, const T &expected) {
 		return EXIT_FAILURE;
 	}
 }
-
-} // namespace
 
 server::Location BuildLocation(
 	const std::string                          &request_uri,
@@ -123,57 +114,16 @@ server::VirtualServer *BuildVirtualServer2() {
 	return new server::VirtualServer(server_names, locationlist, host_ports, 1024, error_page);
 }
 
-server::VirtualServer *BuildVirtualServer3() {
-	// LocationList
-	server::VirtualServer::LocationList locationlist;
-	server::Location::AllowedMethodList allowed_methods;
-	allowed_methods.push_back("DELETE");
-	server::Location::Redirect redirect;
-	server::Location           location1 = // alias_on
-		BuildLocation("/www/data/", "/var/www/", "index.html", true, allowed_methods, redirect);
-	server::Location location2 = // cgi, upload_directory
-		BuildLocation("/web/", "", "index.htm", false, allowed_methods, redirect, ".php", "/data/");
-	locationlist.push_back(location1);
-	locationlist.push_back(location2);
-
-	server::VirtualServer                 virtual_server;
-	server::VirtualServer::ServerNameList server_names;
-	server_names.push_back("host3");
-	server::VirtualServer::HostPortList host_ports;
-	host_ports.push_back(std::make_pair("localhost", 8080));
-	server::VirtualServer::ErrorPage error_page(404, "/404.html");
-
-	return new server::VirtualServer(server_names, locationlist, host_ports, 2024, error_page);
-}
-
-server::VirtualServer *BuildVirtualServer4() {
-	// LocationList
-	server::VirtualServer::LocationList locationlist;
-
-	server::VirtualServer                 virtual_server;
-	server::VirtualServer::ServerNameList server_names;
-	server_names.push_back("host4");
-	server::VirtualServer::HostPortList host_ports;
-	host_ports.push_back(std::make_pair("127.0.0.10", 8090));
-	server::VirtualServer::ErrorPage error_page(404, "/404.html");
-
-	return new server::VirtualServer(server_names, locationlist, host_ports, 1024, error_page);
-}
-
 server::VirtualServerAddrList BuildVirtualServerAddrList() {
 	server::VirtualServerAddrList virtual_servers;
 	server::VirtualServer        *vs1 = BuildVirtualServer1();
 	server::VirtualServer        *vs2 = BuildVirtualServer2();
-	server::VirtualServer        *vs3 = BuildVirtualServer3();
-	server::VirtualServer        *vs4 = BuildVirtualServer4();
 	virtual_servers.push_back(vs1);
 	virtual_servers.push_back(vs2);
-	virtual_servers.push_back(vs3);
-	virtual_servers.push_back(vs4);
 	return virtual_servers;
 }
 
-void DeleteAddrList(server::VirtualServerAddrList &virtual_servers) {
+void DeleteAddrList(const server::VirtualServerAddrList &virtual_servers) {
 	typedef server::VirtualServerAddrList::const_iterator ItVirtualServer;
 	for (ItVirtualServer it = virtual_servers.begin(); it != virtual_servers.end(); ++it) {
 		delete *it;
@@ -190,6 +140,8 @@ std::string SetDefaultHeaderFields(
 	header_fields += http::SERVER + ": " + http::SERVER_VERSION + http::CRLF;
 	return header_fields;
 }
+
+} // namespace
 
 int main(void) {
 	int                                 ret_code = 0;
@@ -231,5 +183,7 @@ int main(void) {
 	const std::string &expected2_response =
 		expected2_status_line + expected2_header_fields + http::CRLF + expected2_body_message;
 	ret_code = HandleResult(response2, expected2_response);
+
+	DeleteAddrList(server_info);
 	return ret_code;
 }
