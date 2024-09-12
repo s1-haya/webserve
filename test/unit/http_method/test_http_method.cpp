@@ -21,7 +21,7 @@ struct MethodArgument {
 		std::string                      &response_body_message,
 		http::HeaderFields               &response_header_fields,
 		const std::string                &index_file_path = "",
-		const bool                       &autoindex_on    = false
+		bool                              autoindex_on    = false
 	)
 		: path(path),
 		  method(method),
@@ -38,7 +38,7 @@ struct MethodArgument {
 	std::string                      &response_body_message;
 	http::HeaderFields               &response_header_fields;
 	const std::string                &index_file_path;
-	const bool                       &autoindex_on;
+	bool                              autoindex_on;
 };
 
 std::string LoadFileContent(const std::string &file_path) {

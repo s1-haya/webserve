@@ -50,7 +50,7 @@ StatusCode Method::Handler(
 	std::string        &response_body_message,
 	HeaderFields       &response_header_fields,
 	const std::string  &index_file_path,
-	const bool         &autoindex_on
+	bool                autoindex_on
 ) {
 	StatusCode status_code(OK);
 	response_body_message.clear();
@@ -76,7 +76,7 @@ StatusCode Method::GetHandler(
 	std::string       &response_body_message,
 	HeaderFields      &response_header_fields,
 	const std::string &index_file_path,
-	const bool        &autoindex_on
+	bool               autoindex_on
 ) {
 	StatusCode  status_code(OK);
 	const Stat &info = TryStat(path);

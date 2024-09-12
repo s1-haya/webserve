@@ -27,7 +27,7 @@ class Method {
 					 std::string        &response_body_message,
 					 HeaderFields       &response_header_fields,
 					 const std::string  &index_file_path,
-					 const bool         &autoindex_on
+					 bool                autoindex_on
 				 );
 	static bool
 	IsAllowedMethod(const std::string &method, const std::list<std::string> &allow_methods);
@@ -38,7 +38,7 @@ class Method {
 		std::string       &body_message,
 		HeaderFields      &response_header_fields,
 		const std::string &index_file_path,
-		const bool        &autoindex_on
+		bool               autoindex_on
 	);
 	static StatusCode PostHandler(
 		const std::string &path,
