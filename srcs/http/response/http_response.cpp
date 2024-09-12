@@ -3,7 +3,6 @@
 #include "http_exception.hpp"
 #include "http_message.hpp"
 #include "http_parse.hpp"
-#include "server_infos.hpp"
 #include <iostream>
 #include <sstream>
 
@@ -24,7 +23,7 @@ namespace http {
 
 std::string HttpResponse::Run(
 	const MockDtoClientInfos &client_info,
-	const MockDtoServerInfos &server_info,
+	const server::VirtualServerAddrList &server_info,
 	const HttpRequestResult  &request_info
 ) {
 	HttpResponseFormat response = CreateHttpResponseFormat(client_info, server_info, request_info);
@@ -35,7 +34,7 @@ std::string HttpResponse::Run(
 // &request_info) 作成
 HttpResponseFormat HttpResponse::CreateHttpResponseFormat(
 	const MockDtoClientInfos &client_info,
-	const MockDtoServerInfos &server_info,
+	const server::VirtualServerAddrList &server_info,
 	const HttpRequestResult  &request_info
 ) {
 	StatusCode   status_code(OK);

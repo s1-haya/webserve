@@ -39,34 +39,6 @@ class HttpServerInfoCheck {
 	HttpServerInfoCheck();
 	~HttpServerInfoCheck();
 
-	/*====================================================*/ // 消す
-
-	static void CheckDTOServerInfo(
-		CheckServerInfoResult    &result,
-		const MockDtoServerInfos &server_info,
-		const HeaderFields       &header_fields
-	);
-	static void CheckLocationList(
-		CheckServerInfoResult &result,
-		const LocationList    &locations,
-		const std::string     &request_target
-	);
-	static const MockLocationCon CheckLocation(
-		CheckServerInfoResult &result,
-		const LocationList    &locations,
-		const std::string     &request_target
-	);
-	static void CheckIndex(CheckServerInfoResult &result, const MockLocationCon &location);
-	static void CheckAutoIndex(CheckServerInfoResult &result, const MockLocationCon &location);
-	static void CheckAlias(CheckServerInfoResult &result, const MockLocationCon &location);
-	static void CheckRedirect(CheckServerInfoResult &result, const MockLocationCon &location);
-	static void CheckAllowedMethods(CheckServerInfoResult &result, const MockLocationCon &location);
-	static void CheckCgiExtension(CheckServerInfoResult &result, const MockLocationCon &location);
-	static void
-	CheckUploadDirectory(CheckServerInfoResult &result, const MockLocationCon &location);
-
-	/*====================================================*/ // 消す
-
 	static const server::VirtualServer *FindVirtualServer(
 		const server::VirtualServerAddrList &virtual_servers, const HeaderFields &header_fields
 	);
@@ -98,8 +70,6 @@ class HttpServerInfoCheck {
 	CheckUploadDirectory(CheckServerInfoResult &result, const server::Location &location);
 
   public:
-	static CheckServerInfoResult
-	Check(const MockDtoServerInfos &server_info, const HttpRequestFormat &request);
 	static CheckServerInfoResult
 	Check(const server::VirtualServerAddrList &server_infos, const HttpRequestFormat &request);
 };
