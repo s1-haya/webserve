@@ -131,6 +131,17 @@ void DeleteAddrList(server::VirtualServerAddrList &virtual_servers) {
 	}
 }
 
+std::string SetDefaultHeaderFields(
+	const std::string &connection, const std::string &length, const std::string &type
+) {
+	std::string header_fields;
+	header_fields += http::CONNECTION + ": " + connection + http::CRLF;
+	header_fields += http::CONTENT_LENGTH + ": " + length + http::CRLF;
+	header_fields += http::CONTENT_TYPE + ": " + type + http::CRLF;
+	header_fields += http::SERVER + ": " + http::SERVER_VERSION + http::CRLF;
+	return header_fields;
+}
+
 int main(void) {
 	int                                 ret_code = 0;
 	http::MockDtoClientInfos            client_info;
@@ -140,25 +151,28 @@ int main(void) {
 	// 前提
 	// header_fields[HOST]がないとAborted what():  map::at
 	// VirtualServerLAddrListがないとセグフォ
+
+	// /html/index.htmlを取得するリクエスト
 	request_info.request.request_line.method         = http::GET;
 	request_info.request.request_line.request_target = "/";
 	request_info.request.request_line.version        = http::HTTP_VERSION;
 	request_info.request.header_fields[http::HOST]   = "sawa";
-	std::string response          = http::HttpResponse::Run(client_info, server_info, request_info);
-	std::string expected_response = LoadFileContent("expected/status_line/ok.txt");
-	std::string expected_body_message = LoadFileContent("../../../html/index.html");
-	expected_response += "Connection: keep-alive\r\n";
-	expected_response +=
-		"Content-Length: " + utils::ToString(expected_body_message.length()) + "\r\n";
-	expected_response += "Content-Type: test/html\r\n";
-	expected_response += "Server: webserv/1.1\r\n";
-	expected_response += "\r\n";
-	expected_response += expected_body_message;
+	std::string response = http::HttpResponse::Run(client_info, server_info, request_info);
+
+	std::string expected_status_line   = LoadFileContent("expected/status_line/ok.txt");
+	std::string expected_body_message  = LoadFileContent("../../../html/index.html");
+	std::string expected_header_fields = SetDefaultHeaderFields(
+		http::KEEP_ALIVE, utils::ToString(expected_body_message.length()), "test/html"
+	);
+	const std::string &expected_response =
+		expected_status_line + expected_header_fields + http::CRLF + expected_body_message;
 
 	if (response == expected_response) {
 		std::cout << "OK" << std::endl;
 	} else {
 		std::cout << "KO" << std::endl;
+		std::cout << response << std::endl;
+		std::cout << expected_response << std::endl;
 	}
 	return ret_code;
 }
