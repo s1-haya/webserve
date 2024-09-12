@@ -39,9 +39,8 @@ class Cgi {
 	std::string  request_body_message_;
 	std::string  response_body_message_;
 
-	static const int READ         = 0;
-	static const int WRITE        = 1;
-	static const int SYSTEM_ERROR = -1;
+	static const int READ  = 0;
+	static const int WRITE = 1;
 };
 
 } // namespace cgi
