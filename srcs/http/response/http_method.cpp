@@ -256,7 +256,7 @@ Method::AutoindexHandler(const std::string &path, std::string &response_body_mes
 	response_body_message += "</pre><hr></body></html>";
 	closedir(dir);
 
-	return utils::Result<void>();
+	return result;
 }
 
 } // namespace http
