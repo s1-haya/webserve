@@ -243,7 +243,7 @@ utils::Result<std::string> Method::AutoindexHandler(const std::string &path) {
 	while ((entry = readdir(dir)) != NULL) {
 		std::string full_path = path + "/" + entry->d_name;
 		struct stat file_stat;
-		if (stat(full_path.c_str(), &file_stat) == 0) {
+		if (stat(full_path.c_str(), &file_stat) == 0 && errno != 0) {
 			response_body_message += "<a href=\"" + std::string(entry->d_name) + "\">" +
 									 std::string(entry->d_name) + "</a> ";
 			response_body_message += utils::ToString(file_stat.st_size) + " bytes ";
