@@ -88,7 +88,8 @@ StatusCode Method::GetHandler(
 			response_header_fields[CONTENT_LENGTH] =
 				utils::ToString(response_body_message.length());
 		} else if (autoindex_on) {
-			utils::Result<void> result = AutoindexHandler(path, response_body_message);
+			utils::Result<std::string> result = AutoindexHandler(path);
+			response_body_message             = result.GetValue();
 			response_header_fields[CONTENT_LENGTH] =
 				utils::ToString(response_body_message.length());
 			if (!result.IsOk()) {
@@ -224,10 +225,10 @@ bool Method::IsAllowedMethod(
 }
 
 // ./と../はいらないかも？
-utils::Result<void>
-Method::AutoindexHandler(const std::string &path, std::string &response_body_message) {
-	utils::Result<void> result;
-	DIR                *dir = opendir(path.c_str());
+utils::Result<std::string> Method::AutoindexHandler(const std::string &path) {
+	utils::Result<std::string> result;
+	DIR                       *dir = opendir(path.c_str());
+	std::string                response_body_message;
 
 	if (dir == NULL) { // system exception?
 		result.Set(false);
@@ -257,6 +258,7 @@ Method::AutoindexHandler(const std::string &path, std::string &response_body_mes
 	response_body_message += "</pre><hr></body></html>";
 	closedir(dir);
 
+	result.SetValue(response_body_message);
 	return result;
 }
 

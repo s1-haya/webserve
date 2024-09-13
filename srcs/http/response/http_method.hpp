@@ -59,8 +59,7 @@ class Method {
 		std::string       &response_body_message,
 		HeaderFields      &response_header_fields
 	);
-	static utils::Result<void>
-	AutoindexHandler(const std::string &path, std::string &response_body_message);
+	static utils::Result<std::string> AutoindexHandler(const std::string &path);
 };
 
 } // namespace http
