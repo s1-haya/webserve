@@ -89,6 +89,8 @@ StatusCode Method::GetHandler(
 				utils::ToString(response_body_message.length());
 		} else if (autoindex_on) {
 			utils::Result<void> result = AutoindexHandler(path, response_body_message);
+			response_header_fields[CONTENT_LENGTH] =
+				utils::ToString(response_body_message.length());
 			if (!result.IsOk()) {
 				throw HttpException("Error: Forbidden", StatusCode(FORBIDDEN)); // system exception?
 			}
