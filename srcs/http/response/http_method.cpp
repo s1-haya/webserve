@@ -93,7 +93,9 @@ StatusCode Method::GetHandler(
 			response_header_fields[CONTENT_LENGTH] =
 				utils::ToString(response_body_message.length());
 			if (!result.IsOk()) {
-				throw HttpException("Error: Forbidden", StatusCode(FORBIDDEN)); // system exception?
+				throw HttpException(
+					"Error: Internal Server Error", StatusCode(INTERNAL_SERVER_ERROR)
+				);
 			}
 		} else {
 			throw HttpException("Error: Forbidden", StatusCode(FORBIDDEN));
@@ -230,7 +232,7 @@ utils::Result<std::string> Method::AutoindexHandler(const std::string &path) {
 	DIR                       *dir = opendir(path.c_str());
 	std::string                response_body_message;
 
-	if (dir == NULL) { // system exception?
+	if (dir == NULL) {
 		result.Set(false);
 		return result;
 	}
@@ -240,21 +242,27 @@ utils::Result<std::string> Method::AutoindexHandler(const std::string &path) {
 							 "<head><title>Index of /</title></head>\n"
 							 "<body><h1>Index of /</h1><hr><pre>"
 							 "<a href=\"../\">../</a>\n";
+
+	errno = 0;
 	while ((entry = readdir(dir)) != NULL) {
 		std::string full_path = path + "/" + entry->d_name;
 		struct stat file_stat;
-		if (stat(full_path.c_str(), &file_stat) == 0 && errno != 0) {
+		if (stat(full_path.c_str(), &file_stat) == 0) {
 			response_body_message += "<a href=\"" + std::string(entry->d_name) + "\">" +
 									 std::string(entry->d_name) + "</a> ";
 			response_body_message += utils::ToString(file_stat.st_size) + " bytes ";
 			response_body_message += std::ctime(&file_stat.st_mtime);
-		} else { // tmp
-			response_body_message += "<a href=\"" + std::string(entry->d_name) + "\">" +
-									 std::string(entry->d_name) + "</a> ";
-			response_body_message += "Error getting file stats\n";
+		} else {
+			// response_body_message += "<a href=\"" + std::string(entry->d_name) + "\">" +
+			// 						 std::string(entry->d_name) + "</a> ";
+			// response_body_message += "Error getting file stats\n"; // tmp
 			result.Set(false);
 		}
 	}
+	if (errno != 0) {
+		result.Set(false);
+	}
+
 	response_body_message += "</pre><hr></body></html>";
 	closedir(dir);
 
