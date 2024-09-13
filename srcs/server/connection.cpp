@@ -61,7 +61,7 @@ std::string ConvertToIpv6Str(const struct in6_addr &addr) {
 
 } // namespace
 
-// "localhost" -> IpList{"127.0.0.1", other..}
+// "localhost" -> IpList{"127.0.0.1", other..} (no duplicates)
 Connection::IpList Connection::ResolveHostName(const std::string &hostname) {
 	AddrInfo hints = {};
 	InitHints(&hints);
@@ -72,14 +72,15 @@ Connection::IpList Connection::ResolveHostName(const std::string &hostname) {
 		throw std::runtime_error("getaddrinfo failed: " + std::string(gai_strerror(status)));
 	}
 
-	IpList ip_list;
+	// Temporary std::set for checking duplicate IPs.
+	std::set<std::string> ip_set;
 	for (; result != NULL; result = result->ai_next) {
 		struct sockaddr_in *sa_in = (struct sockaddr_in *)result->ai_addr;
 		const std::string   ip    = ConvertToIpv4Str(sa_in->sin_addr);
-		ip_list.push_back(ip);
+		ip_set.insert(ip);
 	}
 	freeaddrinfo(result);
-	return ip_list;
+	return IpList(ip_set.begin(), ip_set.end());
 }
 
 // result: dynamic allocated by getaddrinfo()

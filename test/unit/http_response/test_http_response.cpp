@@ -2,6 +2,7 @@
 #include "http_message.hpp"
 #include "http_parse.hpp"
 #include "http_response.hpp"
+#include <cstdlib>
 #include <fstream>
 
 namespace {
@@ -168,7 +169,7 @@ int main(void) {
 	const std::string &expected1_response =
 		expected1_status_line + expected1_header_fields + http::CRLF + expected1_body_message;
 
-	ret_code = HandleResult(response1, expected1_response);
+	ret_code |= HandleResult(response1, expected1_response);
 
 	// GETメソッドの許可がないhost2に/html/index.htmlを取得するリクエスト
 	request_info.request.header_fields[http::HOST] = "host2";
@@ -182,7 +183,7 @@ int main(void) {
 	);
 	const std::string &expected2_response =
 		expected2_status_line + expected2_header_fields + http::CRLF + expected2_body_message;
-	ret_code = HandleResult(response2, expected2_response);
+	ret_code |= HandleResult(response2, expected2_response);
 
 	DeleteAddrList(server_info);
 	return ret_code;
