@@ -42,7 +42,12 @@ uint32_t ConvertToEventType(uint32_t type) {
 	if (type & EPOLLOUT) {
 		ret_type |= event::EVENT_WRITE;
 	}
-	// todo: tmp
+	if (type & EPOLLERR) {
+		ret_type |= event::EVENT_ERROR;
+	}
+	if (type & EPOLLHUP) {
+		ret_type |= event::EVENT_HANGUP;
+	}
 	return ret_type;
 }
 

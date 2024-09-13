@@ -167,6 +167,10 @@ void Server::HandleNewConnection(int server_fd) {
 }
 
 void Server::HandleExistingConnection(const event::Event &event) {
+	if (event.type & event::EVENT_ERROR || event.type & event::EVENT_HANGUP) {
+		Disconnect(event.fd);
+		return;
+	}
 	if (event.type & event::EVENT_READ) {
 		ReadRequest(event.fd);
 		RunHttp(event);
@@ -174,7 +178,6 @@ void Server::HandleExistingConnection(const event::Event &event) {
 	if (event.type & event::EVENT_WRITE) {
 		SendResponse(event.fd);
 	}
-	// todo: handle other EventType
 }
 
 http::ClientInfos Server::GetClientInfos(int client_fd) const {
