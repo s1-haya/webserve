@@ -75,6 +75,19 @@ int HandleResult(const Result &result) {
 		return EXIT_FAILURE;
 	}
 }
+http::HttpResult CreateHttpResult(
+	bool               is_response_complete,
+	bool               is_connection_keep,
+	const std::string &request_buffer,
+	const std::string &response
+) {
+	http::HttpResult result;
+	result.is_response_complete = is_response_complete;
+	result.is_connection_keep   = is_connection_keep;
+	result.request_buf          = request_buffer;
+	result.response             = response;
+	return result;
+}
 
 Result IsSameHttpResult(const http::HttpResult &http_result, const http::HttpResult expected) {
 	Result result;
@@ -104,6 +117,8 @@ int main(void) {
 	// ouput HttpResult
 	http::MockDtoClientInfos      client_infos;
 	server::VirtualServerAddrList server_infos;
+	http::HttpResult expected =
+		CreateHttpResult(false, false, "", "");
 
 	return ret_code;
 }
