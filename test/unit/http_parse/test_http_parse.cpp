@@ -20,11 +20,13 @@ struct Result {
 	std::string error_log;
 };
 
-http::RequestLine CreateRequestLine(const std::string &method, const std::string &request_target, const std::string &version) {
+http::RequestLine CreateRequestLine(
+	const std::string &method, const std::string &request_target, const std::string &version
+) {
 	http::RequestLine request_line;
-	request_line.method = method;
+	request_line.method         = method;
 	request_line.request_target = request_target;
-	request_line.version = version;
+	request_line.version        = version;
 	return request_line;
 }
 
