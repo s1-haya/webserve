@@ -1,6 +1,7 @@
 #include "client_infos.hpp"
 #include "http.hpp"
 #include "http_result.hpp"
+#include <cstdlib>
 
 /**
  * @brief Test Http class: HttpResultの返り値を確認するテスト。
@@ -155,15 +156,15 @@ Result IsSameHttpResult(const http::HttpResult &http_result, const http::HttpRes
 	Result result;
 	result =
 		IsSameIsResponseComplete(http_result.is_response_complete, expected.is_response_complete);
-	if (!result.is_success()) {
+	if (!result.is_success) {
 		return result;
 	}
 	result = IsSameIsConnectionKeep(http_result.is_connection_keep, expected.is_connection_keep);
-	if (!result.is_success()) {
+	if (!result.is_success) {
 		return result;
 	}
 	result = IsSameRequestBuffer(http_result.request_buf, expected.request_buf);
-	if (!result.is_success()) {
+	if (!result.is_success) {
 		return result;
 	}
 	result = IsSameHttpResponse(http_result.response, expected.response);
@@ -187,7 +188,7 @@ int HandleHttpResult(
 } // namespace
 
 int main(void) {
-	int ret_code = 0;
+	int ret_code = EXIT_SUCCESS;
 
 	// CreateHttpResult
 	// input parameter in HttpResult
@@ -197,7 +198,7 @@ int main(void) {
 		CreateMockDtoClientInfos(1, request_buffer, "127.0.0.1");
 	// todo: InitServerInfos;
 	server::VirtualServerAddrList server_infos;
-	http::HttpResult              expected = CreateHttpResult(false, false, "", "");
+	http::HttpResult              expected = CreateHttpResult(false, true, "", "");
 	ret_code |= HandleHttpResult(client_infos, server_infos, expected);
 
 	return ret_code;
