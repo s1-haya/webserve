@@ -112,12 +112,20 @@ Result IsSameHttpResult(const http::HttpResult &http_result, const http::HttpRes
 	return result;
 }
 
-int HandleHttpResult(const http::HttpResult &http_result, const http::HttpResult expected) {
-	const Result &result = IsSameHttpResult(http_result, expected);
+int HandleHttpResult(
+	const http::MockDtoClientInfos            &client_infos,
+	const server::VirtualServerAddrList &server_infos,
+const http::HttpResult               expected
+) {
+	http::HttpResult http_result;
+	(void)client_infos;
+	(void)server_infos;
+	// http::Http       http;
+	// http::HttpResult http_result = http.Run(client_infos, server_infos);
+	const Result    &result      = IsSameHttpResult(http_result, expected);
 	return HandleResult(result);
 }
-
-}
+} // namespace
 
 int main(void) {
 	int ret_code = 0;
@@ -130,6 +138,7 @@ int main(void) {
 	server::VirtualServerAddrList server_infos;
 	http::HttpResult expected =
 		CreateHttpResult(false, false, "", "");
+ret_code |= HandleHttpResult(client_infos, server_infos, expected);
 
 	return ret_code;
 }
