@@ -54,7 +54,7 @@ server::VirtualServer *BuildVirtualServer1() {
 	host_ports.push_back(std::make_pair("localhost", 8080));
 	server::VirtualServer::ErrorPage error_page(404, "/404.html");
 
-	return new server::VirtualServer(server_names, locationlist, host_ports, 1024, error_page);
+	return new server::VirtualServer(server_names, locationlist, host_ports, 2048, error_page);
 }
 
 server::VirtualServer *BuildVirtualServer2() {
@@ -310,6 +310,31 @@ int Test5() {
 	return EXIT_FAILURE;
 }
 
+// client_max_body_sizeを超えたエラー
+int Test6() {
+	// request
+	const RequestLine request_line = {"GET", "/", "HTTP/1.1"};
+	HttpRequestFormat request;
+	request.request_line                  = request_line;
+	request.header_fields[HOST]           = "host1";
+	request.header_fields[CONNECTION]     = "keep-alive";
+	request.header_fields[CONTENT_LENGTH] = "4000"; // host1のclient_max_body_sizeは2048
+
+	server::VirtualServerAddrList virtual_servers = BuildVirtualServerAddrList();
+
+	try {
+		HttpServerInfoCheck::Check(virtual_servers, request);
+	} catch (const std::exception &e) {
+		PrintOk();
+		utils::Debug(e.what());
+		DeleteAddrList(virtual_servers);
+		return EXIT_SUCCESS;
+	}
+	PrintNg();
+	DeleteAddrList(virtual_servers);
+	return EXIT_FAILURE;
+}
+
 } // namespace
 
 int main() {
@@ -320,5 +345,6 @@ int main() {
 	ret |= Test3();
 	ret |= Test4();
 	ret |= Test5();
+	ret |= Test6();
 	return ret;
 }
