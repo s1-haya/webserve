@@ -99,8 +99,7 @@ http::HttpResult CreateHttpResult(
 	return result;
 }
 
-Result
-IsSameIsResponseComplete(bool is_response_complete, bool expected) {
+Result IsSameIsResponseComplete(bool is_response_complete, bool expected) {
 	Result is_response_complete_result;
 	if (is_response_complete != expected) {
 		std::ostringstream error_log;
@@ -113,8 +112,7 @@ IsSameIsResponseComplete(bool is_response_complete, bool expected) {
 	return is_response_complete_result;
 }
 
-Result
-IsSameIsConnectionKeep(bool is_connection_keep, bool expected) {
+Result IsSameIsConnectionKeep(bool is_connection_keep, bool expected) {
 	Result is_connection_keep_result;
 	if (is_connection_keep != expected) {
 		std::ostringstream error_log;
@@ -127,8 +125,7 @@ IsSameIsConnectionKeep(bool is_connection_keep, bool expected) {
 	return is_connection_keep_result;
 }
 
-Result
-IsSameRequestBuffer(const std::string &request_buffer, const std::string &expected) {
+Result IsSameRequestBuffer(const std::string &request_buffer, const std::string &expected) {
 	Result request_buffer_result;
 	if (request_buffer != expected) {
 		std::ostringstream error_log;
@@ -141,8 +138,7 @@ IsSameRequestBuffer(const std::string &request_buffer, const std::string &expect
 	return request_buffer_result;
 }
 
-Result
-IsSameHttpResponse(const std::string &response, const std::string &expected) {
+Result IsSameHttpResponse(const std::string &response, const std::string &expected) {
 	Result http_response_result;
 	if (response != expected) {
 		std::ostringstream error_log;
@@ -157,7 +153,8 @@ IsSameHttpResponse(const std::string &response, const std::string &expected) {
 
 Result IsSameHttpResult(const http::HttpResult &http_result, const http::HttpResult expected) {
 	Result result;
-	result = IsSameIsResponseComplete(http_result.is_response_complete, expected.is_response_complete);
+	result =
+		IsSameIsResponseComplete(http_result.is_response_complete, expected.is_response_complete);
 	if (!result.is_success()) {
 		return result;
 	}
@@ -174,9 +171,9 @@ Result IsSameHttpResult(const http::HttpResult &http_result, const http::HttpRes
 }
 
 int HandleHttpResult(
-	const http::MockDtoClientInfos            &client_infos,
+	const http::MockDtoClientInfos      &client_infos,
 	const server::VirtualServerAddrList &server_infos,
-const http::HttpResult               expected
+	const http::HttpResult               expected
 ) {
 	http::HttpResult http_result;
 	(void)client_infos;
@@ -184,7 +181,7 @@ const http::HttpResult               expected
 	// todo: ServerInfosを作成したら動く;
 	// http::Http       http;
 	// http::HttpResult http_result = http.Run(client_infos, server_infos);
-	const Result    &result      = IsSameHttpResult(http_result, expected);
+	const Result &result = IsSameHttpResult(http_result, expected);
 	return HandleResult(result);
 }
 } // namespace
@@ -195,13 +192,13 @@ int main(void) {
 	// CreateHttpResult
 	// input parameter in HttpResult
 	// ouput HttpResult
-	const std::string &request_buffer = "ok";
-	const http::MockDtoClientInfos      &client_infos = CreateMockDtoClientInfos(1, request_buffer, "127.0.0.1");
+	const std::string              &request_buffer = "ok";
+	const http::MockDtoClientInfos &client_infos =
+		CreateMockDtoClientInfos(1, request_buffer, "127.0.0.1");
 	// todo: InitServerInfos;
 	server::VirtualServerAddrList server_infos;
-	http::HttpResult expected =
-		CreateHttpResult(false, false, "", "");
-ret_code |= HandleHttpResult(client_infos, server_infos, expected);
+	http::HttpResult              expected = CreateHttpResult(false, false, "", "");
+	ret_code |= HandleHttpResult(client_infos, server_infos, expected);
 
 	return ret_code;
 }
