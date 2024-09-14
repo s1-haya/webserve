@@ -3,6 +3,7 @@
 
 #include "stat.hpp"
 #include "status_code.hpp"
+#include "utils.hpp"
 #include <list>
 
 namespace utils {
@@ -24,14 +25,20 @@ class Method {
 					 const AllowMethods &allow_methods,
 					 const std::string  &request_body_message,
 					 std::string        &response_body_message,
-					 HeaderFields       &response_header_fields
+					 HeaderFields       &response_header_fields,
+					 const std::string  &index_file_path,
+					 bool                autoindex_on
 				 );
 	static bool
 	IsAllowedMethod(const std::string &method, const std::list<std::string> &allow_methods);
 
   private:
 	static StatusCode GetHandler(
-		const std::string &path, std::string &body_message, HeaderFields &response_header_fields
+		const std::string &path,
+		std::string       &body_message,
+		HeaderFields      &response_header_fields,
+		const std::string &index_file_path,
+		bool               autoindex_on
 	);
 	static StatusCode PostHandler(
 		const std::string &path,
@@ -52,6 +59,7 @@ class Method {
 		std::string       &response_body_message,
 		HeaderFields      &response_header_fields
 	);
+	static utils::Result<std::string> AutoindexHandler(const std::string &path);
 };
 
 } // namespace http

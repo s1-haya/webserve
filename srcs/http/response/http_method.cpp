@@ -8,9 +8,12 @@
 #include "system_exception.hpp"
 #include <algorithm> // std::find
 #include <cstring>
+#include <ctime>    // ctime
+#include <dirent.h> // opendir, readdir, closedir
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <sys/stat.h>
 #include <unistd.h> // access
 
 namespace {
@@ -45,14 +48,18 @@ StatusCode Method::Handler(
 	const AllowMethods &allow_methods,
 	const std::string  &request_body_message,
 	std::string        &response_body_message,
-	HeaderFields       &response_header_fields
+	HeaderFields       &response_header_fields,
+	const std::string  &index_file_path,
+	bool                autoindex_on
 ) {
 	StatusCode status_code(OK);
 	if (!IsAllowedMethod(method, allow_methods)) {
 		throw HttpException("Error: Not Implemented", StatusCode(NOT_IMPLEMENTED));
 	}
 	if (method == GET) {
-		status_code = GetHandler(path, response_body_message, response_header_fields);
+		status_code = GetHandler(
+			path, response_body_message, response_header_fields, index_file_path, autoindex_on
+		);
 	} else if (method == POST) {
 		status_code =
 			PostHandler(path, request_body_message, response_body_message, response_header_fields);
@@ -66,7 +73,9 @@ StatusCode Method::Handler(
 StatusCode Method::GetHandler(
 	const std::string &path,
 	std::string       &response_body_message,
-	HeaderFields      &response_header_fields
+	HeaderFields      &response_header_fields,
+	const std::string &index_file_path,
+	bool               autoindex_on
 ) {
 	StatusCode  status_code(OK);
 	const Stat &info = TryStat(path);
@@ -74,10 +83,23 @@ StatusCode Method::GetHandler(
 		// No empty string because the path has '/'
 		if (path[path.size() - 1] != '/') {
 			throw HttpException("Error: Moved Permanently", StatusCode(MOVED_PERMANENTLY));
+		} else if (!index_file_path.empty()) {
+			response_body_message = ReadFile(path + index_file_path);
+			response_header_fields[CONTENT_LENGTH] =
+				utils::ToString(response_body_message.length());
+		} else if (autoindex_on) {
+			utils::Result<std::string> result = AutoindexHandler(path);
+			response_body_message             = result.GetValue();
+			response_header_fields[CONTENT_LENGTH] =
+				utils::ToString(response_body_message.length());
+			if (!result.IsOk()) {
+				throw HttpException(
+					"Error: Internal Server Error", StatusCode(INTERNAL_SERVER_ERROR)
+				);
+			}
+		} else {
+			throw HttpException("Error: Forbidden", StatusCode(FORBIDDEN));
 		}
-		// todo: Check for index directive and handle ReadFile function
-		// todo: Check for autoindex directive and handle AutoindexHandler function
-		// todo: Return 403 Forbidden if neither index nor autoindex directives exist
 	} else if (info.IsRegularFile()) {
 		if (!info.IsReadableFile()) {
 			throw HttpException("Error: Forbidden", StatusCode(FORBIDDEN));
@@ -202,6 +224,50 @@ bool Method::IsAllowedMethod(
 	} else {
 		return std::find(allow_methods.begin(), allow_methods.end(), method) != allow_methods.end();
 	}
+}
+
+// ./と../はいらないかも？
+utils::Result<std::string> Method::AutoindexHandler(const std::string &path) {
+	utils::Result<std::string> result;
+	DIR                       *dir = opendir(path.c_str());
+	std::string                response_body_message;
+
+	if (dir == NULL) {
+		result.Set(false);
+		return result;
+	}
+
+	struct dirent *entry;
+	response_body_message += "<html>\n"
+							 "<head><title>Index of /</title></head>\n"
+							 "<body><h1>Index of /</h1><hr><pre>"
+							 "<a href=\"../\">../</a>\n";
+
+	errno = 0;
+	while ((entry = readdir(dir)) != NULL) {
+		std::string full_path = path + "/" + entry->d_name;
+		struct stat file_stat;
+		if (stat(full_path.c_str(), &file_stat) == 0) {
+			response_body_message += "<a href=\"" + std::string(entry->d_name) + "\">" +
+									 std::string(entry->d_name) + "</a> ";
+			response_body_message += utils::ToString(file_stat.st_size) + " bytes ";
+			response_body_message += std::ctime(&file_stat.st_mtime);
+		} else {
+			// response_body_message += "<a href=\"" + std::string(entry->d_name) + "\">" +
+			// 						 std::string(entry->d_name) + "</a> ";
+			// response_body_message += "Error getting file stats\n"; // tmp
+			result.Set(false);
+		}
+	}
+	if (errno != 0) {
+		result.Set(false);
+	}
+
+	response_body_message += "</pre><hr></body></html>";
+	closedir(dir);
+
+	result.SetValue(response_body_message);
+	return result;
 }
 
 } // namespace http
