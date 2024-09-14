@@ -181,6 +181,7 @@ const http::HttpResult               expected
 	http::HttpResult http_result;
 	(void)client_infos;
 	(void)server_infos;
+	// todo: ServerInfosを作成したら動く;
 	// http::Http       http;
 	// http::HttpResult http_result = http.Run(client_infos, server_infos);
 	const Result    &result      = IsSameHttpResult(http_result, expected);
@@ -196,6 +197,7 @@ int main(void) {
 	// ouput HttpResult
 	const std::string &request_buffer = "ok";
 	const http::MockDtoClientInfos      &client_infos = CreateMockDtoClientInfos(1, request_buffer, "127.0.0.1");
+	// todo: InitServerInfos;
 	server::VirtualServerAddrList server_infos;
 	http::HttpResult expected =
 		CreateHttpResult(false, false, "", "");
