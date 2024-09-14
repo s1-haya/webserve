@@ -7,11 +7,6 @@
 namespace http {
 
 struct RequestLine {
-	RequestLine() {};
-	RequestLine(
-		const std::string &method, const std::string &request_target, const std::string &version
-	)
-		: method(method), request_target(request_target), version(version) {};
 	std::string method;
 	std::string request_target;
 	std::string version;
@@ -30,13 +25,6 @@ struct StatusLine {
 typedef std::map<std::string, std::string> HeaderFields;
 
 struct HttpRequestFormat {
-	HttpRequestFormat() {};
-	HttpRequestFormat(
-		const RequestLine  &request_line,
-		const HeaderFields &header_fields,
-		const std::string  &body_message
-	)
-		: request_line(request_line), header_fields(header_fields), body_message(body_message) {};
 	RequestLine  request_line;
 	HeaderFields header_fields;
 	std::string  body_message;

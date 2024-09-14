@@ -20,6 +20,14 @@ struct Result {
 	std::string error_log;
 };
 
+http::RequestLine CreateRequestLine(const std::string &method, const std::string &request_target, const std::string &version) {
+	http::RequestLine request_line;
+	request_line.method = method;
+	request_line.request_target = request_target;
+	request_line.version = version;
+	return request_line;
+}
+
 int GetTestCaseNum() {
 	static unsigned int test_case_num = 0;
 	++test_case_num;
@@ -240,7 +248,7 @@ int main(void) {
 	http::HttpRequestParsedData test1_header_fields;
 	test1_header_fields.request_result.status_code = http::StatusCode(http::OK);
 	test1_header_fields.request_result.request.request_line =
-		http::RequestLine("GET", "/", "HTTP/1.1");
+		CreateRequestLine("GET", "/", "HTTP/1.1");
 	test1_header_fields.is_request_format.is_request_line  = true;
 	test1_header_fields.is_request_format.is_header_fields = true;
 	test1_header_fields.is_request_format.is_body_message  = true;
@@ -257,7 +265,7 @@ int main(void) {
 	// 本来のステータスコードはRequest Timeout
 	test3_header_fields.request_result.status_code = http::StatusCode(http::OK);
 	test3_header_fields.request_result.request.request_line =
-		http::RequestLine("GET", "/", "HTTP/1.1");
+		CreateRequestLine("GET", "/", "HTTP/1.1");
 	test3_header_fields.is_request_format.is_request_line  = true;
 	test3_header_fields.is_request_format.is_header_fields = true;
 	test3_header_fields.is_request_format.is_body_message  = false;
@@ -278,7 +286,7 @@ int main(void) {
 	http::HttpRequestParsedData test1_body_message;
 	test1_body_message.request_result.status_code = http::StatusCode(http::OK);
 	test1_body_message.request_result.request.request_line =
-		http::RequestLine("GET", "/", "HTTP/1.1");
+		CreateRequestLine("GET", "/", "HTTP/1.1");
 	test1_body_message.is_request_format.is_request_line  = true;
 	test1_body_message.is_request_format.is_header_fields = true;
 	test1_body_message.is_request_format.is_body_message  = true;
@@ -287,7 +295,7 @@ int main(void) {
 	http::HttpRequestParsedData test2_body_message;
 	test2_body_message.request_result.status_code = http::StatusCode(http::OK);
 	test2_body_message.request_result.request.request_line =
-		http::RequestLine("GET", "/", "HTTP/1.1");
+		CreateRequestLine("GET", "/", "HTTP/1.1");
 	test2_body_message.is_request_format.is_request_line   = true;
 	test2_body_message.is_request_format.is_header_fields  = true;
 	test2_body_message.is_request_format.is_body_message   = true;

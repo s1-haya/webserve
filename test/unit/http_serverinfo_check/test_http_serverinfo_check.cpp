@@ -113,6 +113,16 @@ void DeleteAddrList(server::VirtualServerAddrList &virtual_servers) {
 	}
 }
 
+http::RequestLine CreateRequestLine(
+	const std::string &method, const std::string &request_target, const std::string &version
+) {
+	http::RequestLine request_line;
+	request_line.method         = method;
+	request_line.request_target = request_target;
+	request_line.version        = version;
+	return request_line;
+}
+
 // ==================== Test汎用 ==================== //
 
 int GetTestCaseNum() {
@@ -157,7 +167,7 @@ InputIt Next(InputIt it, typename std::iterator_traits<InputIt>::difference_type
 int Test1() {
 	// request
 	HttpRequestFormat request;
-	request.request_line              = RequestLine("GET", "/", "HTTP/1.1");
+	request.request_line              = CreateRequestLine("GET", "/", "HTTP/1.1");
 	request.header_fields[HOST]       = "host1";
 	request.header_fields[CONNECTION] = "keep-alive";
 
@@ -189,7 +199,7 @@ int Test1() {
 int Test2() {
 	// request
 	HttpRequestFormat request;
-	request.request_line = RequestLine("GET", "/www/test.html", "HTTP/1.1");
+	request.request_line = CreateRequestLine("GET", "/www/test.html", "HTTP/1.1");
 	request.header_fields[HOST] = "host10"; // hostが見つからない場合がデフォルト(host1)に
 	request.header_fields[CONNECTION] = "keep-alive";
 
@@ -220,7 +230,7 @@ int Test2() {
 int Test3() {
 	// request
 	HttpRequestFormat request;
-	request.request_line              = RequestLine("GET", "/www/data/test.html", "HTTP/1.1");
+	request.request_line              = CreateRequestLine("GET", "/www/data/test.html", "HTTP/1.1");
 	request.header_fields[HOST]       = "host2";
 	request.header_fields[CONNECTION] = "keep-alive";
 
@@ -252,7 +262,7 @@ int Test3() {
 int Test4() {
 	// request
 	HttpRequestFormat request;
-	request.request_line              = RequestLine("GET", "/web/", "HTTP/1.1");
+	request.request_line              = CreateRequestLine("GET", "/web/", "HTTP/1.1");
 	request.header_fields[HOST]       = "host2";
 	request.header_fields[CONNECTION] = "keep-alive";
 
