@@ -127,6 +127,20 @@ IsSameIsConnectionKeep(bool is_connection_keep, bool expected) {
 	return is_connection_keep_result;
 }
 
+Result
+IsSameRequestBuffer(const std::string &request_buffer, const std::string &expected) {
+	Result request_buffer_result;
+	if (request_buffer != expected) {
+		std::ostringstream error_log;
+		error_log << "Error: Request Buffer\n";
+		error_log << "- Expected: [" << expected << "]\n";
+		error_log << "- Result  : [" << request_buffer << "]\n";
+		request_buffer_result.is_success = false;
+		request_buffer_result.error_log  = error_log.str();
+	}
+	return request_buffer_result;
+}
+
 Result IsSameHttpResult(const http::HttpResult &http_result, const http::HttpResult expected) {
 	Result result;
 	// - IsSameIsResponseComplete
@@ -136,7 +150,11 @@ Result IsSameHttpResult(const http::HttpResult &http_result, const http::HttpRes
 	if (!result.is_success()) {
 		return result;
 	}
-	result = IsSameIsConnectionKeep(http_result.is_connection_keep, expected.is_response_complete);
+	result = IsSameIsConnectionKeep(http_result.is_connection_keep, expected.is_connection_keep);
+	if (!result.is_success()) {
+		return result;
+	}
+	result = IsSameRequestBuffer(http_result.request_buf, expected.request_buf);
 	if (!result.is_success()) {
 		return result;
 	}
