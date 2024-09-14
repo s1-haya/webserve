@@ -1,5 +1,5 @@
-#ifndef TMP_HTTP_HPP_
-#define TMP_HTTP_HPP_
+#ifndef HTTP_HPP_
+#define HTTP_HPP_
 
 #include "http_parse.hpp"
 #include "http_response.hpp"
