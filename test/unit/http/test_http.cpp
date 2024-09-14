@@ -75,6 +75,16 @@ int HandleResult(const Result &result) {
 		return EXIT_FAILURE;
 	}
 }
+
+http::MockDtoClientInfos
+CreateMockDtoClientInfos(int fd, const std::string &request_buffer, const std::string &ip) {
+	http::MockDtoClientInfos client_infos;
+	client_infos.fd          = fd;
+	client_infos.request_buf = request_buffer;
+	client_infos.ip          = ip;
+	return client_infos;
+}
+
 http::HttpResult CreateHttpResult(
 	bool               is_response_complete,
 	bool               is_connection_keep,
@@ -115,7 +125,8 @@ int main(void) {
 	// CreateHttpResult
 	// input parameter in HttpResult
 	// ouput HttpResult
-	http::MockDtoClientInfos      client_infos;
+	const std::string &request_buffer = "ok";
+	const http::MockDtoClientInfos      &client_infos = CreateMockDtoClientInfos(1, request_buffer, "127.0.0.1");
 	server::VirtualServerAddrList server_infos;
 	http::HttpResult expected =
 		CreateHttpResult(false, false, "", "");
