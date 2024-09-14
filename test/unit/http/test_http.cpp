@@ -141,11 +141,22 @@ IsSameRequestBuffer(const std::string &request_buffer, const std::string &expect
 	return request_buffer_result;
 }
 
+Result
+IsSameHttpResponse(const std::string &response, const std::string &expected) {
+	Result http_response_result;
+	if (response != expected) {
+		std::ostringstream error_log;
+		error_log << "Error: Http Response\n";
+		error_log << "- Expected: [" << expected << "]\n";
+		error_log << "- Result  : [" << response << "]\n";
+		http_response_result.is_success = false;
+		http_response_result.error_log  = error_log.str();
+	}
+	return http_response_result;
+}
+
 Result IsSameHttpResult(const http::HttpResult &http_result, const http::HttpResult expected) {
 	Result result;
-	// - IsSameIsResponseComplete
-	//	input bool is_response_complete
-	//	output Result
 	result = IsSameIsResponseComplete(http_result.is_response_complete, expected.is_response_complete);
 	if (!result.is_success()) {
 		return result;
@@ -158,11 +169,7 @@ Result IsSameHttpResult(const http::HttpResult &http_result, const http::HttpRes
 	if (!result.is_success()) {
 		return result;
 	}
-	// - IsSameIsConnectionKeep
-	// - IsSameRequestBuffer
-	// - IsSameHttpResponse
-	(void)http_result;
-	(void)expected;
+	result = IsSameHttpResponse(http_result.response, expected.response);
 	return result;
 }
 
