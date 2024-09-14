@@ -99,11 +99,29 @@ http::HttpResult CreateHttpResult(
 	return result;
 }
 
+Result
+IsSameIsResponseComplete(bool is_response_complete, bool expected) {
+	Result is_response_complete_result;
+	if (is_response_complete != expected) {
+		std::ostringstream error_log;
+		error_log << "Error: Is Response Complete\n";
+		error_log << "- Expected: [" << std::boolalpha << expected << "]\n";
+		error_log << "- Result  : [" << std::boolalpha << is_response_complete << "]\n";
+		is_response_complete_result.is_success = false;
+		is_response_complete_result.error_log  = error_log.str();
+	}
+	return is_response_complete_result;
+}
+
 Result IsSameHttpResult(const http::HttpResult &http_result, const http::HttpResult expected) {
 	Result result;
 	// - IsSameIsResponseComplete
 	//	input bool is_response_complete
 	//	output Result
+	result = IsSameIsResponseComplete(http_result.is_response_complete, expected.is_response_complete);
+	if (!result.is_success()) {
+		return result;
+	}
 	// - IsSameIsConnectionKeep
 	// - IsSameRequestBuffer
 	// - IsSameHttpResponse
