@@ -12,7 +12,8 @@ Http::Http() {}
 
 Http::~Http() {}
 
-HttpResult Http::Run(const MockDtoClientInfos &client_info, const server::VirtualServerAddrList &server_info) {
+HttpResult
+Http::Run(const MockDtoClientInfos &client_info, const server::VirtualServerAddrList &server_info) {
 	HttpResult          result;
 	utils::Result<void> parsed_result =
 		ParseHttpRequestFormat(client_info.fd, client_info.request_buf);

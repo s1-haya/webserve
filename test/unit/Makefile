@@ -2,6 +2,7 @@
 # Each directory should have a Makefile with a 'run' target.
 TEST_DIRS	:=	convert_str \
 				http_parse \
+				http_response \
 				http_method \
 				http_storage \
 				http_status_code \

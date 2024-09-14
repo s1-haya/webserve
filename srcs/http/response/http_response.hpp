@@ -35,9 +35,9 @@ class HttpResponse {
   public:
 	typedef std::map<EStatusCode, std::string> ReasonPhrase;
 	static std::string
-					   Run(const MockDtoClientInfos &client_info,
+					   Run(const MockDtoClientInfos            &client_info,
 						   const server::VirtualServerAddrList &server_info,
-						   const HttpRequestResult  &request_info);
+						   const HttpRequestResult             &request_info);
 	static std::string CreateDefaultBodyMessageFormat(const StatusCode &status_code);
 	// static std::string CreateBadRequestResponse(const HttpRequestResult &request_info);
 
@@ -47,9 +47,9 @@ class HttpResponse {
 
 	static std::string        CreateHttpResponse(const HttpResponseFormat &response);
 	static HttpResponseFormat CreateHttpResponseFormat(
-		const MockDtoClientInfos &client_info,
+		const MockDtoClientInfos            &client_info,
 		const server::VirtualServerAddrList &server_info,
-		const HttpRequestResult  &request_info
+		const HttpRequestResult             &request_info
 	);
 	static HeaderFields InitResponseHeaderFields(const HttpRequestResult &request_info);
 	static bool         IsConnectionKeep(const HeaderFields &request_header_fields);

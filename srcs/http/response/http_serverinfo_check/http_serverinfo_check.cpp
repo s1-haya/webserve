@@ -14,7 +14,6 @@ CheckServerInfoResult HttpServerInfoCheck::Check(
 ) {
 	CheckServerInfoResult        result;
 	const server::VirtualServer *vs = FindVirtualServer(server_infos, request.header_fields);
-
 	CheckVirtualServer(result, *vs, request.header_fields);
 	CheckLocationList(result, vs->GetLocationList(), request.request_line.request_target);
 	return result;
