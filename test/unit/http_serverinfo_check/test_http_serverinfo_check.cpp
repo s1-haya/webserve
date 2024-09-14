@@ -178,7 +178,7 @@ int Test1() {
 		COMPARE(result.error_page.GetValue(), virtual_servers.front()->GetErrorPage());
 	} catch (const std::exception &e) {
 		PrintNg();
-		std::cerr << e.what() << '\n';
+		utils::Debug(e.what());
 		DeleteAddrList(virtual_servers);
 		return EXIT_FAILURE;
 	}
@@ -210,7 +210,7 @@ int Test2() {
 		COMPARE(result.error_page.GetValue(), virtual_servers.front()->GetErrorPage());
 	} catch (const std::exception &e) {
 		PrintNg();
-		std::cerr << e.what() << '\n';
+		utils::Debug(e.what());
 		DeleteAddrList(virtual_servers);
 		return EXIT_FAILURE;
 	}
@@ -243,7 +243,7 @@ int Test3() {
 		COMPARE(result.error_page.GetValue(), virtual_servers.front()->GetErrorPage());
 	} catch (const std::exception &e) {
 		PrintNg();
-		std::cerr << e.what() << '\n';
+		utils::Debug(e.what());
 		DeleteAddrList(virtual_servers);
 		return EXIT_FAILURE;
 	}
@@ -277,7 +277,7 @@ int Test4() {
 		COMPARE(result.error_page.GetValue(), virtual_servers.front()->GetErrorPage());
 	} catch (const std::exception &e) {
 		PrintNg();
-		std::cerr << e.what() << '\n';
+		utils::Debug(e.what());
 		DeleteAddrList(virtual_servers);
 		return EXIT_FAILURE;
 	}
@@ -286,40 +286,29 @@ int Test4() {
 	return EXIT_SUCCESS;
 }
 
-// 仮置き: host3を使ってlocation NOFエラーをチェックしたい
-// int Test5() {
-// 	// request
-// 	const RequestLine request_line = {"GET", "/", "HTTP/1.1"};
-// 	HttpRequestFormat request;
-// 	request.request_line              = request_line;
-// 	request.header_fields[HOST]       = "host3";
-// 	request.header_fields[CONNECTION] = "keep-alive";
+// host3に"/"がないのでlocation NOFエラー
+int Test5() {
+	// request
+	const RequestLine request_line = {"GET", "/", "HTTP/1.1"};
+	HttpRequestFormat request;
+	request.request_line              = request_line;
+	request.header_fields[HOST]       = "host3";
+	request.header_fields[CONNECTION] = "keep-alive";
 
-// 	server::VirtualServerAddrList virtual_servers = BuildVirtualServerAddrList();
-// 	CheckServerInfoResult         result = HttpServerInfoCheck::Check(virtual_servers, request);
-// 	const server::VirtualServer  *vs     = *(Next(virtual_servers.begin(), 2)); // host3
-// 	server::Location              location =
-// 		vs->GetLocationList().front(); // location1(nothing)
+	server::VirtualServerAddrList virtual_servers = BuildVirtualServerAddrList();
 
-// 	try {
-// 		COMPARE(result.path, location.request_uri);
-// 		COMPARE(result.index, location.index);
-// 		COMPARE(result.autoindex, location.autoindex);
-// 		COMPARE(result.allowed_methods, location.allowed_methods);
-// 		COMPARE(result.cgi_extension, location.cgi_extension);
-// 		COMPARE(result.upload_directory, location.upload_directory);
-// 		COMPARE(result.redirect.GetValue(), location.redirect);
-// 		COMPARE(result.error_page.GetValue(), virtual_servers.front()->GetErrorPage());
-// 	} catch (const std::exception &e) {
-// 		PrintNg();
-// 		std::cerr << e.what() << '\n';
-// 		DeleteAddrList(virtual_servers);
-// 		return EXIT_FAILURE;
-// 	}
-// 	PrintOk();
-// 	DeleteAddrList(virtual_servers);
-// 	return EXIT_SUCCESS;
-// }
+	try {
+		HttpServerInfoCheck::Check(virtual_servers, request);
+	} catch (const std::exception &e) {
+		PrintOk();
+		utils::Debug(e.what());
+		DeleteAddrList(virtual_servers);
+		return EXIT_SUCCESS;
+	}
+	PrintNg();
+	DeleteAddrList(virtual_servers);
+	return EXIT_FAILURE;
+}
 
 } // namespace
 
@@ -330,5 +319,6 @@ int main() {
 	ret |= Test2();
 	ret |= Test3();
 	ret |= Test4();
+	ret |= Test5();
 	return ret;
 }
