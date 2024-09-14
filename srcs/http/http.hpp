@@ -6,13 +6,6 @@
 #include "http_storage.hpp"
 #include "result.hpp"
 
-namespace server {
-
-struct DtoClientInfos;
-struct DtoServerInfos;
-
-} // namespace server
-
 namespace http {
 
 // todo: server
@@ -26,6 +19,7 @@ namespace http {
 // - HttpRequestFormat
 // - HttpResponse
 // }
+struct DtoClientInfos;
 struct HttpResult;
 
 class Http {

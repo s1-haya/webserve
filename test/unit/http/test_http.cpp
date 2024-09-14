@@ -1,3 +1,4 @@
+#include "client_infos.hpp"
 #include "http.hpp"
 #include "http_result.hpp"
 
@@ -101,9 +102,8 @@ int main(void) {
 	// CreateHttpResult
 	// input parameter in HttpResult
 	// ouput HttpResult
-	http::HttpResult result;
-	http::HttpResult expected;
-	ret_code |= HandleHttpResult(result, expected);
+	http::MockDtoClientInfos      client_infos;
+	server::VirtualServerAddrList server_infos;
 
 	return ret_code;
 }
