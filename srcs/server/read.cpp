@@ -1,5 +1,6 @@
 #include "read.hpp"
-#include <cstdio>   // perror
+#include <cerrno>
+#include <cstring>  // strerror
 #include <unistd.h> // read
 
 namespace server {
@@ -15,7 +16,7 @@ Read::ReadResult Read::ReadRequest(int client_fd) {
 	ssize_t read_ret = read(client_fd, buffer, BUFFER_SIZE);
 	if (read_ret <= 0) {
 		if (read_ret == SYSTEM_ERROR) {
-			perror("read failed");
+			utils::PrintError(__func__, strerror(errno));
 			read_result.Set(false);
 		}
 		const ReadBuf read_buf = {read_ret, ""};

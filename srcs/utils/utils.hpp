@@ -16,6 +16,12 @@ void PrintError(const T &x) {
 	std::cerr << utils::color::RED << "Error: " << x << utils::color::RESET << std::endl;
 }
 
+template <typename T, typename U>
+void PrintError(const T &x, const U &y) {
+	std::cerr << utils::color::RED << "Error: " << x << ": " << y << utils::color::RESET
+			  << std::endl;
+}
+
 template <typename T>
 void Debug(const T &x) {
 	std::cerr << color::GRAY << x << color::RESET << std::endl;
