@@ -115,7 +115,7 @@ void Epoll::Append(const event::Event &event, const event::Type new_type) {
 
 event::Event Epoll::GetEvent(std::size_t index) const {
 	if (index >= MAX_EVENTS) {
-		throw std::out_of_range("evlist index out of range");
+		throw std::logic_error("evlist index out of range");
 	}
 	return ConvertToEventDto(evlist_[index]);
 }
