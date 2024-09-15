@@ -4,6 +4,7 @@
 #include "event.hpp"
 #include "read.hpp"
 #include "send.hpp"
+#include "start_up_exception.hpp"
 #include "utils.hpp"
 #include "virtual_server.hpp"
 #include <errno.h>
@@ -117,7 +118,11 @@ void Server::AddVirtualServers(const ConfigServers &config_servers) {
 }
 
 Server::Server(const ConfigServers &config_servers) {
-	AddVirtualServers(config_servers);
+	try {
+		AddVirtualServers(config_servers);
+	} catch (const std::exception &e) {
+		throw StartUpException("Construct Server failed");
+	}
 }
 
 Server::~Server() {}
@@ -388,7 +393,11 @@ void Server::Init() {
 	const VirtualServerList &virtual_server_list = context_.GetAllVirtualServer();
 
 	AddServerInfoToContext(virtual_server_list);
-	ListenAllHostPorts(virtual_server_list);
+	try {
+		ListenAllHostPorts(virtual_server_list);
+	} catch (const std::exception &e) {
+		throw StartUpException("Init Server failed");
+	}
 }
 
 void Server::SetNonBlockingMode(int sock_fd) {
