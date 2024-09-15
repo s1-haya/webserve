@@ -292,10 +292,11 @@ void Server::KeepConnection(int client_fd) {
 	utils::Debug("server", "Connection: keep-alive client", client_fd);
 }
 
-// todo: 強制Disconnectする場合はHttpにclient_fdを知らせてdata削除する必要あり
-//       internal server error用responseを貰って実際は送らないという手もあり
 // delete from context, event, message
 void Server::Disconnect(int client_fd) {
+	// todo: client_save_dataがない場合に呼ばれても大丈夫な作りになってるか確認
+	// HttpResult is not used.
+	mock_http_.GetErrorResponse(GetClientInfos(client_fd), http::INTERNAL_ERROR);
 	context_.DeleteClientInfo(client_fd);
 	event_monitor_.Delete(client_fd);
 	message_manager_.DeleteMessage(client_fd);
