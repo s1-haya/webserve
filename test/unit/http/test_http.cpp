@@ -46,7 +46,7 @@
  */
 
 server::VirtualServerAddrList BuildVirtualServerAddrList();
-void DeleteAddrList(const server::VirtualServerAddrList &virtual_servers);
+void                          DeleteAddrList(const server::VirtualServerAddrList &virtual_servers);
 
 namespace {
 
@@ -181,7 +181,7 @@ int HandleHttpResult(
 ) {
 	http::Http       http;
 	http::HttpResult http_result = http.Run(client_infos, server_infos);
-	const Result &result = IsSameHttpResult(http_result, expected);
+	const Result    &result      = IsSameHttpResult(http_result, expected);
 	return HandleResult(result);
 }
 } // namespace
@@ -193,7 +193,7 @@ int main(void) {
 	const http::MockDtoClientInfos &client_infos =
 		CreateMockDtoClientInfos(1, request_buffer, "127.0.0.1");
 	server::VirtualServerAddrList server_infos = BuildVirtualServerAddrList();
-	http::HttpResult              expected = CreateHttpResult(false, true, "", "");
+	http::HttpResult              expected     = CreateHttpResult(false, true, "", "");
 	ret_code |= HandleHttpResult(client_infos, server_infos, expected);
 
 	DeleteAddrList(server_infos);

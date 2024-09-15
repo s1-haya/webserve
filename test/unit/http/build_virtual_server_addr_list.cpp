@@ -8,8 +8,8 @@
  *         and containing the response data.
  */
 
-#include "virtual_server.hpp"
 #include "http_message.hpp"
+#include "virtual_server.hpp"
 
 namespace server {
 
@@ -58,9 +58,9 @@ server::VirtualServer *BuildVirtualServer1() {
 	std::list<std::string> allowed_methods_root;
 	allowed_methods_root.push_back(http::GET);
 	allowed_methods_root.push_back(http::POST);
-	server::Location       loc_root             = BuildLocation(
-        "/", "/html/", "index.html", false, allowed_methods_root, std::make_pair(0, "")
-    );
+	server::Location loc_root = BuildLocation(
+		"/", "/html/", "index.html", false, allowed_methods_root, std::make_pair(0, "")
+	);
 	locationlist.push_back(loc_root);
 
 	// Location 2 - "/save"
@@ -68,21 +68,23 @@ server::VirtualServer *BuildVirtualServer1() {
 	allowed_methods_save.push_back(http::GET);
 	allowed_methods_save.push_back(http::POST);
 	allowed_methods_save.push_back(http::DELETE);
-	server::Location       loc_save             = BuildLocation(
-        "/save", "", "", true, allowed_methods_save, std::make_pair(0, ""), "", "/save"
-    );
+	server::Location loc_save = BuildLocation(
+		"/save", "", "", true, allowed_methods_save, std::make_pair(0, ""), "", "/save"
+	);
 	locationlist.push_back(loc_save);
 
 	// Location 3 - "/cgi-bin"
 	std::list<std::string> allowed_methods_cgi;
 	allowed_methods_cgi.push_back(http::GET);
 	allowed_methods_cgi.push_back(http::POST);
-	server::Location       loc_cgi             = BuildLocation(
-        "/cgi-bin", "", "", false, allowed_methods_cgi, std::make_pair(0, ""), ".pl", ""
-    );
+	server::Location loc_cgi = BuildLocation(
+		"/cgi-bin", "", "", false, allowed_methods_cgi, std::make_pair(0, ""), ".pl", ""
+	);
 	locationlist.push_back(loc_cgi);
 
-	return new server::VirtualServer(server_names, locationlist, host_ports, client_max_body_size, error_page);
+	return new server::VirtualServer(
+		server_names, locationlist, host_ports, client_max_body_size, error_page
+	);
 }
 
 // VirtualServer2を作成する関数
@@ -100,12 +102,14 @@ server::VirtualServer *BuildVirtualServer2() {
 	server::VirtualServer::LocationList locationlist;
 	// Location 1 - "/"
 	std::list<std::string> allowed_methods_root;
-	server::Location       loc_root             = BuildLocation(
+	server::Location       loc_root = BuildLocation(
         "/", "/html", "", false, allowed_methods_root, std::make_pair(301, "index.html")
     );
 	locationlist.push_back(loc_root);
 
-	return new server::VirtualServer(server_names, locationlist, host_ports, client_max_body_size, error_page);
+	return new server::VirtualServer(
+		server_names, locationlist, host_ports, client_max_body_size, error_page
+	);
 }
 
 // VirtualServerAddrListを作成する関数
