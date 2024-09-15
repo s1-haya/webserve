@@ -1,6 +1,7 @@
 #include "color.hpp"
 #include "config.hpp"
 #include "server.hpp"
+#include "start_up_exception.hpp"
 #include "utils.hpp"
 #include <csignal>
 #include <cstdlib> // EXIT_
@@ -31,6 +32,23 @@ SignalResult SetSignalHandler() {
 
 } // namespace
 
+// Throw server::StartUpException until server.Init() completes.
+void RunServer() {
+	while (true) {
+		try {
+			server::Server server(config::ConfigInstance->servers_);
+			config::ConfigInstance->Destroy();
+			server.Init();
+			server.Run();
+		} catch (const server::StartUpException &e) {
+			throw;
+		} catch (const std::exception &e) {
+			PrintError(e.what());
+		}
+		utils::Debug("server", "re-run server");
+	}
+}
+
 int main(int argc, char **argv) {
 	if (argc > 2) {
 		PrintError("invalid arguments");
@@ -51,10 +69,7 @@ int main(int argc, char **argv) {
 	}
 	try {
 		config::ConfigInstance->Create(path_config);
-		server::Server server(config::ConfigInstance->servers_);
-		config::ConfigInstance->Destroy();
-		server.Init();
-		server.Run();
+		RunServer();
 	} catch (const std::exception &e) {
 		PrintError(e.what());
 		return EXIT_FAILURE;
