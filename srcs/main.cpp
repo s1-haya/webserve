@@ -37,7 +37,6 @@ void RunServer() {
 	while (true) {
 		try {
 			server::Server server(config::ConfigInstance->servers_);
-			config::ConfigInstance->Destroy();
 			server.Init();
 			server.Run();
 		} catch (const server::StartUpException &e) {
@@ -70,6 +69,7 @@ int main(int argc, char **argv) {
 	try {
 		config::ConfigInstance->Create(path_config);
 		RunServer();
+		config::ConfigInstance->Destroy();
 	} catch (const std::exception &e) {
 		PrintError(e.what());
 		return EXIT_FAILURE;
