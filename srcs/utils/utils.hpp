@@ -12,6 +12,11 @@
 namespace utils {
 
 template <typename T>
+void PrintError(const T &x) {
+	std::cerr << utils::color::RED << "Error: " << x << utils::color::RESET << std::endl;
+}
+
+template <typename T>
 void Debug(const T &x) {
 	std::cerr << color::GRAY << x << color::RESET << std::endl;
 }
