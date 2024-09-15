@@ -77,11 +77,11 @@ void Epoll::Delete(int socket_fd) {
 	}
 }
 
+// epoll_wait() always monitors EPOLLHUP and EPOLLERR, so no need to explicitly set them in events.
 int Epoll::CreateReadyList() {
 	errno = 0;
 	// todo: set timeout(ms)
 	const int ready = epoll_wait(epoll_fd_, evlist_, MAX_EVENTS, 500);
-
 	if (ready == SYSTEM_ERROR) {
 		if (errno == EINTR) {
 			return ready;
