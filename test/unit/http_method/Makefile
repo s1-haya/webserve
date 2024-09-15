@@ -103,8 +103,8 @@ run: all
 	@./$(NAME) 2>&1 | tee $(LOG_FILE_PATH); \
 	status=$${PIPESTATUS[0]}; \
 	echo -e "\nunit test's log =>" $(LOG_FILE_PATH); \
+	make clean-test; \
 	exit $$status;
-	@make clean-test
 
 .PHONY	: val
 val: all
