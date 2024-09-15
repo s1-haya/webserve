@@ -1,6 +1,8 @@
 #include "epoll.hpp"
+#include "system_exception.hpp"
 #include "utils.hpp"
-#include <errno.h>
+#include <cerrno>
+#include <cstring>  // strerror
 #include <stdint.h> // uint32_t
 #include <unistd.h> // close
 
@@ -9,7 +11,7 @@ namespace epoll {
 Epoll::Epoll() {
 	epoll_fd_ = epoll_create1(EPOLL_CLOEXEC);
 	if (epoll_fd_ == SYSTEM_ERROR) {
-		throw std::runtime_error("epoll_create failed");
+		throw SystemException("epoll_create failed: " + std::string(strerror(errno)));
 	}
 }
 
@@ -66,14 +68,14 @@ void Epoll::Add(int socket_fd, event::Type type) {
 	ev.events             = ConvertToEpollEventType(type);
 	ev.data.fd            = socket_fd;
 	if (epoll_ctl(epoll_fd_, EPOLL_CTL_ADD, socket_fd, &ev) == SYSTEM_ERROR) {
-		throw std::runtime_error("epoll_ctl add failed");
+		throw SystemException("epoll_ctl add failed: " + std::string(strerror(errno)));
 	}
 }
 
 // remove socket_fd from epoll's interest list
 void Epoll::Delete(int socket_fd) {
 	if (epoll_ctl(epoll_fd_, EPOLL_CTL_DEL, socket_fd, NULL) == SYSTEM_ERROR) {
-		throw std::runtime_error("epoll_ctl delete failed");
+		throw SystemException("epoll_ctl delete failed: " + std::string(strerror(errno)));
 	}
 }
 
@@ -86,7 +88,7 @@ int Epoll::CreateReadyList() {
 		if (errno == EINTR) {
 			return ready;
 		}
-		throw std::runtime_error("epoll_wait failed");
+		throw SystemException("epoll_wait failed: " + std::string(strerror(errno)));
 	}
 	return ready;
 }
@@ -97,7 +99,7 @@ void Epoll::Replace(int socket_fd, const event::Type new_type) {
 	ev.events             = ConvertToEpollEventType(new_type);
 	ev.data.fd            = socket_fd;
 	if (epoll_ctl(epoll_fd_, EPOLL_CTL_MOD, socket_fd, &ev) == SYSTEM_ERROR) {
-		throw std::runtime_error("epoll_ctl replace failed");
+		throw SystemException("epoll_ctl replace failed: " + std::string(strerror(errno)));
 	}
 }
 
@@ -109,7 +111,7 @@ void Epoll::Append(const event::Event &event, const event::Type new_type) {
 	ev.events             = ConvertToEpollEventType(event.type) | ConvertToEpollEventType(new_type);
 	ev.data.fd            = socket_fd;
 	if (epoll_ctl(epoll_fd_, EPOLL_CTL_MOD, socket_fd, &ev) == SYSTEM_ERROR) {
-		throw std::runtime_error("epoll_ctl append failed");
+		throw SystemException("epoll_ctl append failed: " + std::string(strerror(errno)));
 	}
 }
 
