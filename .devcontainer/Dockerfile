@@ -9,8 +9,8 @@ RUN apt-get update && \
     python3=3.8.2-0ubuntu2 \
     python3-pip=20.0.2-5ubuntu1.10 \
     build-essential \
-    curl=7.68.0-1ubuntu2.22 \
-    vim-common=2:8.1.2269-1ubuntu5.23 vim-runtime=2:8.1.2269-1ubuntu5.23 vim=2:8.1.2269-1ubuntu5.23 \
+    curl=7.68.0-1ubuntu2.23 \
+    vim=2:8.1.2269-1ubuntu5.24 \
     clang-format=1:10.0-50~exp1 \
     valgrind=1:3.15.0-1ubuntu9 \
     cppcheck=1.90-4build1 \
@@ -28,6 +28,11 @@ RUN pip install --upgrade pip && \
     pip-sync
 
 RUN rm -rf /var/lib/apt/lists/*
+
+# 新しいユーザーを作成。この時点ではuserはroot
+RUN useradd -ms /bin/bash tmp_webserv
+# root権限が必要なinstall等を終えたら、作成したユーザーに切り替え
+USER tmp_webserv
 
 VOLUME [ "/workspaces" ]
 
