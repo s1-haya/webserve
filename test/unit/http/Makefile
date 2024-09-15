@@ -35,7 +35,8 @@ SRCS				+=	$(WS_UTILS_DIR)/color.cpp \
 						$(WS_VIRTUAL_SERVER_DIR)/virtual_server.cpp
 
 # 3. Add unit test files
-SRCS	+=	test_http.cpp
+SRCS	+=	test_http.cpp \
+			build_virtual_server_addr_list.cpp
 
 # 4. Add directory for INCLUDE
 SRCS_DIR	:=	$(WS_UTILS_DIR) \

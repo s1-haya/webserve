@@ -45,6 +45,9 @@
  *         and containing the response data.
  */
 
+server::VirtualServerAddrList BuildVirtualServerAddrList();
+void DeleteAddrList(const server::VirtualServerAddrList &virtual_servers);
+
 namespace {
 
 struct Result {
@@ -197,9 +200,10 @@ int main(void) {
 	const http::MockDtoClientInfos &client_infos =
 		CreateMockDtoClientInfos(1, request_buffer, "127.0.0.1");
 	// todo: InitServerInfos;
-	server::VirtualServerAddrList server_infos;
+	server::VirtualServerAddrList server_infos = BuildVirtualServerAddrList();
 	http::HttpResult              expected = CreateHttpResult(false, true, "", "");
 	ret_code |= HandleHttpResult(client_infos, server_infos, expected);
 
+	DeleteAddrList(server_infos);
 	return ret_code;
 }
