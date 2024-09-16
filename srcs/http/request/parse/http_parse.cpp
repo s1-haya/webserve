@@ -142,7 +142,7 @@ void HttpParse::ParseChunkedRequest(HttpRequestParsedData &data) {
 		data.current_buf.erase(0, chunk_data.size() + CRLF.size());
 		if (chunk_data.size() != chunk_size) {
 			throw HttpException(
-				"Error: chunk size and chunked data size are different", StatusCode(BAD_REQUEST)
+				"Error: chunk size and chunk data size are different", StatusCode(BAD_REQUEST)
 			);
 		}
 		data.request_result.request.body_message += chunk_data;
