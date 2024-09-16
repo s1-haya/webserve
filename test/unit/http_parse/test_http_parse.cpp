@@ -162,6 +162,19 @@ Result IsSameHeaderFields(const http::HeaderFields &res, http::HeaderFields expe
 	return header_fields_result;
 }
 
+Result IsSameBodyMessage(const std::string &res, const std::string expected) {
+	Result             body_message_result;
+	std::ostringstream error_log;
+	if (res != expected) {
+		error_log << "Error: body_message\n";
+		error_log << "- Expected: [" << expected << "]\n";
+		error_log << "- Result  : [" << res << "]\n";
+		body_message_result.is_success = false;
+	}
+	body_message_result.error_log = error_log.str();
+	return body_message_result;
+}
+
 Result
 IsSameHttpRequest(const http::HttpRequestFormat &res, const http::HttpRequestFormat &expected) {
 	Result request_line_result = IsSameRequestLine(res.request_line, expected.request_line);
@@ -171,6 +184,10 @@ IsSameHttpRequest(const http::HttpRequestFormat &res, const http::HttpRequestFor
 	Result header_fields_result = IsSameHeaderFields(res.header_fields, expected.header_fields);
 	if (!(header_fields_result.is_success)) {
 		return header_fields_result;
+	}
+	Result body_message_result = IsSameBodyMessage(res.body_message, expected.body_message);
+	if (!(body_message_result.is_success)) {
+		return body_message_result;
 	}
 	Result http_request_result;
 	return http_request_result;
