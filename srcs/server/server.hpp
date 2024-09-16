@@ -56,6 +56,7 @@ class Server {
 	void SetNonBlockingMode(int sock_fd);
 	// wrapper for epoll
 	void ReplaceEvent(int client_fd, event::Type type);
+	void AppendEventWrite(const event::Event &event);
 	// for Server to Http
 	http::ClientInfos     GetClientInfos(int client_fd) const;
 	VirtualServerAddrList GetVirtualServerList(int client_fd) const;

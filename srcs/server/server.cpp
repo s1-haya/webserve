@@ -321,7 +321,7 @@ void Server::UpdateEventInResponseComplete(
 ) {
 	switch (connection_state) {
 	case message::KEEP:
-		event_monitor_.Append(event, event::EVENT_WRITE);
+		AppendEventWrite(event);
 		break;
 	case message::CLOSE:
 		ReplaceEvent(event.fd, event::EVENT_WRITE);
@@ -361,6 +361,15 @@ void Server::ReplaceEvent(int client_fd, event::Type type) {
 		default:
 			break;
 		}
+	}
+}
+
+void Server::AppendEventWrite(const event::Event &event) {
+	try {
+		event_monitor_.Append(event, event::EVENT_WRITE);
+	} catch (const SystemErrorException &e) {
+		utils::PrintError(e.what());
+		Disconnect(event.fd);
 	}
 }
 
