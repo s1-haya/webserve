@@ -362,6 +362,16 @@ int main(void) {
 	test5_body_message.is_request_format.is_body_message   = false;
 	test5_body_message.request_result.request.body_message = "Wikipedia";
 
+	// 12.Chunked Transfer-Encodingの場合で、Content-Lengthがある場合
+	http::HttpRequestParsedData test6_body_message;
+	test6_body_message.request_result.status_code = http::StatusCode(http::BAD_REQUEST);
+	test6_body_message.request_result.request.request_line =
+		CreateRequestLine("POST", "/", "HTTP/1.1");
+	test6_body_message.is_request_format.is_request_line   = true;
+	test6_body_message.is_request_format.is_header_fields  = true;
+	test6_body_message.is_request_format.is_body_message   = false;
+	test6_body_message.request_result.request.body_message = "Wikipedia";
+
 	static const TestCase test_case_http_request_body_message_format[] = {
 		TestCase(
 			"GET / HTTP/1.1\r\nHost: a\r\n\r\nContent-Length:  3\r\n\r\nabc", test1_body_message
@@ -383,6 +393,11 @@ int main(void) {
 			"POST / HTTP/1.1\r\nHost: host\r\nTransfer-Encoding: "
 			"chunked\r\n\r\n4\r\nWiki\r\n2\r\npedia\r\n0\r\n\r\n",
 			test5_body_message
+		),
+		TestCase(
+			"POST / HTTP/1.1\r\nHost: host\r\nTransfer-Encoding: "
+			"chunked\r\nContent-Length: 10\r\n\r\n4\r\nWiki\r\n5\r\npedia\r\n0\r\n\r\n",
+			test6_body_message
 		),
 	};
 
