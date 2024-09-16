@@ -123,7 +123,7 @@ Server::Server(const ConfigServers &config_servers) {
 	try {
 		AddVirtualServers(config_servers);
 	} catch (const std::exception &e) {
-		throw StartUpException("Construct Server failed");
+		throw StartUpException(e.what());
 	}
 }
 
@@ -398,7 +398,7 @@ void Server::Init() {
 	try {
 		ListenAllHostPorts(virtual_server_list);
 	} catch (const std::exception &e) {
-		throw StartUpException("Init Server failed");
+		throw StartUpException(e.what());
 	}
 }
 
