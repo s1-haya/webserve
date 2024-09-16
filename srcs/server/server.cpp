@@ -5,7 +5,7 @@
 #include "read.hpp"
 #include "send.hpp"
 #include "start_up_exception.hpp"
-#include "system_exception.hpp"
+#include "system_error_exception.hpp"
 #include "utils.hpp"
 #include "virtual_server.hpp"
 #include <cerrno>
@@ -129,7 +129,7 @@ Server::Server(const ConfigServers &config_servers) {
 
 Server::~Server() {}
 
-// throw SystemException
+// throw SystemErrorException
 void Server::Run() {
 	utils::Debug("server", "run server");
 
@@ -200,7 +200,7 @@ VirtualServerAddrList Server::GetVirtualServerList(int client_fd) const {
 void Server::ReadRequest(int client_fd) {
 	const Read::ReadResult read_result = Read::ReadRequest(client_fd);
 	if (!read_result.IsOk()) {
-		throw SystemException("read failed: " + std::string(strerror(errno)));
+		throw SystemErrorException("read failed: " + std::string(strerror(errno)));
 	}
 	if (read_result.GetValue().read_size == 0) {
 		// todo: need?
@@ -405,11 +405,11 @@ void Server::Init() {
 void Server::SetNonBlockingMode(int sock_fd) {
 	int flags = fcntl(sock_fd, F_GETFL);
 	if (flags == SYSTEM_ERROR) {
-		throw SystemException("fcntl F_GETFL failed: " + std::string(strerror(errno)));
+		throw SystemErrorException("fcntl F_GETFL failed: " + std::string(strerror(errno)));
 	}
 	flags |= O_NONBLOCK;
 	if (fcntl(sock_fd, F_SETFL, flags) == SYSTEM_ERROR) {
-		throw SystemException("fcntl F_SETFL failed: " + std::string(strerror(errno)));
+		throw SystemErrorException("fcntl F_SETFL failed: " + std::string(strerror(errno)));
 	}
 }
 
