@@ -9,7 +9,7 @@ RUN apt-get update && \
     python3=3.8.2-0ubuntu2 \
     python3-pip=20.0.2-5ubuntu1.10 \
     build-essential \
-    curl=7.68.0-1ubuntu2.23 \
+    curl=7.68.0-1ubuntu2.24 \
     vim=2:8.1.2269-1ubuntu5.24 \
     clang-format=1:10.0-50~exp1 \
     valgrind=1:3.15.0-1ubuntu9 \
