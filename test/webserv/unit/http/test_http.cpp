@@ -46,7 +46,7 @@
  */
 
 server::VirtualServerAddrList BuildVirtualServerAddrList();
-void                          DeleteAddrList(const server::VirtualServerAddrList &virtual_servers);
+void DeleteVirtualServerAddrList(const server::VirtualServerAddrList &virtual_servers);
 
 namespace {
 
@@ -196,6 +196,6 @@ int main(void) {
 	http::HttpResult              expected     = CreateHttpResult(false, true, "", "");
 	ret_code |= HandleHttpResult(client_infos, server_infos, expected);
 
-	DeleteAddrList(server_infos);
+	DeleteVirtualServerAddrList(server_infos);
 	return ret_code;
 }
