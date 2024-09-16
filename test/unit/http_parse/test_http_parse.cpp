@@ -144,6 +144,20 @@ Result IsSameHeaderFields(const http::HeaderFields &res, http::HeaderFields expe
 		error_log << "- Result  : [" << res.at("Connection") << "]\n";
 		header_fields_result.is_success = false;
 	}
+	if (expected["Content-Length"].size() &&
+		expected.at("Content-Length") != res.at("Content-Length")) {
+		error_log << "Error: Content-Length\n";
+		error_log << "- Expected: [" << expected.at("Content-Length") << "]\n";
+		error_log << "- Result  : [" << res.at("Content-Length") << "]\n";
+		header_fields_result.is_success = false;
+	}
+	if (expected["Transfer-Encoding"].size() &&
+		expected.at("Transfer-Encoding") != res.at("Transfer-Encoding")) {
+		error_log << "Error: Transfer-Encoding\n";
+		error_log << "- Expected: [" << expected.at("Transfer-Encoding") << "]\n";
+		error_log << "- Result  : [" << res.at("Transfer-Encoding") << "]\n";
+		header_fields_result.is_success = false;
+	}
 	header_fields_result.error_log = error_log.str();
 	return header_fields_result;
 }
