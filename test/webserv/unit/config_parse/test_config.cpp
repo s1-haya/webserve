@@ -208,7 +208,7 @@ Result Run(std::string file_path, const ServerList &expected) {
 	Result run_result;
 
 	// add file path
-	file_path = "../../../config_files/test_files/" + file_path;
+	file_path = "../../../common/config/test_files/" + file_path;
 	ConfigInstance->Create(file_path);
 	if (ConfigInstance->servers_ != expected) {
 		std::ostringstream error_log;
@@ -250,7 +250,7 @@ int RunErrorTest(std::string file_path, const std::string &src) {
 	int ret_code = EXIT_SUCCESS;
 
 	// add file path
-	file_path = "../../../config_files/error_test_files/" + file_path;
+	file_path = "../../../common/config/error_test_files/" + file_path;
 	try {
 		ConfigInstance->Create(file_path);
 		PrintNg();
