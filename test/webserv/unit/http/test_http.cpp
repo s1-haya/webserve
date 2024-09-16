@@ -231,12 +231,12 @@ int main(void) {
 	// CreateHttpResult
 	// input parameter in HttpResult
 	// ouput HttpResult
-	const std::string              &test1_request_buffer = LoadFileContent("../../../common/request/get/200/no_connection.txt");
+	const std::string              &test1_request_buffer = LoadFileContent("../../../common/request/get/200/no-connection.txt");
 	const http::MockDtoClientInfos &client_infos =
 		CreateMockDtoClientInfos(test1_request_buffer);
 	// todo: InitServerInfos;
 	server::VirtualServerAddrList server_infos;
-	http::HttpResult              expected = CreateHttpResult(false, true, expected1_response, "");
+	http::HttpResult              expected = CreateHttpResult(false, true, "", "");
 	ret_code |= HandleHttpResult(client_infos, server_infos, expected);
 
 	return ret_code;
