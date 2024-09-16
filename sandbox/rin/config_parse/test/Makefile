@@ -4,7 +4,7 @@ NAME			:=	a.out
 TEST_DIR		:=	config_parse
 
 # 2. Add target webserv files
-WS_SRCS_DIR		:=	../../../srcs
+WS_SRCS_DIR		:=	../../../../srcs
 WS_UTILS_DIR	:=	$(WS_SRCS_DIR)/utils
 WS_CONFIG_PARSE_DIR	:=	$(WS_SRCS_DIR)/config_parse
 SRCS			+=	$(WS_CONFIG_PARSE_DIR)/config.cpp \

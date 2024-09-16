@@ -42,7 +42,12 @@ uint32_t ConvertToEventType(uint32_t type) {
 	if (type & EPOLLOUT) {
 		ret_type |= event::EVENT_WRITE;
 	}
-	// todo: tmp
+	if (type & EPOLLERR) {
+		ret_type |= event::EVENT_ERROR;
+	}
+	if (type & EPOLLHUP) {
+		ret_type |= event::EVENT_HANGUP;
+	}
 	return ret_type;
 }
 
@@ -61,21 +66,22 @@ void Epoll::Add(int socket_fd, event::Type type) {
 	ev.events             = ConvertToEpollEventType(type);
 	ev.data.fd            = socket_fd;
 	if (epoll_ctl(epoll_fd_, EPOLL_CTL_ADD, socket_fd, &ev) == SYSTEM_ERROR) {
-		throw std::runtime_error("epoll_ctl failed");
+		throw std::runtime_error("epoll_ctl add failed");
 	}
 }
 
 // remove socket_fd from epoll's interest list
 void Epoll::Delete(int socket_fd) {
-	// todo: error?
-	epoll_ctl(epoll_fd_, EPOLL_CTL_DEL, socket_fd, NULL);
+	if (epoll_ctl(epoll_fd_, EPOLL_CTL_DEL, socket_fd, NULL) == SYSTEM_ERROR) {
+		throw std::runtime_error("epoll_ctl delete failed");
+	}
 }
 
+// epoll_wait() always monitors EPOLLHUP and EPOLLERR, so no need to explicitly set them in events.
 int Epoll::CreateReadyList() {
 	errno = 0;
 	// todo: set timeout(ms)
 	const int ready = epoll_wait(epoll_fd_, evlist_, MAX_EVENTS, 500);
-
 	if (ready == SYSTEM_ERROR) {
 		if (errno == EINTR) {
 			return ready;
@@ -91,7 +97,7 @@ void Epoll::Replace(int socket_fd, const event::Type new_type) {
 	ev.events             = ConvertToEpollEventType(new_type);
 	ev.data.fd            = socket_fd;
 	if (epoll_ctl(epoll_fd_, EPOLL_CTL_MOD, socket_fd, &ev) == SYSTEM_ERROR) {
-		throw std::runtime_error("epoll_ctl failed");
+		throw std::runtime_error("epoll_ctl replace failed");
 	}
 }
 
@@ -103,7 +109,7 @@ void Epoll::Append(const event::Event &event, const event::Type new_type) {
 	ev.events             = ConvertToEpollEventType(event.type) | ConvertToEpollEventType(new_type);
 	ev.data.fd            = socket_fd;
 	if (epoll_ctl(epoll_fd_, EPOLL_CTL_MOD, socket_fd, &ev) == SYSTEM_ERROR) {
-		throw std::runtime_error("epoll_ctl failed");
+		throw std::runtime_error("epoll_ctl append failed");
 	}
 }
 
