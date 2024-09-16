@@ -16,7 +16,7 @@ namespace {
 
 // todo: create path (/, /aaa, /aaa/)
 std::string CreateDefaultPath(const std::string &path) {
-	static const std::string location = "html";
+	static const std::string location = "root/html";
 
 	if (path.size() == 1) {
 		return location + "/index.html";
@@ -49,7 +49,7 @@ std::string FileToString(const std::ifstream &file) {
 std::string ReadFile(const std::string &file_path) {
 	std::ifstream file(file_path.c_str());
 	if (!file) {
-		std::ifstream error_file("html/404.html");
+		std::ifstream error_file("root/html/404.html");
 		utils::Debug("http", "404 file not found");
 		return FileToString(error_file);
 	}

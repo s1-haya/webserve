@@ -11,7 +11,7 @@ def test_ok() -> None:
         response = con.getresponse()
         assert_status_line(response, HTTPStatus.OK)
         assert_header(response, "Connection", "close")
-        assert_body(response, "./html/index.html")
+        assert_body(response, "root/html/index.html")
         con.close()
     except HTTPException as e:
         print(f"Request failed: {e}")
@@ -24,7 +24,7 @@ def test_ok_in_sub_directory() -> None:
         response = con.getresponse()
         assert_status_line(response, HTTPStatus.OK)
         assert_header(response, "Connection", "close")
-        assert_body(response, "./html/sub/index.html")
+        assert_body(response, "root/html/sub/index.html")
         con.close()
     except HTTPException as e:
         print(f"Request failed: {e}")
@@ -37,7 +37,7 @@ def test_not_found() -> None:
         response = con.getresponse()
         # assert_status_line(response, HTTPStatus.NOT_FOUND)
         assert_header(response, "Connection", "close")
-        assert_body(response, "./html/404.html")
+        assert_body(response, "root/html/404.html")
         con.close()
     except HTTPException as e:
         print(f"Request failed: {e}")

@@ -66,7 +66,7 @@ server::VirtualServer *BuildVirtualServer1() {
 	// LocationList
 	server::VirtualServer::LocationList locationlist;
 	// リソースの取得位置によって(srcs/http/response/http_method.cpp)によって出力結果が決まる
-	std::string                         alias = "../../../../html/index.html";
+	std::string                         alias = "../../../../root/html/index.html";
 	server::Location::AllowedMethodList allowed_methods;
 	allowed_methods.push_back("GET");
 	allowed_methods.push_back("POST");
@@ -93,7 +93,7 @@ server::VirtualServer *BuildVirtualServer2() {
 	// LocationList
 	server::VirtualServer::LocationList locationlist;
 	// リソースの取得位置によって(srcs/http/response/http_method.cpp)によって出力結果が決まる
-	std::string                         alias = "../../../../html/index.html";
+	std::string                         alias = "../../../../root/html/index.html";
 	server::Location::AllowedMethodList allowed_methods;
 	allowed_methods.push_back("POST");
 	server::Location::Redirect redirect;
@@ -162,7 +162,7 @@ int main(void) {
 	std::string response1 = http::HttpResponse::Run(client_info, server_info, request_info);
 
 	std::string expected1_status_line   = LoadFileContent("expected/status_line/ok.txt");
-	std::string expected1_body_message  = LoadFileContent("../../../../html/index.html");
+	std::string expected1_body_message  = LoadFileContent("../../../../root/html/index.html");
 	std::string expected1_header_fields = SetDefaultHeaderFields(
 		http::KEEP_ALIVE, utils::ToString(expected1_body_message.length()), "test/html"
 	);

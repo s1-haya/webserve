@@ -42,8 +42,8 @@ def assert_response(response, expected_response):
     ), f"Expected response\n\n {repr(expected_response)}, but got\n\n {repr(response)}"
 
 
-root_index_file, root_index_file_length = read_file("html/index.html")
-sub_index_file, sub_index_file_length = read_file("html/sub/index.html")
+root_index_file, root_index_file_length = read_file("root/html/index.html")
+sub_index_file, sub_index_file_length = read_file("root/html/sub/index.html")
 
 response_header_get_root_200 = f"HTTP/1.1 200 OK\r\nConnection: close \r\nContent-Length: {root_index_file_length} \r\n\r\n"
 
