@@ -9,7 +9,7 @@
 #include "utils.hpp"
 #include "virtual_server.hpp"
 #include <cstring> // strerror
-#include <errno.h>
+#include <cerrno>
 #include <fcntl.h>      // fcntl
 #include <sys/socket.h> // socket
 #include <unistd.h>     // close

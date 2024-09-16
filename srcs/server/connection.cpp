@@ -3,7 +3,8 @@
 #include "server.hpp"
 #include "server_info.hpp"
 #include "system_exception.hpp"
-#include "utils.hpp"    // ConvertUintToStr
+#include "utils.hpp" // ConvertUintToStr
+#include <cerrno>
 #include <cstring>      // strerror
 #include <netdb.h>      // getaddrinfo,freeaddrinfo
 #include <netinet/in.h> // struct sockaddr

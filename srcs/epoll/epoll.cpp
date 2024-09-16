@@ -1,8 +1,8 @@
 #include "epoll.hpp"
 #include "system_exception.hpp"
 #include "utils.hpp"
-#include <cstring> // strerror
-#include <errno.h>
+#include <cerrno>
+#include <cstring>  // strerror
 #include <stdint.h> // uint32_t
 #include <unistd.h> // close
 
