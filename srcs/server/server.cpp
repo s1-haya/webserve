@@ -200,7 +200,8 @@ VirtualServerAddrList Server::GetVirtualServerList(int client_fd) const {
 void Server::ReadRequest(int client_fd) {
 	const Read::ReadResult read_result = Read::ReadRequest(client_fd);
 	if (!read_result.IsOk()) {
-		throw SystemErrorException("read failed: " + std::string(strerror(errno)));
+		SetInternalServerError(client_fd);
+		return;
 	}
 	if (read_result.GetValue().read_size == 0) {
 		// todo: need?
@@ -286,6 +287,15 @@ void Server::HandleTimeoutMessages() {
 		event_monitor_.Replace(client_fd, event::EVENT_WRITE);
 		utils::Debug("server", "timeout client", client_fd);
 	}
+}
+
+// internal server error用のresponseをセットしてevent監視をWRITEに変更
+void Server::SetInternalServerError(int client_fd) {
+	const http::HttpResult http_result =
+		mock_http_.GetErrorResponse(GetClientInfos(client_fd), http::INTERNAL_ERROR);
+	message_manager_.AddPrimaryResponse(client_fd, message::CLOSE, http_result.response);
+	event_monitor_.Replace(client_fd, event::EVENT_WRITE);
+	utils::Debug("server", "internal server error to client", client_fd);
 }
 
 void Server::KeepConnection(int client_fd) {

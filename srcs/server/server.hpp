@@ -44,6 +44,7 @@ class Server {
 	void      RunHttp(const event::Event &event);
 	void      SendResponse(int client_fd);
 	void      HandleTimeoutMessages();
+	void      SetInternalServerError(int client_fd);
 	void      KeepConnection(int client_fd);
 	void      Disconnect(int client_fd);
 	void      UpdateEventInResponseComplete(
