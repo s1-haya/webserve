@@ -100,6 +100,7 @@ void HttpParse::ParseBodyMessage(HttpRequestParsedData &data) {
 			data.request_result.request.header_fields.end() &&
 		data.request_result.request.header_fields.at(TRANSFER_ENCODING) == CHUNKED) {
 		ParseChunkedRequest(data);
+		return;
 	}
 	// todo: HttpRequestParsedDataクラスでcontent_lengthを保持？
 	// why: ParseBodyMessageが呼ばれるたびにcontent_lengthを変換するのを避けるため
@@ -130,14 +131,12 @@ void HttpParse::ParseChunkedRequest(HttpRequestParsedData &data) {
 			StatusCode(BAD_REQUEST)
 		);
 	} // Trans
-	unsigned int length     = 0;
 	unsigned int chunk_size = 0;
 	do {
 		std::string::size_type end_of_chunk_size_pos = data.current_buf.find(CRLF);
 		std::string            chunk_size_str = data.current_buf.substr(0, end_of_chunk_size_pos);
 		data.current_buf.erase(0, chunk_size_str.size() + CRLF.size());
 		chunk_size = utils::ConvertStrToUint(chunk_size_str).GetValue();
-		length += chunk_size;
 		std::string::size_type end_of_chunk_data_pos = data.current_buf.find(CRLF);
 		std::string            chunk_data = data.current_buf.substr(0, end_of_chunk_data_pos);
 		data.current_buf.erase(0, chunk_data.size() + CRLF.size());
