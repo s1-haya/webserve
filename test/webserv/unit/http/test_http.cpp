@@ -49,6 +49,9 @@
 
 namespace {
 
+#define DEFAULT_FD 1
+#define DEFAULT_IP "127.0.0.1"
+
 struct Result {
 	Result() : is_success(true) {}
 	bool        is_success;
@@ -103,11 +106,11 @@ int HandleResult(const Result &result) {
 }
 
 http::MockDtoClientInfos
-CreateMockDtoClientInfos(int fd, const std::string &request_buffer, const std::string &ip) {
+CreateMockDtoClientInfos(const std::string &request_buffer) {
 	http::MockDtoClientInfos client_infos;
-	client_infos.fd          = fd;
+	client_infos.fd          = DEFAULT_FD;
 	client_infos.request_buf = request_buffer;
-	client_infos.ip          = ip;
+	client_infos.ip          = DEFAULT_IP;
 	return client_infos;
 }
 
@@ -230,7 +233,7 @@ int main(void) {
 	// ouput HttpResult
 	const std::string              &test1_request_buffer = LoadFileContent("../../../common/request/get/200/no_connection.txt");
 	const http::MockDtoClientInfos &client_infos =
-		CreateMockDtoClientInfos(1, test1_request_buffer, "127.0.0.1");
+		CreateMockDtoClientInfos(test1_request_buffer);
 	// todo: InitServerInfos;
 	server::VirtualServerAddrList server_infos;
 	http::HttpResult              expected = CreateHttpResult(false, true, expected1_response, "");
