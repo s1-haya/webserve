@@ -182,6 +182,7 @@ void Server::HandleExistingConnection(const event::Event &event) {
 		RunHttp(event);
 	}
 	if (event.type & event::EVENT_WRITE) {
+		// todo: RunHttp内でDisconnect()されていた場合の処理追加
 		SendResponse(event.fd);
 	}
 }
@@ -204,9 +205,9 @@ void Server::ReadRequest(int client_fd) {
 		return;
 	}
 	if (read_result.GetValue().read_size == 0) {
-		// todo: need?
-		// message_manager_.DeleteMessage(client_fd);
-		// event_monitor_.Delete(client_fd);
+		// todo: not close?
+		// clientが正しくshutdownした場合・長さ0のデータグラムを受信した場合などにここに入るらしい
+		Disconnect(client_fd);
 		return;
 	}
 	message_manager_.AddRequestBuf(client_fd, read_result.GetValue().read_buf);
@@ -303,14 +304,14 @@ void Server::KeepConnection(int client_fd) {
 	utils::Debug("server", "Connection: keep-alive client", client_fd);
 }
 
-// delete from context, event, message
+// delete from event, message, context
 void Server::Disconnect(int client_fd) {
 	// todo: client_save_dataがない場合に呼ばれても大丈夫な作りになってるか確認
 	// HttpResult is not used.
 	mock_http_.GetErrorResponse(GetClientInfos(client_fd), http::INTERNAL_ERROR);
-	context_.DeleteClientInfo(client_fd);
 	event_monitor_.Delete(client_fd);
 	message_manager_.DeleteMessage(client_fd);
+	context_.DeleteClientInfo(client_fd);
 	close(client_fd);
 	utils::Debug("server", "Connection: close, disconnected client", client_fd);
 	utils::Debug("------------------------------------------");
