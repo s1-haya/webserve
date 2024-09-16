@@ -11,7 +11,7 @@ LOG_FILE_PATH	:=	$(LOG_DIR)/$(LOG_FILE_NAME)
 WS_SRCS_DIR		:=	../../../../srcs
 WS_UTILS_DIR	:=	$(WS_SRCS_DIR)/utils
 SRCS			+=	$(WS_UTILS_DIR)/color.cpp
-WS_MESSAGE_MANAGER_DIR	:=	../../../srcs/server/message_manager
+WS_MESSAGE_MANAGER_DIR	:=	$(WS_SRCS_DIR)/server/message_manager
 SRCS					+=	$(WS_MESSAGE_MANAGER_DIR)/message.cpp \
 							$(WS_MESSAGE_MANAGER_DIR)/message_manager.cpp
 
