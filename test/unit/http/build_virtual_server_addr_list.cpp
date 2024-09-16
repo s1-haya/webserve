@@ -120,7 +120,7 @@ server::VirtualServerAddrList BuildVirtualServerAddrList() {
 	return virtual_servers;
 }
 
-void DeleteAddrList(const server::VirtualServerAddrList &virtual_servers) {
+void DeleteVirtualServerAddrList(const server::VirtualServerAddrList &virtual_servers) {
 	typedef server::VirtualServerAddrList::const_iterator ItVirtualServer;
 	for (ItVirtualServer it = virtual_servers.begin(); it != virtual_servers.end(); ++it) {
 		delete *it;

@@ -106,7 +106,7 @@ server::VirtualServerAddrList BuildVirtualServerAddrList() {
 	return virtual_servers;
 }
 
-void DeleteAddrList(server::VirtualServerAddrList &virtual_servers) {
+void DeleteVirtualServerAddrList(server::VirtualServerAddrList &virtual_servers) {
 	typedef server::VirtualServerAddrList::const_iterator ItVirtualServer;
 	for (ItVirtualServer it = virtual_servers.begin(); it != virtual_servers.end(); ++it) {
 		delete *it;
@@ -188,11 +188,11 @@ int Test1() {
 	} catch (const std::exception &e) {
 		PrintNg();
 		utils::Debug(e.what());
-		DeleteAddrList(virtual_servers);
+		DeleteVirtualServerAddrList(virtual_servers);
 		return EXIT_FAILURE;
 	}
 	PrintOk();
-	DeleteAddrList(virtual_servers);
+	DeleteVirtualServerAddrList(virtual_servers);
 	return EXIT_SUCCESS;
 }
 
@@ -219,11 +219,11 @@ int Test2() {
 	} catch (const std::exception &e) {
 		PrintNg();
 		utils::Debug(e.what());
-		DeleteAddrList(virtual_servers);
+		DeleteVirtualServerAddrList(virtual_servers);
 		return EXIT_FAILURE;
 	}
 	PrintOk();
-	DeleteAddrList(virtual_servers);
+	DeleteVirtualServerAddrList(virtual_servers);
 	return EXIT_SUCCESS;
 }
 
@@ -251,11 +251,11 @@ int Test3() {
 	} catch (const std::exception &e) {
 		PrintNg();
 		utils::Debug(e.what());
-		DeleteAddrList(virtual_servers);
+		DeleteVirtualServerAddrList(virtual_servers);
 		return EXIT_FAILURE;
 	}
 	PrintOk();
-	DeleteAddrList(virtual_servers);
+	DeleteVirtualServerAddrList(virtual_servers);
 	return EXIT_SUCCESS;
 }
 
@@ -284,11 +284,11 @@ int Test4() {
 	} catch (const std::exception &e) {
 		PrintNg();
 		utils::Debug(e.what());
-		DeleteAddrList(virtual_servers);
+		DeleteVirtualServerAddrList(virtual_servers);
 		return EXIT_FAILURE;
 	}
 	PrintOk();
-	DeleteAddrList(virtual_servers);
+	DeleteVirtualServerAddrList(virtual_servers);
 	return EXIT_SUCCESS;
 }
 
@@ -308,11 +308,11 @@ int Test5() {
 	} catch (const std::exception &e) {
 		PrintOk();
 		utils::Debug(e.what());
-		DeleteAddrList(virtual_servers);
+		DeleteVirtualServerAddrList(virtual_servers);
 		return EXIT_SUCCESS;
 	}
 	PrintNg();
-	DeleteAddrList(virtual_servers);
+	DeleteVirtualServerAddrList(virtual_servers);
 	return EXIT_FAILURE;
 }
 
@@ -333,11 +333,11 @@ int Test6() {
 	} catch (const std::exception &e) {
 		PrintOk();
 		utils::Debug(e.what());
-		DeleteAddrList(virtual_servers);
+		DeleteVirtualServerAddrList(virtual_servers);
 		return EXIT_SUCCESS;
 	}
 	PrintNg();
-	DeleteAddrList(virtual_servers);
+	DeleteVirtualServerAddrList(virtual_servers);
 	return EXIT_FAILURE;
 }
 
