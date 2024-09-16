@@ -54,6 +54,8 @@ class Server {
 		int client_fd, const message::ConnectionState connection_state
 	);
 	void SetNonBlockingMode(int sock_fd);
+	// wrapper for epoll
+	void ReplaceEvent(int client_fd, event::Type type);
 	// for Server to Http
 	http::ClientInfos     GetClientInfos(int client_fd) const;
 	VirtualServerAddrList GetVirtualServerList(int client_fd) const;

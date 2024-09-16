@@ -284,7 +284,7 @@ void Server::HandleTimeoutMessages() {
 		const http::HttpResult http_result =
 			mock_http_.GetErrorResponse(GetClientInfos(client_fd), http::TIMEOUT);
 		message_manager_.AddPrimaryResponse(client_fd, message::CLOSE, http_result.response);
-		event_monitor_.Replace(client_fd, event::EVENT_WRITE);
+		ReplaceEvent(client_fd, event::EVENT_WRITE);
 		utils::Debug("server", "timeout client", client_fd);
 	}
 }
@@ -294,7 +294,7 @@ void Server::SetInternalServerError(int client_fd) {
 	const http::HttpResult http_result =
 		mock_http_.GetErrorResponse(GetClientInfos(client_fd), http::INTERNAL_ERROR);
 	message_manager_.AddPrimaryResponse(client_fd, message::CLOSE, http_result.response);
-	event_monitor_.Replace(client_fd, event::EVENT_WRITE);
+	ReplaceEvent(client_fd, event::EVENT_WRITE);
 	utils::Debug("server", "internal server error to client", client_fd);
 }
 
@@ -324,7 +324,7 @@ void Server::UpdateEventInResponseComplete(
 		event_monitor_.Append(event, event::EVENT_WRITE);
 		break;
 	case message::CLOSE:
-		event_monitor_.Replace(event.fd, event::EVENT_WRITE);
+		ReplaceEvent(event.fd, event::EVENT_WRITE);
 		break;
 	default:
 		break;
@@ -343,6 +343,24 @@ void Server::UpdateConnectionAfterSendResponse(
 		break;
 	default:
 		break;
+	}
+}
+
+void Server::ReplaceEvent(int client_fd, event::Type type) {
+	try {
+		event_monitor_.Replace(client_fd, type);
+	} catch (const SystemErrorException &e) {
+		utils::PrintError(e.what());
+		switch (type) {
+		case event::EVENT_READ:
+			SetInternalServerError(client_fd);
+			break;
+		case event::EVENT_WRITE:
+			Disconnect(client_fd);
+			break;
+		default:
+			break;
+		}
 	}
 }
 
