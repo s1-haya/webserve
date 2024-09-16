@@ -156,8 +156,13 @@ void Server::HandleEvent(const event::Event &event) {
 
 void Server::HandleNewConnection(int server_fd) {
 	// A new socket that has established a connection with the peer socket.
-	const ClientInfo new_client_info = Connection::Accept(server_fd);
-	const int        client_fd       = new_client_info.GetFd();
+	const AcceptResult result = Accept(server_fd);
+	if (!result.IsOk()) {
+		return;
+	}
+
+	const ClientInfo &new_client_info = result.GetValue();
+	const int         client_fd       = new_client_info.GetFd();
 	SetNonBlockingMode(client_fd);
 
 	// add client_info, message, event
@@ -381,6 +386,19 @@ void Server::AppendEventWrite(const event::Event &event) {
 		utils::PrintError(e.what());
 		Disconnect(event.fd);
 	}
+}
+
+Server::AcceptResult Server::Accept(int server_fd) {
+	AcceptResult result;
+	try {
+		ClientInfo new_client_info = Connection::Accept(server_fd);
+		result.SetValue(new_client_info);
+	} catch (const SystemErrorException &e) {
+		result.Set(false);
+		utils::PrintError(e.what());
+		SetInternalServerError(server_fd);
+	}
+	return result;
 }
 
 void Server::AddServerInfoToContext(const VirtualServerList &virtual_server_list) {

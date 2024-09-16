@@ -20,6 +20,7 @@ class Server {
 	typedef VirtualServerStorage::VirtualServerList VirtualServerList;
 	typedef std::set<std::string>                   IpSet;
 	typedef std::map<unsigned int, IpSet>           PortIpMap;
+	typedef utils::Result<ClientInfo>               AcceptResult;
 
 	explicit Server(const ConfigServers &config_servers);
 	~Server();
@@ -58,6 +59,8 @@ class Server {
 	void AddEventRead(int sock_fd);
 	void ReplaceEvent(int client_fd, event::Type type);
 	void AppendEventWrite(const event::Event &event);
+	// wrapper for connection
+	AcceptResult Accept(int server_fd);
 	// for Server to Http
 	http::ClientInfos     GetClientInfos(int client_fd) const;
 	VirtualServerAddrList GetVirtualServerList(int client_fd) const;
