@@ -107,7 +107,7 @@ e2e:
 WEBSERV_IMAGE_NAME := webserv-image
 WEBSERV_IMAGE_TAG := production
 WEBSERV_CONTAINER_NAME := webserv-container
-WEBSERV_PORT := 8080
+WEBSERV_PORT := 8082
 
 .PHONY	: build-webserv
 build-webserv:
