@@ -160,10 +160,10 @@ void Server::HandleNewConnection(int server_fd) {
 	const int        client_fd       = new_client_info.GetFd();
 	SetNonBlockingMode(client_fd);
 
-	// add client_info, event, message
+	// add client_info, message, event
 	context_.AddClientInfo(new_client_info);
-	event_monitor_.Add(client_fd, event::EVENT_READ);
 	message_manager_.AddNewMessage(client_fd);
+	AddEventRead(client_fd);
 	utils::Debug(
 		"server",
 		"add new client / listen server: " + new_client_info.GetListenIp() + ":" +
@@ -346,6 +346,15 @@ void Server::UpdateConnectionAfterSendResponse(
 	}
 }
 
+void Server::AddEventRead(int sock_fd) {
+	try {
+		event_monitor_.Add(sock_fd, event::EVENT_READ);
+	} catch (const SystemErrorException &e) {
+		utils::PrintError(e.what());
+		SetInternalServerError(sock_fd);
+	}
+}
+
 void Server::ReplaceEvent(int client_fd, event::Type type) {
 	try {
 		event_monitor_.Replace(client_fd, type);
@@ -404,7 +413,7 @@ void Server::Listen(const HostPortPair &host_port) {
 	SetNonBlockingMode(server_fd);
 
 	context_.SetListenSockFd(host_port, server_fd);
-	event_monitor_.Add(server_fd, event::EVENT_READ);
+	event_monitor_.Add(server_fd, event::EVENT_READ); // throw SystemErrorException
 	utils::Debug(
 		"server", "listen " + host_port.first + ":" + utils::ToString(host_port.second), server_fd
 	);

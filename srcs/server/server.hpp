@@ -55,6 +55,7 @@ class Server {
 	);
 	void SetNonBlockingMode(int sock_fd);
 	// wrapper for epoll
+	void AddEventRead(int sock_fd);
 	void ReplaceEvent(int client_fd, event::Type type);
 	void AppendEventWrite(const event::Event &event);
 	// for Server to Http
