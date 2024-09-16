@@ -97,7 +97,8 @@ void HttpParse::ParseBodyMessage(HttpRequestParsedData &data) {
 		return;
 	}
 	if (data.request_result.request.header_fields.find(TRANSFER_ENCODING) !=
-		data.request_result.request.header_fields.end()) {
+			data.request_result.request.header_fields.end() &&
+		data.request_result.request.header_fields.at(TRANSFER_ENCODING) == CHUNKED) {
 		ParseChunkedRequest(data);
 	}
 	// todo: HttpRequestParsedDataクラスでcontent_lengthを保持？
