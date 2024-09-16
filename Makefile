@@ -91,16 +91,16 @@ test:
 
 .PHONY	: debug
 debug:
-	@pytest -sv ./test/unit
-	@pytest -sv ./test/integration
+	@pytest -sv ./test/webserv/unit
+	@pytest -sv ./test/webserv/integration
 
 .PHONY	: unit
 unit:
-	@make -C ./test/unit run
+	@make -C ./test/webserv/unit run
 
 .PHONY	: e2e
 e2e:
-	@pytest -v ./test/integration
+	@pytest -v ./test/webserv/integration
 
 #--------------------------------------------
 

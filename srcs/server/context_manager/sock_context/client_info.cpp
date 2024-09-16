@@ -2,7 +2,7 @@
 
 namespace server {
 
-ClientInfo::ClientInfo() : fd_(0), listen_port_(0) {}
+ClientInfo::ClientInfo() : fd_(-1), listen_port_(0) {}
 
 ClientInfo::ClientInfo(int fd, const std::string &listen_ip, unsigned int listen_port)
 	: fd_(fd), listen_ip_(listen_ip), listen_port_(listen_port) {}
