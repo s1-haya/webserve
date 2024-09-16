@@ -1,7 +1,9 @@
 #include "client_infos.hpp"
 #include "http.hpp"
 #include "http_result.hpp"
+#include "http_message.hpp"
 #include <cstdlib>
+#include <fstream>
 
 /**
  * @brief Test Http class: HttpResultの返り値を確認するテスト。
@@ -52,6 +54,29 @@ struct Result {
 	bool        is_success;
 	std::string error_log;
 };
+
+std::string LoadFileContent(const char *file_path) {
+	std::ifstream file(file_path, std::ios::binary);
+	if (!file) {
+		std::cerr << "Error opening file: " << file_path << std::endl;
+		return "";
+	}
+	std::ostringstream file_content;
+	file_content << file.rdbuf();
+	return file_content.str();
+}
+
+//tmp
+std::string SetDefaultHeaderFields(
+	const std::string &connection, const std::string &length, const std::string &type
+) {
+	std::string header_fields;
+	header_fields += http::CONNECTION + ": " + connection + http::CRLF;
+	header_fields += http::CONTENT_LENGTH + ": " + length + http::CRLF;
+	header_fields += http::CONTENT_TYPE + ": " + type + http::CRLF;
+	header_fields += http::SERVER + ": " + http::SERVER_VERSION + http::CRLF;
+	return header_fields;
+}
 
 int GetTestCaseNum() {
 	static unsigned int test_case_num = 0;
@@ -190,15 +215,25 @@ int HandleHttpResult(
 int main(void) {
 	int ret_code = EXIT_SUCCESS;
 
+	std::string        expected1_status_line =
+		LoadFileContent("../../expected_response/default_status_line/ok.txt");
+	std::string expected1_body_message =
+		LoadFileContent("../../../../root/html/index.html");
+	std::string expected1_header_fields = SetDefaultHeaderFields(
+		http::KEEP_ALIVE, utils::ToString(expected1_body_message.length()), "test/html"
+	);
+	const std::string &expected1_response =
+		expected1_status_line + expected1_header_fields + http::CRLF + expected1_body_message;
+
 	// CreateHttpResult
 	// input parameter in HttpResult
 	// ouput HttpResult
-	const std::string              &request_buffer = "ok";
+	const std::string              &test1_request_buffer = LoadFileContent("../../../common/request/get/200/no_connection.txt");
 	const http::MockDtoClientInfos &client_infos =
-		CreateMockDtoClientInfos(1, request_buffer, "127.0.0.1");
+		CreateMockDtoClientInfos(1, test1_request_buffer, "127.0.0.1");
 	// todo: InitServerInfos;
 	server::VirtualServerAddrList server_infos;
-	http::HttpResult              expected = CreateHttpResult(false, true, "", "");
+	http::HttpResult              expected = CreateHttpResult(false, true, expected1_response, "");
 	ret_code |= HandleHttpResult(client_infos, server_infos, expected);
 
 	return ret_code;
