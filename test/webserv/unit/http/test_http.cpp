@@ -48,6 +48,7 @@ int main(void) {
 	// todo: InitServerInfos;
 	server::VirtualServerAddrList server_infos;
 	ret_code |= test::test_no_connection(server_infos);
+	ret_code |= test::test_not_exist_file(server_infos);
 
 	return ret_code;
 }

@@ -47,16 +47,19 @@ SRCS_DIR	:=	$(WS_UTILS_DIR) \
 TEST_CASE_DIR := test_case
 # method
 TEST_CASE_FOR_GET := get
-# status_code
+# status_codes
 TEST_CASE_FOR_200 := 200
+TEST_CASE_FOR_400 := 400
 
 SRCS	+=	test_http.cpp \
 			$(TEST_CASE_DIR)/test_handler.cpp \
-			$(TEST_CASE_DIR)/$(TEST_CASE_FOR_GET)/$(TEST_CASE_FOR_200)/test_no_connection.cpp
+			$(TEST_CASE_DIR)/$(TEST_CASE_FOR_GET)/$(TEST_CASE_FOR_200)/test_no_connection.cpp \
+			$(TEST_CASE_DIR)/$(TEST_CASE_FOR_GET)/$(TEST_CASE_FOR_400)/test_not_exist_file.cpp
 
-# 2. Add unit test directory for INCLUDE
+# 4. Add unit test directory for INCLUDE
 SRCS_DIR += $(TEST_CASE_DIR) \
 			$(TEST_CASE_DIR)/$(TEST_CASE_FOR_GET)/$(TEST_CASE_FOR_200) \
+			$(TEST_CASE_DIR)/$(TEST_CASE_FOR_GET)/$(TEST_CASE_FOR_400)
 
 #--------------------------------------------
 OBJ_DIR		:=	objs
