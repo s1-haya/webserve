@@ -34,10 +34,7 @@ SRCS				+=	$(WS_UTILS_DIR)/color.cpp \
 						$(WS_HTTP_SERVER_INFO_CHECK_DIR)/http_serverinfo_check.cpp \
 						$(WS_VIRTUAL_SERVER_DIR)/virtual_server.cpp
 
-# 3. Add unit test files
-SRCS	+=	test_http.cpp
-
-# 4. Add directory for INCLUDE
+# 2. Add srcs directory for INCLUDE
 SRCS_DIR	:=	$(WS_UTILS_DIR) \
 				$(WS_HTTP_DIR) \
 				$(WS_HTTP_REQUEST_DIR) \
@@ -45,6 +42,21 @@ SRCS_DIR	:=	$(WS_UTILS_DIR) \
 				$(WS_HTTP_PARSE_DIR) \
 				$(WS_HTTP_SERVER_INFO_CHECK_DIR) \
 				$(WS_VIRTUAL_SERVER_DIR) \
+
+# 3. Add unit test files
+TEST_CASE_DIR := test_case
+# method
+TEST_CASE_FOR_GET := get
+# status_code
+TEST_CASE_FOR_200 := 200
+
+SRCS	+=	test_http.cpp \
+			$(TEST_CASE_DIR)/test_handler.cpp \
+			$(TEST_CASE_DIR)/$(TEST_CASE_FOR_GET)/$(TEST_CASE_FOR_200)/test_no_connection.cpp
+
+# 2. Add unit test directory for INCLUDE
+SRCS_DIR += $(TEST_CASE_DIR) \
+			$(TEST_CASE_DIR)/$(TEST_CASE_FOR_GET)/$(TEST_CASE_FOR_200) \
 
 #--------------------------------------------
 OBJ_DIR		:=	objs
