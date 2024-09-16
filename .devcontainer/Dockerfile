@@ -30,9 +30,9 @@ RUN pip install --upgrade pip && \
 RUN rm -rf /var/lib/apt/lists/*
 
 # 新しいユーザーを作成。この時点ではuserはroot
-RUN useradd -ms /bin/bash tmp_webserv
+RUN useradd -ms /bin/bash user_webserv
 # root権限が必要なinstall等を終えたら、作成したユーザーに切り替え
-USER tmp_webserv
+USER user_webserv
 
 VOLUME [ "/workspaces" ]
 
