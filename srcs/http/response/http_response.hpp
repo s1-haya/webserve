@@ -12,7 +12,7 @@
 namespace http {
 
 struct HttpRequestResult;
-struct MockDtoClientInfos;
+struct ClientInfos;
 class Stat;
 
 // HttpResponse {
@@ -35,7 +35,7 @@ class HttpResponse {
   public:
 	typedef std::map<EStatusCode, std::string> ReasonPhrase;
 	static std::string
-					   Run(const MockDtoClientInfos            &client_info,
+					   Run(const ClientInfos                   &client_info,
 						   const server::VirtualServerAddrList &server_info,
 						   const HttpRequestResult             &request_info);
 	static std::string CreateDefaultBodyMessageFormat(const StatusCode &status_code);
@@ -47,7 +47,7 @@ class HttpResponse {
 
 	static std::string        CreateHttpResponse(const HttpResponseFormat &response);
 	static HttpResponseFormat CreateHttpResponseFormat(
-		const MockDtoClientInfos            &client_info,
+		const ClientInfos                   &client_info,
 		const server::VirtualServerAddrList &server_info,
 		const HttpRequestResult             &request_info
 	);

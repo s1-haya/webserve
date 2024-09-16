@@ -5,12 +5,6 @@
 
 namespace http {
 
-struct MockDtoClientInfos {
-	int         fd;
-	std::string request_buf;
-	std::string ip;
-};
-
 struct ClientInfos {
 	int         fd;
 	std::string request_buf;

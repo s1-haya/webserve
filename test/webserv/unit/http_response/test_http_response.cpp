@@ -146,7 +146,7 @@ std::string SetDefaultHeaderFields(
 
 int main(void) {
 	int                                 ret_code = 0;
-	http::MockDtoClientInfos            client_info;
+	http::ClientInfos                   client_info;
 	const server::VirtualServerAddrList server_info = BuildVirtualServerAddrList();
 	http::HttpRequestResult             request_info;
 

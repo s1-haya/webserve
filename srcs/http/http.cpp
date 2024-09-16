@@ -13,7 +13,7 @@ Http::Http() {}
 Http::~Http() {}
 
 HttpResult
-Http::Run(const MockDtoClientInfos &client_info, const server::VirtualServerAddrList &server_info) {
+Http::Run(const ClientInfos &client_info, const server::VirtualServerAddrList &server_info) {
 	HttpResult          result;
 	utils::Result<void> parsed_result =
 		ParseHttpRequestFormat(client_info.fd, client_info.request_buf);
@@ -82,7 +82,7 @@ utils::Result<void> Http::ParseHttpRequestFormat(int client_fd, const std::strin
 // }
 
 std::string Http::CreateHttpResponse(
-	const MockDtoClientInfos &client_info, const server::VirtualServerAddrList &server_info
+	const ClientInfos &client_info, const server::VirtualServerAddrList &server_info
 ) {
 	HttpRequestParsedData data = storage_.GetClientSaveData(client_info.fd);
 	storage_.DeleteClientSaveData(client_info.fd);
