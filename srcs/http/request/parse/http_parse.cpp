@@ -130,7 +130,7 @@ void HttpParse::ParseChunkedRequest(HttpRequestParsedData &data) {
 			"Error: Content-Length and Transfer-Encoding are both specified",
 			StatusCode(BAD_REQUEST)
 		);
-	} // Trans
+	}
 	unsigned int chunk_size = 0;
 	do {
 		std::string::size_type end_of_chunk_size_pos = data.current_buf.find(CRLF);
