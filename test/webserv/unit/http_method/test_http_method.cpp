@@ -142,15 +142,22 @@ int main(void) {
 
 	// http_method/expected
 	// LF:   exist target resourse file
-	std::string expected_file       = LoadFileContent("expected/file.txt");
-	std::string expected_index_file = LoadFileContent("expected/index.txt");
-	std::string expected_autoindex  = CreateAutoIndexContent("test/");
+	std::string expected_file =
+		LoadFileContent("../../expected_response/default_body_message/file.txt");
+	std::string expected_index_file =
+		LoadFileContent("../../expected_response/default_body_message/index.txt");
+	std::string expected_autoindex = CreateAutoIndexContent("test/");
 	// CRLF: use default status code file
-	std::string expected_created    = LoadFileContent("expected/created.txt");
-	std::string expected_no_content = LoadFileContent("expected/no_content.txt");
-	std::string expected_redirect   = LoadFileContent("expected/redirect.txt");
-	std::string expected_forbidden  = LoadFileContent("expected/forbidden.txt");
-	std::string expected_not_found  = LoadFileContent("expected/not_found.txt");
+	std::string expected_created =
+		LoadFileContent("../../expected_response/default_body_message/created.txt");
+	std::string expected_no_content =
+		LoadFileContent("../../expected_response/default_body_message/no_content.txt");
+	std::string expected_redirect =
+		LoadFileContent("../../expected_response/default_body_message/redirect.txt");
+	std::string expected_forbidden =
+		LoadFileContent("../../expected_response/default_body_message/forbidden.txt");
+	std::string expected_not_found =
+		LoadFileContent("../../expected_response/default_body_message/not_found.txt");
 
 	// GET test
 	// ファイルが存在する場合
