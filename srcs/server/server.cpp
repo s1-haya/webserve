@@ -8,6 +8,7 @@
 #include "system_exception.hpp"
 #include "utils.hpp"
 #include "virtual_server.hpp"
+#include <cstring> // strerror
 #include <errno.h>
 #include <fcntl.h>      // fcntl
 #include <sys/socket.h> // socket
@@ -199,7 +200,7 @@ VirtualServerAddrList Server::GetVirtualServerList(int client_fd) const {
 void Server::ReadRequest(int client_fd) {
 	const Read::ReadResult read_result = Read::ReadRequest(client_fd);
 	if (!read_result.IsOk()) {
-		throw SystemException("read failed");
+		throw SystemException("read failed: " + std::string(strerror(errno)));
 	}
 	if (read_result.GetValue().read_size == 0) {
 		// todo: need?
@@ -404,11 +405,11 @@ void Server::Init() {
 void Server::SetNonBlockingMode(int sock_fd) {
 	int flags = fcntl(sock_fd, F_GETFL);
 	if (flags == SYSTEM_ERROR) {
-		throw SystemException("fcntl F_GETFL failed");
+		throw SystemException("fcntl F_GETFL failed: " + std::string(strerror(errno)));
 	}
 	flags |= O_NONBLOCK;
 	if (fcntl(sock_fd, F_SETFL, flags) == SYSTEM_ERROR) {
-		throw SystemException("fcntl F_SETFL failed");
+		throw SystemException("fcntl F_SETFL failed: " + std::string(strerror(errno)));
 	}
 }
 

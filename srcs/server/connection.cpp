@@ -4,6 +4,7 @@
 #include "server_info.hpp"
 #include "system_exception.hpp"
 #include "utils.hpp"    // ConvertUintToStr
+#include <cstring>      // strerror
 #include <netdb.h>      // getaddrinfo,freeaddrinfo
 #include <netinet/in.h> // struct sockaddr
 #include <sys/socket.h> // socket,setsockopt,bind,listen,accept
@@ -134,7 +135,7 @@ int Connection::Connect(const HostPortPair &host_port) {
 	const BindResult bind_result   = TryBind(addrinfo_list);
 	freeaddrinfo(addrinfo_list);
 	if (!bind_result.IsOk()) {
-		throw SystemException("bind failed");
+		throw SystemException("bind failed: " + std::string(strerror(errno)));
 	}
 	const int server_fd = bind_result.GetValue();
 
@@ -142,7 +143,7 @@ int Connection::Connect(const HostPortPair &host_port) {
 	// listen
 	if (listen(server_fd, 3) == SYSTEM_ERROR) {
 		close(server_fd);
-		throw SystemException("listen failed");
+		throw SystemException("listen failed: " + std::string(strerror(errno)));
 	}
 	listen_server_fds_.insert(server_fd);
 
@@ -154,7 +155,7 @@ Connection::IpPortPair Connection::GetListenIpPort(int client_fd) {
 	socklen_t               listen_sock_addr_len = sizeof(listen_sock_addr);
 	if (getsockname(client_fd, (struct sockaddr *)&listen_sock_addr, &listen_sock_addr_len) ==
 		SYSTEM_ERROR) {
-		throw SystemException("getsockname failed");
+		throw SystemException("getsockname failed: " + std::string(strerror(errno)));
 	}
 
 	std::string  listen_ip;
@@ -177,7 +178,7 @@ ClientInfo Connection::Accept(int server_fd) {
 	socklen_t               addrlen          = sizeof(client_sock_addr);
 	const int client_fd = accept(server_fd, (struct sockaddr *)&client_sock_addr, &addrlen);
 	if (client_fd == SYSTEM_ERROR) {
-		throw SystemException("accept failed");
+		throw SystemException("accept failed: " + std::string(strerror(errno)));
 	}
 
 	const IpPortPair   listen_ip_port = GetListenIpPort(client_fd);
