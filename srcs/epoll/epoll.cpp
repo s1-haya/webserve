@@ -52,7 +52,7 @@ uint32_t ConvertToEventType(uint32_t type) {
 	return ret_type;
 }
 
-event::Event ConvertToEventDto(const epoll::Epoll::EpollEvent &event) {
+event::Event ConvertToEvent(const epoll::Epoll::EpollEvent &event) {
 	event::Event ret_event;
 	ret_event.fd   = event.data.fd;
 	ret_event.type = ConvertToEventType(event.events);
@@ -81,7 +81,7 @@ void Epoll::Delete(int socket_fd) {
 }
 
 // epoll_wait() always monitors EPOLLHUP and EPOLLERR, so no need to explicitly set them in events.
-int Epoll::CreateReadyList() {
+int Epoll::CreateEventReadyList() {
 	errno = 0;
 	// todo: set timeout(ms)
 	const int ready = epoll_wait(epoll_fd_, evlist_, MAX_EVENTS, 500);
@@ -117,11 +117,11 @@ void Epoll::Append(const event::Event &event, const event::Type new_type) {
 }
 
 event::EventList Epoll::GetEventList() {
-	const int ready_list_size = CreateReadyList();
+	const int ready_list_size = CreateEventReadyList();
 
 	event::EventList events;
 	for (std::size_t i = 0; i < static_cast<std::size_t>(ready_list_size); ++i) {
-		events.push_back(ConvertToEventDto(evlist_[i]));
+		events.push_back(ConvertToEvent(evlist_[i]));
 	}
 	return events;
 }

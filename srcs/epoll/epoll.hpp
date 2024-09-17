@@ -25,7 +25,7 @@ class Epoll {
 	Epoll(const Epoll &other);
 	Epoll &operator=(const Epoll &other);
 	// function
-	int CreateReadyList();
+	int CreateEventReadyList();
 	// const
 	static const int          SYSTEM_ERROR = -1;
 	static const unsigned int MAX_EVENTS   = 10; // todo: remove
