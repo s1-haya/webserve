@@ -18,6 +18,7 @@ class Connection {
 	typedef std::set<int>                        FdSet;
 	typedef std::list<std::string>               IpList;
 	typedef utils::Result<int>                   BindResult;
+	typedef utils::Result<void>                  ListenResult;
 	typedef std::pair<std::string, unsigned int> IpPortPair;
 	typedef std::pair<std::string, unsigned int> HostPortPair;
 
@@ -36,6 +37,7 @@ class Connection {
 	// functions
 	AddrInfo         *GetAddrInfoList(const HostPortPair &host_port) const;
 	BindResult        TryBind(AddrInfo *addrinfo) const;
+	ListenResult      Listen(int server_fd);
 	static IpPortPair GetListenIpPort(int client_fd);
 	// const
 	static const int SYSTEM_ERROR   = -1;

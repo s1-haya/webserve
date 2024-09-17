@@ -129,6 +129,17 @@ Connection::BindResult Connection::TryBind(AddrInfo *addrinfo) const {
 	return bind_result;
 }
 
+Connection::ListenResult Connection::Listen(int server_fd) {
+	ListenResult listen_result;
+	if (listen(server_fd, LISTEN_BACKLOG) == SYSTEM_ERROR) {
+		close(server_fd);
+		listen_result.Set(false);
+		return listen_result;
+	}
+	listen_server_fds_.insert(server_fd);
+	return listen_result;
+}
+
 int Connection::Connect(const HostPortPair &host_port) {
 	AddrInfo        *addrinfo_list = GetAddrInfoList(host_port);
 	const BindResult bind_result   = TryBind(addrinfo_list);
@@ -136,15 +147,12 @@ int Connection::Connect(const HostPortPair &host_port) {
 	if (!bind_result.IsOk()) {
 		throw std::runtime_error("bind failed");
 	}
-	const int server_fd = bind_result.GetValue();
 
-	// listen
-	if (listen(server_fd, LISTEN_BACKLOG) == SYSTEM_ERROR) {
-		close(server_fd);
+	const int          server_fd     = bind_result.GetValue();
+	const ListenResult listen_result = Listen(server_fd);
+	if (!listen_result.IsOk()) {
 		throw std::runtime_error("listen failed");
 	}
-	listen_server_fds_.insert(server_fd);
-
 	return server_fd;
 }
 
