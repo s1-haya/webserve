@@ -87,7 +87,7 @@ int Epoll::CreateReadyList() {
 	const int ready = epoll_wait(epoll_fd_, evlist_, MAX_EVENTS, 500);
 	if (ready == SYSTEM_ERROR) {
 		if (errno == EINTR) {
-			return ready;
+			return 0;
 		}
 		throw utils::SystemException(errno);
 	}
@@ -116,11 +116,14 @@ void Epoll::Append(const event::Event &event, const event::Type new_type) {
 	}
 }
 
-event::Event Epoll::GetEvent(std::size_t index) const {
-	if (index >= MAX_EVENTS) {
-		throw std::logic_error("evlist index out of range");
+event::EventList Epoll::GetEventList() {
+	const int ready_list_size = CreateReadyList();
+
+	event::EventList events;
+	for (std::size_t i = 0; i < static_cast<std::size_t>(ready_list_size); ++i) {
+		events.push_back(ConvertToEventDto(evlist_[i]));
 	}
-	return ConvertToEventDto(evlist_[index]);
+	return events;
 }
 
 } // namespace epoll
