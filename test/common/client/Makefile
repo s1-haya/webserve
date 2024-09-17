@@ -1,6 +1,6 @@
 NAME		:=	client
 
-UTILS_DIR	:=	../../srcs/utils
+UTILS_DIR	:=	../../../srcs/utils
 SRCS		:=	client.cpp \
 				main.cpp \
 				$(UTILS_DIR)/color.cpp
