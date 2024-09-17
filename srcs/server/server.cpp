@@ -268,7 +268,7 @@ void Server::SendResponse(int client_fd) {
 	utils::Debug("server", "send response to client", client_fd);
 
 	if (!message_manager_.IsResponseExist(client_fd)) {
-		event_monitor_.Replace(client_fd, event::EVENT_READ);
+		ReplaceEvent(client_fd, event::EVENT_READ);
 	}
 	UpdateConnectionAfterSendResponse(client_fd, connection_state);
 }
