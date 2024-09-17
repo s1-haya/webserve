@@ -1,13 +1,29 @@
 #include "sock_context.hpp"
 #include "client_info.hpp"
 #include "server_info.hpp"
+#include "unistd.h"  // close
 #include <stdexcept> // logic_error
-
 namespace server {
 
 SockContext::SockContext() {}
 
-SockContext::~SockContext() {}
+// todo: tmp
+SockContext::~SockContext() {
+	typedef ServerInfoMap::iterator ItServer;
+	for (ItServer it = server_context_.begin(); it != server_context_.end(); ++it) {
+		const int server_fd = it->second.GetFd();
+		if (server_fd != SYSTEM_ERROR) {
+			close(server_fd);
+		}
+	}
+	typedef ClientInfoMap::iterator ItClient;
+	for (ItClient it = client_context_.begin(); it != client_context_.end(); ++it) {
+		const int client_fd = it->first;
+		if (client_fd != SYSTEM_ERROR) {
+			close(client_fd);
+		}
+	}
+}
 
 SockContext::SockContext(const SockContext &other) {
 	*this = other;

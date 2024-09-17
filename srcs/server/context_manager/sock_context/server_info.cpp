@@ -3,9 +3,9 @@
 
 namespace server {
 
-ServerInfo::ServerInfo() : fd_(0), host_port_(std::make_pair(IPV4_ADDR_ANY, 0)) {}
+ServerInfo::ServerInfo() : fd_(-1), host_port_(std::make_pair(IPV4_ADDR_ANY, 0)) {}
 
-ServerInfo::ServerInfo(const HostPortPair &host_port) : fd_(0), host_port_(host_port) {}
+ServerInfo::ServerInfo(const HostPortPair &host_port) : fd_(-1), host_port_(host_port) {}
 
 ServerInfo::~ServerInfo() {}
 

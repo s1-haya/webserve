@@ -4,6 +4,7 @@
 #include "event.hpp"
 #include "read.hpp"
 #include "send.hpp"
+#include "start_up_exception.hpp"
 #include "utils.hpp"
 #include "virtual_server.hpp"
 #include <errno.h>
@@ -117,7 +118,11 @@ void Server::AddVirtualServers(const ConfigServers &config_servers) {
 }
 
 Server::Server(const ConfigServers &config_servers) {
-	AddVirtualServers(config_servers);
+	try {
+		AddVirtualServers(config_servers);
+	} catch (const std::exception &e) {
+		throw StartUpException("Construct Server failed");
+	}
 }
 
 Server::~Server() {}
@@ -167,6 +172,10 @@ void Server::HandleNewConnection(int server_fd) {
 }
 
 void Server::HandleExistingConnection(const event::Event &event) {
+	if (event.type & event::EVENT_ERROR || event.type & event::EVENT_HANGUP) {
+		Disconnect(event.fd);
+		return;
+	}
 	if (event.type & event::EVENT_READ) {
 		ReadRequest(event.fd);
 		RunHttp(event);
@@ -174,7 +183,6 @@ void Server::HandleExistingConnection(const event::Event &event) {
 	if (event.type & event::EVENT_WRITE) {
 		SendResponse(event.fd);
 	}
-	// todo: handle other EventType
 }
 
 http::ClientInfos Server::GetClientInfos(int client_fd) const {
@@ -284,10 +292,11 @@ void Server::KeepConnection(int client_fd) {
 	utils::Debug("server", "Connection: keep-alive client", client_fd);
 }
 
-// todo: 強制Disconnectする場合はHttpにclient_fdを知らせてdata削除する必要あり
-//       internal server error用responseを貰って実際は送らないという手もあり
 // delete from context, event, message
 void Server::Disconnect(int client_fd) {
+	// todo: client_save_dataがない場合に呼ばれても大丈夫な作りになってるか確認
+	// HttpResult is not used.
+	mock_http_.GetErrorResponse(GetClientInfos(client_fd), http::INTERNAL_ERROR);
 	context_.DeleteClientInfo(client_fd);
 	event_monitor_.Delete(client_fd);
 	message_manager_.DeleteMessage(client_fd);
@@ -385,7 +394,11 @@ void Server::Init() {
 	const VirtualServerList &virtual_server_list = context_.GetAllVirtualServer();
 
 	AddServerInfoToContext(virtual_server_list);
-	ListenAllHostPorts(virtual_server_list);
+	try {
+		ListenAllHostPorts(virtual_server_list);
+	} catch (const std::exception &e) {
+		throw StartUpException("Init Server failed");
+	}
 }
 
 void Server::SetNonBlockingMode(int sock_fd) {
