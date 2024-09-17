@@ -67,15 +67,15 @@ Epoll::EpollEventVector Epoll::CreateEventReadyList() {
 
 	errno = 0;
 	// todo: set timeout(ms)
-	const int ready = epoll_wait(epoll_fd_, events.data(), monitored_fd_count_, 500);
-	if (ready == SYSTEM_ERROR) {
+	const int ready_list_size = epoll_wait(epoll_fd_, events.data(), monitored_fd_count_, 500);
+	if (ready_list_size == SYSTEM_ERROR) {
 		if (errno == EINTR) {
 			events.clear();
 			return events;
 		}
 		throw utils::SystemException(errno);
 	}
-	events.resize(ready);
+	events.resize(ready_list_size);
 	return events;
 }
 
