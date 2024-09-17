@@ -75,6 +75,7 @@ Epoll::EpollEventVector Epoll::CreateEventReadyList() {
 		}
 		throw utils::SystemException(errno);
 	}
+	events.resize(ready);
 	return events;
 }
 
