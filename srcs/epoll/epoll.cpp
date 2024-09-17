@@ -62,27 +62,31 @@ event::Event ConvertToEvent(const epoll::Epoll::EpollEvent &event) {
 } // namespace
 
 // epoll_wait() always monitors EPOLLHUP and EPOLLERR, so no need to explicitly set them in events.
-int Epoll::CreateEventReadyList() {
+Epoll::EpollEventVector Epoll::CreateEventReadyList() {
+	EpollEventVector events(monitored_fd_count_);
+
 	errno = 0;
 	// todo: set timeout(ms)
-	const int ready = epoll_wait(epoll_fd_, evlist_, MAX_EVENTS, 500);
+	const int ready = epoll_wait(epoll_fd_, events.data(), monitored_fd_count_, 500);
 	if (ready == SYSTEM_ERROR) {
 		if (errno == EINTR) {
-			return 0;
+			events.clear();
+			return events;
 		}
 		throw utils::SystemException(errno);
 	}
-	return ready;
+	return events;
 }
 
 event::EventList Epoll::GetEventList() {
-	const int ready_list_size = CreateEventReadyList();
+	EpollEventVector ready_events = CreateEventReadyList();
+	event::EventList event_list;
 
-	event::EventList events;
-	for (std::size_t i = 0; i < static_cast<std::size_t>(ready_list_size); ++i) {
-		events.push_back(ConvertToEvent(evlist_[i]));
+	typedef EpollEventVector::const_iterator Itr;
+	for (Itr it = ready_events.begin(); it != ready_events.end(); ++it) {
+		event_list.push_back(ConvertToEvent(*it));
 	}
-	return events;
+	return event_list;
 }
 
 // add new socket_fd to epoll's interest list

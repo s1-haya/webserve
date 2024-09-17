@@ -4,12 +4,14 @@
 #include "event.hpp"
 #include <cstddef>     // size_t
 #include <sys/epoll.h> // epoll
+#include <vector>
 
 namespace epoll {
 
 class Epoll {
   public:
-	typedef struct epoll_event EpollEvent;
+	typedef struct epoll_event      EpollEvent;
+	typedef std::vector<EpollEvent> EpollEventVector;
 
 	Epoll();
 	~Epoll();
@@ -25,13 +27,11 @@ class Epoll {
 	Epoll(const Epoll &other);
 	Epoll &operator=(const Epoll &other);
 	// function
-	int CreateEventReadyList();
+	EpollEventVector CreateEventReadyList();
 	// const
-	static const int          SYSTEM_ERROR = -1;
-	static const unsigned int MAX_EVENTS   = 10; // todo: remove
+	static const int SYSTEM_ERROR = -1;
 	// variables
 	int          epoll_fd_;
-	EpollEvent   evlist_[MAX_EVENTS]; // todo: remove
 	unsigned int monitored_fd_count_;
 };
 
