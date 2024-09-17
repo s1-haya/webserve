@@ -7,7 +7,7 @@
 
 namespace epoll {
 
-Epoll::Epoll() {
+Epoll::Epoll() : monitored_fd_count_(0) {
 	epoll_fd_ = epoll_create1(EPOLL_CLOEXEC);
 	if (epoll_fd_ == SYSTEM_ERROR) {
 		throw utils::SystemException(errno);
@@ -69,6 +69,7 @@ void Epoll::Add(int socket_fd, event::Type type) {
 	if (epoll_ctl(epoll_fd_, EPOLL_CTL_ADD, socket_fd, &ev) == SYSTEM_ERROR) {
 		throw utils::SystemException(errno);
 	}
+	++monitored_fd_count_;
 }
 
 // remove socket_fd from epoll's interest list
@@ -76,6 +77,7 @@ void Epoll::Delete(int socket_fd) {
 	if (epoll_ctl(epoll_fd_, EPOLL_CTL_DEL, socket_fd, NULL) == SYSTEM_ERROR) {
 		throw utils::SystemException(errno);
 	}
+	--monitored_fd_count_;
 }
 
 // epoll_wait() always monitors EPOLLHUP and EPOLLERR, so no need to explicitly set them in events.

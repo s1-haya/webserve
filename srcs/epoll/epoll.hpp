@@ -29,6 +29,7 @@ class Epoll {
 	// variables
 	int                epoll_fd_;
 	struct epoll_event evlist_[MAX_EVENTS];
+	unsigned int       monitored_fd_count_;
 };
 
 } // namespace epoll
