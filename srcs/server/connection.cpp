@@ -138,9 +138,8 @@ int Connection::Connect(const HostPortPair &host_port) {
 	}
 	const int server_fd = bind_result.GetValue();
 
-	// todo / listen() : set an appropriate backlog value
 	// listen
-	if (listen(server_fd, 3) == SYSTEM_ERROR) {
+	if (listen(server_fd, LISTEN_BACKLOG) == SYSTEM_ERROR) {
 		close(server_fd);
 		throw std::runtime_error("listen failed");
 	}

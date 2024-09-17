@@ -38,7 +38,8 @@ class Connection {
 	BindResult        TryBind(AddrInfo *addrinfo) const;
 	static IpPortPair GetListenIpPort(int client_fd);
 	// const
-	static const int SYSTEM_ERROR = -1;
+	static const int SYSTEM_ERROR   = -1;
+	static const int LISTEN_BACKLOG = 512;
 	// variable
 	FdSet listen_server_fds_;
 };
