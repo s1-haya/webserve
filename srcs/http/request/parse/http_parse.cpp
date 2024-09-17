@@ -146,7 +146,12 @@ void HttpParse::ParseChunkedRequest(HttpRequestParsedData &data) {
 		std::string::size_type end_of_chunk_size_pos = data.current_buf.find(CRLF);
 		std::string            chunk_size_str = data.current_buf.substr(0, end_of_chunk_size_pos);
 		data.current_buf.erase(0, chunk_size_str.size() + CRLF.size());
-		chunk_size                                   = HexToDec(chunk_size_str).GetValue();
+		chunk_size = HexToDec(chunk_size_str).GetValue();
+		if (HexToDec(chunk_size_str).IsOk() == false) {
+			throw HttpException(
+				"Error: chunk size is not a hexadecimal number", StatusCode(BAD_REQUEST)
+			);
+		}
 		std::string::size_type end_of_chunk_data_pos = data.current_buf.find(CRLF);
 		std::string            chunk_data = data.current_buf.substr(0, end_of_chunk_data_pos);
 		data.current_buf.erase(0, chunk_data.size() + CRLF.size());
