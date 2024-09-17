@@ -61,6 +61,30 @@ event::Event ConvertToEvent(const epoll::Epoll::EpollEvent &event) {
 
 } // namespace
 
+// epoll_wait() always monitors EPOLLHUP and EPOLLERR, so no need to explicitly set them in events.
+int Epoll::CreateEventReadyList() {
+	errno = 0;
+	// todo: set timeout(ms)
+	const int ready = epoll_wait(epoll_fd_, evlist_, MAX_EVENTS, 500);
+	if (ready == SYSTEM_ERROR) {
+		if (errno == EINTR) {
+			return 0;
+		}
+		throw utils::SystemException(errno);
+	}
+	return ready;
+}
+
+event::EventList Epoll::GetEventList() {
+	const int ready_list_size = CreateEventReadyList();
+
+	event::EventList events;
+	for (std::size_t i = 0; i < static_cast<std::size_t>(ready_list_size); ++i) {
+		events.push_back(ConvertToEvent(evlist_[i]));
+	}
+	return events;
+}
+
 // add new socket_fd to epoll's interest list
 void Epoll::Add(int socket_fd, event::Type type) {
 	EpollEvent ev = {};
@@ -78,20 +102,6 @@ void Epoll::Delete(int socket_fd) {
 		throw utils::SystemException(errno);
 	}
 	--monitored_fd_count_;
-}
-
-// epoll_wait() always monitors EPOLLHUP and EPOLLERR, so no need to explicitly set them in events.
-int Epoll::CreateEventReadyList() {
-	errno = 0;
-	// todo: set timeout(ms)
-	const int ready = epoll_wait(epoll_fd_, evlist_, MAX_EVENTS, 500);
-	if (ready == SYSTEM_ERROR) {
-		if (errno == EINTR) {
-			return 0;
-		}
-		throw utils::SystemException(errno);
-	}
-	return ready;
 }
 
 // replace old_type with new_type
@@ -114,16 +124,6 @@ void Epoll::Append(const event::Event &event, const event::Type new_type) {
 	if (epoll_ctl(epoll_fd_, EPOLL_CTL_MOD, socket_fd, &ev) == SYSTEM_ERROR) {
 		throw utils::SystemException(errno);
 	}
-}
-
-event::EventList Epoll::GetEventList() {
-	const int ready_list_size = CreateEventReadyList();
-
-	event::EventList events;
-	for (std::size_t i = 0; i < static_cast<std::size_t>(ready_list_size); ++i) {
-		events.push_back(ConvertToEvent(evlist_[i]));
-	}
-	return events;
 }
 
 } // namespace epoll
