@@ -347,10 +347,11 @@ int main(void) {
 	test4_body_message.request_result.status_code = http::StatusCode(http::OK);
 	test4_body_message.request_result.request.request_line =
 		CreateRequestLine("POST", "/", "HTTP/1.1");
-	test4_body_message.is_request_format.is_request_line   = true;
-	test4_body_message.is_request_format.is_header_fields  = true;
-	test4_body_message.is_request_format.is_body_message   = true;
-	test4_body_message.request_result.request.body_message = "Wikipedia";
+	test4_body_message.is_request_format.is_request_line  = true;
+	test4_body_message.is_request_format.is_header_fields = true;
+	test4_body_message.is_request_format.is_body_message  = true;
+	test4_body_message.request_result.request.body_message =
+		"Wikipedia is a free online encyclopedia that anyone can edit.";
 
 	// 11.Chunked Transfer-Encodingの場合で、chunk-sizeが間違っている場合
 	http::HttpRequestParsedData test5_body_message;
@@ -386,7 +387,8 @@ int main(void) {
 		),
 		TestCase(
 			"POST / HTTP/1.1\r\nHost: host\r\nTransfer-Encoding: "
-			"chunked\r\n\r\n4\r\nWiki\r\n5\r\npedia\r\n0\r\n\r\n",
+			"chunked\r\n\r\n4\r\nWiki\r\n5\r\npedia\r\n0x34\r\n is a free online encyclopedia that "
+			"anyone can edit.\r\n0\r\n\r\n",
 			test4_body_message
 		),
 		TestCase(

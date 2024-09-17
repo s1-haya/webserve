@@ -49,6 +49,16 @@ bool IsBodyMessageReadingRequired(const HeaderFields &header_fields) {
 	return true;
 }
 
+// 大文字と小文字は区別なし
+utils::Result<int> HexToDec(const std::string &hex_str) {
+	std::istringstream iss(hex_str);
+	int                decimal_value;
+	if (!(iss >> std::hex >> decimal_value)) {
+		return utils::Result<int>(false, 0);
+	}
+	return utils::Result<int>(decimal_value);
+}
+
 } // namespace
 
 void HttpParse::ParseRequestLine(HttpRequestParsedData &data) {
@@ -136,7 +146,7 @@ void HttpParse::ParseChunkedRequest(HttpRequestParsedData &data) {
 		std::string::size_type end_of_chunk_size_pos = data.current_buf.find(CRLF);
 		std::string            chunk_size_str = data.current_buf.substr(0, end_of_chunk_size_pos);
 		data.current_buf.erase(0, chunk_size_str.size() + CRLF.size());
-		chunk_size = utils::ConvertStrToUint(chunk_size_str).GetValue();
+		chunk_size                                   = HexToDec(chunk_size_str).GetValue();
 		std::string::size_type end_of_chunk_data_pos = data.current_buf.find(CRLF);
 		std::string            chunk_data = data.current_buf.substr(0, end_of_chunk_data_pos);
 		data.current_buf.erase(0, chunk_data.size() + CRLF.size());
