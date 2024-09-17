@@ -49,7 +49,7 @@ server::VirtualServer *BuildVirtualServer1() {
 	server::VirtualServer::HostPortList host_ports;
 	host_ports.push_back(std::make_pair("0.0.0.0", 80));
 
-	std::size_t client_max_body_size = 10 * 1024 * 1024;
+	std::size_t client_max_body_size = 1024;
 
 	server::VirtualServer::ErrorPage error_page(404, "/404.html");
 
@@ -63,13 +63,13 @@ server::VirtualServer *BuildVirtualServer1() {
 	);
 	locationlist.push_back(loc_root);
 
-	// Location 2 - "/save"
+	// Location 2 - "/upload"
 	std::list<std::string> allowed_methods_save;
 	allowed_methods_save.push_back(http::GET);
 	allowed_methods_save.push_back(http::POST);
 	allowed_methods_save.push_back(http::DELETE);
 	server::Location loc_save = BuildLocation(
-		"/save", "", "", true, allowed_methods_save, std::make_pair(0, ""), "", "/save"
+		"/upload", "", "", true, allowed_methods_save, std::make_pair(0, ""), "", "/upload"
 	);
 	locationlist.push_back(loc_save);
 
@@ -95,7 +95,7 @@ server::VirtualServer *BuildVirtualServer2() {
 	server::VirtualServer::HostPortList host_ports;
 	host_ports.push_back(std::make_pair("127.0.0.1", 8080));
 
-	std::size_t client_max_body_size = 1024 * 1024;
+	std::size_t client_max_body_size = 0;
 
 	server::VirtualServer::ErrorPage error_page;
 
