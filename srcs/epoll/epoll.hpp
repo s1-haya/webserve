@@ -9,6 +9,8 @@ namespace epoll {
 
 class Epoll {
   public:
+	typedef struct epoll_event EpollEvent;
+
 	Epoll();
 	~Epoll();
 	void Add(int socket_fd, event::Type type);
@@ -27,9 +29,9 @@ class Epoll {
 	static const int          SYSTEM_ERROR = -1;
 	static const unsigned int MAX_EVENTS   = 10;
 	// variables
-	int                epoll_fd_;
-	struct epoll_event evlist_[MAX_EVENTS];
-	unsigned int       monitored_fd_count_;
+	int          epoll_fd_;
+	EpollEvent   evlist_[MAX_EVENTS];
+	unsigned int monitored_fd_count_;
 };
 
 } // namespace epoll

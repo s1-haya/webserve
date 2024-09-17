@@ -52,7 +52,7 @@ uint32_t ConvertToEventType(uint32_t type) {
 	return ret_type;
 }
 
-event::Event ConvertToEventDto(const struct epoll_event &event) {
+event::Event ConvertToEventDto(const epoll::Epoll::EpollEvent &event) {
 	event::Event ret_event;
 	ret_event.fd   = event.data.fd;
 	ret_event.type = ConvertToEventType(event.events);
@@ -63,9 +63,9 @@ event::Event ConvertToEventDto(const struct epoll_event &event) {
 
 // add new socket_fd to epoll's interest list
 void Epoll::Add(int socket_fd, event::Type type) {
-	struct epoll_event ev = {};
-	ev.events             = ConvertToEpollEventType(type);
-	ev.data.fd            = socket_fd;
+	EpollEvent ev = {};
+	ev.events     = ConvertToEpollEventType(type);
+	ev.data.fd    = socket_fd;
 	if (epoll_ctl(epoll_fd_, EPOLL_CTL_ADD, socket_fd, &ev) == SYSTEM_ERROR) {
 		throw utils::SystemException(errno);
 	}
@@ -96,9 +96,9 @@ int Epoll::CreateReadyList() {
 
 // replace old_type with new_type
 void Epoll::Replace(int socket_fd, const event::Type new_type) {
-	struct epoll_event ev = {};
-	ev.events             = ConvertToEpollEventType(new_type);
-	ev.data.fd            = socket_fd;
+	EpollEvent ev = {};
+	ev.events     = ConvertToEpollEventType(new_type);
+	ev.data.fd    = socket_fd;
 	if (epoll_ctl(epoll_fd_, EPOLL_CTL_MOD, socket_fd, &ev) == SYSTEM_ERROR) {
 		throw utils::SystemException(errno);
 	}
@@ -108,9 +108,9 @@ void Epoll::Replace(int socket_fd, const event::Type new_type) {
 void Epoll::Append(const event::Event &event, const event::Type new_type) {
 	int socket_fd = event.fd;
 
-	struct epoll_event ev = {};
-	ev.events             = ConvertToEpollEventType(event.type) | ConvertToEpollEventType(new_type);
-	ev.data.fd            = socket_fd;
+	EpollEvent ev = {};
+	ev.events     = ConvertToEpollEventType(event.type) | ConvertToEpollEventType(new_type);
+	ev.data.fd    = socket_fd;
 	if (epoll_ctl(epoll_fd_, EPOLL_CTL_MOD, socket_fd, &ev) == SYSTEM_ERROR) {
 		throw utils::SystemException(errno);
 	}
