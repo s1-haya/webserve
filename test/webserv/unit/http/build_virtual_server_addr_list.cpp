@@ -95,7 +95,7 @@ server::VirtualServer *BuildVirtualServer2() {
 	server::VirtualServer::HostPortList host_ports;
 	host_ports.push_back(std::make_pair("127.0.0.1", 8080));
 
-	std::size_t client_max_body_size = 0;
+	std::size_t client_max_body_size = 1024;
 
 	server::VirtualServer::ErrorPage error_page;
 
