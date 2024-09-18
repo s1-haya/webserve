@@ -5,11 +5,10 @@
 #include "read.hpp"
 #include "send.hpp"
 #include "start_up_exception.hpp"
-#include "system_error_exception.hpp"
+#include "system_exception.hpp"
 #include "utils.hpp"
 #include "virtual_server.hpp"
 #include <cerrno>
-#include <cstring>      // strerror
 #include <fcntl.h>      // fcntl
 #include <sys/socket.h> // socket
 #include <unistd.h>     // close
@@ -355,7 +354,7 @@ void Server::UpdateConnectionAfterSendResponse(
 void Server::AddEventRead(int sock_fd) {
 	try {
 		event_monitor_.Add(sock_fd, event::EVENT_READ);
-	} catch (const SystemErrorException &e) {
+	} catch (const utils::SystemException &e) {
 		utils::PrintError(e.what());
 		SetInternalServerError(sock_fd);
 	}
@@ -364,7 +363,7 @@ void Server::AddEventRead(int sock_fd) {
 void Server::ReplaceEvent(int client_fd, event::Type type) {
 	try {
 		event_monitor_.Replace(client_fd, type);
-	} catch (const SystemErrorException &e) {
+	} catch (const utils::SystemException &e) {
 		utils::PrintError(e.what());
 		switch (type) {
 		case event::EVENT_READ:
@@ -382,7 +381,7 @@ void Server::ReplaceEvent(int client_fd, event::Type type) {
 void Server::AppendEventWrite(const event::Event &event) {
 	try {
 		event_monitor_.Append(event, event::EVENT_WRITE);
-	} catch (const SystemErrorException &e) {
+	} catch (const utils::SystemException &e) {
 		utils::PrintError(e.what());
 		Disconnect(event.fd);
 	}
@@ -393,7 +392,7 @@ Server::AcceptResult Server::Accept(int server_fd) {
 	try {
 		ClientInfo new_client_info = Connection::Accept(server_fd);
 		result.SetValue(new_client_info);
-	} catch (const SystemErrorException &e) {
+	} catch (const utils::SystemException &e) {
 		result.Set(false);
 		utils::PrintError(e.what());
 		SetInternalServerError(server_fd);
@@ -432,7 +431,7 @@ void Server::Listen(const HostPortPair &host_port) {
 	SetNonBlockingMode(server_fd);
 
 	context_.SetListenSockFd(host_port, server_fd);
-	event_monitor_.Add(server_fd, event::EVENT_READ); // throw SystemErrorException
+	event_monitor_.Add(server_fd, event::EVENT_READ); // throw SystemException
 	utils::Debug(
 		"server", "listen " + host_port.first + ":" + utils::ToString(host_port.second), server_fd
 	);
@@ -470,11 +469,11 @@ void Server::Init() {
 void Server::SetNonBlockingMode(int sock_fd) {
 	int flags = fcntl(sock_fd, F_GETFL);
 	if (flags == SYSTEM_ERROR) {
-		throw SystemErrorException("fcntl F_GETFL failed: " + std::string(strerror(errno)));
+		throw utils::SystemException(errno);
 	}
 	flags |= O_NONBLOCK;
 	if (fcntl(sock_fd, F_SETFL, flags) == SYSTEM_ERROR) {
-		throw SystemErrorException("fcntl F_SETFL failed: " + std::string(strerror(errno)));
+		throw utils::SystemException(errno);
 	}
 }
 
