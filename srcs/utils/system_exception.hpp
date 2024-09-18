@@ -8,6 +8,7 @@ namespace utils {
 
 class SystemException : public std::runtime_error {
   public:
+	explicit SystemException(int error_number);
 	SystemException(const std::string &message, int error_number);
 	int GetErrorNumber() const;
 
