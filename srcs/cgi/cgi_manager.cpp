@@ -21,6 +21,22 @@ void CgiManager::AddNewCgi(int client_fd, const CgiRequest &request) {
 	client_cgi_map_[client_fd] = cgi;
 }
 
+void CgiManager::DeleteCgi(int client_fd) {
+	const Cgi *cgi = GetCgi(client_fd);
+
+	// FdMapから削除
+	if (cgi->IsReadRequired()) {
+		pipe_fd_map_.erase(cgi->GetReadFd());
+	}
+	if (cgi->IsWriteRequired()) {
+		pipe_fd_map_.erase(cgi->GetWriteFd());
+	}
+	// cgi*削除
+	delete cgi;
+	// CgiAddrMap削除
+	client_cgi_map_.erase(client_fd);
+}
+
 void CgiManager::RunCgi(int client_fd) {
 	Cgi *cgi = GetCgi(client_fd);
 

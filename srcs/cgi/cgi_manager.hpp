@@ -20,6 +20,7 @@ class CgiManager {
 
 	// functions
 	void AddNewCgi(int client_fd, const CgiRequest &request);
+	void DeleteCgi(int client_fd);
 	void RunCgi(int client_fd);
 
   private:
