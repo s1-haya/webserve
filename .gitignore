@@ -22,5 +22,5 @@
 
 !.coderabbit.yaml
 
-!html/**
+!root/**
 !*.conf

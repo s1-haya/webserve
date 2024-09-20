@@ -10,7 +10,7 @@ RUN apt-get update && \
     build-essential --no-install-recommends
 
 COPY srcs /webserv/srcs
-COPY html /webserv/html
+COPY root /webserv/root
 COPY Makefile /webserv/Makefile
 COPY Dockerfile /webserv/Dockerfile
 COPY config /webserv/config

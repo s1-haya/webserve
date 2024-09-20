@@ -32,8 +32,8 @@ void PrintNg() {
 // ================================================= //
 
 // cgi_parseから見た相対パス
-const std::string html_dir_path    = "../../../../html";
-const std::string cgi_bin_dir_path = "../../../../cgi-bin";
+const std::string html_dir_path    = "../../../../root/html";
+const std::string cgi_bin_dir_path = "../../../../root/cgi-bin";
 
 // 出力は目で見て確認(実行が成功していたらテストはOKとしている)
 
