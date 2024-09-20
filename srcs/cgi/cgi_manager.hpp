@@ -25,6 +25,7 @@ class CgiManager {
 	bool IsResponseComplete(int client_fd) const;
 	void AddReadBuf(int client_fd, const std::string &read_buf);
 	// getter
+	int                GetClientFd(int pipe_fd) const;
 	const std::string &GetResponse(int client_fd) const;
 
   private:
