@@ -1,6 +1,7 @@
 #include "epoll.hpp"
+#include "system_exception.hpp"
 #include "utils.hpp"
-#include <errno.h>
+#include <cerrno>
 #include <stdint.h> // uint32_t
 #include <unistd.h> // close
 
@@ -9,7 +10,7 @@ namespace epoll {
 Epoll::Epoll() {
 	epoll_fd_ = epoll_create1(EPOLL_CLOEXEC);
 	if (epoll_fd_ == SYSTEM_ERROR) {
-		throw std::runtime_error("epoll_create failed");
+		throw utils::SystemException(errno);
 	}
 }
 
@@ -42,7 +43,12 @@ uint32_t ConvertToEventType(uint32_t type) {
 	if (type & EPOLLOUT) {
 		ret_type |= event::EVENT_WRITE;
 	}
-	// todo: tmp
+	if (type & EPOLLERR) {
+		ret_type |= event::EVENT_ERROR;
+	}
+	if (type & EPOLLHUP) {
+		ret_type |= event::EVENT_HANGUP;
+	}
 	return ret_type;
 }
 
@@ -61,26 +67,27 @@ void Epoll::Add(int socket_fd, event::Type type) {
 	ev.events             = ConvertToEpollEventType(type);
 	ev.data.fd            = socket_fd;
 	if (epoll_ctl(epoll_fd_, EPOLL_CTL_ADD, socket_fd, &ev) == SYSTEM_ERROR) {
-		throw std::runtime_error("epoll_ctl failed");
+		throw utils::SystemException(errno);
 	}
 }
 
 // remove socket_fd from epoll's interest list
 void Epoll::Delete(int socket_fd) {
-	// todo: error?
-	epoll_ctl(epoll_fd_, EPOLL_CTL_DEL, socket_fd, NULL);
+	if (epoll_ctl(epoll_fd_, EPOLL_CTL_DEL, socket_fd, NULL) == SYSTEM_ERROR) {
+		throw utils::SystemException(errno);
+	}
 }
 
+// epoll_wait() always monitors EPOLLHUP and EPOLLERR, so no need to explicitly set them in events.
 int Epoll::CreateReadyList() {
 	errno = 0;
 	// todo: set timeout(ms)
 	const int ready = epoll_wait(epoll_fd_, evlist_, MAX_EVENTS, 500);
-
 	if (ready == SYSTEM_ERROR) {
 		if (errno == EINTR) {
 			return ready;
 		}
-		throw std::runtime_error("epoll_wait failed");
+		throw utils::SystemException(errno);
 	}
 	return ready;
 }
@@ -91,7 +98,7 @@ void Epoll::Replace(int socket_fd, const event::Type new_type) {
 	ev.events             = ConvertToEpollEventType(new_type);
 	ev.data.fd            = socket_fd;
 	if (epoll_ctl(epoll_fd_, EPOLL_CTL_MOD, socket_fd, &ev) == SYSTEM_ERROR) {
-		throw std::runtime_error("epoll_ctl failed");
+		throw utils::SystemException(errno);
 	}
 }
 
@@ -103,13 +110,13 @@ void Epoll::Append(const event::Event &event, const event::Type new_type) {
 	ev.events             = ConvertToEpollEventType(event.type) | ConvertToEpollEventType(new_type);
 	ev.data.fd            = socket_fd;
 	if (epoll_ctl(epoll_fd_, EPOLL_CTL_MOD, socket_fd, &ev) == SYSTEM_ERROR) {
-		throw std::runtime_error("epoll_ctl failed");
+		throw utils::SystemException(errno);
 	}
 }
 
 event::Event Epoll::GetEvent(std::size_t index) const {
 	if (index >= MAX_EVENTS) {
-		throw std::out_of_range("evlist index out of range");
+		throw std::logic_error("evlist index out of range");
 	}
 	return ConvertToEventDto(evlist_[index]);
 }

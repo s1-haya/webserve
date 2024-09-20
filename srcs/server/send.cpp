@@ -1,6 +1,7 @@
 #include "send.hpp"
 #include "utils.hpp"
-#include <cstdio>       // perror
+#include <cerrno>
+#include <cstring>      // strerror
 #include <sys/socket.h> // send
 
 namespace server {
@@ -15,7 +16,7 @@ Send::SendResult Send::SendResponse(int client_fd, const Response &response) {
 	ssize_t send_size = send(client_fd, response.c_str(), response.size(), 0);
 	utils::Debug("Send", "send_size: ", send_size);
 	if (send_size == SYSTEM_ERROR) {
-		perror("send failed");
+		utils::PrintError(__func__, strerror(errno));
 		send_result.Set(false);
 		return send_result;
 	}

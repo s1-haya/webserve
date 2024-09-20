@@ -4,9 +4,11 @@
 #include "event.hpp"
 #include "read.hpp"
 #include "send.hpp"
+#include "start_up_exception.hpp"
+#include "system_exception.hpp"
 #include "utils.hpp"
 #include "virtual_server.hpp"
-#include <errno.h>
+#include <cerrno>
 #include <fcntl.h>      // fcntl
 #include <sys/socket.h> // socket
 #include <unistd.h>     // close
@@ -117,19 +119,22 @@ void Server::AddVirtualServers(const ConfigServers &config_servers) {
 }
 
 Server::Server(const ConfigServers &config_servers) {
-	AddVirtualServers(config_servers);
+	try {
+		AddVirtualServers(config_servers);
+	} catch (const std::exception &e) {
+		throw StartUpException(e.what());
+	}
 }
 
 Server::~Server() {}
 
+// throw SystemErrorException
 void Server::Run() {
 	utils::Debug("server", "run server");
 
 	while (true) {
-		errno           = 0;
 		const int ready = event_monitor_.CreateReadyList();
-		// todo: error handle
-		if (ready == SYSTEM_ERROR && errno == EINTR) {
+		if (ready == SYSTEM_ERROR) {
 			continue;
 		}
 		for (std::size_t i = 0; i < static_cast<std::size_t>(ready); ++i) {
@@ -150,14 +155,19 @@ void Server::HandleEvent(const event::Event &event) {
 
 void Server::HandleNewConnection(int server_fd) {
 	// A new socket that has established a connection with the peer socket.
-	const ClientInfo new_client_info = Connection::Accept(server_fd);
-	const int        client_fd       = new_client_info.GetFd();
+	const AcceptResult result = Accept(server_fd);
+	if (!result.IsOk()) {
+		return;
+	}
+
+	const ClientInfo &new_client_info = result.GetValue();
+	const int         client_fd       = new_client_info.GetFd();
 	SetNonBlockingMode(client_fd);
 
-	// add client_info, event, message
+	// add client_info, message, event
 	context_.AddClientInfo(new_client_info);
-	event_monitor_.Add(client_fd, event::EVENT_READ);
 	message_manager_.AddNewMessage(client_fd);
+	AddEventRead(client_fd);
 	utils::Debug(
 		"server",
 		"add new client / listen server: " + new_client_info.GetListenIp() + ":" +
@@ -167,14 +177,18 @@ void Server::HandleNewConnection(int server_fd) {
 }
 
 void Server::HandleExistingConnection(const event::Event &event) {
+	if (event.type & event::EVENT_ERROR || event.type & event::EVENT_HANGUP) {
+		Disconnect(event.fd);
+		return;
+	}
 	if (event.type & event::EVENT_READ) {
 		ReadRequest(event.fd);
 		RunHttp(event);
 	}
 	if (event.type & event::EVENT_WRITE) {
+		// todo: RunHttp内でDisconnect()されていた場合の処理追加
 		SendResponse(event.fd);
 	}
-	// todo: handle other EventType
 }
 
 http::ClientInfos Server::GetClientInfos(int client_fd) const {
@@ -191,12 +205,13 @@ VirtualServerAddrList Server::GetVirtualServerList(int client_fd) const {
 void Server::ReadRequest(int client_fd) {
 	const Read::ReadResult read_result = Read::ReadRequest(client_fd);
 	if (!read_result.IsOk()) {
-		throw std::runtime_error("read failed");
+		SetInternalServerError(client_fd);
+		return;
 	}
 	if (read_result.GetValue().read_size == 0) {
-		// todo: need?
-		// message_manager_.DeleteMessage(client_fd);
-		// event_monitor_.Delete(client_fd);
+		// todo: not close?
+		// clientが正しくshutdownした場合・長さ0のデータグラムを受信した場合などにここに入るらしい
+		Disconnect(client_fd);
 		return;
 	}
 	message_manager_.AddRequestBuf(client_fd, read_result.GetValue().read_buf);
@@ -252,7 +267,7 @@ void Server::SendResponse(int client_fd) {
 	utils::Debug("server", "send response to client", client_fd);
 
 	if (!message_manager_.IsResponseExist(client_fd)) {
-		event_monitor_.Replace(client_fd, event::EVENT_READ);
+		ReplaceEvent(client_fd, event::EVENT_READ);
 	}
 	UpdateConnectionAfterSendResponse(client_fd, connection_state);
 }
@@ -274,9 +289,18 @@ void Server::HandleTimeoutMessages() {
 		const http::HttpResult http_result =
 			mock_http_.GetErrorResponse(GetClientInfos(client_fd), http::TIMEOUT);
 		message_manager_.AddPrimaryResponse(client_fd, message::CLOSE, http_result.response);
-		event_monitor_.Replace(client_fd, event::EVENT_WRITE);
+		ReplaceEvent(client_fd, event::EVENT_WRITE);
 		utils::Debug("server", "timeout client", client_fd);
 	}
+}
+
+// internal server error用のresponseをセットしてevent監視をWRITEに変更
+void Server::SetInternalServerError(int client_fd) {
+	const http::HttpResult http_result =
+		mock_http_.GetErrorResponse(GetClientInfos(client_fd), http::INTERNAL_ERROR);
+	message_manager_.AddPrimaryResponse(client_fd, message::CLOSE, http_result.response);
+	ReplaceEvent(client_fd, event::EVENT_WRITE);
+	utils::Debug("server", "internal server error to client", client_fd);
 }
 
 void Server::KeepConnection(int client_fd) {
@@ -284,13 +308,14 @@ void Server::KeepConnection(int client_fd) {
 	utils::Debug("server", "Connection: keep-alive client", client_fd);
 }
 
-// todo: 強制Disconnectする場合はHttpにclient_fdを知らせてdata削除する必要あり
-//       internal server error用responseを貰って実際は送らないという手もあり
-// delete from context, event, message
+// delete from event, message, context
 void Server::Disconnect(int client_fd) {
-	context_.DeleteClientInfo(client_fd);
+	// todo: client_save_dataがない場合に呼ばれても大丈夫な作りになってるか確認
+	// HttpResult is not used.
+	mock_http_.GetErrorResponse(GetClientInfos(client_fd), http::INTERNAL_ERROR);
 	event_monitor_.Delete(client_fd);
 	message_manager_.DeleteMessage(client_fd);
+	context_.DeleteClientInfo(client_fd);
 	close(client_fd);
 	utils::Debug("server", "Connection: close, disconnected client", client_fd);
 	utils::Debug("------------------------------------------");
@@ -301,10 +326,10 @@ void Server::UpdateEventInResponseComplete(
 ) {
 	switch (connection_state) {
 	case message::KEEP:
-		event_monitor_.Append(event, event::EVENT_WRITE);
+		AppendEventWrite(event);
 		break;
 	case message::CLOSE:
-		event_monitor_.Replace(event.fd, event::EVENT_WRITE);
+		ReplaceEvent(event.fd, event::EVENT_WRITE);
 		break;
 	default:
 		break;
@@ -324,6 +349,55 @@ void Server::UpdateConnectionAfterSendResponse(
 	default:
 		break;
 	}
+}
+
+void Server::AddEventRead(int sock_fd) {
+	try {
+		event_monitor_.Add(sock_fd, event::EVENT_READ);
+	} catch (const utils::SystemException &e) {
+		utils::PrintError(e.what());
+		SetInternalServerError(sock_fd);
+	}
+}
+
+void Server::ReplaceEvent(int client_fd, event::Type type) {
+	try {
+		event_monitor_.Replace(client_fd, type);
+	} catch (const utils::SystemException &e) {
+		utils::PrintError(e.what());
+		switch (type) {
+		case event::EVENT_READ:
+			SetInternalServerError(client_fd);
+			break;
+		case event::EVENT_WRITE:
+			Disconnect(client_fd);
+			break;
+		default:
+			break;
+		}
+	}
+}
+
+void Server::AppendEventWrite(const event::Event &event) {
+	try {
+		event_monitor_.Append(event, event::EVENT_WRITE);
+	} catch (const utils::SystemException &e) {
+		utils::PrintError(e.what());
+		Disconnect(event.fd);
+	}
+}
+
+Server::AcceptResult Server::Accept(int server_fd) {
+	AcceptResult result;
+	try {
+		ClientInfo new_client_info = Connection::Accept(server_fd);
+		result.SetValue(new_client_info);
+	} catch (const utils::SystemException &e) {
+		result.Set(false);
+		utils::PrintError(e.what());
+		SetInternalServerError(server_fd);
+	}
+	return result;
 }
 
 void Server::AddServerInfoToContext(const VirtualServerList &virtual_server_list) {
@@ -357,7 +431,7 @@ void Server::Listen(const HostPortPair &host_port) {
 	SetNonBlockingMode(server_fd);
 
 	context_.SetListenSockFd(host_port, server_fd);
-	event_monitor_.Add(server_fd, event::EVENT_READ);
+	event_monitor_.Add(server_fd, event::EVENT_READ); // throw SystemException
 	utils::Debug(
 		"server", "listen " + host_port.first + ":" + utils::ToString(host_port.second), server_fd
 	);
@@ -385,17 +459,21 @@ void Server::Init() {
 	const VirtualServerList &virtual_server_list = context_.GetAllVirtualServer();
 
 	AddServerInfoToContext(virtual_server_list);
-	ListenAllHostPorts(virtual_server_list);
+	try {
+		ListenAllHostPorts(virtual_server_list);
+	} catch (const std::exception &e) {
+		throw StartUpException(e.what());
+	}
 }
 
 void Server::SetNonBlockingMode(int sock_fd) {
 	int flags = fcntl(sock_fd, F_GETFL);
 	if (flags == SYSTEM_ERROR) {
-		throw std::runtime_error("fcntl F_GETFL failed");
+		throw utils::SystemException(errno);
 	}
 	flags |= O_NONBLOCK;
 	if (fcntl(sock_fd, F_SETFL, flags) == SYSTEM_ERROR) {
-		throw std::runtime_error("fcntl F_SETFL failed");
+		throw utils::SystemException(errno);
 	}
 }
 

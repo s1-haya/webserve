@@ -42,13 +42,14 @@
  *         and containing the response data.
  */
 
+server::VirtualServerAddrList BuildVirtualServerAddrList();
+void DeleteVirtualServerAddrList(const server::VirtualServerAddrList &virtual_servers);
 int main(void) {
 	int ret_code = EXIT_SUCCESS;
 
-	// todo: InitServerInfos;
-	server::VirtualServerAddrList server_infos;
-	ret_code |= test::test_no_connection(server_infos);
+    server::VirtualServerAddrList server_infos = BuildVirtualServerAddrList();
+    ret_code |= test::test_no_connection(server_infos);
 	ret_code |= test::test_not_exist_file(server_infos);
-
-	return ret_code;
+    DeleteVirtualServerAddrList(server_infos);
+    return ret_code;
 }

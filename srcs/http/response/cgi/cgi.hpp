@@ -15,7 +15,7 @@ typedef std::map<std::string, std::string> MetaMap;
 
 class Cgi {
   public:
-	Cgi(const CgiRequest &request);
+	explicit Cgi(const CgiRequest &request);
 	~Cgi();
 	StatusCode Run(std::string &response_body_message);
 
