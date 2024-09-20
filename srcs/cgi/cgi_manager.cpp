@@ -21,6 +21,23 @@ void CgiManager::AddNewCgi(int client_fd, const CgiRequest &request) {
 	client_cgi_map_[client_fd] = cgi;
 }
 
+void CgiManager::RunCgi(int client_fd) {
+	Cgi *cgi = GetCgi(client_fd);
+
+	const Cgi::CgiResult cgi_result = cgi->Run();
+	if (!cgi_result.IsOk()) {
+		// todo: error handling
+		return;
+	}
+	// pipe_fdとclient_fdの紐づけを保持
+	if (cgi->IsReadRequired()) {
+		pipe_fd_map_[cgi->GetReadFd()] = client_fd;
+	}
+	if (cgi->IsWriteRequired()) {
+		pipe_fd_map_[cgi->GetWriteFd()] = client_fd;
+	}
+}
+
 Cgi *CgiManager::GetCgi(int client_fd) const {
 	// todo: logic_error?
 	return client_cgi_map_.at(client_fd);

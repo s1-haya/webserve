@@ -20,6 +20,7 @@ class CgiManager {
 
 	// functions
 	void AddNewCgi(int client_fd, const CgiRequest &request);
+	void RunCgi(int client_fd);
 
   private:
 	// Prohibit copy
