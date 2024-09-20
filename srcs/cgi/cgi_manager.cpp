@@ -64,6 +64,16 @@ void CgiManager::AddReadBuf(int client_fd, const std::string &read_buf) {
 	cgi->AddReadBuf(read_buf);
 }
 
+bool CgiManager::IsReadRequired(int client_fd) const {
+	const Cgi *cgi = client_cgi_map_.at(client_fd);
+	return cgi->IsReadRequired();
+}
+
+bool CgiManager::IsWriteRequired(int client_fd) const {
+	const Cgi *cgi = client_cgi_map_.at(client_fd);
+	return cgi->IsWriteRequired();
+}
+
 int CgiManager::GetClientFd(int pipe_fd) const {
 	// todo: logic_error?
 	return pipe_fd_map_.at(pipe_fd);
@@ -72,6 +82,16 @@ int CgiManager::GetClientFd(int pipe_fd) const {
 const std::string &CgiManager::GetResponse(int client_fd) const {
 	const Cgi *cgi = client_cgi_map_.at(client_fd);
 	return cgi->GetResponse();
+}
+
+int CgiManager::GetReadFd(int client_fd) const {
+	const Cgi *cgi = client_cgi_map_.at(client_fd);
+	return cgi->GetReadFd();
+}
+
+int CgiManager::GetWriteFd(int client_fd) const {
+	const Cgi *cgi = client_cgi_map_.at(client_fd);
+	return cgi->GetWriteFd();
 }
 
 Cgi *CgiManager::GetCgi(int client_fd) const {

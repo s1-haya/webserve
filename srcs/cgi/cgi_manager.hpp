@@ -24,9 +24,13 @@ class CgiManager {
 	void RunCgi(int client_fd);
 	bool IsResponseComplete(int client_fd) const;
 	void AddReadBuf(int client_fd, const std::string &read_buf);
+	bool IsReadRequired(int client_fd) const;
+	bool IsWriteRequired(int client_fd) const;
 	// getter
 	int                GetClientFd(int pipe_fd) const;
 	const std::string &GetResponse(int client_fd) const;
+	int                GetReadFd(int client_fd) const;
+	int                GetWriteFd(int client_fd) const;
 
   private:
 	// Prohibit copy
