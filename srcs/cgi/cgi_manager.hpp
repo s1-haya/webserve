@@ -24,6 +24,8 @@ class CgiManager {
 	void RunCgi(int client_fd);
 	bool IsResponseComplete(int client_fd) const;
 	void AddReadBuf(int client_fd, const std::string &read_buf);
+	// getter
+	const std::string &GetResponse(int client_fd) const;
 
   private:
 	// Prohibit copy

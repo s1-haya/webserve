@@ -228,5 +228,9 @@ bool Cgi::IsResponseComplete() const {
 	return is_response_complete_;
 }
 
+const std::string &Cgi::GetResponse() const {
+	return response_body_message_;
+}
+
 } // namespace cgi
 } // namespace http
