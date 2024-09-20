@@ -25,6 +25,9 @@ class CgiManager {
 	// Prohibit copy
 	CgiManager(const CgiManager &other);
 	CgiManager &operator=(const CgiManager &other);
+	// functions
+	Cgi *GetCgi(int client_fd) const;
+	bool IsClientFd(int fd) const;
 
 	// client_fd毎にCgiAddrを保持
 	CgiAddrMap client_cgi_map_;
