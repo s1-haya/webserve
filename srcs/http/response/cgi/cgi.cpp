@@ -236,5 +236,9 @@ const std::string &Cgi::GetResponse() const {
 	return response_body_message_;
 }
 
+void Cgi::ReplaceNewRequest(const std::string &new_request_str) {
+	request_body_message_ = new_request_str;
+}
+
 } // namespace cgi
 } // namespace http

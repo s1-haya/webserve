@@ -64,6 +64,11 @@ void CgiManager::AddReadBuf(int client_fd, const std::string &read_buf) {
 	cgi->AddReadBuf(read_buf);
 }
 
+void CgiManager::ReplaceNewRequest(int client_fd, const std::string &new_request_str) {
+	Cgi *cgi = client_cgi_map_.at(client_fd);
+	cgi->ReplaceNewRequest(new_request_str);
+}
+
 bool CgiManager::IsReadRequired(int client_fd) const {
 	const Cgi *cgi = client_cgi_map_.at(client_fd);
 	return cgi->IsReadRequired();
