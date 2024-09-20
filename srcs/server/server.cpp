@@ -183,6 +183,7 @@ void Server::HandleExistingConnection(const event::Event &event) {
 		HandleReadEvent(event);
 	}
 	if (event.type & event::EVENT_WRITE) {
+		// todo: HandleReadEvent()でDisconnect(),DeleteCgi()されてる場合ここに入らない
 		HandleWriteEvent(event.fd);
 	}
 }
@@ -197,7 +198,7 @@ void Server::HandleReadEvent(const event::Event &event) {
 
 	if (IsCgi(fd)) {
 		HandleCgiReadResult(fd, read_result);
-		RunCgi(event); // todo: tmp func name
+		SetCgiResponseToHttp(event);
 		return;
 	}
 	// http
@@ -223,7 +224,7 @@ void Server::HandleCgiReadResult(int pipe_fd, const Read::ReadResult &read_resul
 	cgi_manager_.AddReadBuf(client_fd, read_result.GetValue().read_buf);
 }
 
-void Server::RunCgi(const event::Event &event) {
+void Server::SetCgiResponseToHttp(const event::Event &event) {
 	const int pipe_fd   = event.fd;
 	const int client_fd = cgi_manager_.GetClientFd(pipe_fd);
 
