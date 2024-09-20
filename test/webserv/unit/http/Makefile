@@ -52,18 +52,18 @@ TEST_CASE_DIR := test_case
 # method
 TEST_CASE_FOR_GET := get
 # status_codes
-TEST_CASE_FOR_200 := 200
-TEST_CASE_FOR_400 := 400
+TEST_CASE_FOR_2XX := 2xx
+TEST_CASE_FOR_4XX := 4xx
 
 SRCS	+=	test_http.cpp \
 			$(TEST_CASE_DIR)/test_handler.cpp \
-			$(TEST_CASE_DIR)/$(TEST_CASE_FOR_GET)/$(TEST_CASE_FOR_200)/test_no_connection.cpp \
-			$(TEST_CASE_DIR)/$(TEST_CASE_FOR_GET)/$(TEST_CASE_FOR_400)/test_not_exist_file.cpp
+			$(TEST_CASE_DIR)/$(TEST_CASE_FOR_GET)/$(TEST_CASE_FOR_2XX)/test_no_connection.cpp \
+			$(TEST_CASE_DIR)/$(TEST_CASE_FOR_GET)/$(TEST_CASE_FOR_4XX)/test_not_exist_file.cpp
 
 # 4. Add unit test directory for INCLUDE
 SRCS_DIR += $(TEST_CASE_DIR) \
-			$(TEST_CASE_DIR)/$(TEST_CASE_FOR_GET)/$(TEST_CASE_FOR_200) \
-			$(TEST_CASE_DIR)/$(TEST_CASE_FOR_GET)/$(TEST_CASE_FOR_400)
+			$(TEST_CASE_DIR)/$(TEST_CASE_FOR_GET)/$(TEST_CASE_FOR_2XX) \
+			$(TEST_CASE_DIR)/$(TEST_CASE_FOR_GET)/$(TEST_CASE_FOR_4XX)
 
 #--------------------------------------------
 OBJ_DIR		:=	objs

@@ -8,7 +8,7 @@ namespace test {
 
 int test_no_connection(const server::VirtualServerAddrList &server_infos) {
 	const std::string &request_buffer =
-		test::LoadFileContent("../../../common/request/get/200/no-connection.txt");
+		test::LoadFileContent("../../../common/request/get/2xx/no-connection.txt");
 	http::ClientInfos client_infos = test::CreateClientInfos(request_buffer);
 	std::string       expected1_status_line =
 		test::LoadFileContent("../../expected_response/default_status_line/ok.txt");
