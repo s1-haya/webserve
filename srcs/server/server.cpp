@@ -3,7 +3,6 @@
 #include "client_info.hpp"
 #include "define.hpp"
 #include "event.hpp"
-#include "read.hpp"
 #include "send.hpp"
 #include "start_up_exception.hpp"
 #include "system_exception.hpp"
@@ -193,15 +192,52 @@ bool Server::IsCgi(int fd) const {
 }
 
 void Server::HandleReadEvent(const event::Event &event) {
-	const int fd = event.fd;
+	const int              fd          = event.fd;
+	const Read::ReadResult read_result = Read::ReadRequest(fd);
 
 	if (IsCgi(fd)) {
-		// todo: 処理
+		HandleCgiReadResult(fd, read_result);
+		RunCgi(event); // todo: tmp func name
 		return;
 	}
 	// http
-	ReadRequest(fd);
+	HandleHttpReadResult(fd, read_result);
 	RunHttp(event);
+}
+
+void Server::HandleCgiReadResult(int pipe_fd, const Read::ReadResult &read_result) {
+	const int client_fd = cgi_manager_.GetClientFd(pipe_fd);
+
+	if (!read_result.IsOk()) {
+		utils::Debug(
+			"cgi", "Failed to read the response from the child process through pipe_fd", pipe_fd
+		);
+		cgi_manager_.DeleteCgi(client_fd);
+		SetInternalServerError(client_fd);
+		return;
+	}
+	if (read_result.GetValue().read_size == 0) {
+		// todo
+		return;
+	}
+	cgi_manager_.AddReadBuf(client_fd, read_result.GetValue().read_buf);
+}
+
+void Server::RunCgi(const event::Event &event) {
+	const int pipe_fd   = event.fd;
+	const int client_fd = cgi_manager_.GetClientFd(pipe_fd);
+
+	if (!cgi_manager_.IsResponseComplete(client_fd)) {
+		return;
+	}
+	utils::Debug("cgi", "Read the entire response from the child process through pipe_fd", pipe_fd);
+
+	const std::string &cgi_response = cgi_manager_.GetResponse(client_fd);
+	mock_http_.SetCgiResponse(client_fd, cgi_response);
+	// std::cerr << cgi_manager_.GetResponse(client_fd) << std::endl;
+
+	cgi_manager_.DeleteCgi(client_fd);
+	event_monitor_.Delete(client_fd);
 }
 
 http::ClientInfos Server::GetClientInfos(int client_fd) const {
@@ -215,8 +251,7 @@ VirtualServerAddrList Server::GetVirtualServerList(int client_fd) const {
 	return context_.GetVirtualServerAddrList(client_fd);
 }
 
-void Server::ReadRequest(int client_fd) {
-	const Read::ReadResult read_result = Read::ReadRequest(client_fd);
+void Server::HandleHttpReadResult(int client_fd, const Read::ReadResult &read_result) {
 	if (!read_result.IsOk()) {
 		SetInternalServerError(client_fd);
 		return;

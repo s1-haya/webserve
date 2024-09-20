@@ -9,6 +9,7 @@
 #include "http_result.hpp"
 #include "message_manager.hpp"
 #include "mock_http.hpp"
+#include "read.hpp"
 #include <list>
 #include <string>
 
@@ -43,8 +44,8 @@ class Server {
 	void      HandleNewConnection(int server_fd);
 	void      HandleExistingConnection(const event::Event &event);
 	void      HandleReadEvent(const event::Event &event);
+	void      HandleHttpReadResult(int client_fd, const Read::ReadResult &read_result);
 	void      HandleWriteEvent(int fd);
-	void      ReadRequest(int client_fd);
 	void      RunHttp(const event::Event &event);
 	void      SendResponse(int client_fd);
 	void      HandleTimeoutMessages();
@@ -69,6 +70,8 @@ class Server {
 	VirtualServerAddrList GetVirtualServerList(int client_fd) const;
 	// for Cgi
 	bool IsCgi(int fd) const;
+	void HandleCgiReadResult(int pipe_fd, const Read::ReadResult &read_result);
+	void RunCgi(const event::Event &event);
 
 	// const
 	static const int    SYSTEM_ERROR = -1;
