@@ -30,6 +30,8 @@ class Cgi {
 	// read/writeのpipe_fdが存在するかどうか
 	bool IsReadRequired() const;
 	bool IsWriteRequired() const;
+	// read()した結果をresponseに追加していく
+	void AddReadBuf(const std::string &read_buf);
 	// >>> todo
 
   private:

@@ -218,4 +218,8 @@ bool Cgi::IsWriteRequired() const {
 	return write_fd_ != -1;
 }
 
+void Cgi::AddReadBuf(const std::string &read_buf) {
+	response_body_message_ += read_buf;
+}
+
 } // namespace cgi

@@ -53,6 +53,11 @@ void CgiManager::DeleteCgi(int client_fd) {
 	cgi_addr_map_.erase(client_fd);
 }
 
+void CgiManager::AddReadBuf(int client_fd, const std::string &read_buf) {
+	Cgi *cgi = cgi_addr_map_.at(client_fd);
+	cgi->AddReadBuf(read_buf);
+}
+
 CgiManager::GetFdResult CgiManager::GetReadFd(int client_fd) const {
 	GetFdResult result;
 
