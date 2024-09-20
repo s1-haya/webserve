@@ -1,6 +1,7 @@
 #ifndef CGI_HPP_
 #define CGI_HPP_
 
+#include "utils.hpp"
 #include <map>
 #include <string>
 
@@ -20,6 +21,9 @@ class Cgi {
 	StatusCode Run(std::string &response_body_message);
 
 	// <<< todo
+	typedef utils::Result<void> CgiResult;
+	// pipe(),fork(),close()してpipe_fdをメンバにセット
+	CgiResult Run();
 	// pipe_fdのgetter
 	int GetReadFd() const;
 	int GetWriteFd() const;
