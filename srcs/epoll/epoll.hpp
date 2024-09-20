@@ -4,31 +4,35 @@
 #include "event.hpp"
 #include <cstddef>     // size_t
 #include <sys/epoll.h> // epoll
+#include <vector>
 
 namespace epoll {
 
 class Epoll {
   public:
+	typedef struct epoll_event      EpollEvent;
+	typedef std::vector<EpollEvent> EpollEventVector;
+
 	Epoll();
 	~Epoll();
-	void Add(int socket_fd, event::Type type);
-	void Delete(int socket_fd);
-	void Replace(int socket_fd, event::Type new_type);
-	void Append(const event::Event &event, event::Type new_type);
-	int  CreateReadyList();
-	// getter
-	event::Event GetEvent(std::size_t index) const;
+
+	event::EventList GetEventList();
+	void             Add(int socket_fd, event::Type type);
+	void             Delete(int socket_fd);
+	void             Replace(int socket_fd, event::Type new_type);
+	void             Append(const event::Event &event, event::Type new_type);
 
   private:
 	// prohibit copy
 	Epoll(const Epoll &other);
 	Epoll &operator=(const Epoll &other);
+	// function
+	EpollEventVector CreateEventReadyList();
 	// const
-	static const int          SYSTEM_ERROR = -1;
-	static const unsigned int MAX_EVENTS   = 10;
+	static const int SYSTEM_ERROR = -1;
 	// variables
-	int                epoll_fd_;
-	struct epoll_event evlist_[MAX_EVENTS];
+	int          epoll_fd_;
+	unsigned int monitored_fd_count_;
 };
 
 } // namespace epoll
