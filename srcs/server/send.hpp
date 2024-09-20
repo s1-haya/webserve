@@ -3,7 +3,6 @@
 
 #include "utils.hpp"
 #include <string>
-#include <sys/types.h> // ssize_t
 
 namespace server {
 
@@ -16,11 +15,10 @@ namespace server {
  */
 class Send {
   public:
-	typedef std::string             Response;
-	typedef utils::Result<Response> SendResult;
+	typedef utils::Result<std::string> SendResult;
 
 	// function
-	static SendResult SendResponse(int client_fd, const Response &response);
+	static SendResult SendStr(int client_fd, const std::string &response);
 
   private:
 	Send();
