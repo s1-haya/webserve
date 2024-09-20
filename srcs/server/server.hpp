@@ -20,6 +20,7 @@ class Server {
 	typedef VirtualServerStorage::VirtualServerList VirtualServerList;
 	typedef std::set<std::string>                   IpSet;
 	typedef std::map<unsigned int, IpSet>           PortIpMap;
+	typedef utils::Result<ClientInfo>               AcceptResult;
 
 	explicit Server(const ConfigServers &config_servers);
 	~Server();
@@ -44,6 +45,7 @@ class Server {
 	void      RunHttp(const event::Event &event);
 	void      SendResponse(int client_fd);
 	void      HandleTimeoutMessages();
+	void      SetInternalServerError(int client_fd);
 	void      KeepConnection(int client_fd);
 	void      Disconnect(int client_fd);
 	void      UpdateEventInResponseComplete(
@@ -53,6 +55,12 @@ class Server {
 		int client_fd, const message::ConnectionState connection_state
 	);
 	void SetNonBlockingMode(int sock_fd);
+	// wrapper for epoll
+	void AddEventRead(int sock_fd);
+	void ReplaceEvent(int client_fd, event::Type type);
+	void AppendEventWrite(const event::Event &event);
+	// wrapper for connection
+	AcceptResult Accept(int server_fd);
 	// for Server to Http
 	http::ClientInfos     GetClientInfos(int client_fd) const;
 	VirtualServerAddrList GetVirtualServerList(int client_fd) const;

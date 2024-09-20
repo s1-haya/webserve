@@ -1,5 +1,5 @@
-#ifndef SYSTEM_EXCEPTION_HPP_
-#define SYSTEM_EXCEPTION_HPP_
+#ifndef UTILS_SYSTEM_EXCEPTION_HPP_
+#define UTILS_SYSTEM_EXCEPTION_HPP_
 
 #include <stdexcept>
 #include <string>
@@ -8,7 +8,8 @@ namespace utils {
 
 class SystemException : public std::runtime_error {
   public:
-	explicit SystemException(const std::string &message, int error_number);
+	explicit SystemException(int error_number);
+	SystemException(const std::string &message, int error_number);
 	int GetErrorNumber() const;
 
   private:

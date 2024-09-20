@@ -27,6 +27,7 @@ const std::string CLOSE                   = "close";
 const std::string CONTENT_TYPE            = "Content-Type";
 const std::string CONTENT_LENGTH          = "Content-Length";
 const std::string TRANSFER_ENCODING       = "Transfer-Encoding";
+const std::string CHUNKED                 = "chunked";
 const std::string AUTHORIZATION           = "Authorization";
 const std::string REQUEST_HEADER_FIELDS[] = {
 	HOST,
