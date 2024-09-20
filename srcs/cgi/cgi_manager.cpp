@@ -79,6 +79,11 @@ int CgiManager::GetClientFd(int pipe_fd) const {
 	return pipe_fd_map_.at(pipe_fd);
 }
 
+const std::string &CgiManager::GetRequest(int client_fd) const {
+	const Cgi *cgi = client_cgi_map_.at(client_fd);
+	return cgi->GetRequest();
+}
+
 const std::string &CgiManager::GetResponse(int client_fd) const {
 	const Cgi *cgi = client_cgi_map_.at(client_fd);
 	return cgi->GetResponse();

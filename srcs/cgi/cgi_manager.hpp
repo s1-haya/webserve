@@ -28,6 +28,7 @@ class CgiManager {
 	bool           IsWriteRequired(int client_fd) const;
 	// getter
 	int                GetClientFd(int pipe_fd) const;
+	const std::string &GetRequest(int client_fd) const;
 	const std::string &GetResponse(int client_fd) const;
 	int                GetReadFd(int client_fd) const;
 	int                GetWriteFd(int client_fd) const;

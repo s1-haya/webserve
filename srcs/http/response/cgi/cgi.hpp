@@ -36,6 +36,8 @@ class Cgi {
 	bool IsResponseComplete() const;
 	// responseのgetter(struct CgiResponseになる？)
 	const std::string &GetResponse() const;
+	// requestのgetter
+	const std::string &GetRequest() const;
 	// >>> todo
 
   private:
