@@ -186,7 +186,6 @@ void Server::HandleExistingConnection(const event::Event &event) {
 	if (event.type & event::EVENT_WRITE) {
 		HandleWriteEvent(event.fd);
 	}
-	// RunCgi();
 }
 
 bool Server::IsCgi(int fd) const {
@@ -247,8 +246,9 @@ void Server::RunHttp(const event::Event &event) {
 	if (!http_result.is_response_complete) {
 		message_manager_.SetIsCompleteRequest(client_fd, false);
 		if (http_result.is_cgi) {
+			// todo: try-catch?
 			cgi_manager_.AddNewCgi(client_fd, http_result.cgi_request);
-			// todo: client_fdと紐づけて保持
+			cgi_manager_.RunCgi(client_fd); // todo: 新規作成時しかRunしたくないので仮にここ
 		}
 		return;
 	}
