@@ -1,4 +1,5 @@
 #include "server.hpp"
+#include "cgi.hpp"
 #include "client_info.hpp"
 #include "define.hpp"
 #include "event.hpp"
@@ -245,6 +246,10 @@ void Server::RunHttp(const event::Event &event) {
 	// If not completed, the request will be re-read by the event_monitor.
 	if (!http_result.is_response_complete) {
 		message_manager_.SetIsCompleteRequest(client_fd, false);
+		if (http_result.is_cgi) {
+			http::cgi::Cgi cgi(http_result.cgi_request);
+			// todo: client_fdと紐づけて保持
+		}
 		return;
 	}
 	message_manager_.SetIsCompleteRequest(client_fd, true);
