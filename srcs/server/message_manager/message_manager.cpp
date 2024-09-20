@@ -105,4 +105,8 @@ void MessageManager::SetIsCompleteRequest(int client_fd, bool is_complete_reques
 	message.SetIsCompleteRequest(is_complete_request);
 }
 
+bool MessageManager::IsClientFd(int fd) const {
+	return messages_.count(fd) == 1;
+}
+
 } // namespace server
