@@ -180,13 +180,28 @@ void Server::HandleExistingConnection(const event::Event &event) {
 		return;
 	}
 	if (event.type & event::EVENT_READ) {
-		ReadRequest(event.fd);
-		RunHttp(event);
+		HandleReadEvent(event);
 	}
 	if (event.type & event::EVENT_WRITE) {
-		// todo: RunHttp内でDisconnect()されていた場合の処理追加
-		SendResponse(event.fd);
+		HandleWriteEvent(event.fd);
 	}
+	// RunCgi();
+}
+
+bool Server::IsCgi(int fd) const {
+	return !message_manager_.IsClientFd(fd);
+}
+
+void Server::HandleReadEvent(const event::Event &event) {
+	const int fd = event.fd;
+
+	if (IsCgi(fd)) {
+		// todo: 処理
+		return;
+	}
+	// http
+	ReadRequest(fd);
+	RunHttp(event);
 }
 
 http::ClientInfos Server::GetClientInfos(int client_fd) const {
@@ -240,6 +255,15 @@ void Server::RunHttp(const event::Event &event) {
 		http_result.is_connection_keep ? message::KEEP : message::CLOSE;
 	message_manager_.AddNormalResponse(client_fd, connection_state, http_result.response);
 	UpdateEventInResponseComplete(connection_state, event);
+}
+
+void Server::HandleWriteEvent(int fd) {
+	if (IsCgi(fd)) {
+		// todo: 処理
+		return;
+	}
+	// http
+	SendResponse(fd);
 }
 
 void Server::SendResponse(int client_fd) {

@@ -41,6 +41,8 @@ class Server {
 	void      HandleEvent(const event::Event &event);
 	void      HandleNewConnection(int server_fd);
 	void      HandleExistingConnection(const event::Event &event);
+	void      HandleReadEvent(const event::Event &event);
+	void      HandleWriteEvent(int fd);
 	void      ReadRequest(int client_fd);
 	void      RunHttp(const event::Event &event);
 	void      SendResponse(int client_fd);
@@ -64,6 +66,8 @@ class Server {
 	// for Server to Http
 	http::ClientInfos     GetClientInfos(int client_fd) const;
 	VirtualServerAddrList GetVirtualServerList(int client_fd) const;
+	// for Cgi
+	bool IsCgi(int fd) const;
 
 	// const
 	static const int    SYSTEM_ERROR = -1;
