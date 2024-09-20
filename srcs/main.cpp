@@ -1,4 +1,3 @@
-#include "color.hpp"
 #include "config.hpp"
 #include "server.hpp"
 #include "start_up_exception.hpp"
@@ -9,10 +8,6 @@
 #include <string>
 
 namespace {
-
-void PrintError(const std::string &s) {
-	std::cerr << utils::color::RED << "Error: " << s << utils::color::RESET << std::endl;
-}
 
 static void PrintUsage() {
 	std::cerr << "Usage:" << std::endl;
@@ -42,7 +37,7 @@ void RunServer() {
 		} catch (const server::StartUpException &e) {
 			throw;
 		} catch (const std::exception &e) {
-			PrintError(e.what());
+			utils::PrintError(e.what());
 		}
 		utils::Debug("server", "re-run server");
 	}
@@ -50,13 +45,13 @@ void RunServer() {
 
 int main(int argc, char **argv) {
 	if (argc > 2) {
-		PrintError("invalid arguments");
+		utils::PrintError("invalid arguments");
 		PrintUsage();
 		return EXIT_FAILURE;
 	}
 	const SignalResult result = SetSignalHandler();
 	if (!result.IsOk()) {
-		PrintError("signal failed");
+		utils::PrintError("signal failed");
 		return EXIT_FAILURE;
 	}
 
@@ -71,7 +66,7 @@ int main(int argc, char **argv) {
 		RunServer();
 		config::ConfigInstance->Destroy();
 	} catch (const std::exception &e) {
-		PrintError(e.what());
+		utils::PrintError(e.what());
 		return EXIT_FAILURE;
 	}
 	return EXIT_SUCCESS;
