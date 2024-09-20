@@ -1,4 +1,5 @@
 #include "cgi_manager.hpp"
+#include "cgi.hpp"
 
 namespace cgi {
 
@@ -10,5 +11,14 @@ CgiManager::~CgiManager() {
 	}
 }
 
+void CgiManager::AddNewCgi(int client_fd, const CgiRequest &request) {
+	// todo: iru?
+	// if (cgi_map_.count(client_fd) != 0) {
+	// 	return;
+	// }
+	Cgi *cgi = new Cgi(request);
+	// todo: new error handling
+	client_cgi_map_[client_fd] = cgi;
+}
 
 } // namespace cgi

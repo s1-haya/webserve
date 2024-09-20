@@ -1,6 +1,7 @@
 #ifndef SERVER_SERVER_HPP_
 #define SERVER_SERVER_HPP_
 
+#include "cgi_manager.hpp"
 #include "config_parse/context.hpp"
 #include "connection.hpp"
 #include "context_manager.hpp"
@@ -82,6 +83,8 @@ class Server {
 	http::MockHttp mock_http_;
 	// message manager with time control
 	MessageManager message_manager_;
+	// cgi
+	cgi::CgiManager cgi_manager_;
 };
 
 } // namespace server

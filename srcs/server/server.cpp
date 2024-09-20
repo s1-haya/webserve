@@ -247,7 +247,7 @@ void Server::RunHttp(const event::Event &event) {
 	if (!http_result.is_response_complete) {
 		message_manager_.SetIsCompleteRequest(client_fd, false);
 		if (http_result.is_cgi) {
-			http::cgi::Cgi cgi(http_result.cgi_request);
+			cgi_manager_.AddNewCgi(client_fd, http_result.cgi_request);
 			// todo: client_fdと紐づけて保持
 		}
 		return;
