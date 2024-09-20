@@ -25,6 +25,8 @@ class MockHttp : public IHttp {
 	HttpResult
 	Run(const ClientInfos &client_infos, const server::VirtualServerAddrList &virtual_servers);
 	HttpResult GetErrorResponse(const ClientInfos &client_info, ErrState state);
+	// todo: CgiResponseを受け取ってセットする。struct CgiResponseでIHttpにも追加？
+	void SetCgiResponse(int client_fd, const std::string &cgi_response);
 
   private:
 	// prohibit copy

@@ -140,4 +140,9 @@ HttpResult MockHttp::GetErrorResponse(const ClientInfos &client_info, ErrState s
 	return result;
 }
 
+void MockHttp::SetCgiResponse(int client_fd, const std::string &cgi_response) {
+	(void)client_fd;
+	(void)cgi_response;
+}
+
 } // namespace http
