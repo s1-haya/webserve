@@ -2,6 +2,7 @@
 #define CGI_HPP_
 
 #include "cgi_request.hpp"
+#include "utils.hpp"
 #include <map>
 #include <string>
 
@@ -20,6 +21,9 @@ class Cgi {
 	http::StatusCode Run(std::string &response_body_message);
 
 	// <<< todo (関数名・変数名とか含め変えてしまって全然大丈夫です)
+	typedef utils::Result<void> CgiResult;
+	// pipe(),fork(),close()してpipe_fdをメンバにセット
+	CgiResult Run();
 	// pipe_fdのgetter
 	int GetReadFd() const;
 	int GetWriteFd() const;

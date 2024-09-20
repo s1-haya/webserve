@@ -198,6 +198,10 @@ char *const *Cgi::SetCgiEnv(const MetaMap &meta_variables) {
 	return cgi_env;
 }
 
+Cgi::CgiResult Cgi::Run() {
+	return CgiResult();
+}
+
 int Cgi::GetReadFd() const {
 	return read_fd_;
 }
