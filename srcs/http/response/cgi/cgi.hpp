@@ -32,6 +32,8 @@ class Cgi {
 	bool IsWriteRequired() const;
 	// read()した結果をresponseに追加していく
 	void AddReadBuf(const std::string &read_buf);
+	// responseが完成したかどうか
+	bool IsResponseComplete() const;
 	// >>> todo
 
   private:
@@ -61,6 +63,8 @@ class Cgi {
 	// constructorの初期化も適当に-1にしてある
 	int read_fd_;
 	int write_fd_;
+	// 初期値本当はfalse。どこかでチェックしてフラグ変更する
+	bool is_response_complete_;
 	// >>> todo
 };
 

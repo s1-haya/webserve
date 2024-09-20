@@ -84,7 +84,8 @@ Cgi::Cgi(const CgiRequest &request)
 	  exit_status_(0),
 	  request_body_message_(request.body_message),
 	  read_fd_(-1),
-	  write_fd_(-1) {}
+	  write_fd_(-1),
+	  is_response_complete_(true) {}
 
 Cgi::~Cgi() {
 	Free();
@@ -221,6 +222,10 @@ bool Cgi::IsWriteRequired() const {
 
 void Cgi::AddReadBuf(const std::string &read_buf) {
 	response_body_message_ += read_buf;
+}
+
+bool Cgi::IsResponseComplete() const {
+	return is_response_complete_;
 }
 
 } // namespace cgi
