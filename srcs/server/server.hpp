@@ -70,8 +70,10 @@ class Server {
 	VirtualServerAddrList GetVirtualServerList(int client_fd) const;
 	// for Cgi
 	bool IsCgi(int fd) const;
-	void SetCgiResponseToHttp(int pipe_fd, const Read::ReadResult &read_result);
-	void RunCgi(const event::Event &event);
+	void RunCgi(int client_fd);
+	void HandleCgiReadResult(int pipe_fd, const Read::ReadResult &read_result);
+	void SetCgiResponseToHttp(const event::Event &event);
+	void AddEventForCgi(int client_fd);
 
 	// const
 	static const int    SYSTEM_ERROR = -1;

@@ -266,6 +266,17 @@ void Server::HandleHttpReadResult(int client_fd, const Read::ReadResult &read_re
 	message_manager_.AddRequestBuf(client_fd, read_result.GetValue().read_buf);
 }
 
+void Server::RunCgi(int client_fd) {
+	// todo: cgi::CgiResultにしたい
+	http::cgi::Cgi::CgiResult cgi_result = cgi_manager_.RunCgi(client_fd);
+	if (!cgi_result.IsOk()) {
+		cgi_manager_.DeleteCgi(client_fd);
+		SetInternalServerError(client_fd);
+		return;
+	}
+	AddEventForCgi(client_fd);
+}
+
 void Server::RunHttp(const event::Event &event) {
 	const int client_fd = event.fd;
 
@@ -284,7 +295,7 @@ void Server::RunHttp(const event::Event &event) {
 		if (http_result.is_cgi) {
 			// todo: try-catch?
 			cgi_manager_.AddNewCgi(client_fd, http_result.cgi_request);
-			cgi_manager_.RunCgi(client_fd); // todo: 新規作成時しかRunしたくないので仮にここ
+			RunCgi(client_fd); // todo: 新規作成時しかRunしたくないので仮にここ
 		}
 		return;
 	}
@@ -447,6 +458,28 @@ void Server::AppendEventWrite(const event::Event &event) {
 	} catch (const utils::SystemException &e) {
 		utils::PrintError(e.what());
 		Disconnect(event.fd);
+	}
+}
+
+void Server::AddEventForCgi(int client_fd) {
+	if (cgi_manager_.IsReadRequired(client_fd)) {
+		try {
+			event_monitor_.Add(cgi_manager_.GetReadFd(client_fd), event::EVENT_READ);
+		} catch (const utils::SystemException &e) {
+			utils::PrintError(e.what());
+			cgi_manager_.DeleteCgi(client_fd);
+			SetInternalServerError(client_fd);
+			return;
+		}
+	}
+	if (cgi_manager_.IsReadRequired(client_fd)) {
+		try {
+			event_monitor_.Add(cgi_manager_.GetWriteFd(client_fd), event::EVENT_WRITE);
+		} catch (const utils::SystemException &e) {
+			utils::PrintError(e.what());
+			cgi_manager_.DeleteCgi(client_fd);
+			Disconnect(client_fd);
+		}
 	}
 }
 
