@@ -54,6 +54,12 @@ void CgiManager::RunCgi(int client_fd) {
 	}
 }
 
+void CgiManager::AddReadBuf(int client_fd, const std::string &read_buf) {
+	Cgi *cgi = client_cgi_map_.at(client_fd);
+	cgi->AddReadBuf(read_buf);
+}
+
+
 Cgi *CgiManager::GetCgi(int client_fd) const {
 	// todo: logic_error?
 	return client_cgi_map_.at(client_fd);
