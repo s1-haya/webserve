@@ -37,13 +37,12 @@ void CgiManager::DeleteCgi(int client_fd) {
 	client_cgi_map_.erase(client_fd);
 }
 
-void CgiManager::RunCgi(int client_fd) {
+Cgi::CgiResult CgiManager::RunCgi(int client_fd) {
 	Cgi *cgi = GetCgi(client_fd);
 
 	const Cgi::CgiResult cgi_result = cgi->Run();
 	if (!cgi_result.IsOk()) {
-		// todo: error handling
-		return;
+		return cgi_result;
 	}
 	// pipe_fdとclient_fdの紐づけを保持
 	if (cgi->IsReadRequired()) {
@@ -52,6 +51,7 @@ void CgiManager::RunCgi(int client_fd) {
 	if (cgi->IsWriteRequired()) {
 		pipe_fd_map_[cgi->GetWriteFd()] = client_fd;
 	}
+	return cgi_result;
 }
 
 bool CgiManager::IsResponseComplete(int client_fd) const {
