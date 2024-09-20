@@ -311,14 +311,35 @@ void Server::RunHttp(const event::Event &event) {
 
 void Server::HandleWriteEvent(int fd) {
 	if (IsCgi(fd)) {
-		// todo: 処理
+		SendCgiRequest(fd);
 		return;
 	}
 	// http
-	SendResponse(fd);
+	SendHttpResponse(fd);
 }
 
-void Server::SendResponse(int client_fd) {
+void Server::SendCgiRequest(int pipe_fd) {
+	const int          client_fd   = cgi_manager_.GetClientFd(pipe_fd);
+	const std::string &request_str = cgi_manager_.GetRequest(client_fd);
+
+	const Send::SendResult send_result = Send::SendStr(pipe_fd, request_str);
+	if (!send_result.IsOk()) {
+		utils::Debug(
+			"cgi", "Failed to send the request to the child process through pipe_fd", pipe_fd
+		);
+		cgi_manager_.DeleteCgi(client_fd);
+		// todo: close()だけしない？
+		Disconnect(client_fd);
+		return;
+	}
+	const std::string &new_request_str = send_result.GetValue();
+	cgi_manager_.ReplaceNewRequest(client_fd, new_request_str);
+	if (new_request_str.empty()) {
+		ReplaceEvent(pipe_fd, event::EVENT_READ);
+	}
+}
+
+void Server::SendHttpResponse(int client_fd) {
 	message::Response              response         = message_manager_.PopHeadResponse(client_fd);
 	const message::ConnectionState connection_state = response.connection_state;
 	const std::string             &response_str     = response.response_str;
