@@ -143,9 +143,9 @@ int main(void) {
 	// http_method/expected
 	// LF:   exist target resourse file
 	std::string expected_file =
-		LoadFileContent("../../expected_response/default_body_message/file.txt");
+		LoadFileContent("test/file.txt");
 	std::string expected_index_file =
-		LoadFileContent("../../expected_response/default_body_message/index.txt");
+		LoadFileContent("test/index.txt");
 	std::string expected_autoindex = CreateAutoIndexContent("test/");
 	// CRLF: use default status code file
 	std::string expected_created =
