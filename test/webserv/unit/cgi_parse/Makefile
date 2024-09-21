@@ -1,7 +1,7 @@
 NAME			:=	a.out
 
 # 1. Set each directory name
-TEST_DIR		:=	http_cgi_parse
+TEST_DIR		:=	cgi_parse
 
 LOG_DIR			:=	log
 LOG_FILE_NAME	:=	$(TEST_DIR).log
@@ -19,7 +19,7 @@ SRCS				+=	$(WS_CGI_PARSE_DIR)/cgi_parse.cpp \
 						$(WS_UTILS_DIR)/color.cpp
 
 # 3. Add unit test files
-SRCS	+=	test_http_cgi_parse.cpp
+SRCS	+=	test_cgi_parse.cpp
 
 # 4. Add directory for INCLUDE
 SRCS_DIR	:=	$(WS_UTILS_DIR) \
