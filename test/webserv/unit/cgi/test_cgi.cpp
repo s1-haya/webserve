@@ -1,5 +1,6 @@
 #include "cgi.hpp"
 #include "cgi_parse.hpp"
+#include "cgi_request.hpp"
 #include "http_format.hpp"
 #include "http_message.hpp"
 #include "status_code.hpp"

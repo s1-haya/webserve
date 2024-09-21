@@ -1,4 +1,5 @@
 #include "cgi_parse.hpp"
+#include "cgi_request.hpp"
 #include "http_format.hpp"
 #include "http_message.hpp"
 #include "utils.hpp"
@@ -71,7 +72,7 @@ int Test1() {
 	std::string server_port   = "8080";
 
 	utils::Result<cgi::CgiRequest> parse_result =
-		cgi::CgiParse::Parse(request, cgi_script + cgi_path_info, cgi_extension, server_port);
+		CgiParse::Parse(request, cgi_script + cgi_path_info, cgi_extension, server_port);
 	cgi::MetaMap meta_variables = parse_result.GetValue().meta_variables;
 
 	try {
@@ -108,7 +109,7 @@ int Test2() {
 	std::string server_port   = "8080";
 
 	utils::Result<cgi::CgiRequest> parse_result =
-		cgi::CgiParse::Parse(request, cgi_script + cgi_path_info, cgi_extension, server_port);
+		CgiParse::Parse(request, cgi_script + cgi_path_info, cgi_extension, server_port);
 	cgi::MetaMap meta_variables = parse_result.GetValue().meta_variables;
 
 	try {

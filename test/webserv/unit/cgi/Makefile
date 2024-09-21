@@ -16,6 +16,7 @@ WS_HTTP_RESPONSE_DIR	:=	$(WS_HTTP_DIR)/response
 WS_HTTP_CGI_PARSE_DIR	:=	$(WS_HTTP_RESPONSE_DIR)/cgi_parse
 
 SRCS				+=	$(WS_CGI_DIR)/cgi.cpp \
+						$(WS_CGI_DIR)/cgi_request.cpp \
 						$(WS_HTTP_CGI_PARSE_DIR)/cgi_parse.cpp \
 						$(WS_HTTP_DIR)/http_message.cpp \
 						$(WS_HTTP_DIR)/http_exception.cpp \
