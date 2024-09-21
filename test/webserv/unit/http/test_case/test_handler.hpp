@@ -2,6 +2,7 @@
 #define TEST_HANDLER_HPP_
 
 #include <list>
+#include <map>
 
 namespace server {
 
@@ -19,10 +20,13 @@ struct HttpResult;
 
 namespace test {
 
+typedef std::map<std::string, std::string> HeaderFields;
+
 std::string LoadFileContent(const std::string& file_path);
-// tmp
-std::string SetDefaultHeaderFields(
-	const std::string &connection, const std::string &length, const std::string &type
+std::string CreateHttpResponseFormat(
+	const std::string  &status_line,
+	const HeaderFields &header_fields,
+	const std::string  &body_message
 );
 http::ClientInfos CreateClientInfos(const std::string &request_buffer);
 http::HttpResult  CreateHttpResult(
