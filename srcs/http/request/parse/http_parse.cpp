@@ -53,8 +53,8 @@ bool IsBodyMessageReadingRequired(const HeaderFields &header_fields) {
 utils::Result<int> HexToDec(const std::string &hex_str) {
 	std::istringstream iss(hex_str);
 	int                decimal_value;
-	if (!(iss >> std::hex >> decimal_value)) {
-		return utils::Result<int>(false, 0);
+	if (!(iss >> std::hex >> decimal_value) || decimal_value < 0) {
+		return utils::Result<int>(false, -1);
 	}
 	return utils::Result<int>(decimal_value);
 }
