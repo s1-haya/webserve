@@ -9,7 +9,7 @@
 
 namespace {
 
-using namespace http::cgi;
+using namespace cgi;
 
 // ==================== Test汎用 ==================== //
 

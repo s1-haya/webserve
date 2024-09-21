@@ -9,12 +9,12 @@ LOG_FILE_PATH	:=	$(LOG_DIR)/$(LOG_FILE_NAME)
 
 # 2. Add target webserv files
 WS_SRCS_DIR				:=	../../../../srcs
-WS_UTILS_DIR			:= $(WS_SRCS_DIR)/utils
+WS_UTILS_DIR			:=  $(WS_SRCS_DIR)/utils
 WS_HTTP_DIR				:=	$(WS_SRCS_DIR)/http
-WS_HTTP_RESPONSE_DIR	:=	$(WS_HTTP_DIR)/response
-WS_HTTP_CGI_PARSE		:=	$(WS_HTTP_RESPONSE_DIR)/cgi_parse
+WS_CGI_DIR				:=	$(WS_SRCS_DIR)/cgi
+WS_CGI_PARSE_DIR		:=	$(WS_CGI_DIR)/cgi_parse
 
-SRCS				+=	$(WS_HTTP_CGI_PARSE)/cgi_parse.cpp \
+SRCS				+=	$(WS_CGI_PARSE_DIR)/cgi_parse.cpp \
 						$(WS_HTTP_DIR)/http_message.cpp \
 						$(WS_UTILS_DIR)/color.cpp
 
@@ -24,8 +24,7 @@ SRCS	+=	test_http_cgi_parse.cpp
 # 4. Add directory for INCLUDE
 SRCS_DIR	:=	$(WS_UTILS_DIR) \
 				$(WS_HTTP_DIR) \
-				$(WS_HTTP_RESPONSE_DIR) \
-				$(WS_HTTP_CGI_PARSE)
+				$(WS_CGI_PARSE_DIR)
 
 #--------------------------------------------
 OBJ_DIR		:=	objs
