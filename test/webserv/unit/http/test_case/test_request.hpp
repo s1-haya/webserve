@@ -1,3 +1,6 @@
+#ifndef TEST_REQUEST_HPP_
+#define TEST_REQUEST_HPP_
+
 #include <string>
 
 namespace test {
@@ -12,4 +15,7 @@ static const std::string &REQUEST_GET_200_NO_CONNECTION =
 	test::LoadFileContent(REQUEST_GET + "/200/no-connection.txt");
 static const std::string &REQUEST_GET_404_NOT_EXIST_PATH_CONNECTION_CLOSE =
 	test::LoadFileContent(REQUEST_GET + "/404_not-exist-path_connection-close.txt");
+
 } // namespace test
+
+#endif
