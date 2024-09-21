@@ -403,6 +403,16 @@ int main(void) {
 	test9_body_message.is_request_format.is_body_message   = false;
 	test9_body_message.request_result.request.body_message = "Wikipedia";
 
+	// 16.Chunked Transfer-Encodingの場合で、終端の0\r\n\r\nが中途半端な場合
+	http::HttpRequestParsedData test10_body_message;
+	test10_body_message.request_result.status_code = http::StatusCode(http::BAD_REQUEST);
+	test10_body_message.request_result.request.request_line =
+		CreateRequestLine("POST", "/", "HTTP/1.1");
+	test10_body_message.is_request_format.is_request_line   = true;
+	test10_body_message.is_request_format.is_header_fields  = true;
+	test10_body_message.is_request_format.is_body_message   = false;
+	test10_body_message.request_result.request.body_message = "Wikipedia";
+
 	static const TestCase test_case_http_request_body_message_format[] = {
 		TestCase(
 			"GET / HTTP/1.1\r\nHost: a\r\n\r\nContent-Length:  3\r\n\r\nabc", test1_body_message
@@ -445,6 +455,11 @@ int main(void) {
 			"POST / HTTP/1.1\r\nHost: host\r\nTransfer-Encoding: "
 			"chunked\r\n\r\n4\r\nWiki\r\n-122\r\npedia\r\n",
 			test9_body_message
+		),
+		TestCase(
+			"POST / HTTP/1.1\r\nHost: host\r\nTransfer-Encoding: "
+			"chunked\r\n\r\n4\r\nWiki\r\n5\r\npedia\r\n0\r\n",
+			test10_body_message
 		),
 	};
 
