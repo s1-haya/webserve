@@ -1,6 +1,6 @@
 #include "cgi_parse.hpp"
+#include "http_format.hpp"
 
-namespace http {
 namespace cgi {
 namespace {
 
@@ -48,7 +48,7 @@ const std::string SERVER_PROTOCOL   = "SERVER_PROTOCOL";
 const std::string SERVER_SOFTWARE   = "SERVER_SOFTWARE";
 
 MetaMap CgiParse::CreateRequestMetaVariables(
-	const HttpRequestFormat &request,
+	const  http::HttpRequestFormat &request,
 	const std::string       &cgi_script,
 	const std::string       &cgi_extension,
 	const std::string       &server_port
@@ -76,7 +76,7 @@ MetaMap CgiParse::CreateRequestMetaVariables(
 }
 
 utils::Result<CgiRequest> CgiParse::Parse(
-	const HttpRequestFormat &request,
+	const http::HttpRequestFormat &request,
 	const std::string       &cgi_script,
 	const std::string       &cgi_extension,
 	const std::string       &server_port
@@ -96,4 +96,3 @@ utils::Result<CgiRequest> CgiParse::Parse(
 }
 
 } // namespace cgi
-} // namespace http

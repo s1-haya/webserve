@@ -1,9 +1,13 @@
-#include "http_format.hpp"
 #include "result.hpp"
 #include <map>
 #include <string>
 
 namespace http {
+
+struct HttpRequestFormat;
+
+} // namespace http
+
 namespace cgi {
 
 typedef std::map<std::string, std::string> MetaMap;
@@ -35,7 +39,7 @@ struct CgiRequest {
 class CgiParse {
   public:
 	static utils::Result<CgiRequest> Parse(
-		const HttpRequestFormat &request,
+		const http::HttpRequestFormat &request,
 		const std::string       &cgi_script,
 		const std::string       &cgi_extension,
 		const std::string       &server_port
@@ -47,7 +51,7 @@ class CgiParse {
 	CgiParse(const CgiParse &other);
 	CgiParse      &operator=(const CgiParse &other);
 	static MetaMap CreateRequestMetaVariables(
-		const HttpRequestFormat &request,
+		const http::HttpRequestFormat &request,
 		const std::string       &cgi_script,
 		const std::string       &cgi_extension,
 		const std::string       &server_port
@@ -55,4 +59,3 @@ class CgiParse {
 };
 
 } // namespace cgi
-} // namespace http
