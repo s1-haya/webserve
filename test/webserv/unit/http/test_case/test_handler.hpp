@@ -19,7 +19,7 @@ struct HttpResult;
 
 namespace test {
 
-std::string LoadFileContent(const char *file_path);
+std::string LoadFileContent(const std::string& file_path);
 // tmp
 std::string SetDefaultHeaderFields(
 	const std::string &connection, const std::string &length, const std::string &type

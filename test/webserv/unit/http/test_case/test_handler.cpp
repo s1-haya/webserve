@@ -15,8 +15,8 @@ struct Result {
 	std::string error_log;
 };
 
-std::string LoadFileContent(const char *file_path) {
-	std::ifstream file(file_path, std::ios::binary);
+std::string LoadFileContent(const std::string& file_path) {
+	std::ifstream file(file_path.c_str(), std::ios::binary);
 	if (!file) {
 		std::cerr << "Error opening file: " << file_path << std::endl;
 		return "";
