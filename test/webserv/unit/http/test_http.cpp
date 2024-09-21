@@ -45,12 +45,12 @@
 
 server::VirtualServerAddrList BuildVirtualServerAddrList();
 void DeleteVirtualServerAddrList(const server::VirtualServerAddrList &virtual_servers);
-int main(void) {
-	int ret_code = EXIT_SUCCESS;
+int  main(void) {
+    int ret_code = EXIT_SUCCESS;
 
     server::VirtualServerAddrList server_infos = BuildVirtualServerAddrList();
-    ret_code |= test::test_no_connection(server_infos);
-	ret_code |= test::test_not_exist_file(server_infos);
+    ret_code |= test::TestGetOk1NoConnection(server_infos);
+    ret_code |= test::TestGetNotFound1NotExistFile(server_infos);
     DeleteVirtualServerAddrList(server_infos);
     return ret_code;
 }
