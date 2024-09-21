@@ -171,7 +171,7 @@ void HttpParse::ParseChunkedRequest(HttpRequestParsedData &data) {
 			);
 		}
 	}
-	if (data.current_buf != "\r\n") { // 終端に0\r\n\r\nの\r\nがあるはず
+	if (data.current_buf != CRLF) { // 終端に0\r\n\r\nの\r\nがあるはず
 		throw HttpException(
 			"Error: Missing or incorrect chunked transfer encoding terminator",
 			StatusCode(BAD_REQUEST)
