@@ -54,7 +54,7 @@ def test_get_root_close_200():
     expected_response = response_header_get_root_200 + root_index_file
     client_instance = client.Client(8080)
     request = read_file_binary(
-        "test/common/request/get/200_root_connection-close.txt"
+        "test/common/request/get/2xx/200_1_no_connection.txt"
     )
     response = client_instance.SendRequestAndReceiveResponse(request)
     assert_response(response, expected_response)
@@ -65,7 +65,7 @@ def test_get_root_keep_200():
     # responseヘッダーもkeepaliveになる？
     client_instance = client.Client(8080)
     request = read_file_binary(
-        "test/common/request/get/200_root_connection-keep.txt"
+        "test/common/request/get/2xx/200_2_connection_keep.txt"
     )
     response = client_instance.SendRequestAndReceiveResponse(request)
     assert_response(response, expected_response)
@@ -75,7 +75,7 @@ def test_get_sub_close_200():
     expected_response = response_header_get_sub_200 + sub_index_file
     client_instance = client.Client(8080)
     request = read_file_binary(
-        "test/common/request/get/200_sub_connection-close.txt"
+        "test/common/request/get/2xx/200_3_sub_connection_close.txt"
     )
     response = client_instance.SendRequestAndReceiveResponse(request)
     assert_response(response, expected_response)
