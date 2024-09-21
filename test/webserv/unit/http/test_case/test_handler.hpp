@@ -22,7 +22,7 @@ namespace test {
 
 typedef std::map<std::string, std::string> HeaderFields;
 
-std::string LoadFileContent(const std::string& file_path);
+std::string LoadFileContent(const std::string &file_path);
 std::string CreateHttpResponseFormat(
 	const std::string  &status_line,
 	const HeaderFields &header_fields,

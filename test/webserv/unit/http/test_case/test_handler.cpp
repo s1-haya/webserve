@@ -1,8 +1,8 @@
+#include "test_handler.hpp"
 #include "client_infos.hpp"
 #include "http.hpp"
 #include "http_message.hpp"
 #include "http_result.hpp"
-#include "test_handler.hpp"
 #include <cstdlib>
 #include <fstream>
 
@@ -16,7 +16,7 @@ struct Result {
 	std::string error_log;
 };
 
-std::string LoadFileContent(const std::string& file_path) {
+std::string LoadFileContent(const std::string &file_path) {
 	std::ifstream file(file_path.c_str(), std::ios::binary);
 	if (!file) {
 		std::cerr << "Error opening file: " << file_path << std::endl;
@@ -27,7 +27,11 @@ std::string LoadFileContent(const std::string& file_path) {
 	return file_content.str();
 }
 
-std::string CreateHttpResponseFormat(const std::string& status_line, const HeaderFields& header_fields, const std::string& body_message) {
+std::string CreateHttpResponseFormat(
+	const std::string  &status_line,
+	const HeaderFields &header_fields,
+	const std::string  &body_message
+) {
 	std::string response;
 	response += status_line;
 	typedef HeaderFields::const_iterator Itr;
