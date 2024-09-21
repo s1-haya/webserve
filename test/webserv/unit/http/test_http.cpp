@@ -49,7 +49,7 @@ int  main(void) {
     int ret_code = EXIT_SUCCESS;
 
     server::VirtualServerAddrList server_infos = BuildVirtualServerAddrList();
-    ret_code |= test::TestGetOk1NoConnection(server_infos);
+    ret_code |= test::TestGetOk1ConnectionClose(server_infos);
     ret_code |= test::TestGetNotFound1NotExistFile(server_infos);
     DeleteVirtualServerAddrList(server_infos);
     return ret_code;

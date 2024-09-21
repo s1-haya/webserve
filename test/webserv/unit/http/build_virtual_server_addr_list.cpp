@@ -59,7 +59,7 @@ server::VirtualServer *BuildVirtualServer1() {
 	allowed_methods_root.push_back(http::GET);
 	allowed_methods_root.push_back(http::POST);
 	server::Location loc_root = BuildLocation(
-		"/", "/html/", "index.html", false, allowed_methods_root, std::make_pair(0, "")
+		"/", "../../../../root/html/", "index.html", false, allowed_methods_root, std::make_pair(0, "")
 	);
 	locationlist.push_back(loc_root);
 
