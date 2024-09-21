@@ -375,7 +375,7 @@ int main(void) {
 
 	// 13.Chunked Transfer-Encodingの場合で、終端に0\r\n\r\nがない場合
 	http::HttpRequestParsedData test7_body_message;
-	test7_body_message.request_result.status_code = http::StatusCode(http::OK);
+	test7_body_message.request_result.status_code = http::StatusCode(http::BAD_REQUEST);
 	test7_body_message.request_result.request.request_line =
 		CreateRequestLine("POST", "/", "HTTP/1.1");
 	test7_body_message.is_request_format.is_request_line   = true;

@@ -141,19 +141,17 @@ void HttpParse::ParseChunkedRequest(HttpRequestParsedData &data) {
 			StatusCode(BAD_REQUEST)
 		);
 	}
-	unsigned int chunk_size = 0;
-	do {
-		std::string::size_type end_of_chunk_size_pos = data.current_buf.find(CRLF);
-		std::string            chunk_size_str = data.current_buf.substr(0, end_of_chunk_size_pos);
-		data.current_buf.erase(0, chunk_size_str.size() + CRLF.size());
-		chunk_size = HexToDec(chunk_size_str).GetValue();
-		if (HexToDec(chunk_size_str).IsOk() == false && chunk_size_str != "\0") {
-			throw HttpException(
-				"Error: chunk size is not a hexadecimal number", StatusCode(BAD_REQUEST)
-			);
-		} else if (chunk_size_str == "\0") {
-			return; // is_body_message = false
-		}
+
+	std::string::size_type end_of_chunk_size_pos = data.current_buf.find(CRLF);
+	std::string            chunk_size_str = data.current_buf.substr(0, end_of_chunk_size_pos);
+	data.current_buf.erase(0, chunk_size_str.size() + CRLF.size());
+	unsigned int chunk_size = HexToDec(chunk_size_str).GetValue();
+	if (HexToDec(chunk_size_str).IsOk() == false) {
+		throw HttpException(
+			"Error: chunk size is not a hexadecimal number", StatusCode(BAD_REQUEST)
+		);
+	}
+	while (chunk_size > 0) {
 		std::string::size_type end_of_chunk_data_pos = data.current_buf.find(CRLF);
 		std::string            chunk_data = data.current_buf.substr(0, end_of_chunk_data_pos);
 		data.current_buf.erase(0, chunk_data.size() + CRLF.size());
@@ -163,7 +161,23 @@ void HttpParse::ParseChunkedRequest(HttpRequestParsedData &data) {
 			);
 		}
 		data.request_result.request.body_message += chunk_data;
-	} while (chunk_size > 0);
+		end_of_chunk_size_pos = data.current_buf.find(CRLF);
+		chunk_size_str        = data.current_buf.substr(0, end_of_chunk_size_pos);
+		data.current_buf.erase(0, chunk_size_str.size() + CRLF.size());
+		chunk_size = HexToDec(chunk_size_str).GetValue();
+		if (HexToDec(chunk_size_str).IsOk() == false) {
+			throw HttpException(
+				"Error: chunk size is not a hexadecimal number", StatusCode(BAD_REQUEST)
+			);
+		}
+	}
+	if (data.current_buf != "\r\n") { // 終端に0\r\n\r\nの\r\nがあるはず
+		throw HttpException(
+			"Error: Missing or incorrect chunked transfer encoding terminator",
+			StatusCode(BAD_REQUEST)
+		);
+	}
+
 	data.is_request_format.is_body_message = true;
 }
 
