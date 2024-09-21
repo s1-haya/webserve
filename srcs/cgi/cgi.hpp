@@ -8,6 +8,8 @@ namespace http {
 
 class StatusCode;
 
+} // namespace http
+
 namespace cgi {
 
 struct CgiRequest;
@@ -17,7 +19,7 @@ class Cgi {
   public:
 	explicit Cgi(const CgiRequest &request);
 	~Cgi();
-	StatusCode Run(std::string &response_body_message);
+	http::StatusCode Run(std::string &response_body_message);
 
   private:
 	// prohibit copy constructor and assignment operator
@@ -44,6 +46,5 @@ class Cgi {
 };
 
 } // namespace cgi
-} // namespace http
 
 #endif
