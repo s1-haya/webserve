@@ -1,6 +1,7 @@
 #ifndef CGI_HPP_
 #define CGI_HPP_
 
+#include "cgi_request.hpp"
 #include <map>
 #include <string>
 
@@ -11,9 +12,6 @@ class StatusCode;
 } // namespace http
 
 namespace cgi {
-
-struct CgiRequest;
-typedef std::map<std::string, std::string> MetaMap;
 
 class Cgi {
   public:
