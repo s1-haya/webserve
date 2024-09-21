@@ -152,8 +152,7 @@ void HttpParse::ParseChunkedRequest(HttpRequestParsedData &data) {
 				"Error: chunk size is not a hexadecimal number", StatusCode(BAD_REQUEST)
 			);
 		} else if (chunk_size_str == "\0") {
-			data.is_request_format.is_body_message = false;
-			return;
+			return; // is_body_message = false
 		}
 		std::string::size_type end_of_chunk_data_pos = data.current_buf.find(CRLF);
 		std::string            chunk_data = data.current_buf.substr(0, end_of_chunk_data_pos);
