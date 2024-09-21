@@ -393,7 +393,7 @@ int main(void) {
 	test8_body_message.is_request_format.is_body_message   = false;
 	test8_body_message.request_result.request.body_message = "Wikipedia";
 
-	// 14.Chunked Transfer-Encodingの場合で、chunk-sizeが不正な場合(負の数)
+	// 15.Chunked Transfer-Encodingの場合で、chunk-sizeが不正な場合(負の数)
 	http::HttpRequestParsedData test9_body_message;
 	test9_body_message.request_result.status_code = http::StatusCode(http::BAD_REQUEST);
 	test9_body_message.request_result.request.request_line =
