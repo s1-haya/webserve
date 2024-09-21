@@ -1,4 +1,5 @@
 #include "test_case.hpp"
+#include <cstdlib>
 
 /**
  * @brief Test Http class: HttpResultの返り値を確認するテスト。

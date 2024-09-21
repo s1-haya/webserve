@@ -2,7 +2,6 @@
 #include "http.hpp"
 #include "http_message.hpp"
 #include "http_result.hpp"
-#include <cstdlib>
 #include <fstream>
 
 namespace test {
