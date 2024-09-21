@@ -1,7 +1,7 @@
 NAME			:=	a.out
 
 # 1. Set each directory name
-TEST_DIR		:=	http_cgi
+TEST_DIR		:=	cgi
 
 LOG_DIR			:=	log
 LOG_FILE_NAME	:=	$(TEST_DIR).log
@@ -23,7 +23,7 @@ SRCS				+=	$(WS_CGI_DIR)/cgi.cpp \
 						$(WS_UTILS_DIR)/system_exception.cpp 
 
 # 3. Add unit test files
-SRCS	+=	test_http_cgi.cpp
+SRCS	+=	test_cgi.cpp
 
 # 4. Add directory for INCLUDE
 SRCS_DIR	:=	$(WS_UTILS_DIR) \
