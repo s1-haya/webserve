@@ -142,22 +142,20 @@ int main(void) {
 
 	// http_method/expected
 	// LF:   exist target resourse file
-	std::string expected_file =
-		LoadFileContent("test/file.txt");
-	std::string expected_index_file =
-		LoadFileContent("test/index.txt");
-	std::string expected_autoindex = CreateAutoIndexContent("test/");
+	std::string expected_file       = LoadFileContent("test/file.txt");
+	std::string expected_index_file = LoadFileContent("test/index.txt");
+	std::string expected_autoindex  = CreateAutoIndexContent("test/");
 	// CRLF: use default status code file
 	std::string expected_created =
-		LoadFileContent("../../expected_response/default_body_message/created.txt");
+		LoadFileContent("../../expected_response/default_body_message/201_created.txt");
 	std::string expected_no_content =
-		LoadFileContent("../../expected_response/default_body_message/no_content.txt");
+		LoadFileContent("../../expected_response/default_body_message/204_no_content.txt");
 	std::string expected_redirect =
-		LoadFileContent("../../expected_response/default_body_message/redirect.txt");
+		LoadFileContent("../../expected_response/default_body_message/301_redirect.txt");
 	std::string expected_forbidden =
-		LoadFileContent("../../expected_response/default_body_message/forbidden.txt");
+		LoadFileContent("../../expected_response/default_body_message/403_forbidden.txt");
 	std::string expected_not_found =
-		LoadFileContent("../../expected_response/default_body_message/not_found.txt");
+		LoadFileContent("../../expected_response/default_body_message/404_not_found.txt");
 
 	// GET test
 	// ファイルが存在する場合
@@ -224,7 +222,7 @@ int main(void) {
 	const std::string &post_test1_request_body_message = "OK";
 	ret_code |= MethodHandlerResult(
 		MethodArgument(
-			"ok.txt",
+			"200_ok.txt",
 			http::POST,
 			allow_methods,
 			post_test1_request_body_message,
@@ -238,7 +236,7 @@ int main(void) {
 	const std::string &post_test2_request_body_message = "OK";
 	ret_code |= MethodHandlerResult(
 		MethodArgument(
-			"ok.txt",
+			"200_ok.txt",
 			http::POST,
 			allow_methods,
 			post_test2_request_body_message,
@@ -260,7 +258,7 @@ int main(void) {
 	// ファイルが存在するかつ親ディレクトリが書き込み権限あるとき
 	ret_code |= MethodHandlerResult(
 		MethodArgument(
-			"ok.txt", http::DELETE, allow_methods, request, response, response_header_fields
+			"200_ok.txt", http::DELETE, allow_methods, request, response, response_header_fields
 		),
 		expected_no_content
 	);
@@ -268,7 +266,12 @@ int main(void) {
 	// ファイルが存在しない場合
 	ret_code |= MethodHandlerResult(
 		MethodArgument(
-			"not_found.txt", http::DELETE, allow_methods, request, response, response_header_fields
+			"404_not_found.txt",
+			http::DELETE,
+			allow_methods,
+			request,
+			response,
+			response_header_fields
 		),
 		expected_not_found
 	);
