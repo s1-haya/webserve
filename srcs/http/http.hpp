@@ -1,6 +1,7 @@
 #ifndef HTTP_HPP_
 #define HTTP_HPP_
 
+#include "IHttp.hpp"
 #include "http_parse.hpp"
 #include "http_response.hpp"
 #include "http_storage.hpp"
@@ -22,15 +23,13 @@ namespace http {
 struct ClientInfos;
 struct HttpResult;
 
-class Http {
+class Http : public IHttp {
   public:
 	Http();
 	~Http();
 	HttpResult
 	Run(const ClientInfos &client_info, const server::VirtualServerAddrList &server_info);
-	//  HttpResult GetErrorResponse(const ClientInfos &client_info, ErrState state);
-	// For test
-	HttpRequestParsedData GetClientData(int client_fd);
+	HttpResult GetErrorResponse(const ClientInfos &client_info, ErrState state);
 
   private:
 	Http(const Http &other);
@@ -40,7 +39,8 @@ class Http {
 	std::string         CreateHttpResponse(
 				const ClientInfos &client_info, const server::VirtualServerAddrList &server_info
 			);
-	bool IsHttpRequestFormatComplete(int client_fd);
+	bool                  IsHttpRequestFormatComplete(int client_fd);
+	HttpRequestParsedData GetClientData(int client_fd);
 	// HttpResult CreateBadRequestResponse(int client_fd);
 };
 

@@ -30,6 +30,13 @@ Http::Run(const ClientInfos &client_info, const server::VirtualServerAddrList &s
 	return result;
 }
 
+HttpResult Http::GetErrorResponse(const ClientInfos &client_info, ErrState state) {
+	HttpResult result;
+	(void)client_info;
+	(void)state;
+	return result;
+}
+
 utils::Result<void> Http::ParseHttpRequestFormat(int client_fd, const std::string &read_buf) {
 	utils::Result<void>   result;
 	HttpRequestParsedData save_data = storage_.GetClientSaveData(client_fd);
