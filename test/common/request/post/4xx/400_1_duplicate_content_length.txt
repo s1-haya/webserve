@@ -1,0 +1,8 @@
+POST /upload/duplicate_content_length HTTP/1.1
+Host: localhost
+Connection: close
+Content-Type: text/plain
+Content-Length: 5
+Content-Length: 5
+
+abcde
