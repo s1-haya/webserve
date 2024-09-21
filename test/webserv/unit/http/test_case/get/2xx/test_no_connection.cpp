@@ -2,15 +2,14 @@
 #include "http_message.hpp"
 #include "http_result.hpp"
 #include "test_handler.hpp"
+#include "test_request.hpp"
 #include "test_expected_response.hpp"
 #include "utils.hpp"
 
 namespace test {
 
 int test_no_connection(const server::VirtualServerAddrList &server_infos) {
-	const std::string &request_buffer =
-		test::LoadFileContent("../../../common/request/get/200/no-connection.txt");
-	http::ClientInfos client_infos = test::CreateClientInfos(request_buffer);
+	http::ClientInfos  client_infos = test::CreateClientInfos(test::REQUEST_GET_200_NO_CONNECTION);
 	std::string       expected1_status_line =test::EXPECTED_STATUS_LINE_OK;
 	std::string expected1_body_message  = test::LoadFileContent("../../../../root/html/index.html");
 	std::string expected1_header_fields = test::SetDefaultHeaderFields(
