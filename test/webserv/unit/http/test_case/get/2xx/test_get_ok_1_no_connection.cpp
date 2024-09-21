@@ -9,7 +9,7 @@
 namespace test {
 
 int TestGetOk1NoConnection(const server::VirtualServerAddrList &server_infos) {
-	http::ClientInfos client_infos = test::CreateClientInfos(test::REQUEST_GET_200_NO_CONNECTION);
+	http::ClientInfos client_infos = test::CreateClientInfos(test::REQUEST_GET_200_1_NO_CONNECTION);
 	std::string       expected_status_line = test::EXPECTED_STATUS_LINE_OK;
 	std::string  expected_body_message = test::LoadFileContent("../../../../root/html/index.html");
 	HeaderFields expected_header_fields;

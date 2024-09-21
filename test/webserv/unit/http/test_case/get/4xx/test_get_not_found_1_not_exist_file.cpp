@@ -10,7 +10,7 @@ namespace test {
 
 int TestGetNotFound1NotExistFile(const server::VirtualServerAddrList &server_infos) {
 	http::ClientInfos client_infos =
-		test::CreateClientInfos(test::REQUEST_GET_404_NOT_EXIST_PATH_CONNECTION_CLOSE);
+		test::CreateClientInfos(test::REQUEST_GET_404_1_NOT_EXIST_PATH_CONNECTION_CLOSE);
 	std::string  expected_status_line  = test::EXPECTED_STATUS_LINE_NOT_FOUND;
 	std::string  expected_body_message = test::EXPECTED_BODY_MESSAGE_NOT_FOUND;
 	HeaderFields expected_header_fields;
