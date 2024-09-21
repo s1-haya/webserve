@@ -1,6 +1,7 @@
 #ifndef TEST_HANDLER_HPP_
 #define TEST_HANDLER_HPP_
 
+#include <string>
 #include <list>
 #include <map>
 
