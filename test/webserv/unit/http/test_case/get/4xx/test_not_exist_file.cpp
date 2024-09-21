@@ -13,8 +13,7 @@ int test_not_exist_file(const server::VirtualServerAddrList &server_infos) {
 		);
 	http::ClientInfos client_infos = test::CreateClientInfos(request_buffer);
 	std::string       expected1_status_line = test::EXPECTED_STATUS_LINE_NOT_FOUND;
-	std::string expected1_body_message =
-		test::LoadFileContent("../../expected_response/default_body_message/not_found.txt");
+	std::string expected1_body_message = test::EXPECTED_BODY_MESSAGE_NOT_FOUND;
 	std::string expected1_header_fields = test::SetDefaultHeaderFields(
 		http::KEEP_ALIVE, utils::ToString(expected1_body_message.length()), "test/html"
 	);
