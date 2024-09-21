@@ -45,7 +45,7 @@ SRCS_DIR	:=	$(WS_UTILS_DIR) \
 				$(WS_HTTP_RESPONSE_DIR) \
 				$(WS_HTTP_PARSE_DIR) \
 				$(WS_HTTP_SERVER_INFO_CHECK_DIR) \
-				$(WS_VIRTUAL_SERVER_DIR) \
+				$(WS_VIRTUAL_SERVER_DIR)
 
 # 3. Add unit test files
 TEST_CASE_DIR := test_case
