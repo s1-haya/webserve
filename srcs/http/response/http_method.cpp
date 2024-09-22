@@ -249,6 +249,9 @@ utils::Result<std::string> Method::AutoindexHandler(const std::string &path) {
 
 	errno = 0;
 	while ((entry = readdir(dir)) != NULL) {
+		if (entry->d_name[0] == '.') {
+			continue;
+		}
 		std::string full_path = path + "/" + entry->d_name;
 		struct stat file_stat;
 		if (stat(full_path.c_str(), &file_stat) == 0) {
