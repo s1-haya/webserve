@@ -19,6 +19,15 @@ class Cgi {
 	~Cgi();
 	http::StatusCode Run(std::string &response_body_message);
 
+	// <<< todo (関数名・変数名とか含め変えてしまって全然大丈夫です)
+	// pipe_fdのgetter
+	int GetReadFd() const;
+	int GetWriteFd() const;
+	// read/writeのpipe_fdが存在するかどうか
+	bool IsReadRequired() const;
+	bool IsWriteRequired() const;
+	// >>> todo
+
   private:
 	// prohibit copy constructor and assignment operator
 	Cgi(const Cgi &cgi);
@@ -41,6 +50,12 @@ class Cgi {
 
 	static const int READ  = 0;
 	static const int WRITE = 1;
+
+	// <<< todo
+	// constructorの初期化も適当に-1にしてある
+	int read_fd_;
+	int write_fd_;
+	// >>> todo
 };
 
 } // namespace cgi
