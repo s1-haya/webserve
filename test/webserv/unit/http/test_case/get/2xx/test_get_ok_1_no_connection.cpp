@@ -9,10 +9,10 @@
 namespace test {
 
 int TestGetOk1NoConnection(const server::VirtualServerAddrList &server_infos) {
-	http::ClientInfos client_infos = test::CreateClientInfos(test::REQUEST_GET_200_1_NO_CONNECTION);
-	std::string       expected_status_line = test::EXPECTED_STATUS_LINE_OK;
-	std::string  expected_body_message = test::LoadFileContent("../../../../root/html/index.html");
-	HeaderFields expected_header_fields;
+	http::ClientInfos client_infos = CreateClientInfos(request::REQUEST_GET_200_1_NO_CONNECTION);
+	std::string       expected_status_line  = EXPECTED_STATUS_LINE_OK;
+	std::string       expected_body_message = LoadFileContent("../../../../root/html/index.html");
+	HeaderFields      expected_header_fields;
 	expected_header_fields[http::CONNECTION]     = http::CLOSE;
 	expected_header_fields[http::CONTENT_LENGTH] = utils::ToString(expected_body_message.length());
 	expected_header_fields[http::CONTENT_TYPE]   = "test/html";
@@ -20,8 +20,8 @@ int TestGetOk1NoConnection(const server::VirtualServerAddrList &server_infos) {
 	const std::string &expected_response         = CreateHttpResponseFormat(
         expected_status_line, expected_header_fields, expected_body_message
     );
-	http::HttpResult expected = test::CreateHttpResult(false, true, "", "");
-	return test::HandleHttpResult(client_infos, server_infos, expected);
+	http::HttpResult expected = CreateHttpResult(false, true, "", "");
+	return HandleHttpResult(client_infos, server_infos, expected);
 }
 
 } // namespace test
