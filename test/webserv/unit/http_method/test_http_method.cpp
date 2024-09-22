@@ -76,10 +76,16 @@ std::string CreateAutoIndexContent(const std::string &path) {
 		if (stat(full_path.c_str(), &file_stat) == 0) {
 			std::string entry_name =
 				std::string(entry->d_name) + (entry->d_type == DT_DIR ? "/" : "");
-			content += "<a href=\"" + entry_name + "\">" + entry_name + "</a> ";
-			content +=
-				entry->d_type == DT_DIR ? " - " : utils::ToString(file_stat.st_size) + " bytes ";
-			content += std::ctime(&file_stat.st_mtime);
+			content += "<a href=\"" + entry_name + "\">" + entry_name + "</a>";
+			content += std::string(50 - entry_name.length(), ' ') + " ";
+			char time_buf[20];
+			std::strftime(
+				time_buf, sizeof(time_buf), "%Y-%m-%d %H:%M:%S", std::localtime(&file_stat.st_mtime)
+			);
+			content += std::string(time_buf) + " ";
+			std::string size_str =
+				entry->d_type == DT_DIR ? "-" : utils::ToString(file_stat.st_size) + " bytes";
+			content += std::string(20 - size_str.length(), ' ') + size_str + "\n";
 		} else {
 			content += "<a href=\"" + std::string(entry->d_name) + "\">" +
 					   std::string(entry->d_name) + "</a> ";
