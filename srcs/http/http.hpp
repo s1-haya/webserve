@@ -1,6 +1,7 @@
 #ifndef HTTP_HPP_
 #define HTTP_HPP_
 
+#include "IHttp.hpp"
 #include "http_parse.hpp"
 #include "http_response.hpp"
 #include "http_storage.hpp"
@@ -19,18 +20,16 @@ namespace http {
 // - HttpRequestFormat
 // - HttpResponse
 // }
-struct DtoClientInfos;
+struct ClientInfos;
 struct HttpResult;
 
-class Http {
+class Http : public IHttp {
   public:
 	Http();
 	~Http();
 	HttpResult
-	Run(const MockDtoClientInfos &client_info, const server::VirtualServerAddrList &server_info);
-	//  HttpResult GetErrorResponse(const ClientInfos &client_info, ErrState state);
-	// For test
-	HttpRequestParsedData GetClientData(int client_fd);
+	Run(const ClientInfos &client_info, const server::VirtualServerAddrList &server_info);
+	HttpResult GetErrorResponse(const ClientInfos &client_info, ErrState state);
 
   private:
 	Http(const Http &other);
@@ -38,9 +37,10 @@ class Http {
 	HttpStorage         storage_;
 	utils::Result<void> ParseHttpRequestFormat(int client_fd, const std::string &read_buf);
 	std::string         CreateHttpResponse(
-				const MockDtoClientInfos &client_info, const server::VirtualServerAddrList &server_info
+				const ClientInfos &client_info, const server::VirtualServerAddrList &server_info
 			);
-	bool IsHttpRequestFormatComplete(int client_fd);
+	bool                  IsHttpRequestFormatComplete(int client_fd);
+	HttpRequestParsedData GetClientData(int client_fd);
 	// HttpResult CreateBadRequestResponse(int client_fd);
 };
 

@@ -146,7 +146,7 @@ std::string SetDefaultHeaderFields(
 
 int main(void) {
 	int                                 ret_code = 0;
-	http::MockDtoClientInfos            client_info;
+	http::ClientInfos                   client_info;
 	const server::VirtualServerAddrList server_info = BuildVirtualServerAddrList();
 	http::HttpRequestResult             request_info;
 
@@ -161,7 +161,8 @@ int main(void) {
 	request_info.request.header_fields[http::HOST]   = "sawa";
 	std::string response1 = http::HttpResponse::Run(client_info, server_info, request_info);
 
-	std::string expected1_status_line   = LoadFileContent("expected/status_line/ok.txt");
+	std::string expected1_status_line =
+		LoadFileContent("../../expected_response/default_status_line/ok.txt");
 	std::string expected1_body_message  = LoadFileContent("../../../../root/html/index.html");
 	std::string expected1_header_fields = SetDefaultHeaderFields(
 		http::KEEP_ALIVE, utils::ToString(expected1_body_message.length()), "test/html"
@@ -175,9 +176,10 @@ int main(void) {
 	request_info.request.header_fields[http::HOST] = "host2";
 	std::string response2 = http::HttpResponse::Run(client_info, server_info, request_info);
 
-	std::string expected2_status_line = LoadFileContent("expected/status_line/not_implemented.txt");
+	std::string expected2_status_line =
+		LoadFileContent("../../expected_response/default_status_line/not_implemented.txt");
 	std::string expected2_body_message =
-		LoadFileContent("expected/body_message/not_implemented.txt");
+		LoadFileContent("../../expected_response/default_body_message/not_implemented.txt");
 	std::string expected2_header_fields = SetDefaultHeaderFields(
 		http::KEEP_ALIVE, utils::ToString(expected2_body_message.length()), "test/html"
 	);

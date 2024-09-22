@@ -45,7 +45,25 @@ SRCS_DIR	:=	$(WS_UTILS_DIR) \
 				$(WS_HTTP_RESPONSE_DIR) \
 				$(WS_HTTP_PARSE_DIR) \
 				$(WS_HTTP_SERVER_INFO_CHECK_DIR) \
-				$(WS_VIRTUAL_SERVER_DIR) \
+				$(WS_VIRTUAL_SERVER_DIR)
+
+# 3. Add unit test files
+TEST_CASE_DIR := test_case
+# method
+TEST_CASE_FOR_GET := get
+# status_codes
+TEST_CASE_FOR_2XX := 2xx
+TEST_CASE_FOR_4XX := 4xx
+
+SRCS	+=	test_http.cpp \
+			$(TEST_CASE_DIR)/test_handler.cpp \
+			$(TEST_CASE_DIR)/$(TEST_CASE_FOR_GET)/$(TEST_CASE_FOR_2XX)/test_get_ok_1_no_connection.cpp \
+			$(TEST_CASE_DIR)/$(TEST_CASE_FOR_GET)/$(TEST_CASE_FOR_4XX)/test_get_not_found_1_not_exist_file.cpp
+
+# 4. Add unit test directory for INCLUDE
+SRCS_DIR += $(TEST_CASE_DIR) \
+			$(TEST_CASE_DIR)/$(TEST_CASE_FOR_GET)/$(TEST_CASE_FOR_2XX) \
+			$(TEST_CASE_DIR)/$(TEST_CASE_FOR_GET)/$(TEST_CASE_FOR_4XX)
 
 #--------------------------------------------
 OBJ_DIR		:=	objs

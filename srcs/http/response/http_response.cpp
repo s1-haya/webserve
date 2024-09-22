@@ -22,7 +22,7 @@ std::string GetExtension(const std::string &path) {
 namespace http {
 
 std::string HttpResponse::Run(
-	const MockDtoClientInfos            &client_info,
+	const ClientInfos                   &client_info,
 	const server::VirtualServerAddrList &server_info,
 	const HttpRequestResult             &request_info
 ) {
@@ -33,7 +33,7 @@ std::string HttpResponse::Run(
 // todo: HttpResponseFormat HttpResponse::CreateHttpResponseFormat(const HttpRequestResult
 // &request_info) 作成
 HttpResponseFormat HttpResponse::CreateHttpResponseFormat(
-	const MockDtoClientInfos            &client_info,
+	const ClientInfos                   &client_info,
 	const server::VirtualServerAddrList &server_info,
 	const HttpRequestResult             &request_info
 ) {
