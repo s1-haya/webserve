@@ -38,7 +38,8 @@ class CgiManager {
 	CgiManager &operator=(const CgiManager &other);
 
 	// functions
-	Cgi *GetCgi(int client_fd) const;
+	Cgi       *GetCgi(int client_fd);
+	const Cgi *GetCgi(int client_fd) const;
 
 	// variables
 	// client_fd毎にCgiをnewして保持
