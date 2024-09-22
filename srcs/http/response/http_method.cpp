@@ -258,7 +258,8 @@ utils::Result<std::string> Method::AutoindexHandler(const std::string &path) {
 			std::string entry_name =
 				std::string(entry->d_name) + (entry->d_type == DT_DIR ? "/" : "");
 			response_body_message += "<a href=\"" + entry_name + "\">" + entry_name + "</a> ";
-			response_body_message += utils::ToString(file_stat.st_size) + " bytes ";
+			response_body_message +=
+				entry->d_type == DT_DIR ? " - " : utils::ToString(file_stat.st_size) + " bytes ";
 			response_body_message += std::ctime(&file_stat.st_mtime);
 		} else {
 			// response_body_message += "<a href=\"" + std::string(entry->d_name) + "\">" +
