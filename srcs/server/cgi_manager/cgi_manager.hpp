@@ -30,6 +30,7 @@ class CgiManager {
 	int                GetClientFd(int pipe_fd) const;
 	const std::string &GetRequest(int client_fd) const;
 	const std::string &GetResponse(int client_fd) const;
+	void               ReplaceNewRequest(int client_fd, const std::string &new_request_str);
 
   private:
 	// Prohibit copy

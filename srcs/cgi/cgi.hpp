@@ -38,6 +38,8 @@ class Cgi {
 	const std::string &GetRequest() const;
 	// responseのgetter(返り値がstruct CgiResponseになる？)
 	const std::string &GetResponse() const;
+	// write()が全部できなかった場合に送れなかった分だけ渡されるので差し替える
+	void ReplaceNewRequest(const std::string &new_request_str);
 	// >>> todo
 
   private:

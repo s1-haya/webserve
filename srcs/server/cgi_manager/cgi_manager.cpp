@@ -103,6 +103,11 @@ const std::string &CgiManager::GetResponse(int client_fd) const {
 	return cgi->GetResponse();
 }
 
+void CgiManager::ReplaceNewRequest(int client_fd, const std::string &new_request_str) {
+	Cgi *cgi = cgi_addr_map_.at(client_fd);
+	cgi->ReplaceNewRequest(new_request_str);
+}
+
 CgiManager::Cgi *CgiManager::GetCgi(int client_fd) const {
 	// todo: add logic_error?
 	return cgi_addr_map_.at(client_fd);
