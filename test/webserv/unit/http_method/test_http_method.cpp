@@ -60,8 +60,12 @@ std::string CreateAutoIndexContent(const std::string &path) {
 
 	struct dirent *entry;
 	content += "<html>\n"
-			   "<head><title>Index of /</title></head>\n"
-			   "<body><h1>Index of /</h1><hr><pre>"
+			   "<head><title>Index of " +
+			   path +
+			   "</title></head>\n"
+			   "<body><h1>Index of " +
+			   path +
+			   "</h1><hr><pre>"
 			   "<a href=\"../\">../</a>\n";
 	while ((entry = readdir(dir)) != NULL) {
 		std::string full_path = path + "/" + entry->d_name;

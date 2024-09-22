@@ -239,8 +239,12 @@ utils::Result<std::string> Method::AutoindexHandler(const std::string &path) {
 
 	struct dirent *entry;
 	response_body_message += "<html>\n"
-							 "<head><title>Index of /</title></head>\n"
-							 "<body><h1>Index of /</h1><hr><pre>"
+							 "<head><title>Index of " +
+							 path +
+							 "</title></head>\n"
+							 "<body><h1>Index of " +
+							 path +
+							 "</h1><hr><pre>"
 							 "<a href=\"../\">../</a>\n";
 
 	errno = 0;
