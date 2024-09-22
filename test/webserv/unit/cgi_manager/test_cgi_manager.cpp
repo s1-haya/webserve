@@ -13,7 +13,9 @@ using namespace cgi;
 
 const std::string PATH_DIR_CGI_BIN = "../../../../root/cgi-bin";
 
-typedef server::CgiManager CgiManager;
+typedef server::CgiManager      CgiManager;
+typedef cgi::Cgi::CgiResult     CgiResult;
+typedef CgiManager::GetFdResult GetFdResult;
 
 struct Result {
 	Result() : is_success(true) {}
@@ -99,6 +101,21 @@ RunGetResponse(const CgiManager &cgi_manager, int client_fd, const std::string &
 		oss << "response" << std::endl;
 		oss << "- result  : " << cgi_response << std::endl;
 		oss << "- expected: " << expected_response << std::endl;
+		result.error_log = oss.str();
+	}
+	return result;
+}
+
+Result IsSameClientFd(const CgiManager &cgi_manager, int pipe_fd, int expected_client_fd) {
+	Result             result;
+	std::ostringstream oss;
+
+	const int result_client_fd = cgi_manager.GetClientFd(pipe_fd);
+	if (!IsSame(result_client_fd, expected_client_fd)) {
+		result.is_success = false;
+		oss << "client_fd" << std::endl;
+		oss << "- result  : " << result_client_fd << std::endl;
+		oss << "- expected: " << expected_client_fd << std::endl;
 		result.error_log = oss.str();
 	}
 	return result;
@@ -200,6 +217,53 @@ int RunTest3() {
 	return ret_code;
 }
 
+// todo: cgi.Run()が動くまではif文に入らずTest()が呼ばれてない
+// -----------------------------------------------------------------------------
+// CgiManager classの主なテスト対象関数
+// - RunCgi()
+// - GetClientFd()
+// - GetReadFd()
+// - GetWriteFd()
+// -----------------------------------------------------------------------------
+int RunTest4() {
+	int ret_code = EXIT_SUCCESS;
+
+	const int         expected_client_fd = 3;
+	const std::string expected_request   = "abcde";
+
+	// 最低限のCgiRequest準備
+	CgiRequest cgi_request;
+	cgi_request.meta_variables[REQUEST_METHOD] = "GET";
+	cgi_request.meta_variables[SCRIPT_NAME]    = PATH_DIR_CGI_BIN + "/test.sh";
+	cgi_request.body_message                   = expected_request;
+
+	// CgiManager内で新規Cgiを複数作成
+	CgiManager cgi_manager;
+	cgi_manager.AddNewCgi(expected_client_fd, cgi_request);
+	cgi_manager.AddNewCgi(4, cgi_request);
+
+	// cgiを実行する(子プロセスで実行 & pipe_fdがclient_fdと紐づけられる)
+	const CgiResult run_cgi_result = cgi_manager.RunCgi(expected_client_fd);
+
+	// pipe_fd(read)を取得
+	const GetFdResult read_fd_result = cgi_manager.GetReadFd(expected_client_fd);
+	if (read_fd_result.IsOk()) {
+		const int read_pipe_fd = read_fd_result.GetValue();
+		// read_pipe_fdとclient_fdの紐づけ確認
+		ret_code |= Test(IsSameClientFd(cgi_manager, read_pipe_fd, expected_client_fd));
+	}
+
+	// pipe_fd(write)を取得
+	const GetFdResult write_fd_result = cgi_manager.GetWriteFd(expected_client_fd);
+	if (write_fd_result.IsOk()) {
+		const int write_pipe_fd = write_fd_result.GetValue();
+		// write_pipe_fdとclient_fdの紐づけ確認
+		ret_code |= Test(IsSameClientFd(cgi_manager, write_pipe_fd, expected_client_fd));
+	}
+
+	return ret_code;
+}
+
 } // namespace
 
 int main() {
@@ -208,6 +272,7 @@ int main() {
 	ret_code |= RunTest1();
 	ret_code |= RunTest2();
 	ret_code |= RunTest3();
+	ret_code |= RunTest4();
 
 	return ret_code;
 }
