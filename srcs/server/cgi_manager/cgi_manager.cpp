@@ -87,6 +87,11 @@ CgiManager::GetFdResult CgiManager::GetWriteFd(int client_fd) const {
 	return result;
 }
 
+int CgiManager::GetClientFd(int pipe_fd) const {
+	// todo: add logic_error?
+	return client_fd_map_.at(pipe_fd);
+}
+
 // todo: 返り値がcgi::CgiResponseになりそう
 const std::string &CgiManager::GetResponse(int client_fd) const {
 	const Cgi *cgi = cgi_addr_map_.at(client_fd);
