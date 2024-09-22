@@ -25,6 +25,30 @@ void CgiManager::DeleteCgi(int client_fd) {
 	cgi_addr_map_.erase(client_fd);
 }
 
+CgiManager::GetFdResult CgiManager::GetReadFd(int client_fd) const {
+	GetFdResult result;
+
+	const Cgi *cgi = cgi_addr_map_.at(client_fd);
+	if (!cgi->IsReadRequired()) {
+		result.Set(false);
+		return result;
+	}
+	result.SetValue(cgi->GetReadFd());
+	return result;
+}
+
+CgiManager::GetFdResult CgiManager::GetWriteFd(int client_fd) const {
+	GetFdResult result;
+
+	const Cgi *cgi = cgi_addr_map_.at(client_fd);
+	if (!cgi->IsWriteRequired()) {
+		result.Set(false);
+		return result;
+	}
+	result.SetValue(cgi->GetWriteFd());
+	return result;
+}
+
 CgiManager::Cgi *CgiManager::GetCgi(int client_fd) const {
 	// todo: add logic_error?
 	return cgi_addr_map_.at(client_fd);

@@ -2,6 +2,7 @@
 #define SERVER_CGI_MANAGER_HPP_
 
 #include "cgi.hpp"
+#include "utils.hpp"
 #include <map>
 
 namespace server {
@@ -13,13 +14,16 @@ class CgiManager {
 	typedef std::map<int, cgi::Cgi *>  CgiAddrMap;
 	typedef CgiAddrMap::const_iterator ItrCgiAddrMap;
 	typedef std::map<int, int>         FdMap;
+	typedef utils::Result<int>         GetFdResult;
 
 	CgiManager();
 	~CgiManager();
 
 	// functions
-	void AddNewCgi(int client_fd, const cgi::CgiRequest &request);
-	void DeleteCgi(int client_fd);
+	void        AddNewCgi(int client_fd, const cgi::CgiRequest &request);
+	void        DeleteCgi(int client_fd);
+	GetFdResult GetReadFd(int client_fd) const;
+	GetFdResult GetWriteFd(int client_fd) const;
 
   private:
 	// Prohibit copy
