@@ -263,7 +263,7 @@ utils::Result<std::string> Method::AutoindexHandler(const std::string &path) {
 		result.Set(false);
 	}
 
-	response_body_message += "</pre><hr></body></html>";
+	response_body_message += "</pre><hr></body>\n</html>";
 	closedir(dir);
 
 	result.SetValue(response_body_message);

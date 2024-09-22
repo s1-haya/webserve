@@ -77,7 +77,7 @@ std::string CreateAutoIndexContent(const std::string &path) {
 			content += "Error getting file stats\n";
 		}
 	}
-	content += "</pre><hr></body></html>";
+	content += "</pre><hr></body>\n</html>";
 	closedir(dir);
 
 	return content;
