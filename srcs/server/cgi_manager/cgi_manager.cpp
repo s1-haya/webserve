@@ -92,6 +92,11 @@ int CgiManager::GetClientFd(int pipe_fd) const {
 	return client_fd_map_.at(pipe_fd);
 }
 
+const std::string &CgiManager::GetRequest(int client_fd) const {
+	const Cgi *cgi = cgi_addr_map_.at(client_fd);
+	return cgi->GetRequest();
+}
+
 // todo: 返り値がcgi::CgiResponseになりそう
 const std::string &CgiManager::GetResponse(int client_fd) const {
 	const Cgi *cgi = cgi_addr_map_.at(client_fd);

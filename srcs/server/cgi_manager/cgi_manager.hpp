@@ -28,6 +28,7 @@ class CgiManager {
 	GetFdResult        GetReadFd(int client_fd) const;
 	GetFdResult        GetWriteFd(int client_fd) const;
 	int                GetClientFd(int pipe_fd) const;
+	const std::string &GetRequest(int client_fd) const;
 	const std::string &GetResponse(int client_fd) const;
 
   private:

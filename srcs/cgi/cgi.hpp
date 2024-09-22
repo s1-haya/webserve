@@ -34,6 +34,8 @@ class Cgi {
 	void AddReadBuf(const std::string &read_buf);
 	// responseが完成したかどうかを取得
 	bool IsResponseComplete() const;
+	// requestのgetter
+	const std::string &GetRequest() const;
 	// responseのgetter(返り値がstruct CgiResponseになる？)
 	const std::string &GetResponse() const;
 	// >>> todo
