@@ -264,6 +264,16 @@ int RunTest4() {
 	return ret_code;
 }
 
+// todo: Cgi classの実装が終わったら作成
+// -----------------------------------------------------------------------------
+// CgiManager classの主なテスト対象関数
+// - IsResponseComplete()
+// -----------------------------------------------------------------------------
+// int RunTest5() {
+// 	int ret_code = EXIT_SUCCESS;
+// 	return ret_code;
+// }
+
 } // namespace
 
 int main() {
@@ -273,6 +283,7 @@ int main() {
 	ret_code |= RunTest2();
 	ret_code |= RunTest3();
 	ret_code |= RunTest4();
+	// ret_code |= RunTest5();
 
 	return ret_code;
 }
