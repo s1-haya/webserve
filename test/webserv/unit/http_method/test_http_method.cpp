@@ -74,8 +74,9 @@ std::string CreateAutoIndexContent(const std::string &path) {
 		std::string full_path = path + "/" + entry->d_name;
 		struct stat file_stat;
 		if (stat(full_path.c_str(), &file_stat) == 0) {
-			content += "<a href=\"" + std::string(entry->d_name) + "\">" +
-					   std::string(entry->d_name) + "</a> ";
+			std::string entry_name =
+				std::string(entry->d_name) + (entry->d_type == DT_DIR ? "/" : "");
+			content += "<a href=\"" + entry_name + "\">" + entry_name + "</a> ";
 			content += utils::ToString(file_stat.st_size) + " bytes ";
 			content += std::ctime(&file_stat.st_mtime);
 		} else {
