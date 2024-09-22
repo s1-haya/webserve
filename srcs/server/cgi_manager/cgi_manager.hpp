@@ -20,10 +20,11 @@ class CgiManager {
 	~CgiManager();
 
 	// functions
-	void        AddNewCgi(int client_fd, const cgi::CgiRequest &request);
-	void        DeleteCgi(int client_fd);
-	GetFdResult GetReadFd(int client_fd) const;
-	GetFdResult GetWriteFd(int client_fd) const;
+	void           AddNewCgi(int client_fd, const cgi::CgiRequest &request);
+	Cgi::CgiResult RunCgi(int client_fd);
+	void           DeleteCgi(int client_fd);
+	GetFdResult    GetReadFd(int client_fd) const;
+	GetFdResult    GetWriteFd(int client_fd) const;
 
   private:
 	// Prohibit copy
