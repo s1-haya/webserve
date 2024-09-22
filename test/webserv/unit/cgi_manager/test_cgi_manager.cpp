@@ -56,6 +56,21 @@ int Test(Result result) {
 	return EXIT_FAILURE;
 }
 
+// test_funcを実行したらthrowされることを期待する関数
+template <typename TestFunc>
+int TestThrow(TestFunc test_func, const CgiManager &cgi_manager, int client_fd) {
+	try {
+		(cgi_manager.*test_func)(client_fd);
+		PrintNg();
+		PrintError("throw failed");
+		return EXIT_FAILURE;
+	} catch (const std::exception &e) {
+		PrintOk();
+		std::cerr << utils::color::GRAY << e.what() << utils::color::RESET << std::endl;
+		return EXIT_SUCCESS;
+	}
+}
+
 // -----------------------------------------------------------------------------
 Result
 RunGetRequest(const CgiManager &cgi_manager, int client_fd, const std::string &expected_request) {
@@ -107,12 +122,39 @@ int RunTest1() {
 	return ret_code;
 }
 
+// -----------------------------------------------------------------------------
+// CgiManager classの主なテスト対象関数
+// - DeleteCgi()
+// -----------------------------------------------------------------------------
+int RunTest2() {
+	int ret_code = EXIT_SUCCESS;
+
+	const int client_fd = 3;
+
+	// 最低限のCgiRequest準備
+	CgiRequest cgi_request;
+	cgi_request.meta_variables[REQUEST_METHOD] = "GET";
+	cgi_request.meta_variables[SCRIPT_NAME]    = PATH_DIR_CGI_BIN + "/test.sh";
+
+	// CgiManager内で新規Cgi作成
+	CgiManager cgi_manager;
+	cgi_manager.AddNewCgi(client_fd, cgi_request);
+
+	// cgiを削除
+	cgi_manager.DeleteCgi(client_fd);
+	// 存在しないcgiにアクセスしようとしてthrowされることを確認
+	ret_code |= TestThrow(&CgiManager::GetRequest, cgi_manager, client_fd);
+
+	return ret_code;
+}
+
 } // namespace
 
 int main() {
 	int ret_code = EXIT_SUCCESS;
 
 	ret_code |= RunTest1();
+	ret_code |= RunTest2();
 
 	return ret_code;
 }
