@@ -19,11 +19,15 @@ class CgiManager {
 
 	// functions
 	void AddNewCgi(int client_fd, const cgi::CgiRequest &request);
+	void DeleteCgi(int client_fd);
 
   private:
 	// Prohibit copy
 	CgiManager(const CgiManager &other);
 	CgiManager &operator=(const CgiManager &other);
+
+	// functions
+	Cgi *GetCgi(int client_fd) const;
 
 	// variables
 	// client_fd毎にCgiをnewして保持

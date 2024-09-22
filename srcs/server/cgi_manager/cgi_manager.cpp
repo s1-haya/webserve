@@ -18,4 +18,16 @@ void CgiManager::AddNewCgi(int client_fd, const cgi::CgiRequest &request) {
 	cgi_addr_map_[client_fd] = cgi;
 }
 
+void CgiManager::DeleteCgi(int client_fd) {
+	const Cgi *cgi = GetCgi(client_fd);
+
+	delete cgi;
+	cgi_addr_map_.erase(client_fd);
+}
+
+CgiManager::Cgi *CgiManager::GetCgi(int client_fd) const {
+	// todo: add logic_error?
+	return cgi_addr_map_.at(client_fd);
+}
+
 } // namespace server
