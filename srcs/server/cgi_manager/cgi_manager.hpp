@@ -17,6 +17,9 @@ class CgiManager {
 	CgiManager();
 	~CgiManager();
 
+	// functions
+	void AddNewCgi(int client_fd, const cgi::CgiRequest &request);
+
   private:
 	// Prohibit copy
 	CgiManager(const CgiManager &other);
