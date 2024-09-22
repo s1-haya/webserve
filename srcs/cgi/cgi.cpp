@@ -1,5 +1,5 @@
 #include "cgi.hpp"
-#include "cgi_parse.hpp"
+#include "cgi_request.hpp"
 #include "http_exception.hpp"
 #include "http_message.hpp"
 #include "status_code.hpp"
@@ -11,7 +11,6 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-namespace http {
 namespace cgi {
 namespace {
 
@@ -88,27 +87,27 @@ Cgi::~Cgi() {
 	Free();
 }
 
-StatusCode Cgi::Run(std::string &response_body_message) {
+http::StatusCode Cgi::Run(std::string &response_body_message) {
 	try {
 		Execve();
 		response_body_message = response_body_message_;
 	} catch (const utils::SystemException &e) {
-		throw HttpException(e.what(), StatusCode(INTERNAL_SERVER_ERROR));
+		throw http::HttpException(e.what(), http::StatusCode(http::INTERNAL_SERVER_ERROR));
 	}
-	return StatusCode(OK);
+	return http::StatusCode(http::OK);
 }
 
 void Cgi::Execve() {
 	int cgi_request[2];
 	int cgi_response[2];
 
-	if (method_ == POST) {
+	if (method_ == http::POST) {
 		Pipe(cgi_request);
 	}
 	Pipe(cgi_response);
 	pid_t p = Fork();
 	if (p == 0) {
-		if (method_ == POST) {
+		if (method_ == http::POST) {
 			Close(cgi_request[WRITE]);
 			Dup2(cgi_request[READ], STDIN_FILENO);
 			Close(cgi_request[READ]);
@@ -118,7 +117,7 @@ void Cgi::Execve() {
 		Close(cgi_response[WRITE]);
 		ExecveCgiScript();
 	}
-	if (method_ == POST) {
+	if (method_ == http::POST) {
 		Close(cgi_request[READ]);
 		Write(cgi_request[WRITE], request_body_message_.c_str(), request_body_message_.length());
 		Close(cgi_request[WRITE]);
@@ -196,4 +195,3 @@ char *const *Cgi::SetCgiEnv(const MetaMap &meta_variables) {
 }
 
 } // namespace cgi
-} // namespace http

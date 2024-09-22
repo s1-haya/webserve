@@ -1,6 +1,7 @@
 #ifndef CGI_HPP_
 #define CGI_HPP_
 
+#include "cgi_request.hpp"
 #include <map>
 #include <string>
 
@@ -8,16 +9,15 @@ namespace http {
 
 class StatusCode;
 
-namespace cgi {
+} // namespace http
 
-struct CgiRequest;
-typedef std::map<std::string, std::string> MetaMap;
+namespace cgi {
 
 class Cgi {
   public:
 	explicit Cgi(const CgiRequest &request);
 	~Cgi();
-	StatusCode Run(std::string &response_body_message);
+	http::StatusCode Run(std::string &response_body_message);
 
   private:
 	// prohibit copy constructor and assignment operator
@@ -44,6 +44,5 @@ class Cgi {
 };
 
 } // namespace cgi
-} // namespace http
 
 #endif

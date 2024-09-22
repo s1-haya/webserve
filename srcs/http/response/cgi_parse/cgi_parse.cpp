@@ -1,7 +1,8 @@
 #include "cgi_parse.hpp"
+#include "cgi_request.hpp"
+#include "http_format.hpp"
 
 namespace http {
-namespace cgi {
 namespace {
 
 std::string CreatePathInfo(const std::string &cgi_extension, const std::string &request_target) {
@@ -29,60 +30,42 @@ std::string TranslateToHtmlPath(const std::string &request_target) {
 
 } // namespace
 
-const std::string AUTH_TYPE         = "AUTH_TYPE";
-const std::string CONTENT_LENGTH    = "CONTENT_LENGTH";
-const std::string CONTENT_TYPE      = "CONTENT_TYPE";
-const std::string GATEWAY_INTERFACE = "GATEWAY_INTERFACE";
-const std::string PATH_INFO         = "PATH_INFO";
-const std::string PATH_TRANSLATED   = "PATH_TRANSLATED";
-const std::string QUERY_STRING      = "QUERY_STRING";
-const std::string REMOTE_ADDR       = "REMOTE_ADDR";
-const std::string REMOTE_HOST       = "REMOTE_HOST";
-const std::string REMOTE_IDENT      = "REMOTE_IDENT";
-const std::string REMOTE_USER       = "REMOTE_USER";
-const std::string REQUEST_METHOD    = "REQUEST_METHOD";
-const std::string SCRIPT_NAME       = "SCRIPT_NAME";
-const std::string SERVER_NAME       = "SERVER_NAME";
-const std::string SERVER_PORT       = "SERVER_PORT";
-const std::string SERVER_PROTOCOL   = "SERVER_PROTOCOL";
-const std::string SERVER_SOFTWARE   = "SERVER_SOFTWARE";
-
-MetaMap CgiParse::CreateRequestMetaVariables(
-	const HttpRequestFormat &request,
-	const std::string       &cgi_script,
-	const std::string       &cgi_extension,
-	const std::string       &server_port
+cgi::MetaMap CgiParse::CreateRequestMetaVariables(
+	const http::HttpRequestFormat &request,
+	const std::string             &cgi_script,
+	const std::string             &cgi_extension,
+	const std::string             &server_port
 ) {
-	MetaMap request_meta_variables;
-	request_meta_variables[AUTH_TYPE]         = "";
-	request_meta_variables[CONTENT_LENGTH]    = request.header_fields.at("Content-Length");
-	request_meta_variables[CONTENT_TYPE]      = request.header_fields.at("Content-Type");
-	request_meta_variables[GATEWAY_INTERFACE] = "CGI/1.1";
-	request_meta_variables[PATH_INFO]         = CreatePathInfo(cgi_extension, cgi_script);
-	request_meta_variables[PATH_TRANSLATED] =
+	cgi::MetaMap request_meta_variables;
+	request_meta_variables[cgi::AUTH_TYPE]         = "";
+	request_meta_variables[cgi::CONTENT_LENGTH]    = request.header_fields.at("Content-Length");
+	request_meta_variables[cgi::CONTENT_TYPE]      = request.header_fields.at("Content-Type");
+	request_meta_variables[cgi::GATEWAY_INTERFACE] = "CGI/1.1";
+	request_meta_variables[cgi::PATH_INFO]         = CreatePathInfo(cgi_extension, cgi_script);
+	request_meta_variables[cgi::PATH_TRANSLATED] =
 		TranslateToHtmlPath(request_meta_variables["PATH_INFO"]);
-	request_meta_variables[QUERY_STRING]    = "";
-	request_meta_variables[REMOTE_ADDR]     = ""; // 追加する？
-	request_meta_variables[REMOTE_HOST]     = "";
-	request_meta_variables[REMOTE_IDENT]    = "";
-	request_meta_variables[REMOTE_USER]     = "";
-	request_meta_variables[REQUEST_METHOD]  = request.request_line.method;
-	request_meta_variables[SCRIPT_NAME]     = TranslateToCgiPath(cgi_extension, cgi_script);
-	request_meta_variables[SERVER_NAME]     = request.header_fields.at("Host");
-	request_meta_variables[SERVER_PORT]     = server_port;
-	request_meta_variables[SERVER_PROTOCOL] = request.request_line.version;
-	request_meta_variables[SERVER_SOFTWARE] = "Webserv/1.1";
+	request_meta_variables[cgi::QUERY_STRING]    = "";
+	request_meta_variables[cgi::REMOTE_ADDR]     = ""; // 追加する？
+	request_meta_variables[cgi::REMOTE_HOST]     = "";
+	request_meta_variables[cgi::REMOTE_IDENT]    = "";
+	request_meta_variables[cgi::REMOTE_USER]     = "";
+	request_meta_variables[cgi::REQUEST_METHOD]  = request.request_line.method;
+	request_meta_variables[cgi::SCRIPT_NAME]     = TranslateToCgiPath(cgi_extension, cgi_script);
+	request_meta_variables[cgi::SERVER_NAME]     = request.header_fields.at("Host");
+	request_meta_variables[cgi::SERVER_PORT]     = server_port;
+	request_meta_variables[cgi::SERVER_PROTOCOL] = request.request_line.version;
+	request_meta_variables[cgi::SERVER_SOFTWARE] = "Webserv/1.1";
 	return request_meta_variables;
 }
 
-utils::Result<CgiRequest> CgiParse::Parse(
-	const HttpRequestFormat &request,
-	const std::string       &cgi_script,
-	const std::string       &cgi_extension,
-	const std::string       &server_port
+utils::Result<cgi::CgiRequest> CgiParse::Parse(
+	const http::HttpRequestFormat &request,
+	const std::string             &cgi_script,
+	const std::string             &cgi_extension,
+	const std::string             &server_port
 ) {
-	CgiRequest                cgi_request;
-	utils::Result<CgiRequest> result;
+	cgi::CgiRequest                cgi_request;
+	utils::Result<cgi::CgiRequest> result;
 
 	try {
 		cgi_request.meta_variables =
@@ -95,5 +78,4 @@ utils::Result<CgiRequest> CgiParse::Parse(
 	return result;
 }
 
-} // namespace cgi
 } // namespace http

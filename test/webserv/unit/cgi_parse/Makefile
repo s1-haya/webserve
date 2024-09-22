@@ -1,7 +1,7 @@
 NAME			:=	a.out
 
 # 1. Set each directory name
-TEST_DIR		:=	http_cgi_parse
+TEST_DIR		:=	cgi_parse
 
 LOG_DIR			:=	log
 LOG_FILE_NAME	:=	$(TEST_DIR).log
@@ -11,21 +11,24 @@ LOG_FILE_PATH	:=	$(LOG_DIR)/$(LOG_FILE_NAME)
 WS_SRCS_DIR				:=	../../../../srcs
 WS_UTILS_DIR			:= $(WS_SRCS_DIR)/utils
 WS_HTTP_DIR				:=	$(WS_SRCS_DIR)/http
+WS_CGI_DIR				:=	$(WS_SRCS_DIR)/cgi
 WS_HTTP_RESPONSE_DIR	:=	$(WS_HTTP_DIR)/response
 WS_HTTP_CGI_PARSE		:=	$(WS_HTTP_RESPONSE_DIR)/cgi_parse
 
 SRCS				+=	$(WS_HTTP_CGI_PARSE)/cgi_parse.cpp \
+						$(WS_CGI_DIR)/cgi_request.cpp \
 						$(WS_HTTP_DIR)/http_message.cpp \
 						$(WS_UTILS_DIR)/color.cpp
 
 # 3. Add unit test files
-SRCS	+=	test_http_cgi_parse.cpp
+SRCS	+=	test_cgi_parse.cpp
 
 # 4. Add directory for INCLUDE
 SRCS_DIR	:=	$(WS_UTILS_DIR) \
 				$(WS_HTTP_DIR) \
 				$(WS_HTTP_RESPONSE_DIR) \
-				$(WS_HTTP_CGI_PARSE)
+				$(WS_HTTP_CGI_PARSE) \
+				$(WS_CGI_DIR)
 
 #--------------------------------------------
 OBJ_DIR		:=	objs
