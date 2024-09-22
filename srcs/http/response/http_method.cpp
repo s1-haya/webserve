@@ -226,7 +226,6 @@ bool Method::IsAllowedMethod(
 	}
 }
 
-// ./と../はいらないかも？
 utils::Result<std::string> Method::AutoindexHandler(const std::string &path) {
 	utils::Result<std::string> result;
 	DIR                       *dir = opendir(path.c_str());
@@ -273,9 +272,6 @@ utils::Result<std::string> Method::AutoindexHandler(const std::string &path) {
 				entry->d_type == DT_DIR ? "-" : utils::ToString(file_stat.st_size) + " bytes";
 			response_body_message += std::string(20 - size_str.length(), ' ') + size_str + "\n";
 		} else {
-			// response_body_message += "<a href=\"" + std::string(entry->d_name) + "\">" +
-			// 						 std::string(entry->d_name) + "</a> ";
-			// response_body_message += "Error getting file stats\n"; // tmp
 			result.Set(false);
 		}
 	}

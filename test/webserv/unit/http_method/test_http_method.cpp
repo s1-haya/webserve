@@ -87,9 +87,7 @@ std::string CreateAutoIndexContent(const std::string &path) {
 				entry->d_type == DT_DIR ? "-" : utils::ToString(file_stat.st_size) + " bytes";
 			content += std::string(20 - size_str.length(), ' ') + size_str + "\n";
 		} else {
-			content += "<a href=\"" + std::string(entry->d_name) + "\">" +
-					   std::string(entry->d_name) + "</a> ";
-			content += "Error getting file stats\n";
+			return "";
 		}
 	}
 	content += "</pre><hr></body>\n</html>";
