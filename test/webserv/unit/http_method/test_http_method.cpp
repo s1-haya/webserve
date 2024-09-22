@@ -76,7 +76,7 @@ std::string CreateAutoIndexContent(const std::string &path) {
 		if (stat(full_path.c_str(), &file_stat) == 0) {
 			bool        is_dir     = S_ISDIR(file_stat.st_mode);
 			std::string entry_name = std::string(entry->d_name) + (is_dir ? "/" : "");
-			content += "<a href=\"" + entry_name + "\">" + entry_name + "</a>";
+			content += "<a href=\"" + path + entry_name + "\">" + entry_name + "</a>";
 			size_t padding = (entry_name.length() < 50) ? 50 - entry_name.length() : 0;
 			content += std::string(padding, ' ') + " ";
 			char time_buf[20];
