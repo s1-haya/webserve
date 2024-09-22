@@ -74,18 +74,19 @@ std::string CreateAutoIndexContent(const std::string &path) {
 		std::string full_path = path + "/" + entry->d_name;
 		struct stat file_stat;
 		if (stat(full_path.c_str(), &file_stat) == 0) {
-			std::string entry_name =
-				std::string(entry->d_name) + (entry->d_type == DT_DIR ? "/" : "");
+			bool        is_dir     = S_ISDIR(file_stat.st_mode);
+			std::string entry_name = std::string(entry->d_name) + (is_dir ? "/" : "");
 			content += "<a href=\"" + entry_name + "\">" + entry_name + "</a>";
-			content += std::string(50 - entry_name.length(), ' ') + " ";
+			size_t padding = (entry_name.length() < 50) ? 50 - entry_name.length() : 0;
+			content += std::string(padding, ' ') + " ";
 			char time_buf[20];
 			std::strftime(
 				time_buf, sizeof(time_buf), "%Y-%m-%d %H:%M:%S", std::localtime(&file_stat.st_mtime)
 			);
 			content += std::string(time_buf) + " ";
-			std::string size_str =
-				entry->d_type == DT_DIR ? "-" : utils::ToString(file_stat.st_size) + " bytes";
-			content += std::string(20 - size_str.length(), ' ') + size_str + "\n";
+			std::string size_str = is_dir ? "-" : utils::ToString(file_stat.st_size) + " bytes";
+			padding              = (size_str.length() < 20) ? 20 - size_str.length() : 0;
+			content += std::string(padding, ' ') + size_str + "\n";
 		} else {
 			return "";
 		}

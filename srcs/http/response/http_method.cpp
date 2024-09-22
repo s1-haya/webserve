@@ -254,11 +254,12 @@ utils::Result<std::string> Method::AutoindexHandler(const std::string &path) {
 		std::string full_path = path + "/" + entry->d_name;
 		struct stat file_stat;
 		if (stat(full_path.c_str(), &file_stat) == 0) {
-			std::string entry_name =
-				std::string(entry->d_name) + (entry->d_type == DT_DIR ? "/" : "");
+			bool        is_dir     = S_ISDIR(file_stat.st_mode);
+			std::string entry_name = std::string(entry->d_name) + (is_dir ? "/" : "");
 			// エントリ名の幅を固定
 			response_body_message += "<a href=\"" + entry_name + "\">" + entry_name + "</a>";
-			response_body_message += std::string(50 - entry_name.length(), ' ') + " ";
+			size_t padding = (entry_name.length() < 50) ? 50 - entry_name.length() : 0;
+			response_body_message += std::string(padding, ' ') + " ";
 
 			// ctimeの部分を固定幅にする
 			char time_buf[20];
@@ -268,9 +269,9 @@ utils::Result<std::string> Method::AutoindexHandler(const std::string &path) {
 			response_body_message += std::string(time_buf) + " ";
 
 			// bytesの部分を固定幅にする
-			std::string size_str =
-				entry->d_type == DT_DIR ? "-" : utils::ToString(file_stat.st_size) + " bytes";
-			response_body_message += std::string(20 - size_str.length(), ' ') + size_str + "\n";
+			std::string size_str = is_dir ? "-" : utils::ToString(file_stat.st_size) + " bytes";
+			padding              = (size_str.length() < 20) ? 20 - size_str.length() : 0;
+			response_body_message += std::string(padding, ' ') + size_str + "\n";
 		} else {
 			result.Set(false);
 		}
