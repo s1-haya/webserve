@@ -8,6 +8,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
+#include <signal.h>
 #include <sys/wait.h>
 #include <unistd.h>
 
@@ -90,6 +91,8 @@ Cgi::~Cgi() {
 	Free();
 	Close(read_fd_);
 	Close(write_fd_);
+	kill(pid_, SIGKILL);
+	Waitpid(pid_, &exit_status_, 0);
 }
 
 http::StatusCode Cgi::Run(std::string &response_body_message) {
@@ -110,8 +113,8 @@ void Cgi::Execve() {
 		Pipe(cgi_request);
 	}
 	Pipe(cgi_response);
-	pid_t p = Fork();
-	if (p == 0) {
+	pid_ = Fork();
+	if (pid_ == 0) {
 		if (method_ == http::POST) {
 			Close(cgi_request[WRITE]);
 			Dup2(cgi_request[READ], STDIN_FILENO);
@@ -134,7 +137,7 @@ void Cgi::Execve() {
 	while ((bytes_read = Read(cgi_response[READ], buffer, sizeof(buffer))) > 0) {
 		response_body_message_.append(buffer, bytes_read);
 	}
-	Waitpid(p, &exit_status_, 0);
+	Waitpid(pid_, &exit_status_, 0);
 	if (WIFEXITED(exit_status_)) {
 		if (WEXITSTATUS(exit_status_) != 0) {
 			throw utils::SystemException("CGI script failed", WEXITSTATUS(exit_status_));

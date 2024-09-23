@@ -65,6 +65,8 @@ class Cgi {
 	static const int READ  = 0;
 	static const int WRITE = 1;
 
+	pid_t pid_;
+
 	// <<< todo
 	// constructorの初期化も適当に-1にしてある
 	int read_fd_;
