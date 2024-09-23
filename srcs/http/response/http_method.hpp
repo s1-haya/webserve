@@ -30,9 +30,8 @@ class Method {
 					 bool                autoindex_on
 				 );
 	static bool IsSupportedMethod(const std::string &method);
-	static bool IsAllowedMethod(
-		const std::string &method, const std::list<std::string> &allow_methods
-	);
+	static bool
+	IsAllowedMethod(const std::string &method, const std::list<std::string> &allow_methods);
 
   private:
 	static StatusCode GetHandler(

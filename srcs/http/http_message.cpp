@@ -14,8 +14,7 @@ const std::string GET                       = "GET";
 const std::string DELETE                    = "DELETE";
 const std::string POST                      = "POST";
 const std::string DEFAULT_METHODS[]         = {GET, DELETE, POST};
-const std::size_t DEFAULT_METHODS_SIZE =
-	sizeof(DEFAULT_METHODS) / sizeof(DEFAULT_METHODS[0]);
+const std::size_t DEFAULT_METHODS_SIZE      = sizeof(DEFAULT_METHODS) / sizeof(DEFAULT_METHODS[0]);
 const std::string DEFAULT_ALLOWED_METHODS[] = {GET};
 const std::size_t DEFAULT_ALLOWED_METHODS_SIZE =
 	sizeof(DEFAULT_ALLOWED_METHODS) / sizeof(DEFAULT_ALLOWED_METHODS[0]);
