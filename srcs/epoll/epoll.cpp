@@ -2,6 +2,7 @@
 #include "system_exception.hpp"
 #include "utils.hpp"
 #include <cerrno>
+#include <cstring>  // strerror
 #include <stdint.h> // uint32_t
 #include <unistd.h> // close
 
@@ -10,7 +11,7 @@ namespace epoll {
 Epoll::Epoll() : monitored_fd_count_(0) {
 	epoll_fd_ = epoll_create1(EPOLL_CLOEXEC);
 	if (epoll_fd_ == SYSTEM_ERROR) {
-		throw SystemException(errno);
+		throw SystemException("epoll_create1 failed: " + std::string(std::strerror(errno)));
 	}
 }
 
@@ -73,7 +74,7 @@ Epoll::EpollEventVector Epoll::CreateEventReadyList() {
 			events.clear();
 			return events;
 		}
-		throw SystemException(errno);
+		throw SystemException("epoll_wait failed: " + std::string(std::strerror(errno)));
 	}
 	events.resize(ready_list_size);
 	return events;
@@ -96,7 +97,7 @@ void Epoll::Add(int socket_fd, event::Type type) {
 	ev.events     = ConvertToEpollEventType(type);
 	ev.data.fd    = socket_fd;
 	if (epoll_ctl(epoll_fd_, EPOLL_CTL_ADD, socket_fd, &ev) == SYSTEM_ERROR) {
-		throw SystemException(errno);
+		throw SystemException("epoll_ctl add failed: " + std::string(std::strerror(errno)));
 	}
 	++monitored_fd_count_;
 }
@@ -104,7 +105,7 @@ void Epoll::Add(int socket_fd, event::Type type) {
 // remove socket_fd from epoll's interest list
 void Epoll::Delete(int socket_fd) {
 	if (epoll_ctl(epoll_fd_, EPOLL_CTL_DEL, socket_fd, NULL) == SYSTEM_ERROR) {
-		throw SystemException(errno);
+		throw SystemException("epoll_ctl delete failed: " + std::string(std::strerror(errno)));
 	}
 	--monitored_fd_count_;
 }
@@ -115,7 +116,7 @@ void Epoll::Replace(int socket_fd, const event::Type new_type) {
 	ev.events     = ConvertToEpollEventType(new_type);
 	ev.data.fd    = socket_fd;
 	if (epoll_ctl(epoll_fd_, EPOLL_CTL_MOD, socket_fd, &ev) == SYSTEM_ERROR) {
-		throw SystemException(errno);
+		throw SystemException("epoll_ctl replace failed: " + std::string(std::strerror(errno)));
 	}
 }
 
@@ -127,7 +128,7 @@ void Epoll::Append(const event::Event &event, const event::Type new_type) {
 	ev.events     = ConvertToEpollEventType(event.type) | ConvertToEpollEventType(new_type);
 	ev.data.fd    = socket_fd;
 	if (epoll_ctl(epoll_fd_, EPOLL_CTL_MOD, socket_fd, &ev) == SYSTEM_ERROR) {
-		throw SystemException(errno);
+		throw SystemException("epoll_ctl append failed: " + std::string(std::strerror(errno)));
 	}
 }
 

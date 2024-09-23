@@ -9,6 +9,7 @@
 #include "utils.hpp"
 #include "virtual_server.hpp"
 #include <cerrno>
+#include <cstring>      // strerror
 #include <fcntl.h>      // fcntl
 #include <sys/socket.h> // socket
 #include <unistd.h>     // close
@@ -467,11 +468,11 @@ void Server::Init() {
 void Server::SetNonBlockingMode(int sock_fd) {
 	int flags = fcntl(sock_fd, F_GETFL);
 	if (flags == SYSTEM_ERROR) {
-		throw SystemException(errno);
+		throw SystemException("fcntl F_GETFL failed: " + std::string(std::strerror(errno)));
 	}
 	flags |= O_NONBLOCK;
 	if (fcntl(sock_fd, F_SETFL, flags) == SYSTEM_ERROR) {
-		throw SystemException(errno);
+		throw SystemException("fcntl F_SETFL failed: " + std::string(std::strerror(errno)));
 	}
 }
 
