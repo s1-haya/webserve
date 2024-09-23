@@ -1,0 +1,14 @@
+POST /upload/chunked_request_file HTTP/1.1
+Host: www.example.com
+Transfer-Encoding: chunked
+Content-Type: text/plain
+Connection: close
+
+8
+SAWAMURA
+1
+ 
+6
+HAYATO
+0
+

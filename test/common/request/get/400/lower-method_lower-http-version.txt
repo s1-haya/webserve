@@ -1,5 +1,0 @@
-gET / HTtP/1.1
-Host: localhost
-Connection: close
-
-
