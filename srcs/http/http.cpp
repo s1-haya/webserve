@@ -77,7 +77,7 @@ utils::Result<void> Http::ParseHttpRequestFormat(int client_fd, const std::strin
 HttpResult Http::CreateBadRequestResponse(int client_fd) {
 	HttpResult            result;
 	HttpRequestParsedData data  = storage_.GetClientSaveData(client_fd);
-	result.is_response_complete = false;
+	result.is_response_complete = true;
 	// todo: BadRequestの場合はkeep-aliveにするかcloseにするか(現在はclose)
 	result.is_connection_keep = false;
 	result.request_buf        = data.current_buf;
