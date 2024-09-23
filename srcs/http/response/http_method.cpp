@@ -53,8 +53,11 @@ StatusCode Method::Handler(
 	bool                autoindex_on
 ) {
 	StatusCode status_code(OK);
-	if (!IsAllowedMethod(method, allow_methods)) {
+	if (!IsSupportedMethod(method)) {
 		throw HttpException("Error: Not Implemented", StatusCode(NOT_IMPLEMENTED));
+	}
+	if (!IsAllowedMethod(method, allow_methods)) {
+		throw HttpException("Error: Method Not Allowed", StatusCode(METHOD_NOT_ALLOWED));
 	}
 	if (method == GET) {
 		status_code = GetHandler(
@@ -212,9 +215,17 @@ Stat Method::TryStat(const std::string &path) {
 	return info;
 }
 
+bool Method::IsSupportedMethod(const std::string &method) {
+	return std::find(
+				DEFAULT_METHODS,
+				DEFAULT_METHODS + DEFAULT_METHODS_SIZE,
+				method
+			) != DEFAULT_METHODS + DEFAULT_METHODS_SIZE;
+}
+
 bool Method::IsAllowedMethod(
-	const std::string &method, const std::list<std::string> &allow_methods
-) {
+		const std::string &method, const std::list<std::string> &allow_methods
+	) {
 	if (allow_methods.empty()) {
 		return std::find(
 				   DEFAULT_ALLOWED_METHODS,
