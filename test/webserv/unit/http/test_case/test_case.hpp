@@ -13,6 +13,7 @@ typedef std::list<const VirtualServer *> VirtualServerAddrList;
 namespace test {
 
 int TestGetOk1ConnectionClose(const server::VirtualServerAddrList &server_infos);
+int TestGetBadRequest1OnlyCrlf(const server::VirtualServerAddrList &server_infos);
 int TestGetNotFound1NotExistFile(const server::VirtualServerAddrList &server_infos);
 
 } // namespace test

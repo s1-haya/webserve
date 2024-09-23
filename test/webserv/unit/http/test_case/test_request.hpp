@@ -17,9 +17,12 @@ static const std::string &ROOT_2XX = "/2xx";
 static const std::string &ROOT_4XX = "/4xx";
 
 static const std::string &REQUEST_GET_200_1_NO_CONNECTION =
-	test::LoadFileContent(REQUEST_GET + ROOT_2XX + "/200_01_connection_close.txt");
+	LoadFileContent(REQUEST_GET + ROOT_2XX + "/200_01_connection_close.txt");
+
+static const std::string &GET_400_1_ONLY_CRLF = LoadFileContent(REQUEST_GET + ROOT_4XX + "/400_01_only_crlf.txt");
+
 static const std::string &REQUEST_GET_404_1_NOT_EXIST_PATH_CONNECTION_CLOSE =
-	test::LoadFileContent(REQUEST_GET + ROOT_4XX + "/404_01_not_exist_path.txt");
+		LoadFileContent(REQUEST_GET + ROOT_4XX + "/404_01_not_exist_path.txt");
 
 } // namespace request
 

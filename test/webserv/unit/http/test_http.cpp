@@ -50,7 +50,9 @@ int  main(void) {
 
     server::VirtualServerAddrList server_infos = BuildVirtualServerAddrList();
     ret_code |= test::TestGetOk1ConnectionClose(server_infos);
-    ret_code |= test::TestGetNotFound1NotExistFile(server_infos);
+    // todo: HttpResponse::CreateBadRequestResponse
+	// ret_code |= test::TestGetBadRequest1OnlyCrlf(server_infos);
+	ret_code |= test::TestGetNotFound1NotExistFile(server_infos);
     DeleteVirtualServerAddrList(server_infos);
     return ret_code;
 }

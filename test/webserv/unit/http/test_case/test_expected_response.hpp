@@ -12,10 +12,14 @@ static const std::string &EXPECTED_RESPONSE = "../../expected_response";
 static const std::string &EXPECTED_STATUS_LINE = EXPECTED_RESPONSE + "/default_status_line";
 static const std::string &EXPECTED_STATUS_LINE_OK =
 	LoadFileContent(EXPECTED_STATUS_LINE + "/200_ok.txt");
+static const std::string &EXPECTED_STATUS_LINE_BAD_REQUEST =
+	LoadFileContent(EXPECTED_STATUS_LINE + "/400_bad_request.txt");
 static const std::string &EXPECTED_STATUS_LINE_NOT_FOUND =
 	LoadFileContent(EXPECTED_STATUS_LINE + "/404_not_found.txt");
 // body_message
 static const std::string &EXPECTED_BODY_MESSAGE = EXPECTED_RESPONSE + "/default_body_message";
+static const std::string &EXPECTED_BODY_MESSAGE_BAD_REQUEST =
+	LoadFileContent(EXPECTED_BODY_MESSAGE + "/400_bad_request.txt");
 static const std::string &EXPECTED_BODY_MESSAGE_NOT_FOUND =
 	LoadFileContent(EXPECTED_BODY_MESSAGE + "/404_not_found.txt");
 
