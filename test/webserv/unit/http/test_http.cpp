@@ -53,8 +53,9 @@ int  main(void) {
     // todo: HttpResponse::CreateBadRequestResponse
 	// ret_code |= test::TestGetBadRequest1OnlyCrlf(server_infos);
 	ret_code |= test::TestGetNotFound1NotExistFile(server_infos);
-    // todo: HttpResponse::CreateTimeoutResponse
+	// todo: HttpResponse::CreateTimeoutResponse
 	// ret_code |= test::TestGetTimeout1NoCrlf(server_infos);
-    DeleteVirtualServerAddrList(server_infos);
+	ret_code |= test::TestGetNotImplemented1NotExistMethod(server_infos);
+	DeleteVirtualServerAddrList(server_infos);
     return ret_code;
 }
