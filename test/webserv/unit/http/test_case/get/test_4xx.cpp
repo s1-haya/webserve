@@ -27,7 +27,7 @@ int TestGetBadRequest1OnlyCrlf(const server::VirtualServerAddrList &server_infos
 
 int TestGetNotFound1NotExistFile(const server::VirtualServerAddrList &server_infos) {
 	http::ClientInfos client_infos =
-		CreateClientInfos(request::REQUEST_GET_404_1_NOT_EXIST_PATH_CONNECTION_CLOSE);
+		CreateClientInfos(request::GET_404_1_NOT_EXIST_PATH_CONNECTION_CLOSE);
 	std::string  expected_status_line  = EXPECTED_STATUS_LINE_NOT_FOUND;
 	std::string  expected_body_message = EXPECTED_BODY_MESSAGE_NOT_FOUND;
 	HeaderFields expected_header_fields;
