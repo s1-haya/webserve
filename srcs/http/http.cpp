@@ -18,9 +18,7 @@ Http::Run(const ClientInfos &client_info, const server::VirtualServerAddrList &s
 	utils::Result<void> parsed_result =
 		ParseHttpRequestFormat(client_info.fd, client_info.request_buf);
 	if (!parsed_result.IsOk()) {
-		// todo: request_buf, is_connection_keep
-		return result;
-		// return HttpResult CreateBadRequestResponse(int client_fd);
+		return CreateBadRequestResponse(client_info.fd);
 	}
 	if (IsHttpRequestFormatComplete(client_info.fd)) {
 		// todo: request_buf, is_connection_keep
@@ -76,18 +74,17 @@ utils::Result<void> Http::ParseHttpRequestFormat(int client_fd, const std::strin
 // return result;
 // }
 
-// HttpResult Http::CreateBadRequestResponse(int client_fd) {
-// 	HttpResult            result;
-// 	HttpRequestParsedData data  = storage_.GetClientSaveData(client_fd);
-// 	result.is_response_complete = true;
-// 	result.response             = HttpResponse::CreateBadRequestResponse(data.request_result);
-// 	;
-// 	result.request_buf = data.current_buf;
-// 	// todo: HttpResponse::IsConnectionKeep
-// 	// result.is_connection_keep = ;
-// 	storage_.DeleteClientSaveData(client_fd);
-// 	return result;
-// }
+HttpResult Http::CreateBadRequestResponse(int client_fd) {
+	HttpResult            result;
+	HttpRequestParsedData data  = storage_.GetClientSaveData(client_fd);
+	result.is_response_complete = false;
+	// todo: BadRequestの場合はkeep-aliveにするかcloseにするか(現在はclose)
+	result.is_connection_keep = false;
+	result.request_buf = data.current_buf;
+	result.response             = HttpResponse::CreateBadRequestResponse(data.request_result);
+	storage_.DeleteClientSaveData(client_fd);
+	return result;
+}
 
 std::string Http::CreateHttpResponse(
 	const ClientInfos &client_info, const server::VirtualServerAddrList &server_info
