@@ -84,10 +84,10 @@ Cgi::CgiResult Cgi::Run() {
 		Execve();
 	} catch (const utils::SystemException &e) {
 		throw utils::SystemException(e.what(), e.GetErrorNumber());
-		// to server exception
+		// todo: server exception
 	}
-	// return http::StatusCode(http::OK);
-	return CgiResult();
+	return CgiResult(CgiResponse(response_body_message_, "text/plain"));
+	// text/plainのみ対応
 }
 
 void Cgi::Execve() {
@@ -143,7 +143,7 @@ char *const *Cgi::SetCgiArgv() {
 	char  *dest = new (std::nothrow) char[cgi_script_.size() + 1];
 	if (argv == NULL || dest == NULL) {
 		throw utils::SystemException(std::strerror(errno), errno);
-		// to server exception (constructor)
+		// todo: server exception (constructor)
 	}
 	std::strcpy(dest, cgi_script_.c_str());
 	argv[0] = dest;
@@ -155,7 +155,7 @@ char *const *Cgi::SetCgiEnv(const MetaMap &meta_variables) {
 	char **cgi_env = new (std::nothrow) char *[meta_variables.size() + 1];
 	if (cgi_env == NULL) {
 		throw utils::SystemException(std::strerror(errno), errno);
-		// to server exception (constructor)
+		// todo: server exception (constructor)
 	}
 	std::size_t i = 0;
 
@@ -165,7 +165,7 @@ char *const *Cgi::SetCgiEnv(const MetaMap &meta_variables) {
 		char             *dest    = new (std::nothrow) char[element.size() + 1];
 		if (dest == NULL) {
 			throw utils::SystemException(std::strerror(errno), errno);
-			// to server exception (constructor)
+			// todo: server exception (constructor)
 		}
 		std::strcpy(dest, element.c_str());
 		cgi_env[i] = dest;

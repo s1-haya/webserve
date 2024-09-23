@@ -6,18 +6,14 @@
 #include <map>
 #include <string>
 
-namespace http {
-
-class StatusCode;
-
-} // namespace http
-
 namespace cgi {
 
 struct CgiResponse {
-	http::StatusCode status_code;
-	std::string      response;
-	std::string      content_type;
+	// parse等の他の処理で決まるのでstatus_codeはここにはいらない
+	std::string response;
+	std::string content_type;
+	CgiResponse(std::string response, std::string content_type)
+		: response(response), content_type(content_type) {}
 };
 
 class Cgi {
