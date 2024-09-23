@@ -21,7 +21,7 @@ int TestGetBadRequest1OnlyCrlf(const server::VirtualServerAddrList &server_infos
 	const std::string &expected_response         = CreateHttpResponseFormat(
         expected_status_line, expected_header_fields, expected_body_message
     );
-	http::HttpResult expected = CreateHttpResult(false, true, "", expected_response);
+	http::HttpResult expected = CreateHttpResult(false, false, "", expected_response);
 	return HandleHttpResult(client_infos, server_infos, expected);
 }
 
@@ -38,6 +38,10 @@ int TestGetNotFound1NotExistFile(const server::VirtualServerAddrList &server_inf
 	const std::string &expected_response         = CreateHttpResponseFormat(
         expected_status_line, expected_header_fields, expected_body_message
     );
+	http::HttpResult expected = CreateHttpResult(true, false, "", expected_response);
+	return HandleHttpResult(client_infos, server_infos, expected);
+}
+
 int TestGetTimeout1NoCrlf(const server::VirtualServerAddrList &server_infos) {
 	http::ClientInfos client_infos          = CreateClientInfos(request::GET_408_1_NO_CRLF);
 	std::string  expected_status_line  = EXPECTED_STATUS_LINE_TIMEOUT;

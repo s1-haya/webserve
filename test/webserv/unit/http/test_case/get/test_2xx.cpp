@@ -21,7 +21,7 @@ int TestGetOk1ConnectionClose(const server::VirtualServerAddrList &server_infos)
 	const std::string &expected_response         = CreateHttpResponseFormat(
         expected_status_line, expected_header_fields, expected_body_message
     );
-	http::HttpResult expected = CreateHttpResult(true, true, "", expected_response);
+	http::HttpResult expected = CreateHttpResult(true, false, "", expected_response);
 	return HandleHttpResult(client_infos, server_infos, expected);
 }
 
