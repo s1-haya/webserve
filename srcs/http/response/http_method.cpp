@@ -155,21 +155,9 @@ StatusCode Method::DeleteHandler(
 		response_body_message = HttpResponse::CreateDefaultBodyMessageFormat(status_code);
 		response_header_fields[CONTENT_LENGTH] = utils::ToString(response_body_message.length());
 	} else {
-		throw SystemException(std::strerror(errno), errno);
+		throw SystemException(std::strerror(errno));
 	}
 	return status_code;
-}
-
-void Method::SystemExceptionHandler(const SystemException &e) {
-	int error_number = e.GetErrorNumber();
-	if (error_number == EACCES || error_number == EPERM) {
-		throw HttpException("Error: Forbidden", StatusCode(FORBIDDEN));
-	} else if (error_number == ENOENT || error_number == ENOTDIR || error_number == ELOOP ||
-			   error_number == ENAMETOOLONG) {
-		throw HttpException("Error: Not Found", StatusCode(NOT_FOUND));
-	} else {
-		throw HttpException("Error: Internal Server Error", StatusCode(INTERNAL_SERVER_ERROR));
-	}
 }
 
 StatusCode Method::FileCreationHandler(
@@ -187,7 +175,7 @@ StatusCode Method::FileCreationHandler(
 	if (file.fail()) {
 		file.close();
 		if (std::remove(path.c_str()) != 0) {
-			throw SystemException(std::strerror(errno), errno);
+			throw SystemException(std::strerror(errno));
 		}
 		throw HttpException("Error: Forbidden", StatusCode(FORBIDDEN));
 	}
@@ -198,14 +186,15 @@ StatusCode Method::FileCreationHandler(
 
 Stat Method::TryStat(const std::string &path) {
 	struct stat stat_buf;
-	try {
-		if (stat(path.c_str(), &stat_buf) == -1) {
-			std::string error_message =
-				"Error: stat on path '" + path + "': " + std::strerror(errno);
-			throw SystemException(error_message, errno);
+	errno = 0;
+	if (stat(path.c_str(), &stat_buf) == -1) {
+		if (errno == EACCES || errno == EPERM) {
+			throw HttpException("Error: Forbidden", StatusCode(FORBIDDEN));
+		} else if (errno == ENOENT || errno == ENOTDIR || errno == ELOOP || errno == ENAMETOOLONG) {
+			throw HttpException("Error: Not Found", StatusCode(NOT_FOUND));
+		} else {
+			throw HttpException("Error: Internal Server Error", StatusCode(INTERNAL_SERVER_ERROR));
 		}
-	} catch (const SystemException &e) {
-		SystemExceptionHandler(e);
 	}
 	Stat info(stat_buf);
 	return info;
