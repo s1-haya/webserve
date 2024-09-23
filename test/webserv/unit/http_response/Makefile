@@ -10,6 +10,7 @@ LOG_FILE_PATH	:=	$(LOG_DIR)/$(LOG_FILE_NAME)
 
 # 2. Add target webserv files
 WS_SRCS_DIR		:=	../../../../srcs
+WS_EXCEPTION_DIR:=	$(WS_SRCS_DIR)/exception
 WS_UTILS_DIR	:=	$(WS_SRCS_DIR)/utils
 WS_HTTP_DIR				:=	$(WS_SRCS_DIR)/http
 WS_HTTP_REQUEST_DIR	:=	$(WS_HTTP_DIR)/request
@@ -18,7 +19,8 @@ WS_HTTP_RESPONSE_DIR	:=	$(WS_HTTP_DIR)/response
 WS_HTTP_SERVER_INFO_CHECK_DIR	:=	$(WS_HTTP_RESPONSE_DIR)/http_serverinfo_check
 WS_VIRTUAL_SERVER_DIR			:=	$(WS_SRCS_DIR)/server/virtual_server
 
-SRCS			+=	$(WS_UTILS_DIR)/color.cpp \
+SRCS			+=	$(WS_EXCEPTION_DIR)/system_exception.cpp \
+					$(WS_UTILS_DIR)/color.cpp \
 					$(WS_UTILS_DIR)/system_exception.cpp \
 					$(WS_UTILS_DIR)/convert_str.cpp \
 					$(WS_UTILS_DIR)/isdigit.cpp \
@@ -35,7 +37,8 @@ SRCS			+=	$(WS_UTILS_DIR)/color.cpp \
 SRCS	+=	test_http_response.cpp
 
 # 4. Add directory for INCLUDE
-SRCS_DIR	:=	$(WS_UTILS_DIR) \
+SRCS_DIR	:=	$(WS_EXCEPTION_DIR) \
+				$(WS_UTILS_DIR) \
 				$(WS_HTTP_DIR) \
 				$(WS_HTTP_REQUEST_DIR) \
 				$(WS_HTTP_PARSE_DIR) \

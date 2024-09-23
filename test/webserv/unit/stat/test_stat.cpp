@@ -51,9 +51,8 @@ int main(void) {
 		ret_code |= HandleResult(test.IsWritableFile(), true);
 		ret_code |= HandleResult(test.IsDirectory(), false);
 		std::cout << "Makefile size: " << test.GetFileSize() << std::endl;
-	} catch (const utils::SystemException &e) {
+	} catch (const SystemException &e) {
 		std::cerr << e.what() << std::endl;
-		std::cerr << e.GetErrorNumber() << std::endl;
 		PrintNg();
 		ret_code |= EXIT_FAILURE;
 	}
@@ -62,9 +61,8 @@ int main(void) {
 		http::Stat test2("no.txt");
 		PrintNg();
 		ret_code |= EXIT_FAILURE;
-	} catch (const utils::SystemException &e) {
+	} catch (const SystemException &e) {
 		std::cerr << e.what() << std::endl;
-		std::cerr << e.GetErrorNumber() << std::endl;
 		PrintOk();
 		ret_code |= EXIT_SUCCESS;
 	}
