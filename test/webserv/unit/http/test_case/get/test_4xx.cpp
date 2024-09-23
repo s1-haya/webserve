@@ -23,6 +23,23 @@ int TestGetBadRequest1OnlyCrlf(const server::VirtualServerAddrList &server_infos
 	http::HttpResult expected = CreateHttpResult(false, false, "", expected_response);
 	return HandleHttpResult(client_infos, server_infos, expected);
 }
+int TestGetBadRequest2LowerMethod(const server::VirtualServerAddrList &server_infos) {
+	http::ClientInfos client_infos          = CreateClientInfos(request::GET_400_2_LOWER_METHOD);
+	std::string       expected_status_line  = EXPECTED_STATUS_LINE_BAD_REQUEST;
+	std::string       expected_body_message = EXPECTED_BODY_MESSAGE_BAD_REQUEST;
+	HeaderFields      expected_header_fields;
+	expected_header_fields[http::CONNECTION]     = http::CLOSE;
+	expected_header_fields[http::CONTENT_LENGTH] = utils::ToString(expected_body_message.length());
+	expected_header_fields[http::CONTENT_TYPE]   = "test/html";
+	expected_header_fields[http::SERVER]         = http::SERVER_VERSION;
+	const std::string &expected_response         = CreateHttpResponseFormat(
+        expected_status_line, expected_header_fields, expected_body_message
+    );
+	const std::string &expected_request_buffer = "Host: localhost\r\nConnection: close\r\n\r\n";
+	http::HttpResult expected = CreateHttpResult(false, false, expected_request_buffer, expected_response);
+	return HandleHttpResult(client_infos, server_infos, expected);
+}
+
 
 int TestGetNotFound1NotExistFile(const server::VirtualServerAddrList &server_infos) {
 	http::ClientInfos client_infos =

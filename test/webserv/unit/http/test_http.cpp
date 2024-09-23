@@ -51,8 +51,8 @@ int  main(void) {
     server::VirtualServerAddrList server_infos = BuildVirtualServerAddrList();
     // todo: alias ../../../../root/html/ -> /html in build_virtual_server.cpp
     // ret_code |= test::TestGetOk1ConnectionClose(server_infos);
-    // todo: HttpResponse::CreateBadRequestResponse
     ret_code |= test::TestGetBadRequest1OnlyCrlf(server_infos);
+	ret_code |= test::TestGetBadRequest2LowerMethod(server_infos);
     ret_code |= test::TestGetNotFound1NotExistFile(server_infos);
     // todo: 405 Method Not Implemented
     // ret_code |= test::TestGetMethodNotAllowed(server_infos);
