@@ -14,13 +14,19 @@ class StatusCode;
 
 namespace cgi {
 
+struct CgiResponse {
+	http::StatusCode status_code;
+	std::string      response;
+	std::string      content_type;
+};
+
 class Cgi {
-	typedef utils::Result<void> CgiResult;
+	typedef utils::Result<CgiResponse> CgiResult;
 
   public:
 	explicit Cgi(const CgiRequest &request);
 	~Cgi();
-	CgiResult Cgi::Run(std::string &response_body_message);
+	CgiResult Cgi::Run();
 
 	// <<< todo (関数名・変数名とか含め変えてしまって全然大丈夫です)
 	// pipe(),fork(),close()してpipe_fdをメンバにセット

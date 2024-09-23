@@ -79,10 +79,9 @@ Cgi::~Cgi() {
 	Waitpid(pid_, &exit_status_, 0);
 }
 
-Cgi::CgiResult Cgi::Run(std::string &response_body_message) {
+Cgi::CgiResult Cgi::Run() {
 	try {
 		Execve();
-		response_body_message = response_body_message_;
 	} catch (const utils::SystemException &e) {
 		throw utils::SystemException(e.what(), e.GetErrorNumber());
 		// to server exception
