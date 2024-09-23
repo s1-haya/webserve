@@ -88,6 +88,8 @@ Cgi::Cgi(const CgiRequest &request)
 
 Cgi::~Cgi() {
 	Free();
+	Close(read_fd_);
+	Close(write_fd_);
 }
 
 http::StatusCode Cgi::Run(std::string &response_body_message) {
@@ -124,7 +126,6 @@ void Cgi::Execve() {
 		Close(cgi_request[READ]);
 		write_fd_ = cgi_request[WRITE]; // todo: tmp
 		Write(cgi_request[WRITE], request_body_message_.c_str(), request_body_message_.length());
-		Close(cgi_request[WRITE]);
 	}
 	read_fd_ = cgi_response[READ]; // todo: tmp
 	Close(cgi_response[WRITE]);
@@ -133,7 +134,6 @@ void Cgi::Execve() {
 	while ((bytes_read = Read(cgi_response[READ], buffer, sizeof(buffer))) > 0) {
 		response_body_message_.append(buffer, bytes_read);
 	}
-	Close(cgi_response[READ]);
 	Waitpid(p, &exit_status_, 0);
 	if (WIFEXITED(exit_status_)) {
 		if (WEXITSTATUS(exit_status_) != 0) {
