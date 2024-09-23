@@ -1,6 +1,8 @@
 #include "system_exception.hpp"
 #include <cstring> // strerror
 
+SystemException::SystemException(const std::string &error_message)
+	: std::runtime_error(error_message) {}
 
 SystemException::SystemException(int error_number)
 	: std::runtime_error(std::strerror(error_number)) {}

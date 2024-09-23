@@ -5,6 +5,7 @@
 #include "system_exception.hpp"
 #include "utils.hpp" // ConvertUintToStr
 #include <cerrno>
+#include <cstring>      // strerror
 #include <netdb.h>      // getaddrinfo,freeaddrinfo
 #include <netinet/in.h> // struct sockaddr
 #include <sys/socket.h> // socket,setsockopt,bind,listen,accept
@@ -70,8 +71,7 @@ Connection::IpList Connection::ResolveHostName(const std::string &hostname) {
 	AddrInfo *result = NULL;
 	const int status = getaddrinfo(hostname.c_str(), NULL, &hints, &result);
 	if (status != 0) {
-		// todo: fix -1
-		throw SystemException("getaddrinfo failed: " + std::string(gai_strerror(status)), -1);
+		throw SystemException("getaddrinfo failed: " + std::string(gai_strerror(status)));
 	}
 
 	// Temporary std::set for checking duplicate IPs.
@@ -95,8 +95,7 @@ Connection::AddrInfo *Connection::GetAddrInfoList(const HostPortPair &host_port)
 	const int status = getaddrinfo(host_port.first.c_str(), port.c_str(), &hints, &result);
 	// EAI_MEMORY is also included in status != 0
 	if (status != 0) {
-		// todo: fix -1
-		throw SystemException("getaddrinfo failed: " + std::string(gai_strerror(status)), -1);
+		throw SystemException("getaddrinfo failed: " + std::string(gai_strerror(status)));
 	}
 	return result;
 }
@@ -148,7 +147,7 @@ int Connection::Connect(const HostPortPair &host_port) {
 	const BindResult bind_result   = TryBind(addrinfo_list);
 	freeaddrinfo(addrinfo_list);
 	if (!bind_result.IsOk()) {
-		throw SystemException(errno);
+		throw SystemException("bind failed: " + std::string(std::strerror(errno)));
 	}
 
 	const int          server_fd     = bind_result.GetValue();
@@ -164,7 +163,7 @@ Connection::IpPortPair Connection::GetListenIpPort(int client_fd) {
 	socklen_t               listen_sock_addr_len = sizeof(listen_sock_addr);
 	if (getsockname(client_fd, (struct sockaddr *)&listen_sock_addr, &listen_sock_addr_len) ==
 		SYSTEM_ERROR) {
-		throw SystemException(errno);
+		throw SystemException("getsockname failed: " + std::string(std::strerror(errno)));
 	}
 
 	std::string  listen_ip;
@@ -187,7 +186,7 @@ ClientInfo Connection::Accept(int server_fd) {
 	socklen_t               addrlen          = sizeof(client_sock_addr);
 	const int client_fd = accept(server_fd, (struct sockaddr *)&client_sock_addr, &addrlen);
 	if (client_fd == SYSTEM_ERROR) {
-		throw SystemException(errno);
+		throw SystemException("accept failed: " + std::string(std::strerror(errno)));
 	}
 
 	const IpPortPair   listen_ip_port = GetListenIpPort(client_fd);
