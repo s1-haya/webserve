@@ -1,5 +1,5 @@
-POST /upload/upload_file HTTP/1.1
-Host: localhost
+POST / HTTP/1.1
+Host: host2
 Connection: close
 Content-Type: test/plain
 Content-Length: 5
