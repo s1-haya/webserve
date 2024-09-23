@@ -49,8 +49,16 @@ int  main(void) {
     int ret_code = EXIT_SUCCESS;
 
     server::VirtualServerAddrList server_infos = BuildVirtualServerAddrList();
-    ret_code |= test::TestGetOk1NoConnection(server_infos);
+    // todo: alias ../../../../root/html/ -> /html in build_virtual_server.cpp
+    // ret_code |= test::TestGetOk1ConnectionClose(server_infos);
+    // todo: HttpResponse::CreateBadRequestResponse
+    // ret_code |= test::TestGetBadRequest1OnlyCrlf(server_infos);
     ret_code |= test::TestGetNotFound1NotExistFile(server_infos);
+    // todo: 405 Method Not Implemented
+    // ret_code |= test::TestGetMethodNotAllowed(server_infos);
+    // todo: HttpResponse::CreateTimeoutResponse
+    // ret_code |= test::TestGetTimeout1NoCrlf(server_infos);
+    ret_code |= test::TestGetNotImplemented1NotExistMethod(server_infos);
     DeleteVirtualServerAddrList(server_infos);
     return ret_code;
 }

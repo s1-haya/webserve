@@ -24,8 +24,9 @@ Http::Run(const ClientInfos &client_info, const server::VirtualServerAddrList &s
 	}
 	if (IsHttpRequestFormatComplete(client_info.fd)) {
 		// todo: request_buf, is_connection_keep
-		result.response             = CreateHttpResponse(client_info, server_info);
+		result.is_connection_keep   = IsConnectionKeep(client_info.fd);
 		result.is_response_complete = true;
+		result.response             = CreateHttpResponse(client_info, server_info);
 	}
 	return result;
 }
@@ -102,6 +103,11 @@ bool Http::IsHttpRequestFormatComplete(int client_fd) {
 	return save_data.is_request_format.is_request_line &&
 		   save_data.is_request_format.is_header_fields &&
 		   save_data.is_request_format.is_body_message;
+}
+
+bool Http::IsConnectionKeep(int client_fd) {
+	HttpRequestParsedData save_data = storage_.GetClientSaveData(client_fd);
+	return HttpResponse::IsConnectionKeep(save_data.request_result.request.header_fields);
 }
 
 // For test

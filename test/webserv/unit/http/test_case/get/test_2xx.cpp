@@ -8,20 +8,19 @@
 
 namespace test {
 
-int TestGetNotFound1NotExistFile(const server::VirtualServerAddrList &server_infos) {
-	http::ClientInfos client_infos =
-		CreateClientInfos(request::REQUEST_GET_404_1_NOT_EXIST_PATH_CONNECTION_CLOSE);
-	std::string  expected_status_line  = EXPECTED_STATUS_LINE_NOT_FOUND;
-	std::string  expected_body_message = EXPECTED_BODY_MESSAGE_NOT_FOUND;
-	HeaderFields expected_header_fields;
+int TestGetOk1ConnectionClose(const server::VirtualServerAddrList &server_infos) {
+	http::ClientInfos client_infos          = CreateClientInfos(request::GET_200_1_NO_CONNECTION);
+	std::string       expected_status_line  = EXPECTED_STATUS_LINE_OK;
+	std::string       expected_body_message = LoadFileContent("../../../../root/html/index.html");
+	HeaderFields      expected_header_fields;
 	expected_header_fields[http::CONNECTION]     = http::CLOSE;
 	expected_header_fields[http::CONTENT_LENGTH] = utils::ToString(expected_body_message.length());
 	expected_header_fields[http::CONTENT_TYPE]   = "test/html";
 	expected_header_fields[http::SERVER]         = http::SERVER_VERSION;
-	const std::string &expected1_response        = CreateHttpResponseFormat(
+	const std::string &expected_response         = CreateHttpResponseFormat(
         expected_status_line, expected_header_fields, expected_body_message
     );
-	http::HttpResult expected = CreateHttpResult(false, true, "", "");
+	http::HttpResult expected = CreateHttpResult(true, false, "", expected_response);
 	return HandleHttpResult(client_infos, server_infos, expected);
 }
 

@@ -59,7 +59,7 @@ server::VirtualServer *BuildVirtualServer1() {
 	allowed_methods_root.push_back(http::GET);
 	allowed_methods_root.push_back(http::POST);
 	server::Location loc_root = BuildLocation(
-		"/", "/html/", "index.html", false, allowed_methods_root, std::make_pair(0, "")
+		"/", "/html", "index.html", false, allowed_methods_root, std::make_pair(0, "")
 	);
 	locationlist.push_back(loc_root);
 
@@ -81,6 +81,14 @@ server::VirtualServer *BuildVirtualServer1() {
 		"/cgi-bin", "", "", false, allowed_methods_cgi, std::make_pair(0, ""), ".pl", ""
 	);
 	locationlist.push_back(loc_cgi);
+
+	// Location 4 - "/get_not_allowed"
+	std::list<std::string> get_not_allowed;
+	get_not_allowed.push_back(http::DELETE);
+	server::Location loc_get_not_allowed = BuildLocation(
+		"/get_not_allowed", "", "", false, get_not_allowed, std::make_pair(0, ""), ".pl", ""
+	);
+	locationlist.push_back(loc_get_not_allowed);
 
 	return new server::VirtualServer(
 		server_names, locationlist, host_ports, client_max_body_size, error_page
