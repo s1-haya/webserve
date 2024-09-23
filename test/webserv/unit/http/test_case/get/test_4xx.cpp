@@ -9,11 +9,10 @@
 namespace test {
 
 int TestGetBadRequest1OnlyCrlf(const server::VirtualServerAddrList &server_infos) {
-	http::ClientInfos client_infos =
-		CreateClientInfos(request::GET_400_1_ONLY_CRLF);
-	std::string  expected_status_line  = EXPECTED_STATUS_LINE_BAD_REQUEST;
-	std::string  expected_body_message = EXPECTED_BODY_MESSAGE_BAD_REQUEST;
-	HeaderFields expected_header_fields;
+	http::ClientInfos client_infos          = CreateClientInfos(request::GET_400_1_ONLY_CRLF);
+	std::string       expected_status_line  = EXPECTED_STATUS_LINE_BAD_REQUEST;
+	std::string       expected_body_message = EXPECTED_BODY_MESSAGE_BAD_REQUEST;
+	HeaderFields      expected_header_fields;
 	expected_header_fields[http::CONNECTION]     = http::CLOSE;
 	expected_header_fields[http::CONTENT_LENGTH] = utils::ToString(expected_body_message.length());
 	expected_header_fields[http::CONTENT_TYPE]   = "test/html";
@@ -44,9 +43,9 @@ int TestGetNotFound1NotExistFile(const server::VirtualServerAddrList &server_inf
 
 int TestGetMethodNotAllowed(const server::VirtualServerAddrList &server_infos) {
 	http::ClientInfos client_infos          = CreateClientInfos(request::GET_405_1_NOT_ALLOWED);
-	std::string  expected_status_line  = EXPECTED_STATUS_LINE_METHOD_NOT_ALLOWED;
-	std::string  expected_body_message = EXPECTED_BODY_MESSAGE_METHOD_NOT_ALLOWED;
-	HeaderFields expected_header_fields;
+	std::string       expected_status_line  = EXPECTED_STATUS_LINE_METHOD_NOT_ALLOWED;
+	std::string       expected_body_message = EXPECTED_BODY_MESSAGE_METHOD_NOT_ALLOWED;
+	HeaderFields      expected_header_fields;
 	expected_header_fields[http::CONNECTION]     = http::CLOSE;
 	expected_header_fields[http::CONTENT_LENGTH] = utils::ToString(expected_body_message.length());
 	expected_header_fields[http::CONTENT_TYPE]   = "test/html";
@@ -60,9 +59,9 @@ int TestGetMethodNotAllowed(const server::VirtualServerAddrList &server_infos) {
 
 int TestGetTimeout1NoCrlf(const server::VirtualServerAddrList &server_infos) {
 	http::ClientInfos client_infos          = CreateClientInfos(request::GET_408_1_NO_CRLF);
-	std::string  expected_status_line  = EXPECTED_STATUS_LINE_TIMEOUT;
-	std::string  expected_body_message = EXPECTED_BODY_MESSAGE_TIMEOUT;
-	HeaderFields expected_header_fields;
+	std::string       expected_status_line  = EXPECTED_STATUS_LINE_TIMEOUT;
+	std::string       expected_body_message = EXPECTED_BODY_MESSAGE_TIMEOUT;
+	HeaderFields      expected_header_fields;
 	expected_header_fields[http::CONNECTION]     = http::CLOSE;
 	expected_header_fields[http::CONTENT_LENGTH] = utils::ToString(expected_body_message.length());
 	expected_header_fields[http::CONTENT_TYPE]   = "test/html";

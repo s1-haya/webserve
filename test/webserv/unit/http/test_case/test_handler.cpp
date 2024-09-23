@@ -166,7 +166,7 @@ int HandleHttpResult(
 ) {
 	http::Http       http;
 	http::HttpResult http_result = http.Run(client_infos, server_infos);
-	const Result &result = IsSameHttpResult(http_result, expected);
+	const Result    &result      = IsSameHttpResult(http_result, expected);
 	return HandleResult(result);
 }
 

@@ -39,12 +39,12 @@ int main() {
 	// HTTP GETリクエストの作成
 	std::string request_body = "key1=value1&key2=value2";
 	std::string http_request = "GET / HTTP/1.1";
-							//    "Connection: close\r\n"
-							//    "Content-Length: " +
-							//    std::to_string(request_body.length()) +
-							//    "\r\n"
-							//    "Host: user42.42.fr\r\n\r\n" +
-							//    request_body;
+	//    "Connection: close\r\n"
+	//    "Content-Length: " +
+	//    std::to_string(request_body.length()) +
+	//    "\r\n"
+	//    "Host: user42.42.fr\r\n\r\n" +
+	//    request_body;
 	// request_body; Hostを複数設定した場合　HTTP/1.1 400 Bad Request
 	// std::string http_request = "GET / HTTP/1.1\r\n"
 	// 						   "Host: a\r\n"

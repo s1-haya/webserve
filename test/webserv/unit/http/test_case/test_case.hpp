@@ -12,14 +12,14 @@ typedef std::list<const VirtualServer *> VirtualServerAddrList;
 
 namespace test {
 
-//2xx
+// 2xx
 int TestGetOk1ConnectionClose(const server::VirtualServerAddrList &server_infos);
-//4xx
+// 4xx
 int TestGetBadRequest1OnlyCrlf(const server::VirtualServerAddrList &server_infos);
 int TestGetNotFound1NotExistFile(const server::VirtualServerAddrList &server_infos);
 int TestGetMethodNotAllowed(const server::VirtualServerAddrList &server_infos);
 int TestGetTimeout1NoCrlf(const server::VirtualServerAddrList &server_infos);
-//5xx
+// 5xx
 int TestGetNotImplemented1NotExistMethod(const server::VirtualServerAddrList &server_infos);
 
 } // namespace test

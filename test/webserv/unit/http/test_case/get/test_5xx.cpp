@@ -9,8 +9,8 @@
 namespace test {
 
 int TestGetNotImplemented1NotExistMethod(const server::VirtualServerAddrList &server_infos) {
-	http::ClientInfos client_infos = CreateClientInfos(request::GET_501_1_NOT_EXIST_METHOD);
-	std::string       expected_status_line  = EXPECTED_STATUS_LINE_NOT_IMPLEMENTED;
+	http::ClientInfos client_infos         = CreateClientInfos(request::GET_501_1_NOT_EXIST_METHOD);
+	std::string       expected_status_line = EXPECTED_STATUS_LINE_NOT_IMPLEMENTED;
 	std::string       expected_body_message = EXPECTED_BODY_MESSAGE_NOT_IMPLEMENTED;
 	HeaderFields      expected_header_fields;
 	expected_header_fields[http::CONNECTION]     = http::CLOSE;

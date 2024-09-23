@@ -9,11 +9,10 @@
 namespace test {
 
 int TestGetOk1ConnectionClose(const server::VirtualServerAddrList &server_infos) {
-	http::ClientInfos client_infos =
-		CreateClientInfos(request::GET_200_1_NO_CONNECTION);
-	std::string  expected_status_line  = EXPECTED_STATUS_LINE_OK;
-	std::string  expected_body_message = LoadFileContent("../../../../root/html/index.html");
-	HeaderFields expected_header_fields;
+	http::ClientInfos client_infos          = CreateClientInfos(request::GET_200_1_NO_CONNECTION);
+	std::string       expected_status_line  = EXPECTED_STATUS_LINE_OK;
+	std::string       expected_body_message = LoadFileContent("../../../../root/html/index.html");
+	HeaderFields      expected_header_fields;
 	expected_header_fields[http::CONNECTION]     = http::CLOSE;
 	expected_header_fields[http::CONTENT_LENGTH] = utils::ToString(expected_body_message.length());
 	expected_header_fields[http::CONTENT_TYPE]   = "test/html";
