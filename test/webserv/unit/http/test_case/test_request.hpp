@@ -22,6 +22,8 @@ static const std::string &GET_400_1_ONLY_CRLF =
 	LoadFileContent(REQUEST_GET + ROOT_4XX + "/400_01_only_crlf.txt");
 static const std::string &GET_400_2_LOWER_METHOD =
 	LoadFileContent(REQUEST_GET + ROOT_4XX + "/400_02_lower_method.txt");
+static const std::string &GET_400_3_NO_ASCII_METHOD =
+	LoadFileContent(REQUEST_GET + ROOT_4XX + "/400_03_no_ascii_method.txt");
 static const std::string &GET_404_1_NOT_EXIST_PATH_CONNECTION_CLOSE =
 	LoadFileContent(REQUEST_GET + ROOT_4XX + "/404_01_not_exist_path.txt");
 static const std::string &GET_405_1_NOT_ALLOWED =
