@@ -79,14 +79,15 @@ Cgi::~Cgi() {
 	Waitpid(pid_, &exit_status_, 0);
 }
 
-http::StatusCode Cgi::Run(std::string &response_body_message) {
+Cgi::CgiResult Cgi::Run(std::string &response_body_message) {
 	try {
 		Execve();
 		response_body_message = response_body_message_;
 	} catch (const utils::SystemException &e) {
 		throw http::HttpException(e.what(), http::StatusCode(http::INTERNAL_SERVER_ERROR));
 	}
-	return http::StatusCode(http::OK);
+	// return http::StatusCode(http::OK);
+	return CgiResult();
 }
 
 void Cgi::Execve() {
@@ -169,10 +170,6 @@ char *const *Cgi::SetCgiEnv(const MetaMap &meta_variables) {
 	}
 	cgi_env[i] = NULL;
 	return cgi_env;
-}
-
-Cgi::CgiResult Cgi::Run() {
-	return CgiResult();
 }
 
 int Cgi::GetReadFd() const {

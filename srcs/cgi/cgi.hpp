@@ -15,15 +15,15 @@ class StatusCode;
 namespace cgi {
 
 class Cgi {
+	typedef utils::Result<void> CgiResult;
+
   public:
 	explicit Cgi(const CgiRequest &request);
 	~Cgi();
-	http::StatusCode Run(std::string &response_body_message);
+	CgiResult Cgi::Run(std::string &response_body_message);
 
 	// <<< todo (関数名・変数名とか含め変えてしまって全然大丈夫です)
-	typedef utils::Result<void> CgiResult;
 	// pipe(),fork(),close()してpipe_fdをメンバにセット
-	CgiResult Run();
 	// pipe_fdのgetter
 	int GetReadFd() const;
 	int GetWriteFd() const;
