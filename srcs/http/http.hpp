@@ -36,7 +36,7 @@ class Http : public IHttp {
 	Http               &operator=(const Http &other);
 	HttpStorage         storage_;
 	utils::Result<void> ParseHttpRequestFormat(int client_fd, const std::string &read_buf);
-	std::string         CreateHttpResponse(
+	HttpResult        CreateHttpResponse(
 				const ClientInfos &client_info, const server::VirtualServerAddrList &server_info
 			);
 	bool                  IsHttpRequestFormatComplete(int client_fd);

@@ -23,10 +23,7 @@ Http::Run(const ClientInfos &client_info, const server::VirtualServerAddrList &s
 		// return HttpResult CreateBadRequestResponse(int client_fd);
 	}
 	if (IsHttpRequestFormatComplete(client_info.fd)) {
-		// todo: request_buf, is_connection_keep
-		result.is_connection_keep   = IsConnectionKeep(client_info.fd);
-		result.is_response_complete = true;
-		result.response             = CreateHttpResponse(client_info, server_info);
+		result                      = CreateHttpResponse(client_info, server_info);
 	}
 	return result;
 }
@@ -89,12 +86,17 @@ utils::Result<void> Http::ParseHttpRequestFormat(int client_fd, const std::strin
 // 	return result;
 // }
 
-std::string Http::CreateHttpResponse(
+HttpResult Http::CreateHttpResponse(
 	const ClientInfos &client_info, const server::VirtualServerAddrList &server_info
 ) {
+	HttpResult result;
 	HttpRequestParsedData data = storage_.GetClientSaveData(client_info.fd);
+	result.is_connection_keep   = IsConnectionKeep(client_info.fd);
+	result.is_response_complete = true;
+	result.request_buf = data.current_buf;
+	result.response             = HttpResponse::Run(client_info, server_info, data.request_result);
 	storage_.DeleteClientSaveData(client_info.fd);
-	return HttpResponse::Run(client_info, server_info, data.request_result);
+	return result;
 }
 
 // todo: HTTPRequestの書式が完全かどうか(どのように取得するかは要検討)
