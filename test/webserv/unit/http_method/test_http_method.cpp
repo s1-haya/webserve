@@ -60,24 +60,38 @@ std::string CreateAutoIndexContent(const std::string &path) {
 
 	struct dirent *entry;
 	content += "<html>\n"
-			   "<head><title>Index of /</title></head>\n"
-			   "<body><h1>Index of /</h1><hr><pre>"
+			   "<head><title>Index of " +
+			   path +
+			   "</title></head>\n"
+			   "<body><h1>Index of " +
+			   path +
+			   "</h1><hr><pre>"
 			   "<a href=\"../\">../</a>\n";
 	while ((entry = readdir(dir)) != NULL) {
+		if (entry->d_name[0] == '.') {
+			continue;
+		}
 		std::string full_path = path + "/" + entry->d_name;
 		struct stat file_stat;
 		if (stat(full_path.c_str(), &file_stat) == 0) {
-			content += "<a href=\"" + std::string(entry->d_name) + "\">" +
-					   std::string(entry->d_name) + "</a> ";
-			content += utils::ToString(file_stat.st_size) + " bytes ";
-			content += std::ctime(&file_stat.st_mtime);
+			bool        is_dir     = S_ISDIR(file_stat.st_mode);
+			std::string entry_name = std::string(entry->d_name) + (is_dir ? "/" : "");
+			content += "<a href=\"" + path + entry_name + "\">" + entry_name + "</a>";
+			size_t padding = (entry_name.length() < 50) ? 50 - entry_name.length() : 0;
+			content += std::string(padding, ' ') + " ";
+			char time_buf[20];
+			std::strftime(
+				time_buf, sizeof(time_buf), "%Y-%m-%d %H:%M:%S", std::localtime(&file_stat.st_mtime)
+			);
+			content += std::string(time_buf) + " ";
+			std::string size_str = is_dir ? "-" : utils::ToString(file_stat.st_size) + " bytes";
+			padding              = (size_str.length() < 20) ? 20 - size_str.length() : 0;
+			content += std::string(padding, ' ') + size_str + "\n";
 		} else {
-			content += "<a href=\"" + std::string(entry->d_name) + "\">" +
-					   std::string(entry->d_name) + "</a> ";
-			content += "Error getting file stats\n";
+			return "";
 		}
 	}
-	content += "</pre><hr></body></html>";
+	content += "</pre><hr></body>\n</html>";
 	closedir(dir);
 
 	return content;
