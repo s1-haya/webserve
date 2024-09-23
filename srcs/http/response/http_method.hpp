@@ -53,7 +53,7 @@ class Method {
 		HeaderFields      &response_header_fields
 	);
 	static Stat       TryStat(const std::string &path);
-	static void       SystemExceptionHandler(const SystemException &e);
+	static void       SystemExceptionHandler(int error_number);
 	static StatusCode FileCreationHandler(
 		const std::string &path,
 		const std::string &request_body_message,

@@ -7,12 +7,6 @@
 class SystemException : public std::runtime_error {
   public:
 	explicit SystemException(const std::string &message);
-	explicit SystemException(int error_number);
-	SystemException(const std::string &message, int error_number);
-	int GetErrorNumber() const;
-
-  private:
-	int error_number_;
 };
 
 #endif

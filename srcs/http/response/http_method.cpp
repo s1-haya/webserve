@@ -155,13 +155,12 @@ StatusCode Method::DeleteHandler(
 		response_body_message = HttpResponse::CreateDefaultBodyMessageFormat(status_code);
 		response_header_fields[CONTENT_LENGTH] = utils::ToString(response_body_message.length());
 	} else {
-		throw SystemException(std::strerror(errno), errno);
+		throw SystemException(std::strerror(errno));
 	}
 	return status_code;
 }
 
-void Method::SystemExceptionHandler(const SystemException &e) {
-	int error_number = e.GetErrorNumber();
+void Method::SystemExceptionHandler(int error_number) {
 	if (error_number == EACCES || error_number == EPERM) {
 		throw HttpException("Error: Forbidden", StatusCode(FORBIDDEN));
 	} else if (error_number == ENOENT || error_number == ENOTDIR || error_number == ELOOP ||
@@ -187,7 +186,7 @@ StatusCode Method::FileCreationHandler(
 	if (file.fail()) {
 		file.close();
 		if (std::remove(path.c_str()) != 0) {
-			throw SystemException(std::strerror(errno), errno);
+			throw SystemException(std::strerror(errno));
 		}
 		throw HttpException("Error: Forbidden", StatusCode(FORBIDDEN));
 	}
@@ -198,14 +197,10 @@ StatusCode Method::FileCreationHandler(
 
 Stat Method::TryStat(const std::string &path) {
 	struct stat stat_buf;
-	try {
-		if (stat(path.c_str(), &stat_buf) == -1) {
-			std::string error_message =
-				"Error: stat on path '" + path + "': " + std::strerror(errno);
-			throw SystemException(error_message, errno);
-		}
-	} catch (const SystemException &e) {
-		SystemExceptionHandler(e);
+	if (stat(path.c_str(), &stat_buf) == -1) {
+		// std::string error_message = "Error: stat on path '" + path + "': " +
+		// std::strerror(errno);
+		SystemExceptionHandler(errno);
 	}
 	Stat info(stat_buf);
 	return info;
