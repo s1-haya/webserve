@@ -3,6 +3,7 @@
 
 #include "stat.hpp"
 #include "status_code.hpp"
+#include "system_exception.hpp"
 #include "utils.hpp"
 #include <list>
 
@@ -52,7 +53,7 @@ class Method {
 		HeaderFields      &response_header_fields
 	);
 	static Stat       TryStat(const std::string &path);
-	static void       SystemExceptionHandler(const utils::SystemException &e);
+	static void       SystemExceptionHandler(const SystemException &e);
 	static StatusCode FileCreationHandler(
 		const std::string &path,
 		const std::string &request_body_message,
