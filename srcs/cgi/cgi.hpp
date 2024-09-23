@@ -2,6 +2,7 @@
 #define CGI_HPP_
 
 #include "cgi_request.hpp"
+#include "utils.hpp"
 #include <map>
 #include <string>
 
@@ -18,6 +19,28 @@ class Cgi {
 	explicit Cgi(const CgiRequest &request);
 	~Cgi();
 	http::StatusCode Run(std::string &response_body_message);
+
+	// <<< todo (関数名・変数名とか含め変えてしまって全然大丈夫です)
+	typedef utils::Result<void> CgiResult;
+	// pipe(),fork(),close()してpipe_fdをメンバにセット
+	CgiResult Run();
+	// pipe_fdのgetter
+	int GetReadFd() const;
+	int GetWriteFd() const;
+	// read/writeのpipe_fdが存在するかどうか
+	bool IsReadRequired() const;
+	bool IsWriteRequired() const;
+	// read()した結果をresponseに追加していく
+	void AddReadBuf(const std::string &read_buf);
+	// responseが完成したかどうかを取得
+	bool IsResponseComplete() const;
+	// requestのgetter
+	const std::string &GetRequest() const;
+	// responseのgetter(返り値がstruct CgiResponseになる？)
+	const std::string &GetResponse() const;
+	// write()が全部できなかった場合に送れなかった分だけ渡されるので差し替える
+	void ReplaceNewRequest(const std::string &new_request_str);
+	// >>> todo
 
   private:
 	// prohibit copy constructor and assignment operator
@@ -41,6 +64,14 @@ class Cgi {
 
 	static const int READ  = 0;
 	static const int WRITE = 1;
+
+	// <<< todo
+	// constructorの初期化も適当に-1にしてある
+	int read_fd_;
+	int write_fd_;
+	// constructorの初期化をtrueにしてるけど本当はfalse。どこかでチェックしてフラグ変更する
+	bool is_response_complete_;
+	// >>> todo
 };
 
 } // namespace cgi

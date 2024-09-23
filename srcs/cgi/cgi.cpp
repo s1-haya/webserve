@@ -81,7 +81,10 @@ Cgi::Cgi(const CgiRequest &request)
 	  argv_(SetCgiArgv()),
 	  env_(SetCgiEnv(request.meta_variables)),
 	  exit_status_(0),
-	  request_body_message_(request.body_message) {}
+	  request_body_message_(request.body_message),
+	  read_fd_(-1),
+	  write_fd_(-1),
+	  is_response_complete_(true) {}
 
 Cgi::~Cgi() {
 	Free();
@@ -119,9 +122,11 @@ void Cgi::Execve() {
 	}
 	if (method_ == http::POST) {
 		Close(cgi_request[READ]);
+		write_fd_ = cgi_request[WRITE]; // todo: tmp
 		Write(cgi_request[WRITE], request_body_message_.c_str(), request_body_message_.length());
 		Close(cgi_request[WRITE]);
 	}
+	read_fd_ = cgi_response[READ]; // todo: tmp
 	Close(cgi_response[WRITE]);
 	char    buffer[1024]; // 読み取りバッファ
 	ssize_t bytes_read;
@@ -192,6 +197,46 @@ char *const *Cgi::SetCgiEnv(const MetaMap &meta_variables) {
 	}
 	cgi_env[i] = NULL;
 	return cgi_env;
+}
+
+Cgi::CgiResult Cgi::Run() {
+	return CgiResult();
+}
+
+int Cgi::GetReadFd() const {
+	return read_fd_;
+}
+
+int Cgi::GetWriteFd() const {
+	return write_fd_;
+}
+
+bool Cgi::IsReadRequired() const {
+	return read_fd_ != -1;
+}
+
+bool Cgi::IsWriteRequired() const {
+	return write_fd_ != -1;
+}
+
+void Cgi::AddReadBuf(const std::string &read_buf) {
+	response_body_message_ += read_buf;
+}
+
+bool Cgi::IsResponseComplete() const {
+	return is_response_complete_;
+}
+
+const std::string &Cgi::GetRequest() const {
+	return request_body_message_;
+}
+
+const std::string &Cgi::GetResponse() const {
+	return response_body_message_;
+}
+
+void Cgi::ReplaceNewRequest(const std::string &new_request_str) {
+	request_body_message_ = new_request_str;
 }
 
 } // namespace cgi
