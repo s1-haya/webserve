@@ -82,6 +82,14 @@ server::VirtualServer *BuildVirtualServer1() {
 	);
 	locationlist.push_back(loc_cgi);
 
+	// Location 4 - "/get_not_allowed"
+	std::list<std::string> get_not_allowed;
+	get_not_allowed.push_back(http::DELETE);
+	server::Location loc_get_not_allowed = BuildLocation(
+		"/get_not_allowed", "", "", false, get_not_allowed, std::make_pair(0, ""), ".pl", ""
+	);
+	locationlist.push_back(loc_get_not_allowed);
+
 	return new server::VirtualServer(
 		server_names, locationlist, host_ports, client_max_body_size, error_page
 	);

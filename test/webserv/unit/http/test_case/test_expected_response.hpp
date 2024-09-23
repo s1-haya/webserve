@@ -16,6 +16,8 @@ static const std::string &EXPECTED_STATUS_LINE_BAD_REQUEST =
 	LoadFileContent(EXPECTED_STATUS_LINE + "/400_bad_request.txt");
 static const std::string &EXPECTED_STATUS_LINE_NOT_FOUND =
 	LoadFileContent(EXPECTED_STATUS_LINE + "/404_not_found.txt");
+static const std::string &EXPECTED_STATUS_LINE_METHOD_NOT_ALLOWED =
+	LoadFileContent(EXPECTED_STATUS_LINE + "/405_method_not_allowed.txt");
 static const std::string &EXPECTED_STATUS_LINE_TIMEOUT =
 	LoadFileContent(EXPECTED_STATUS_LINE + "/408_timeout.txt");
 static const std::string &EXPECTED_STATUS_LINE_NOT_IMPLEMENTED =
@@ -26,6 +28,8 @@ static const std::string &EXPECTED_BODY_MESSAGE_BAD_REQUEST =
 	LoadFileContent(EXPECTED_BODY_MESSAGE + "/400_bad_request.txt");
 static const std::string &EXPECTED_BODY_MESSAGE_NOT_FOUND =
 	LoadFileContent(EXPECTED_BODY_MESSAGE + "/404_not_found.txt");
+static const std::string &EXPECTED_BODY_MESSAGE_METHOD_NOT_ALLOWED =
+	LoadFileContent(EXPECTED_BODY_MESSAGE + "/405_method_not_allowed.txt");
 static const std::string &EXPECTED_BODY_MESSAGE_TIMEOUT =
 	LoadFileContent(EXPECTED_BODY_MESSAGE + "/408_timeout.txt");
 static const std::string &EXPECTED_BODY_MESSAGE_NOT_IMPLEMENTED =
