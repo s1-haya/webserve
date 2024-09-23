@@ -24,4 +24,21 @@ int TestGetOk1ConnectionClose(const server::VirtualServerAddrList &server_infos)
 	return HandleHttpResult(client_infos, server_infos, expected);
 }
 
+int TestGetOk13ExtraRequest(const server::VirtualServerAddrList &server_infos) {
+	http::ClientInfos client_infos          = CreateClientInfos(request::GET_200_13_EXTRA_REQUEST);
+	std::string       expected_status_line  = EXPECTED_STATUS_LINE_OK;
+	std::string       expected_body_message = LoadFileContent("../../../../root/html/index.html");
+	HeaderFields      expected_header_fields;
+	expected_header_fields[http::CONNECTION]     = http::CLOSE;
+	expected_header_fields[http::CONTENT_LENGTH] = utils::ToString(expected_body_message.length());
+	expected_header_fields[http::CONTENT_TYPE]   = "test/html";
+	expected_header_fields[http::SERVER]         = http::SERVER_VERSION;
+	const std::string &expected_response         = CreateHttpResponseFormat(
+        expected_status_line, expected_header_fields, expected_body_message
+    );
+	const std::string &request_buffer = "HELLO";
+	http::HttpResult expected = CreateHttpResult(true, false, request_buffer, expected_response);
+	return HandleHttpResult(client_infos, server_infos, expected);
+}
+
 } // namespace test
