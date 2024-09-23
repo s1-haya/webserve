@@ -1,10 +1,8 @@
-#ifndef UTILS_SYSTEM_EXCEPTION_HPP_
-#define UTILS_SYSTEM_EXCEPTION_HPP_
+#ifndef SYSTEM_EXCEPTION_HPP_
+#define SYSTEM_EXCEPTION_HPP_
 
 #include <stdexcept>
 #include <string>
-
-namespace utils {
 
 class SystemException : public std::runtime_error {
   public:
@@ -15,7 +13,5 @@ class SystemException : public std::runtime_error {
   private:
 	int error_number_;
 };
-
-} // namespace utils
 
 #endif
