@@ -84,7 +84,8 @@ Cgi::CgiResult Cgi::Run(std::string &response_body_message) {
 		Execve();
 		response_body_message = response_body_message_;
 	} catch (const utils::SystemException &e) {
-		throw http::HttpException(e.what(), http::StatusCode(http::INTERNAL_SERVER_ERROR));
+		throw utils::SystemException(e.what(), e.GetErrorNumber());
+		// to server exception
 	}
 	// return http::StatusCode(http::OK);
 	return CgiResult();
@@ -143,6 +144,7 @@ char *const *Cgi::SetCgiArgv() {
 	char  *dest = new (std::nothrow) char[cgi_script_.size() + 1];
 	if (argv == NULL || dest == NULL) {
 		throw utils::SystemException(std::strerror(errno), errno);
+		// to server exception (constructor)
 	}
 	std::strcpy(dest, cgi_script_.c_str());
 	argv[0] = dest;
@@ -154,6 +156,7 @@ char *const *Cgi::SetCgiEnv(const MetaMap &meta_variables) {
 	char **cgi_env = new (std::nothrow) char *[meta_variables.size() + 1];
 	if (cgi_env == NULL) {
 		throw utils::SystemException(std::strerror(errno), errno);
+		// to server exception (constructor)
 	}
 	std::size_t i = 0;
 
@@ -163,6 +166,7 @@ char *const *Cgi::SetCgiEnv(const MetaMap &meta_variables) {
 		char             *dest    = new (std::nothrow) char[element.size() + 1];
 		if (dest == NULL) {
 			throw utils::SystemException(std::strerror(errno), errno);
+			// to server exception (constructor)
 		}
 		std::strcpy(dest, element.c_str());
 		cgi_env[i] = dest;
