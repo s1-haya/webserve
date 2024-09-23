@@ -49,22 +49,6 @@ pid_t Fork(void) {
 	return p;
 }
 
-ssize_t Write(int fd, const void *buf, size_t nbyte) {
-	ssize_t bytes_write = write(fd, buf, nbyte);
-	if (bytes_write == SYSTEM_ERROR) {
-		throw utils::SystemException(std::strerror(errno), errno);
-	}
-	return bytes_write;
-}
-
-ssize_t Read(int fd, void *buf, size_t nbyte) {
-	ssize_t bytes_read = read(fd, buf, nbyte);
-	if (bytes_read == SYSTEM_ERROR) {
-		throw utils::SystemException(std::strerror(errno), errno);
-	}
-	return bytes_read;
-}
-
 pid_t Waitpid(pid_t pid, int *stat_loc, int options) {
 	pid_t p = waitpid(pid, stat_loc, options);
 	if (p == SYSTEM_ERROR) {
@@ -127,25 +111,10 @@ void Cgi::Execve() {
 	}
 	if (method_ == http::POST) {
 		Close(cgi_request[READ]);
-		write_fd_ = cgi_request[WRITE]; // todo: tmp
-		Write(cgi_request[WRITE], request_body_message_.c_str(), request_body_message_.length());
+		write_fd_ = cgi_request[WRITE];
 	}
-	read_fd_ = cgi_response[READ]; // todo: tmp
 	Close(cgi_response[WRITE]);
-	char    buffer[1024]; // 読み取りバッファ
-	ssize_t bytes_read;
-	while ((bytes_read = Read(cgi_response[READ], buffer, sizeof(buffer))) > 0) {
-		response_body_message_.append(buffer, bytes_read);
-	}
-	Waitpid(pid_, &exit_status_, 0);
-	if (WIFEXITED(exit_status_)) {
-		if (WEXITSTATUS(exit_status_) != 0) {
-			throw utils::SystemException("CGI script failed", WEXITSTATUS(exit_status_));
-		}
-	} else {
-		throw utils::SystemException("CGI script did not exit normally", exit_status_);
-		// exit_status_にはシグナル番号が入っている
-	}
+	read_fd_ = cgi_response[READ];
 }
 
 void Cgi::Free() {
