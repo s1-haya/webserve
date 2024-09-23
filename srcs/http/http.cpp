@@ -23,7 +23,7 @@ Http::Run(const ClientInfos &client_info, const server::VirtualServerAddrList &s
 		// return HttpResult CreateBadRequestResponse(int client_fd);
 	}
 	if (IsHttpRequestFormatComplete(client_info.fd)) {
-		result                      = CreateHttpResponse(client_info, server_info);
+		result = CreateHttpResponse(client_info, server_info);
 	}
 	return result;
 }
@@ -89,11 +89,11 @@ utils::Result<void> Http::ParseHttpRequestFormat(int client_fd, const std::strin
 HttpResult Http::CreateHttpResponse(
 	const ClientInfos &client_info, const server::VirtualServerAddrList &server_info
 ) {
-	HttpResult result;
-	HttpRequestParsedData data = storage_.GetClientSaveData(client_info.fd);
+	HttpResult            result;
+	HttpRequestParsedData data  = storage_.GetClientSaveData(client_info.fd);
 	result.is_connection_keep   = IsConnectionKeep(client_info.fd);
 	result.is_response_complete = true;
-	result.request_buf = data.current_buf;
+	result.request_buf          = data.current_buf;
 	result.response             = HttpResponse::Run(client_info, server_info, data.request_result);
 	storage_.DeleteClientSaveData(client_info.fd);
 	return result;

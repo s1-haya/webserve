@@ -37,7 +37,7 @@ int TestGetOk13ExtraRequest(const server::VirtualServerAddrList &server_infos) {
         expected_status_line, expected_header_fields, expected_body_message
     );
 	const std::string &request_buffer = "HELLO";
-	http::HttpResult expected = CreateHttpResult(true, false, request_buffer, expected_response);
+	http::HttpResult   expected = CreateHttpResult(true, false, request_buffer, expected_response);
 	return HandleHttpResult(client_infos, server_infos, expected);
 }
 
