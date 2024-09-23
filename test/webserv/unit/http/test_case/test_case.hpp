@@ -19,6 +19,9 @@ int TestGetBadRequest1OnlyCrlf(const server::VirtualServerAddrList &server_infos
 int TestGetBadRequest2LowerMethod(const server::VirtualServerAddrList &server_infos);
 int TestGetBadRequest3NoAsciiMethod(const server::VirtualServerAddrList &server_infos);
 int TestGetBadRequest4NoRoot(const server::VirtualServerAddrList &server_infos);
+int TestGetBadRequest5RelativePath(const server::VirtualServerAddrList &server_infos);
+
+
 int TestGetNotFound1NotExistFile(const server::VirtualServerAddrList &server_infos);
 int TestGetMethodNotAllowed(const server::VirtualServerAddrList &server_infos);
 int TestGetTimeout1NoCrlf(const server::VirtualServerAddrList &server_infos);

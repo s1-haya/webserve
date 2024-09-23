@@ -55,7 +55,9 @@ int  main(void) {
 	ret_code |= test::TestGetBadRequest2LowerMethod(server_infos);
 	ret_code |= test::TestGetBadRequest3NoAsciiMethod(server_infos);
 	ret_code |= test::TestGetBadRequest4NoRoot(server_infos);
-    ret_code |= test::TestGetNotFound1NotExistFile(server_infos);
+	ret_code |= test::TestGetBadRequest5RelativePath(server_infos);
+
+	ret_code |= test::TestGetNotFound1NotExistFile(server_infos);
     // todo: 405 Method Not Implemented
     // ret_code |= test::TestGetMethodNotAllowed(server_infos);
     // todo: HttpResponse::CreateTimeoutResponse
