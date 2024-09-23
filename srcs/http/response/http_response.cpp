@@ -168,15 +168,15 @@ bool HttpResponse::IsCgi(
 
 std::string HttpResponse::CreateBadRequestResponse(const HttpRequestResult &request_info) {
 	HttpResponseFormat response;
-	response.status_line                  = StatusLine(
-        HTTP_VERSION,
-        request_info.status_code.GetStatusCode(),
-        request_info.status_code.GetReasonPhrase()
-    );
+	response.status_line = StatusLine(
+		HTTP_VERSION,
+		request_info.status_code.GetStatusCode(),
+		request_info.status_code.GetReasonPhrase()
+	);
 	response.header_fields[SERVER]       = SERVER_VERSION;
 	response.header_fields[CONTENT_TYPE] = "test/html";
 	response.header_fields[CONNECTION]   = CLOSE;
-	response.body_message = CreateDefaultBodyMessageFormat(request_info.status_code);
+	response.body_message                = CreateDefaultBodyMessageFormat(request_info.status_code);
 	response.header_fields[CONTENT_LENGTH] = utils::ToString(response.body_message.length());
 	return CreateHttpResponse(response);
 }

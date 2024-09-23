@@ -80,8 +80,8 @@ HttpResult Http::CreateBadRequestResponse(int client_fd) {
 	result.is_response_complete = false;
 	// todo: BadRequestの場合はkeep-aliveにするかcloseにするか(現在はclose)
 	result.is_connection_keep = false;
-	result.request_buf = data.current_buf;
-	result.response             = HttpResponse::CreateBadRequestResponse(data.request_result);
+	result.request_buf        = data.current_buf;
+	result.response           = HttpResponse::CreateBadRequestResponse(data.request_result);
 	storage_.DeleteClientSaveData(client_fd);
 	return result;
 }
