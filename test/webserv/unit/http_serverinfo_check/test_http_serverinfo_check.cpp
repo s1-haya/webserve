@@ -166,11 +166,11 @@ InputIt Next(InputIt it, typename std::iterator_traits<InputIt>::difference_type
 #define ROOT_DIR "root"
 
 // root 以降を抜き出す
-std::string ExtractHttpServerInfoCheckPath(const std::string &fullPath) {
+std::string ExtractHttpServerInfoCheckPath(const std::string &full_path) {
 	const std::string target = ROOT_DIR;
-	size_t            pos    = fullPath.find(target);
+	size_t            pos    = full_path.find(target);
 	if (pos != std::string::npos) {
-		return fullPath.substr(pos + target.length());
+		return full_path.substr(pos + target.length());
 	} else {
 		return "";
 	}

@@ -11,8 +11,8 @@ namespace http {
 namespace {
 
 std::string GetCwd() {
-	const char            *filePath = __FILE__;
-	std::string            path(filePath);
+	const char            *file_path = __FILE__;
+	std::string            path(file_path);
 	std::string::size_type pos       = path.find_last_of("/\\");
 	std::string            directory = (pos != std::string::npos) ? path.substr(0, pos) : "";
 	return directory;
