@@ -151,11 +151,12 @@ StatusCode Method::DeleteHandler(
 	StatusCode  status_code = StatusCode(NO_CONTENT);
 	if (info.IsDirectory()) {
 		throw HttpException("Error: Forbidden", StatusCode(FORBIDDEN));
-	} else if (std::remove(path.c_str()) == 0) {
+	}
+	if (std::remove(path.c_str()) == SYSTEM_ERROR) {
+		SystemExceptionHandler(errno);
+	} else {
 		response_body_message = HttpResponse::CreateDefaultBodyMessageFormat(status_code);
 		response_header_fields[CONTENT_LENGTH] = utils::ToString(response_body_message.length());
-	} else {
-		SystemExceptionHandler(errno);
 	}
 	return status_code;
 }
@@ -185,7 +186,7 @@ StatusCode Method::FileCreationHandler(
 	file.write(request_body_message.c_str(), request_body_message.length());
 	if (file.fail()) {
 		file.close();
-		if (std::remove(path.c_str()) != 0) {
+		if (std::remove(path.c_str()) == SYSTEM_ERROR) {
 			SystemExceptionHandler(errno);
 		}
 		throw HttpException("Error: Forbidden", StatusCode(FORBIDDEN));
@@ -197,9 +198,7 @@ StatusCode Method::FileCreationHandler(
 
 Stat Method::TryStat(const std::string &path) {
 	struct stat stat_buf;
-	if (stat(path.c_str(), &stat_buf) == -1) {
-		// std::string error_message = "Error: stat on path '" + path + "': " +
-		// std::strerror(errno);
+	if (stat(path.c_str(), &stat_buf) == SYSTEM_ERROR) {
 		SystemExceptionHandler(errno);
 	}
 	Stat info(stat_buf);
