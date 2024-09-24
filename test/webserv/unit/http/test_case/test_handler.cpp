@@ -119,8 +119,8 @@ Result IsSameRequestBuffer(const std::string &request_buffer, const std::string 
 	if (request_buffer != expected) {
 		std::ostringstream error_log;
 		error_log << "Error: Request Buffer\n";
-		error_log << "- Expected: [" << expected << "]\n";
-		error_log << "- Result  : [" << request_buffer << "]\n";
+		error_log << "- Expected: [\n" << expected << "]\n";
+		error_log << "- Result  : [\n" << request_buffer << "]\n";
 		request_buffer_result.is_success = false;
 		request_buffer_result.error_log  = error_log.str();
 	}
@@ -132,8 +132,8 @@ Result IsSameHttpResponse(const std::string &response, const std::string &expect
 	if (response != expected) {
 		std::ostringstream error_log;
 		error_log << "Error: Http Response\n";
-		error_log << "- Expected: [" << expected << "]\n";
-		error_log << "- Result  : [" << response << "]\n";
+		error_log << "- Expected: [\n" << expected << "]\n";
+		error_log << "- Result  : [\n" << response << "]\n";
 		http_response_result.is_success = false;
 		http_response_result.error_log  = error_log.str();
 	}
@@ -164,13 +164,9 @@ int HandleHttpResult(
 	const server::VirtualServerAddrList &server_infos,
 	const http::HttpResult               expected
 ) {
-	http::HttpResult http_result;
-	(void)client_infos;
-	(void)server_infos;
-	// todo: ServerInfosを作成したら動く;
-	// http::Http       http;
-	// http::HttpResult http_result = http.Run(client_infos, server_infos);
-	const Result &result = IsSameHttpResult(http_result, expected);
+	http::Http       http;
+	http::HttpResult http_result = http.Run(client_infos, server_infos);
+	const Result    &result      = IsSameHttpResult(http_result, expected);
 	return HandleResult(result);
 }
 

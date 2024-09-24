@@ -1,10 +1,10 @@
 IMAGE_NAME := nginx
 CONTAINER_NAME := nginx-container
-BUILD_CONTEXT := ../../
+BUILD_CONTEXT := ../../../
 
 .PHONY	: build
 build:
-	@cd $(BUILD_CONTEXT) && docker build -f test/nginx/Dockerfile -t $(IMAGE_NAME) .
+	@cd $(BUILD_CONTEXT) && docker build -f test/nginx/manual/Dockerfile -t $(IMAGE_NAME) .
 
 .PHONY	: run
 run:

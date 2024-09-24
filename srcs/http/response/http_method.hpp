@@ -29,6 +29,7 @@ class Method {
 					 const std::string  &index_file_path,
 					 bool                autoindex_on
 				 );
+	static bool IsSupportedMethod(const std::string &method);
 	static bool
 	IsAllowedMethod(const std::string &method, const std::list<std::string> &allow_methods);
 
