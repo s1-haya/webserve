@@ -209,12 +209,13 @@ const std::string &Cgi::GetRequest() const {
 	return request_body_message_;
 }
 
-Cgi::CgiResult Cgi::AddAndGetResponse(const std::string &read_buf) {
+CgiResponse Cgi::AddAndGetResponse(const std::string &read_buf) {
 	response_body_message_ += read_buf;
 	if (read_buf.empty()) {
 		is_response_complete_ = true;
 	}
-	return CgiResult(CgiResponse(response_body_message_, "text/plain", is_response_complete_));
+	return CgiResponse(response_body_message_, "text/plain", is_response_complete_);
+	// text/plainのみ対応
 }
 
 void Cgi::ReplaceNewRequest(const std::string &new_request_str) {

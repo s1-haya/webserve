@@ -2,6 +2,7 @@
 #define CGI_HPP_
 
 #include "cgi_request.hpp"
+#include "result.hpp"
 #include "utils.hpp"
 #include <map>
 #include <string>
@@ -20,15 +21,13 @@ struct CgiResponse {
 };
 
 class Cgi {
-	typedef utils::Result<CgiResponse> CgiResult;
-	typedef std::map<int, int>         PFdMap;
+	typedef std::map<int, int> PFdMap;
 
   public:
 	explicit Cgi(const CgiRequest &request);
 	~Cgi();
-	PFdMap Cgi::Run();
+	PFdMap Run();
 
-	// <<< todo (関数名・変数名とか含め変えてしまって全然大丈夫です)
 	// pipe(),fork(),close()してpipe_fdをメンバにセット
 	// pipe_fdのgetter
 	int GetReadFd() const;
@@ -41,10 +40,9 @@ class Cgi {
 	// requestのgetter
 	const std::string &GetRequest() const;
 	// responseをaddしてget(全部送れたらresponse_completeをtrueにする)
-	CgiResult AddAndGetResponse(const std::string &read_buf);
+	CgiResponse AddAndGetResponse(const std::string &read_buf);
 	// write()が全部できなかった場合に送れなかった分だけ渡されるので差し替える
 	void ReplaceNewRequest(const std::string &new_request_str);
-	// >>> todo
 
   private:
 	// prohibit copy constructor and assignment operator
