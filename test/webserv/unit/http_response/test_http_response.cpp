@@ -177,9 +177,9 @@ int main(void) {
 	std::string response2 = http::HttpResponse::Run(client_info, server_info, request_info);
 
 	std::string expected2_status_line =
-		LoadFileContent("../../expected_response/default_status_line/501_not_implemented.txt");
+		LoadFileContent("../../expected_response/default_status_line/405_method_not_allowed.txt");
 	std::string expected2_body_message =
-		LoadFileContent("../../expected_response/default_body_message/501_not_implemented.txt");
+		LoadFileContent("../../expected_response/default_body_message/405_method_not_allowed.txt");
 	std::string expected2_header_fields = SetDefaultHeaderFields(
 		http::KEEP_ALIVE, utils::ToString(expected2_body_message.length()), "test/html"
 	);
