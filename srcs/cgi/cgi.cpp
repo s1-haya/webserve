@@ -1,13 +1,10 @@
 #include "cgi.hpp"
 #include "cgi_request.hpp"
-#include "http_exception.hpp"
 #include "http_message.hpp"
-#include "status_code.hpp"
 #include "utils.hpp"
 #include <cerrno>
 #include <cstdlib>
 #include <cstring>
-#include <iostream>
 #include <signal.h>
 #include <sys/wait.h>
 #include <unistd.h>

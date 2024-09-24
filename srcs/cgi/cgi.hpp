@@ -2,8 +2,6 @@
 #define CGI_HPP_
 
 #include "cgi_request.hpp"
-#include "result.hpp"
-#include "utils.hpp"
 #include <map>
 #include <string>
 
