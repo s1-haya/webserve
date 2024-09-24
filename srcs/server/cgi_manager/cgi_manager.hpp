@@ -21,15 +21,14 @@ class CgiManager {
 
 	// functions
 	void               AddNewCgi(int client_fd, const cgi::CgiRequest &request);
-	Cgi::CgiResult     RunCgi(int client_fd);
+	FdMap              RunCgi(int client_fd);
 	void               DeleteCgi(int client_fd);
 	bool               IsResponseComplete(int client_fd) const;
-	void               AddReadBuf(int client_fd, const std::string &read_buf);
 	GetFdResult        GetReadFd(int client_fd) const;
 	GetFdResult        GetWriteFd(int client_fd) const;
 	int                GetClientFd(int pipe_fd) const;
 	const std::string &GetRequest(int client_fd) const;
-	const std::string &GetResponse(int client_fd) const;
+	cgi::CgiResponse   AddAndGetResponse(int client_fd, const std::string &read_buf);
 	void               ReplaceNewRequest(int client_fd, const std::string &new_request_str);
 
   private:
