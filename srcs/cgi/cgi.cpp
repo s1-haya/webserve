@@ -49,6 +49,14 @@ pid_t Fork(void) {
 	return p;
 }
 
+int Kill(pid_t pid, int sig) {
+	int status = kill(pid, sig);
+	if (status == SYSTEM_ERROR) {
+		throw utils::SystemException(std::strerror(errno), errno);
+	}
+	return status;
+}
+
 pid_t Waitpid(pid_t pid, int *stat_loc, int options) {
 	pid_t p = waitpid(pid, stat_loc, options);
 	if (p == SYSTEM_ERROR) {
@@ -75,7 +83,7 @@ Cgi::~Cgi() {
 	Free();
 	Close(read_fd_);
 	Close(write_fd_);
-	kill(pid_, SIGKILL);
+	Kill(pid_, SIGKILL);
 	Waitpid(pid_, &exit_status_, 0);
 }
 
