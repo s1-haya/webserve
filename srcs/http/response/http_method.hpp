@@ -7,12 +7,6 @@
 #include "utils.hpp"
 #include <list>
 
-namespace utils {
-
-class SystemException;
-
-}
-
 namespace http {
 
 typedef std::map<std::string, std::string> HeaderFields;

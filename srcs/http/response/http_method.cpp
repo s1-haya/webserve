@@ -155,7 +155,7 @@ StatusCode Method::DeleteHandler(
 		response_body_message = HttpResponse::CreateDefaultBodyMessageFormat(status_code);
 		response_header_fields[CONTENT_LENGTH] = utils::ToString(response_body_message.length());
 	} else {
-		throw SystemException(std::strerror(errno));
+		SystemExceptionHandler(errno);
 	}
 	return status_code;
 }
@@ -186,7 +186,7 @@ StatusCode Method::FileCreationHandler(
 	if (file.fail()) {
 		file.close();
 		if (std::remove(path.c_str()) != 0) {
-			throw SystemException(std::strerror(errno));
+			SystemExceptionHandler(errno);
 		}
 		throw HttpException("Error: Forbidden", StatusCode(FORBIDDEN));
 	}
