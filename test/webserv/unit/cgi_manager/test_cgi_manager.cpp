@@ -224,7 +224,7 @@ int RunTest3() {
 		cgi_manager, client_fd, appended_buffer, cgi::CgiResponse("abcdefgh", "text/plain", false)
 	));
 
-	// 最後に""をread()したとして、responseが完成になっているかか確認
+	// 最後に""をread()したとして、responseが完成になっているか確認
 	ret_code |= Test(RunAddAndGetResponse(
 		cgi_manager, client_fd, "", cgi::CgiResponse("abcdefgh", "text/plain", true)
 	));
