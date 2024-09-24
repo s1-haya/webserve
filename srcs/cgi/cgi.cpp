@@ -191,10 +191,6 @@ bool Cgi::IsWriteRequired() const {
 	return write_fd_ != -1;
 }
 
-void Cgi::AddReadBuf(const std::string &read_buf) {
-	response_body_message_ += read_buf;
-}
-
 bool Cgi::IsResponseComplete() const {
 	return is_response_complete_;
 }
@@ -203,7 +199,11 @@ const std::string &Cgi::GetRequest() const {
 	return request_body_message_;
 }
 
-const std::string &Cgi::GetResponse() const {
+const std::string &Cgi::AddAndGetResponse(const std::string &read_buf) {
+	response_body_message_ += read_buf;
+	if (read_buf.empty()) {
+		is_response_complete_ = true;
+	}
 	return response_body_message_;
 }
 

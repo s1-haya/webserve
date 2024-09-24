@@ -32,14 +32,12 @@ class Cgi {
 	// read/writeのpipe_fdが存在するかどうか
 	bool IsReadRequired() const;
 	bool IsWriteRequired() const;
-	// read()した結果をresponseに追加していく
-	void AddReadBuf(const std::string &read_buf);
 	// responseが完成したかどうかを取得
 	bool IsResponseComplete() const;
 	// requestのgetter
 	const std::string &GetRequest() const;
-	// responseのgetter(返り値がstruct CgiResponseになる？)
-	const std::string &GetResponse() const;
+	// responseをaddしてget(全部送れたらresponse_completeをtrueにする)
+	const std::string &AddAndGetResponse(const std::string &read_buf);
 	// write()が全部できなかった場合に送れなかった分だけ渡されるので差し替える
 	void ReplaceNewRequest(const std::string &new_request_str);
 	// >>> todo
