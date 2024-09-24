@@ -69,7 +69,7 @@ Cgi::Cgi(const CgiRequest &request)
 	  request_body_message_(request.body_message),
 	  read_fd_(-1),
 	  write_fd_(-1),
-	  is_response_complete_(true) {}
+	  is_response_complete_(false) {}
 
 Cgi::~Cgi() {
 	Free();

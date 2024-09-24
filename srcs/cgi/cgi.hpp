@@ -67,13 +67,9 @@ class Cgi {
 
 	pid_t pid_;
 
-	// <<< todo
-	// constructorの初期化も適当に-1にしてある
-	int read_fd_;
-	int write_fd_;
-	// constructorの初期化をtrueにしてるけど本当はfalse。どこかでチェックしてフラグ変更する
+	int  read_fd_;
+	int  write_fd_;
 	bool is_response_complete_;
-	// >>> todo
 };
 
 } // namespace cgi
