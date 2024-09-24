@@ -67,6 +67,9 @@ pid_t Waitpid(pid_t pid, int *stat_loc, int options) {
 
 } // namespace
 
+const int Cgi::READ  = 0;
+const int Cgi::WRITE = 1;
+
 // 他のところでチェックしてここのatではthrowされない様にする
 Cgi::Cgi(const CgiRequest &request)
 	: method_(request.meta_variables.at(REQUEST_METHOD)),
@@ -81,8 +84,12 @@ Cgi::Cgi(const CgiRequest &request)
 
 Cgi::~Cgi() {
 	Free();
-	Close(read_fd_);
-	Close(write_fd_);
+	if (read_fd_ != -1) {
+		Close(read_fd_);
+	}
+	if (write_fd_ != -1) {
+		Close(write_fd_);
+	}
 	Kill(pid_, SIGKILL);
 	Waitpid(pid_, &exit_status_, 0);
 }

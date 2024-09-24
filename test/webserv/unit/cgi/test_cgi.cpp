@@ -7,6 +7,7 @@
 #include "utils.hpp"
 #include <cstdlib>
 #include <iostream>
+#include <unistd.h>
 
 namespace {
 
@@ -35,6 +36,9 @@ void PrintNg() {
 // cgi_parseから見た相対パス
 const std::string html_dir_path    = "../../../../root/html";
 const std::string cgi_bin_dir_path = "../../../../root/cgi-bin";
+const int         BUF_SIZE         = 1024;
+
+typedef std::map<int, int> PFdMap;
 
 // 出力は目で見て確認(実行が成功していたらテストはOKとしている)
 
@@ -53,17 +57,29 @@ int Test1() {
 	cgi_request.meta_variables[SERVER_PORT]     = "8080";
 	cgi_request.meta_variables[SERVER_PROTOCOL] = "HTTP/1.1";
 
-	std::string response_body_message;
+	CgiResponse response;
 	try {
-		Cgi cgi(cgi_request);
-		cgi.Run(response_body_message);
+		Cgi    cgi(cgi_request);
+		PFdMap pfd_map = cgi.Run();
+		if (cgi.IsWriteRequired()) {
+			write(
+				pfd_map.at(cgi::Cgi::WRITE),
+				cgi_request.body_message.c_str(),
+				cgi_request.body_message.length()
+			);
+		}
+		while (!response.is_response_complete) {
+			char    buffer[BUF_SIZE] = {};
+			ssize_t read_bytes       = read(pfd_map.at(cgi::Cgi::READ), buffer, BUF_SIZE);
+			response                 = cgi.AddAndGetResponse(std::string(buffer, read_bytes));
+		}
 	} catch (const std::exception &e) {
 		PrintNg();
 		std::cerr << e.what() << '\n';
 		return EXIT_FAILURE;
 	}
 	PrintOk();
-	utils::Debug(response_body_message);
+	utils::Debug(response.response);
 	return EXIT_SUCCESS;
 }
 
@@ -82,17 +98,29 @@ int Test2() {
 	cgi_request.meta_variables[SERVER_PORT]     = "8080";
 	cgi_request.meta_variables[SERVER_PROTOCOL] = "HTTP/1.1";
 
-	std::string response_body_message;
+	CgiResponse response;
 	try {
-		Cgi cgi(cgi_request);
-		cgi.Run(response_body_message);
+		Cgi    cgi(cgi_request);
+		PFdMap pfd_map = cgi.Run();
+		if (cgi.IsWriteRequired()) {
+			write(
+				pfd_map.at(cgi::Cgi::WRITE),
+				cgi_request.body_message.c_str(),
+				cgi_request.body_message.length()
+			);
+		}
+		while (!response.is_response_complete) {
+			char    buffer[BUF_SIZE] = {};
+			ssize_t read_bytes       = read(pfd_map.at(cgi::Cgi::READ), buffer, BUF_SIZE);
+			response                 = cgi.AddAndGetResponse(std::string(buffer, read_bytes));
+		}
 	} catch (const std::exception &e) {
 		PrintNg();
 		std::cerr << e.what() << '\n';
 		return EXIT_FAILURE;
 	}
 	PrintOk();
-	utils::Debug(response_body_message);
+	utils::Debug(response.response);
 	return EXIT_SUCCESS;
 }
 
@@ -113,17 +141,29 @@ int Test3() {
 	cgi_request.meta_variables[SERVER_PORT]     = "8080";
 	cgi_request.meta_variables[SERVER_PROTOCOL] = "HTTP/1.1";
 
-	std::string response_body_message;
+	CgiResponse response;
 	try {
-		Cgi cgi(cgi_request);
-		cgi.Run(response_body_message);
+		Cgi    cgi(cgi_request);
+		PFdMap pfd_map = cgi.Run();
+		if (cgi.IsWriteRequired()) {
+			write(
+				pfd_map.at(cgi::Cgi::WRITE),
+				cgi_request.body_message.c_str(),
+				cgi_request.body_message.length()
+			);
+		}
+		while (!response.is_response_complete) {
+			char    buffer[BUF_SIZE] = {};
+			ssize_t read_bytes       = read(pfd_map.at(cgi::Cgi::READ), buffer, BUF_SIZE);
+			response                 = cgi.AddAndGetResponse(std::string(buffer, read_bytes));
+		}
 	} catch (const std::exception &e) {
 		PrintNg();
 		std::cerr << e.what() << '\n';
 		return EXIT_FAILURE;
 	}
 	PrintOk();
-	utils::Debug(response_body_message);
+	utils::Debug(response.response);
 	return EXIT_SUCCESS;
 }
 
@@ -143,17 +183,30 @@ int Test4() {
 	cgi_request.meta_variables[SERVER_PORT]     = "8080";
 	cgi_request.meta_variables[SERVER_PROTOCOL] = "HTTP/1.1";
 
-	std::string response_body_message;
+	CgiResponse response;
 	try {
-		Cgi cgi(cgi_request);
-		cgi.Run(response_body_message);
+		Cgi    cgi(cgi_request);
+		PFdMap pfd_map = cgi.Run();
+		if (cgi.IsWriteRequired()) {
+			write(
+				pfd_map.at(cgi::Cgi::WRITE),
+				cgi_request.body_message.c_str(),
+				cgi_request.body_message.length()
+			);
+		}
+		while (!response.is_response_complete) {
+			char    buffer[BUF_SIZE] = {};
+			ssize_t read_bytes       = read(pfd_map.at(cgi::Cgi::READ), buffer, BUF_SIZE);
+			response                 = cgi.AddAndGetResponse(std::string(buffer, read_bytes));
+		}
 	} catch (const std::exception &e) {
-		PrintOk();
-		utils::Debug(e.what());
-		return EXIT_SUCCESS;
+		PrintNg();
+		std::cerr << e.what() << '\n';
+		return EXIT_FAILURE;
 	}
-	PrintNg();
-	return EXIT_FAILURE;
+	PrintOk();
+	utils::Debug(response.response);
+	return EXIT_SUCCESS;
 }
 
 } // namespace

@@ -14,14 +14,16 @@ struct CgiResponse {
 	std::string response;
 	std::string content_type;
 	bool        is_response_complete;
-	CgiResponse(std::string response, std::string content_type, bool is_response_complete)
+	CgiResponse(
+		std::string response = "", std::string content_type = "", bool is_response_complete = false
+	)
 		: response(response),
 		  content_type(content_type),
 		  is_response_complete(is_response_complete) {}
 };
 
 class Cgi {
-	typedef std::map<int, int> PFdMap;
+	typedef std::map<int, int> PFdMap; // 他のコンテナに
 
   public:
 	explicit Cgi(const CgiRequest &request);
@@ -44,6 +46,9 @@ class Cgi {
 	// write()が全部できなかった場合に送れなかった分だけ渡されるので差し替える
 	void ReplaceNewRequest(const std::string &new_request_str);
 
+	static const int READ;
+	static const int WRITE;
+
   private:
 	// prohibit copy constructor and assignment operator
 	Cgi(const Cgi &cgi);
@@ -63,9 +68,6 @@ class Cgi {
 	int          exit_status_;
 	std::string  request_body_message_;
 	std::string  response_body_message_;
-
-	static const int READ  = 0;
-	static const int WRITE = 1;
 
 	pid_t pid_;
 
