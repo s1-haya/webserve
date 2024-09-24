@@ -86,7 +86,7 @@ Cgi::CgiResult Cgi::Run() {
 		throw utils::SystemException(e.what(), e.GetErrorNumber());
 		// todo: server exception
 	}
-	return CgiResult(CgiResponse(response_body_message_, "text/plain"));
+	return CgiResult(CgiResponse(response_body_message_, "text/plain", is_response_complete_));
 	// text/plainのみ対応
 }
 
@@ -199,12 +199,12 @@ const std::string &Cgi::GetRequest() const {
 	return request_body_message_;
 }
 
-const std::string &Cgi::AddAndGetResponse(const std::string &read_buf) {
+Cgi::CgiResult Cgi::AddAndGetResponse(const std::string &read_buf) {
 	response_body_message_ += read_buf;
 	if (read_buf.empty()) {
 		is_response_complete_ = true;
 	}
-	return response_body_message_;
+	return CgiResult(CgiResponse(response_body_message_, "text/plain", is_response_complete_));
 }
 
 void Cgi::ReplaceNewRequest(const std::string &new_request_str) {

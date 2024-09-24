@@ -12,8 +12,11 @@ struct CgiResponse {
 	// parse等の他の処理で決まるのでstatus_codeはここにはいらない
 	std::string response;
 	std::string content_type;
-	CgiResponse(std::string response, std::string content_type)
-		: response(response), content_type(content_type) {}
+	bool        is_response_complete;
+	CgiResponse(std::string response, std::string content_type, bool is_response_complete)
+		: response(response),
+		  content_type(content_type),
+		  is_response_complete(is_response_complete) {}
 };
 
 class Cgi {
@@ -37,7 +40,7 @@ class Cgi {
 	// requestのgetter
 	const std::string &GetRequest() const;
 	// responseをaddしてget(全部送れたらresponse_completeをtrueにする)
-	const std::string &AddAndGetResponse(const std::string &read_buf);
+	CgiResult AddAndGetResponse(const std::string &read_buf);
 	// write()が全部できなかった場合に送れなかった分だけ渡されるので差し替える
 	void ReplaceNewRequest(const std::string &new_request_str);
 	// >>> todo
