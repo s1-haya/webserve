@@ -13,7 +13,9 @@ struct CgiResponse {
 	std::string content_type;
 	bool        is_response_complete;
 	CgiResponse(
-		std::string response = "", std::string content_type = "", bool is_response_complete = false
+		const std::string &response             = "",
+		const std::string &content_type         = "",
+		bool               is_response_complete = false
 	)
 		: response(response),
 		  content_type(content_type),

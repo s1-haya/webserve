@@ -34,8 +34,25 @@ void PrintNg() {
 const std::string html_dir_path    = "../../../../root/html";
 const std::string cgi_bin_dir_path = "../../../../root/cgi-bin";
 const int         BUF_SIZE         = 1024;
+const int         SYSTEM_ERROR     = -1;
 
 typedef std::map<int, int> PFdMap;
+
+ssize_t Write(int fd, const void *buf, size_t nbyte) {
+	ssize_t bytes_write = write(fd, buf, nbyte);
+	if (bytes_write == SYSTEM_ERROR) {
+		throw std::runtime_error(std::strerror(errno));
+	}
+	return bytes_write;
+}
+
+ssize_t Read(int fd, void *buf, size_t nbyte) {
+	ssize_t bytes_read = read(fd, buf, nbyte);
+	if (bytes_read == SYSTEM_ERROR) {
+		throw std::runtime_error(std::strerror(errno));
+	}
+	return bytes_read;
+}
 
 // 出力は目で見て確認(実行が成功していたらテストはOKとしている)
 
@@ -59,7 +76,7 @@ int Test1() {
 		Cgi    cgi(cgi_request);
 		PFdMap pfd_map = cgi.Run();
 		if (cgi.IsWriteRequired()) {
-			write(
+			Write(
 				pfd_map.at(cgi::Cgi::WRITE),
 				cgi_request.body_message.c_str(),
 				cgi_request.body_message.length()
@@ -67,7 +84,7 @@ int Test1() {
 		}
 		while (!response.is_response_complete) {
 			char    buffer[BUF_SIZE] = {};
-			ssize_t read_bytes       = read(pfd_map.at(cgi::Cgi::READ), buffer, BUF_SIZE);
+			ssize_t read_bytes       = Read(pfd_map.at(cgi::Cgi::READ), buffer, BUF_SIZE);
 			response                 = cgi.AddAndGetResponse(std::string(buffer, read_bytes));
 		}
 	} catch (const std::exception &e) {
@@ -100,7 +117,7 @@ int Test2() {
 		Cgi    cgi(cgi_request);
 		PFdMap pfd_map = cgi.Run();
 		if (cgi.IsWriteRequired()) {
-			write(
+			Write(
 				pfd_map.at(cgi::Cgi::WRITE),
 				cgi_request.body_message.c_str(),
 				cgi_request.body_message.length()
@@ -108,7 +125,7 @@ int Test2() {
 		}
 		while (!response.is_response_complete) {
 			char    buffer[BUF_SIZE] = {};
-			ssize_t read_bytes       = read(pfd_map.at(cgi::Cgi::READ), buffer, BUF_SIZE);
+			ssize_t read_bytes       = Read(pfd_map.at(cgi::Cgi::READ), buffer, BUF_SIZE);
 			response                 = cgi.AddAndGetResponse(std::string(buffer, read_bytes));
 		}
 	} catch (const std::exception &e) {
@@ -143,7 +160,7 @@ int Test3() {
 		Cgi    cgi(cgi_request);
 		PFdMap pfd_map = cgi.Run();
 		if (cgi.IsWriteRequired()) {
-			write(
+			Write(
 				pfd_map.at(cgi::Cgi::WRITE),
 				cgi_request.body_message.c_str(),
 				cgi_request.body_message.length()
@@ -151,7 +168,7 @@ int Test3() {
 		}
 		while (!response.is_response_complete) {
 			char    buffer[BUF_SIZE] = {};
-			ssize_t read_bytes       = read(pfd_map.at(cgi::Cgi::READ), buffer, BUF_SIZE);
+			ssize_t read_bytes       = Read(pfd_map.at(cgi::Cgi::READ), buffer, BUF_SIZE);
 			response                 = cgi.AddAndGetResponse(std::string(buffer, read_bytes));
 		}
 	} catch (const std::exception &e) {
@@ -185,7 +202,7 @@ int Test4() {
 		Cgi    cgi(cgi_request);
 		PFdMap pfd_map = cgi.Run();
 		if (cgi.IsWriteRequired()) {
-			write(
+			Write(
 				pfd_map.at(cgi::Cgi::WRITE),
 				cgi_request.body_message.c_str(),
 				cgi_request.body_message.length()
@@ -193,7 +210,7 @@ int Test4() {
 		}
 		while (!response.is_response_complete) {
 			char    buffer[BUF_SIZE] = {};
-			ssize_t read_bytes       = read(pfd_map.at(cgi::Cgi::READ), buffer, BUF_SIZE);
+			ssize_t read_bytes       = Read(pfd_map.at(cgi::Cgi::READ), buffer, BUF_SIZE);
 			response                 = cgi.AddAndGetResponse(std::string(buffer, read_bytes));
 		}
 	} catch (const std::exception &e) {
