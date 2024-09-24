@@ -3,7 +3,6 @@
 
 #include "stat.hpp"
 #include "status_code.hpp"
-#include "system_exception.hpp"
 #include "utils.hpp"
 #include <list>
 
