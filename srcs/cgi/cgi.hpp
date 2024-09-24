@@ -21,11 +21,12 @@ struct CgiResponse {
 
 class Cgi {
 	typedef utils::Result<CgiResponse> CgiResult;
+	typedef std::map<int, int>         PFdMap;
 
   public:
 	explicit Cgi(const CgiRequest &request);
 	~Cgi();
-	CgiResult Cgi::Run();
+	PFdMap Cgi::Run();
 
 	// <<< todo (関数名・変数名とか含め変えてしまって全然大丈夫です)
 	// pipe(),fork(),close()してpipe_fdをメンバにセット

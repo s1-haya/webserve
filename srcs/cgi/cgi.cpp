@@ -79,15 +79,17 @@ Cgi::~Cgi() {
 	Waitpid(pid_, &exit_status_, 0);
 }
 
-Cgi::CgiResult Cgi::Run() {
+Cgi::PFdMap Cgi::Run() {
 	try {
 		Execve();
 	} catch (const utils::SystemException &e) {
 		throw utils::SystemException(e.what(), e.GetErrorNumber());
 		// todo: server exception
 	}
-	return CgiResult(CgiResponse(response_body_message_, "text/plain", is_response_complete_));
-	// text/plainのみ対応
+	PFdMap pfd_map;
+	pfd_map[READ]  = read_fd_;
+	pfd_map[WRITE] = write_fd_;
+	return pfd_map;
 }
 
 void Cgi::Execve() {
