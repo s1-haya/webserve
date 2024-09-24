@@ -71,10 +71,8 @@ int  main(void) {
     ret_code |= test::TestGetBadRequest15NotExistHeaderField(server_infos);
     ret_code |= test::TestGetBadRequest16HeaderFieldNameSpaceColon(server_infos);
     ret_code |= test::TestGetBadRequest17SpaceHeaderFieldName(server_infos);
-
-	ret_code |= test::TestGetNotFound1NotExistFile(server_infos);
-    // todo: 405 Method Not Implemented
-    // ret_code |= test::TestGetMethodNotAllowed(server_infos);
+    ret_code |= test::TestGetNotFound1NotExistFile(server_infos);
+    ret_code |= test::TestGetMethodNotAllowed(server_infos);
     // todo: HttpResponse::CreateTimeoutResponse
     // ret_code |= test::TestGetTimeout1NoCrlf(server_infos);
     ret_code |= test::TestGetNotImplemented1NotExistMethod(server_infos);

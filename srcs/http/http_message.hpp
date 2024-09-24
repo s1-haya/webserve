@@ -16,6 +16,8 @@ extern const std::string SERVER_VERSION;
 extern const std::string GET;
 extern const std::string DELETE;
 extern const std::string POST;
+extern const std::string DEFAULT_METHODS[];
+extern const std::size_t DEFAULT_METHODS_SIZE;
 extern const std::string DEFAULT_ALLOWED_METHODS[];
 extern const std::size_t DEFAULT_ALLOWED_METHODS_SIZE;
 

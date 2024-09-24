@@ -133,12 +133,10 @@ void Server::Run() {
 	utils::Debug("server", "run server");
 
 	while (true) {
-		const int ready = event_monitor_.CreateReadyList();
-		if (ready == SYSTEM_ERROR) {
-			continue;
-		}
-		for (std::size_t i = 0; i < static_cast<std::size_t>(ready); ++i) {
-			HandleEvent(event_monitor_.GetEvent(i));
+		const event::EventList events = event_monitor_.GetEventList();
+		for (event::ItEventList it = events.begin(); it != events.end(); ++it) {
+			const event::Event &event = *it;
+			HandleEvent(event);
 		}
 		HandleTimeoutMessages();
 	}

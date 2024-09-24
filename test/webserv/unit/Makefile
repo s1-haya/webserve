@@ -8,8 +8,9 @@ TEST_DIRS	:=	convert_str \
 				http_storage \
 				http_status_code \
 				http_serverinfo_check \
-				http_cgi_parse \
-				http_cgi \
+				cgi_parse \
+				cgi \
+				cgi_manager \
 				sock_context \
 				split_str \
 				virtual_server \
