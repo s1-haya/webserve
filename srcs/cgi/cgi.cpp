@@ -75,6 +75,7 @@ Cgi::Cgi(const CgiRequest &request)
 	  env_(SetCgiEnv(request.meta_variables)),
 	  exit_status_(0),
 	  request_body_message_(request.body_message),
+	  pid_(-1),
 	  read_fd_(-1),
 	  write_fd_(-1),
 	  is_response_complete_(false) {}
@@ -87,8 +88,10 @@ Cgi::~Cgi() {
 	if (write_fd_ != -1) {
 		Close(write_fd_);
 	}
-	Kill(pid_, SIGKILL);
-	Waitpid(pid_, &exit_status_, 0);
+	if (pid_ > 0) {
+		Kill(pid_, SIGKILL);
+		Waitpid(pid_, &exit_status_, 0);
+	}
 }
 
 Cgi::PFdMap Cgi::Run() {
