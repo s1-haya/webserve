@@ -6,7 +6,7 @@ from assert_http_response import assert_body, assert_header, assert_status_line
 
 def test_ok() -> None:
     try:
-        con = HTTPConnection("localhost", 8000)
+        con = HTTPConnection("localhost", 8080)
         con.request("GET", "/")
         response = con.getresponse()
         assert_status_line(response, HTTPStatus.OK)
@@ -19,7 +19,7 @@ def test_ok() -> None:
 
 def test_ok_in_sub_directory() -> None:
     try:
-        con = HTTPConnection("localhost", 8000)
+        con = HTTPConnection("localhost", 8080)
         con.request("GET", "/sub/")
         response = con.getresponse()
         assert_status_line(response, HTTPStatus.OK)
@@ -32,7 +32,7 @@ def test_ok_in_sub_directory() -> None:
 
 # def test_not_found() -> None:
 #     try:
-#         con = HTTPConnection("localhost", 8000)
+#         con = HTTPConnection("localhost", 8080)
 #         con.request("GET", "/no-exist-path")
 #         response = con.getresponse()
 #         # assert_status_line(response, HTTPStatus.NOT_FOUND)
