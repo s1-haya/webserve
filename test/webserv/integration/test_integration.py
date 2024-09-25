@@ -45,14 +45,14 @@ def assert_response(response, expected_response):
 root_index_file, root_index_file_length = read_file("root/html/index.html")
 sub_index_file, sub_index_file_length = read_file("root/html/sub/index.html")
 
-response_header_get_root_200 = f"HTTP/1.1 200 OK\r\nConnection: close \r\nContent-Length: {root_index_file_length} \r\n\r\n"
-
-response_header_get_sub_200 = f"HTTP/1.1 200 OK\r\nConnection: close \r\nContent-Length: {sub_index_file_length} \r\n\r\n"
+response_header_get_root_200_close = f"HTTP/1.1 200 OK\r\nConnection: close\r\nContent-Length: {root_index_file_length}\r\nContent-Type: test/html\r\nServer: webserv/1.1\r\n\r\n"
+response_header_get_root_200_keep = f"HTTP/1.1 200 OK\r\nConnection: keep-alive\r\nContent-Length: {root_index_file_length}\r\nContent-Type: test/html\r\nServer: webserv/1.1\r\n\r\n"
+response_header_get_sub_200_close = f"HTTP/1.1 200 OK\r\nConnection: close\r\nContent-Length: {sub_index_file_length}\r\nContent-Type: test/html\r\nServer: webserv/1.1\r\n\r\n"
 
 
 def test_get_root_close_200():
-    expected_response = response_header_get_root_200 + root_index_file
-    client_instance = client.Client(8080)
+    expected_response = response_header_get_root_200_close + root_index_file
+    client_instance = client.Client(8000)
     request = read_file_binary(
         "test/common/request/get/2xx/200_01_connection_close.txt"
     )
@@ -61,19 +61,17 @@ def test_get_root_close_200():
 
 
 def test_get_root_keep_200():
-    expected_response = response_header_get_root_200 + root_index_file
+    expected_response = response_header_get_root_200_keep + root_index_file
     # responseヘッダーもkeepaliveになる？
-    client_instance = client.Client(8080)
-    request = read_file_binary(
-        "test/common/request/get/2xx/200_02_connection_keep.txt"
-    )
+    client_instance = client.Client(8000)
+    request = read_file_binary("test/common/request/get/2xx/200_02_connection_keep.txt")
     response = client_instance.SendRequestAndReceiveResponse(request)
     assert_response(response, expected_response)
 
 
 def test_get_sub_close_200():
-    expected_response = response_header_get_sub_200 + sub_index_file
-    client_instance = client.Client(8080)
+    expected_response = response_header_get_sub_200_close + sub_index_file
+    client_instance = client.Client(8000)
     request = read_file_binary(
         "test/common/request/get/2xx/200_03_sub_connection_close.txt"
     )
@@ -83,7 +81,7 @@ def test_get_sub_close_200():
 
 # def test_get_404():
 #     expected_response = response_header_get_404 + read_file("../../html/sub/index.html")
-#     client_instance = client.Client(8080)
+#     client_instance = client.Client(8000)
 #     request = read_file_binary("../request_messages/webserv/get/404_not-exist-path_connection-close.txt")
 #     response = client_instance.SendRequestAndReceiveResponse(request)
 #     assert (
@@ -102,28 +100,28 @@ def test_webserv():
 
 
 # def test1():
-#     client_instance = client.Client(8080)
+#     client_instance = client.Client(8000)
 #     response = client_instance.SendRequestAndReceiveResponse("")
 #     print(response)
 #     # assert
 
 
 # def test2():
-#     client_instance = client.Client(8080)
+#     client_instance = client.Client(8000)
 #     response = client_instance.SendRequestAndReceiveResponse("GET / HTTP/1.1\n")
 #     print(response)
 #     # assert
 
 
 # def test3():
-#     client_instance = client.Client(8080)
+#     client_instance = client.Client(8000)
 #     response = client_instance.SendRequestAndReceiveResponse("aaa" * 10000)
 #     print(response)
 #     # assert
 
 
 # def test4():
-#     client_instance = client.Client(8080)
+#     client_instance = client.Client(8000)
 #     while True:
 #         response = client_instance.SendRequestAndReceiveResponse(
 #             "GET / HTTP/1.1\nHost: localhost\r\n\r\n"
@@ -133,7 +131,7 @@ def test_webserv():
 
 
 # def test5():
-#     client_instance = client.Client(8080)
+#     client_instance = client.Client(8000)
 #     response = client_instance.SendRequestAndReceiveResponse(
 #         "GET \n   Test: aaa  \r\n\r\n"
 #     )
