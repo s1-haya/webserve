@@ -14,6 +14,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Run unit test message_manager
+      - name: Run unit tests
         run:
-          make -C test/webserv/unit/message_manager run
+          make unit
