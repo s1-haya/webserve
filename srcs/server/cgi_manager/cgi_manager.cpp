@@ -18,10 +18,10 @@ void CgiManager::AddNewCgi(int client_fd, const cgi::CgiRequest &request) {
 	cgi_addr_map_[client_fd] = cgi;
 }
 
-CgiManager::FdMap CgiManager::RunCgi(int client_fd) {
+void CgiManager::RunCgi(int client_fd) {
 	Cgi *cgi = GetCgi(client_fd);
 
-	FdMap pfd_map = cgi->Run();
+	cgi->Run();
 	// todo: try catch
 	// pipe_fdとclient_fdの紐づけをFdMapに追加
 	// todo: add logic_error?
@@ -31,7 +31,6 @@ CgiManager::FdMap CgiManager::RunCgi(int client_fd) {
 	if (cgi->IsWriteRequired()) {
 		client_fd_map_[cgi->GetWriteFd()] = client_fd;
 	}
-	return pfd_map;
 }
 
 void CgiManager::DeleteCgi(int client_fd) {

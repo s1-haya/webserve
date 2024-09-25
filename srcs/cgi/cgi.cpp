@@ -96,16 +96,12 @@ Cgi::~Cgi() {
 	}
 }
 
-Cgi::PFdMap Cgi::Run() {
+void Cgi::Run() {
 	try {
 		Execve();
 	} catch (const SystemException &e) {
 		throw;
 	}
-	PFdMap pfd_map;
-	pfd_map[READ]  = read_fd_;
-	pfd_map[WRITE] = write_fd_;
-	return pfd_map;
 }
 
 void Cgi::Execve() {

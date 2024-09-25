@@ -23,12 +23,10 @@ struct CgiResponse {
 };
 
 class Cgi {
-	typedef std::map<int, int> PFdMap; // 他のコンテナに
-
   public:
 	explicit Cgi(const CgiRequest &request);
 	~Cgi();
-	PFdMap Run();
+	void Run();
 
 	// pipe(),fork(),close()してpipe_fdをメンバにセット
 	// pipe_fdのgetter

@@ -15,7 +15,6 @@ const std::string PATH_DIR_CGI_BIN = "../../../../root/cgi-bin";
 
 typedef server::CgiManager      CgiManager;
 typedef CgiManager::GetFdResult GetFdResult;
-typedef CgiManager::FdMap       FdMap;
 
 struct Result {
 	Result() : is_success(true) {}
@@ -258,7 +257,7 @@ int RunTest4() {
 	cgi_manager.AddNewCgi(4, cgi_request);
 
 	// cgiを実行する(子プロセスで実行 & pipe_fdがclient_fdと紐づけられる)
-	const FdMap pfd_map = cgi_manager.RunCgi(expected_client_fd);
+	cgi_manager.RunCgi(expected_client_fd);
 
 	// pipe_fd(read)を取得
 	const GetFdResult read_fd_result = cgi_manager.GetReadFd(expected_client_fd);

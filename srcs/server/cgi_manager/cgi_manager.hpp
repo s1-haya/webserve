@@ -21,7 +21,7 @@ class CgiManager {
 
 	// functions
 	void               AddNewCgi(int client_fd, const cgi::CgiRequest &request);
-	FdMap              RunCgi(int client_fd);
+	void               RunCgi(int client_fd);
 	void               DeleteCgi(int client_fd);
 	bool               IsResponseComplete(int client_fd) const;
 	GetFdResult        GetReadFd(int client_fd) const;

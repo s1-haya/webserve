@@ -59,17 +59,15 @@ ssize_t Read(int fd, void *buf, size_t nbyte) {
 CgiResponse RunCgi(const CgiRequest &cgi_request) {
 	CgiResponse response;
 	Cgi         cgi(cgi_request);
-	PFdMap      pfd_map = cgi.Run();
+	cgi.Run();
 	if (cgi.IsWriteRequired()) {
 		Write(
-			pfd_map.at(cgi::Cgi::WRITE),
-			cgi_request.body_message.c_str(),
-			cgi_request.body_message.length()
+			cgi.GetWriteFd(), cgi_request.body_message.c_str(), cgi_request.body_message.length()
 		);
 	}
 	while (!response.is_response_complete) {
 		char    buffer[BUF_SIZE] = {};
-		ssize_t read_bytes       = Read(pfd_map.at(cgi::Cgi::READ), buffer, BUF_SIZE);
+		ssize_t read_bytes       = Read(cgi.GetReadFd(), buffer, BUF_SIZE);
 		response                 = cgi.AddAndGetResponse(std::string(buffer, read_bytes));
 	}
 	return response;
