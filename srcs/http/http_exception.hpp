@@ -7,6 +7,8 @@
 
 namespace http {
 
+static const int SYSTEM_ERROR = -1;
+
 class HttpException : public std::runtime_error {
   public:
 	HttpException(const std::string &error_message, const StatusCode &status_code);

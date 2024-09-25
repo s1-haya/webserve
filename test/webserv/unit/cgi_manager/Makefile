@@ -12,7 +12,9 @@ WS_SRCS_DIR			:=	../../../../srcs
 
 WS_UTILS_DIR		:=	$(WS_SRCS_DIR)/utils
 SRCS				+=	$(WS_UTILS_DIR)/color.cpp \
-						$(WS_UTILS_DIR)/system_exception.cpp
+
+WS_EXCEPTION_DIR	:=	$(WS_SRCS_DIR)/exception
+SRCS				+=	$(WS_EXCEPTION_DIR)/system_exception.cpp
 
 # todo: remove (http_excetion.cpp, status_code.cpp)
 WS_HTTP_DIR			:=	$(WS_SRCS_DIR)/http
@@ -33,6 +35,7 @@ SRCS		+=	test_cgi_manager.cpp
 
 # 4. Add directory for INCLUDE
 SRCS_DIR	:=	$(WS_UTILS_DIR) \
+				$(WS_EXCEPTION_DIR) \
 				$(WS_HTTP_DIR) \
 				$(WS_CGI_DIR) \
 				$(WS_CGI_MANAGER_DIR)
