@@ -1,4 +1,4 @@
-GET /get_not_allowed HTTP/1.1
+GET /get_not_allowed/ HTTP/1.1
 Host: localhost
 Connection: close
 

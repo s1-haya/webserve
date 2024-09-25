@@ -60,8 +60,7 @@ SRCS	+=	test_http.cpp \
 
 # 4. Add unit test directory for INCLUDE
 SRCS_DIR += $(TEST_CASE_DIR) \
-			$(TEST_CASE_DIR)/$(TEST_CASE_FOR_GET)/$(TEST_CASE_FOR_2XX) \
-			$(TEST_CASE_DIR)/$(TEST_CASE_FOR_GET)/$(TEST_CASE_FOR_4XX)
+			$(TEST_CASE_DIR)/$(TEST_CASE_FOR_GET)
 
 #--------------------------------------------
 OBJ_DIR		:=	objs
