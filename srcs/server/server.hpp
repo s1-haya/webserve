@@ -5,6 +5,7 @@
 #include "connection.hpp"
 #include "context_manager.hpp"
 #include "epoll.hpp"
+#include "http.hpp"
 #include "http_result.hpp"
 #include "message_manager.hpp"
 #include "mock_http.hpp"
@@ -75,7 +76,7 @@ class Server {
 	// event poll
 	epoll::Epoll event_monitor_;
 	// http
-	http::MockHttp mock_http_;
+	http::Http http_;
 	// message manager with time control
 	MessageManager message_manager_;
 };
