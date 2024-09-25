@@ -66,9 +66,6 @@ pid_t Waitpid(pid_t pid, int *stat_loc, int options) {
 
 } // namespace
 
-const int Cgi::READ  = 0;
-const int Cgi::WRITE = 1;
-
 // 他のところでチェックしてここのatではthrowされない様にする
 Cgi::Cgi(const CgiRequest &request)
 	: method_(request.meta_variables.at(REQUEST_METHOD)),
