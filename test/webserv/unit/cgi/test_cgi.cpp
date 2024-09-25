@@ -2,9 +2,9 @@
 #include "cgi_parse.hpp"
 #include "cgi_request.hpp"
 #include "utils.hpp"
+#include <cerrno>
 #include <cstdlib>
 #include <cstring>
-#include <errno.h>
 #include <iostream>
 #include <unistd.h>
 
