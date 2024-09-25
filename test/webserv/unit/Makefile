@@ -15,6 +15,7 @@ TEST_DIRS	:=	convert_str \
 				split_str \
 				virtual_server \
 				virtual_server_storage \
+				message_manager \
 				config_parse/lexer \
 				config_parse/parser \
 				config_parse \
