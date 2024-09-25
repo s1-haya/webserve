@@ -3,7 +3,7 @@
 #include "http_exception.hpp"
 #include "http_message.hpp"
 #include "status_code.hpp"
-#include "utils.hpp"
+#include "system_exception.hpp"
 #include <cerrno>
 #include <cstdlib>
 #include <cstring>
@@ -19,7 +19,7 @@ static const int SYSTEM_ERROR = -1;
 int Close(int fd) {
 	int status = close(fd);
 	if (status == SYSTEM_ERROR) {
-		throw utils::SystemException(std::strerror(errno), errno);
+		throw SystemException(std::strerror(errno));
 	}
 	return status;
 }
@@ -27,7 +27,7 @@ int Close(int fd) {
 int Dup2(int fd1, int fd2) {
 	int status = dup2(fd1, fd2);
 	if (status == SYSTEM_ERROR) {
-		throw utils::SystemException(std::strerror(errno), errno);
+		throw SystemException(std::strerror(errno));
 	}
 	return status;
 }
@@ -35,7 +35,7 @@ int Dup2(int fd1, int fd2) {
 int Pipe(int fd[2]) {
 	int status = pipe(fd);
 	if (status == SYSTEM_ERROR) {
-		throw utils::SystemException(std::strerror(errno), errno);
+		throw SystemException(std::strerror(errno));
 	}
 	return status;
 }
@@ -43,7 +43,7 @@ int Pipe(int fd[2]) {
 pid_t Fork(void) {
 	pid_t p = fork();
 	if (p == SYSTEM_ERROR) {
-		throw utils::SystemException(std::strerror(errno), errno);
+		throw SystemException(std::strerror(errno));
 	}
 	return p;
 }
@@ -51,7 +51,7 @@ pid_t Fork(void) {
 ssize_t Write(int fd, const void *buf, size_t nbyte) {
 	ssize_t bytes_write = write(fd, buf, nbyte);
 	if (bytes_write == SYSTEM_ERROR) {
-		throw utils::SystemException(std::strerror(errno), errno);
+		throw SystemException(std::strerror(errno));
 	}
 	return bytes_write;
 }
@@ -59,7 +59,7 @@ ssize_t Write(int fd, const void *buf, size_t nbyte) {
 ssize_t Read(int fd, void *buf, size_t nbyte) {
 	ssize_t bytes_read = read(fd, buf, nbyte);
 	if (bytes_read == SYSTEM_ERROR) {
-		throw utils::SystemException(std::strerror(errno), errno);
+		throw SystemException(std::strerror(errno));
 	}
 	return bytes_read;
 }
@@ -67,7 +67,7 @@ ssize_t Read(int fd, void *buf, size_t nbyte) {
 pid_t Waitpid(pid_t pid, int *stat_loc, int options) {
 	pid_t p = waitpid(pid, stat_loc, options);
 	if (p == SYSTEM_ERROR) {
-		throw utils::SystemException(std::strerror(errno), errno);
+		throw SystemException(std::strerror(errno));
 	}
 	return p;
 }
@@ -94,7 +94,7 @@ http::StatusCode Cgi::Run(std::string &response_body_message) {
 	try {
 		Execve();
 		response_body_message = response_body_message_;
-	} catch (const utils::SystemException &e) {
+	} catch (const SystemException &e) {
 		throw http::HttpException(e.what(), http::StatusCode(http::INTERNAL_SERVER_ERROR));
 	}
 	return http::StatusCode(http::OK);
@@ -137,10 +137,13 @@ void Cgi::Execve() {
 	Waitpid(p, &exit_status_, 0);
 	if (WIFEXITED(exit_status_)) {
 		if (WEXITSTATUS(exit_status_) != 0) {
-			throw utils::SystemException("CGI script failed", WEXITSTATUS(exit_status_));
+			// todo:
+			//   WEXITSTATUS(exit_status_)をCgiResultに入れて返す？
+			//   or 子プロセスのexit_statusってhttp_responseに関係ない？
+			throw SystemException("CGI script failed");
 		}
 	} else {
-		throw utils::SystemException("CGI script did not exit normally", exit_status_);
+		throw SystemException("CGI script did not exit normally");
 		// exit_status_にはシグナル番号が入っている
 	}
 }
@@ -169,7 +172,7 @@ char *const *Cgi::SetCgiArgv() {
 	char **argv = new (std::nothrow) char *[2];
 	char  *dest = new (std::nothrow) char[cgi_script_.size() + 1];
 	if (argv == NULL || dest == NULL) {
-		throw utils::SystemException(std::strerror(errno), errno);
+		throw SystemException(std::strerror(errno));
 	}
 	std::strcpy(dest, cgi_script_.c_str());
 	argv[0] = dest;
@@ -180,7 +183,7 @@ char *const *Cgi::SetCgiArgv() {
 char *const *Cgi::SetCgiEnv(const MetaMap &meta_variables) {
 	char **cgi_env = new (std::nothrow) char *[meta_variables.size() + 1];
 	if (cgi_env == NULL) {
-		throw utils::SystemException(std::strerror(errno), errno);
+		throw SystemException(std::strerror(errno));
 	}
 	std::size_t i = 0;
 
@@ -189,7 +192,7 @@ char *const *Cgi::SetCgiEnv(const MetaMap &meta_variables) {
 		const std::string element = it->first + "=" + it->second;
 		char             *dest    = new (std::nothrow) char[element.size() + 1];
 		if (dest == NULL) {
-			throw utils::SystemException(std::strerror(errno), errno);
+			throw SystemException(std::strerror(errno));
 		}
 		std::strcpy(dest, element.c_str());
 		cgi_env[i] = dest;
