@@ -3,7 +3,7 @@ import subprocess
 
 def test_webserv() -> None:
     try:
-        server_url = "http://localhost:8080"
+        server_url = "http://localhost:8000"
         cp = subprocess.run(
             ["/usr/bin/curl", server_url], capture_output=True, text=True
         )
