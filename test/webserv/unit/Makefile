@@ -10,6 +10,7 @@ TEST_DIRS	:=	convert_str \
 				http_serverinfo_check \
 				cgi_parse \
 				cgi \
+				cgi_manager \
 				sock_context \
 				split_str \
 				virtual_server \

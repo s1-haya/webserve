@@ -163,6 +163,19 @@ InputIt Next(InputIt it, typename std::iterator_traits<InputIt>::difference_type
 
 // ================================================= //
 
+#define ROOT_DIR "root"
+
+// root 以降を抜き出す
+std::string ExtractHttpServerInfoCheckPath(const std::string &full_path) {
+	const std::string target = ROOT_DIR;
+	size_t            pos    = full_path.find(target);
+	if (pos != std::string::npos) {
+		return full_path.substr(pos + target.length());
+	} else {
+		return "";
+	}
+}
+
 /* 以下のテストではメソッドは特に関係ない */
 int Test1() {
 	// request
@@ -177,7 +190,7 @@ int Test1() {
 	server::Location              location = vs->GetLocationList().front(); // location1
 
 	try {
-		COMPARE(result.path, location.request_uri);
+		COMPARE(ExtractHttpServerInfoCheckPath(result.path), location.request_uri);
 		COMPARE(result.index, location.index);
 		COMPARE(result.autoindex, location.autoindex);
 		COMPARE(result.allowed_methods, location.allowed_methods);
@@ -240,7 +253,7 @@ int Test3() {
 	server::Location              location = vs->GetLocationList().front(); // location1(alias)
 
 	try {
-		COMPARE(result.path, location.alias + "test.html");
+		COMPARE(ExtractHttpServerInfoCheckPath(result.path), location.alias + "test.html");
 		COMPARE(result.index, location.index);
 		COMPARE(result.autoindex, location.autoindex);
 		COMPARE(result.allowed_methods, location.allowed_methods);
@@ -273,7 +286,7 @@ int Test4() {
 		*(Next(vs->GetLocationList().begin(), 1)); // location2(cgi, upload_directory)
 
 	try {
-		COMPARE(result.path, location.request_uri);
+		COMPARE(ExtractHttpServerInfoCheckPath(result.path), location.request_uri);
 		COMPARE(result.index, location.index);
 		COMPARE(result.autoindex, location.autoindex);
 		COMPARE(result.allowed_methods, location.allowed_methods);

@@ -8,6 +8,17 @@
 #include <iostream>
 
 namespace http {
+namespace {
+
+std::string GetCwd() {
+	const char            *file_path = __FILE__;
+	std::string            path(file_path);
+	std::string::size_type pos       = path.find_last_of("/\\");
+	std::string            directory = (pos != std::string::npos) ? path.substr(0, pos) : "";
+	return directory;
+}
+
+} // namespace
 
 CheckServerInfoResult HttpServerInfoCheck::Check(
 	const server::VirtualServerAddrList &server_infos, const HttpRequestFormat &request
@@ -70,6 +81,8 @@ void HttpServerInfoCheck::CheckLocationList(
 	CheckAllowedMethods(result, match_location);
 	CheckCgiExtension(result, match_location);
 	CheckUploadDirectory(result, match_location);
+	const std::string ROOT_PATH = GetCwd() + "/../../../../root";
+	result.path                 = ROOT_PATH + result.path;
 	return;
 }
 

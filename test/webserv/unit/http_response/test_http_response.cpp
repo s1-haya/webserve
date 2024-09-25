@@ -66,7 +66,7 @@ server::VirtualServer *BuildVirtualServer1() {
 	// LocationList
 	server::VirtualServer::LocationList locationlist;
 	// リソースの取得位置によって(srcs/http/response/http_method.cpp)によって出力結果が決まる
-	std::string                         alias = "../../../../root/html/index.html";
+	std::string                         alias = "/html/";
 	server::Location::AllowedMethodList allowed_methods;
 	allowed_methods.push_back("GET");
 	allowed_methods.push_back("POST");

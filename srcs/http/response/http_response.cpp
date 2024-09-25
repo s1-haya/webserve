@@ -83,7 +83,7 @@ HttpResponseFormat HttpResponse::CreateHttpResponseFormat(
 		// 	// check the path of error_page
 		// }
 		// for debug
-		std::cout << utils::color::GRAY << "Debug [" << e.what() << "]" << utils::color::RESET
+		std::cerr << utils::color::GRAY << "Debug [" << e.what() << "]" << utils::color::RESET
 				  << std::endl;
 		status_code                            = e.GetStatusCode();
 		response_body_message                  = CreateDefaultBodyMessageFormat(status_code);
