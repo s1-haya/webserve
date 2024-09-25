@@ -49,11 +49,6 @@ void CgiManager::DeleteCgi(int client_fd) {
 	cgi_addr_map_.erase(client_fd);
 }
 
-bool CgiManager::IsResponseComplete(int client_fd) const {
-	const Cgi *cgi = cgi_addr_map_.at(client_fd);
-	return cgi->IsResponseComplete();
-}
-
 CgiManager::GetFdResult CgiManager::GetReadFd(int client_fd) const {
 	GetFdResult result;
 

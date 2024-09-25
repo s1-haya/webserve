@@ -202,10 +202,6 @@ bool Cgi::IsWriteRequired() const {
 	return write_fd_ != -1;
 }
 
-bool Cgi::IsResponseComplete() const {
-	return is_response_complete_;
-}
-
 const std::string &Cgi::GetRequest() const {
 	return request_body_message_;
 }

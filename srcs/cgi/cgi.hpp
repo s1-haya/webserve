@@ -35,8 +35,6 @@ class Cgi {
 	// read/writeのpipe_fdが存在するかどうか
 	bool IsReadRequired() const;
 	bool IsWriteRequired() const;
-	// responseが完成したかどうかを取得
-	bool IsResponseComplete() const;
 	// requestのgetter
 	const std::string &GetRequest() const;
 	// responseをaddしてget(全部送れたらresponse_completeをtrueにする)

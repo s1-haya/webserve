@@ -23,7 +23,6 @@ class CgiManager {
 	void               AddNewCgi(int client_fd, const cgi::CgiRequest &request);
 	void               RunCgi(int client_fd);
 	void               DeleteCgi(int client_fd);
-	bool               IsResponseComplete(int client_fd) const;
 	GetFdResult        GetReadFd(int client_fd) const;
 	GetFdResult        GetWriteFd(int client_fd) const;
 	int                GetClientFd(int pipe_fd) const;
