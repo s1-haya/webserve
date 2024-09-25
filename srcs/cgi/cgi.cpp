@@ -1,6 +1,8 @@
 #include "cgi.hpp"
 #include "cgi_request.hpp"
 #include "http_message.hpp"
+#include "status_code.hpp"
+#include "system_exception.hpp"
 #include "utils.hpp"
 #include <cerrno>
 #include <cstdlib>
@@ -17,7 +19,7 @@ static const int SYSTEM_ERROR = -1;
 int Close(int fd) {
 	int status = close(fd);
 	if (status == SYSTEM_ERROR) {
-		throw utils::SystemException(std::strerror(errno), errno);
+		throw SystemException(std::strerror(errno));
 	}
 	return status;
 }
@@ -25,7 +27,7 @@ int Close(int fd) {
 int Dup2(int fd1, int fd2) {
 	int status = dup2(fd1, fd2);
 	if (status == SYSTEM_ERROR) {
-		throw utils::SystemException(std::strerror(errno), errno);
+		throw SystemException(std::strerror(errno));
 	}
 	return status;
 }
@@ -33,7 +35,7 @@ int Dup2(int fd1, int fd2) {
 int Pipe(int fd[2]) {
 	int status = pipe(fd);
 	if (status == SYSTEM_ERROR) {
-		throw utils::SystemException(std::strerror(errno), errno);
+		throw SystemException(std::strerror(errno));
 	}
 	return status;
 }
@@ -41,7 +43,7 @@ int Pipe(int fd[2]) {
 pid_t Fork(void) {
 	pid_t p = fork();
 	if (p == SYSTEM_ERROR) {
-		throw utils::SystemException(std::strerror(errno), errno);
+		throw SystemException(std::strerror(errno));
 	}
 	return p;
 }
@@ -49,7 +51,7 @@ pid_t Fork(void) {
 int Kill(pid_t pid, int sig) {
 	int status = kill(pid, sig);
 	if (status == SYSTEM_ERROR) {
-		throw utils::SystemException(std::strerror(errno), errno);
+		throw SystemException(std::strerror(errno));
 	}
 	return status;
 }
@@ -57,7 +59,7 @@ int Kill(pid_t pid, int sig) {
 pid_t Waitpid(pid_t pid, int *stat_loc, int options) {
 	pid_t p = waitpid(pid, stat_loc, options);
 	if (p == SYSTEM_ERROR) {
-		throw utils::SystemException(std::strerror(errno), errno);
+		throw SystemException(std::strerror(errno));
 	}
 	return p;
 }
@@ -97,8 +99,8 @@ Cgi::~Cgi() {
 Cgi::PFdMap Cgi::Run() {
 	try {
 		Execve();
-	} catch (const utils::SystemException &e) {
-		throw utils::SystemException(e.what(), e.GetErrorNumber());
+	} catch (const SystemException &e) {
+		throw SystemException(e.what());
 		// todo: server exception
 	}
 	PFdMap pfd_map;
@@ -159,8 +161,7 @@ char *const *Cgi::SetCgiArgv() {
 	char **argv = new (std::nothrow) char *[2];
 	char  *dest = new (std::nothrow) char[cgi_script_.size() + 1];
 	if (argv == NULL || dest == NULL) {
-		throw utils::SystemException(std::strerror(errno), errno);
-		// todo: server exception (constructor)
+		throw SystemException(std::strerror(errno));
 	}
 	std::strcpy(dest, cgi_script_.c_str());
 	argv[0] = dest;
@@ -171,8 +172,7 @@ char *const *Cgi::SetCgiArgv() {
 char *const *Cgi::SetCgiEnv(const MetaMap &meta_variables) {
 	char **cgi_env = new (std::nothrow) char *[meta_variables.size() + 1];
 	if (cgi_env == NULL) {
-		throw utils::SystemException(std::strerror(errno), errno);
-		// todo: server exception (constructor)
+		throw SystemException(std::strerror(errno));
 	}
 	std::size_t i = 0;
 
@@ -181,8 +181,7 @@ char *const *Cgi::SetCgiEnv(const MetaMap &meta_variables) {
 		const std::string element = it->first + "=" + it->second;
 		char             *dest    = new (std::nothrow) char[element.size() + 1];
 		if (dest == NULL) {
-			throw utils::SystemException(std::strerror(errno), errno);
-			// todo: server exception (constructor)
+			throw SystemException(std::strerror(errno));
 		}
 		std::strcpy(dest, element.c_str());
 		cgi_env[i] = dest;

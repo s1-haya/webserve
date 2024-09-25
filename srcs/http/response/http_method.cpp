@@ -5,7 +5,6 @@
 #include "http_response.hpp"
 #include "http_serverinfo_check.hpp"
 #include "stat.hpp"
-#include "system_exception.hpp"
 #include <algorithm> // std::find
 #include <cstring>
 #include <ctime>    // ctime
@@ -155,17 +154,17 @@ StatusCode Method::DeleteHandler(
 	StatusCode  status_code = StatusCode(NO_CONTENT);
 	if (info.IsDirectory()) {
 		throw HttpException("Error: Forbidden", StatusCode(FORBIDDEN));
-	} else if (std::remove(path.c_str()) == 0) {
+	}
+	if (std::remove(path.c_str()) == SYSTEM_ERROR) {
+		SystemExceptionHandler(errno);
+	} else {
 		response_body_message = HttpResponse::CreateDefaultBodyMessageFormat(status_code);
 		response_header_fields[CONTENT_LENGTH] = utils::ToString(response_body_message.length());
-	} else {
-		throw utils::SystemException(std::strerror(errno), errno);
 	}
 	return status_code;
 }
 
-void Method::SystemExceptionHandler(const utils::SystemException &e) {
-	int error_number = e.GetErrorNumber();
+void Method::SystemExceptionHandler(int error_number) {
 	if (error_number == EACCES || error_number == EPERM) {
 		throw HttpException("Error: Forbidden", StatusCode(FORBIDDEN));
 	} else if (error_number == ENOENT || error_number == ENOTDIR || error_number == ELOOP ||
@@ -190,8 +189,8 @@ StatusCode Method::FileCreationHandler(
 	file.write(request_body_message.c_str(), request_body_message.length());
 	if (file.fail()) {
 		file.close();
-		if (std::remove(path.c_str()) != 0) {
-			throw utils::SystemException(std::strerror(errno), errno);
+		if (std::remove(path.c_str()) == SYSTEM_ERROR) {
+			SystemExceptionHandler(errno);
 		}
 		throw HttpException("Error: Forbidden", StatusCode(FORBIDDEN));
 	}
@@ -202,14 +201,8 @@ StatusCode Method::FileCreationHandler(
 
 Stat Method::TryStat(const std::string &path) {
 	struct stat stat_buf;
-	try {
-		if (stat(path.c_str(), &stat_buf) == -1) {
-			std::string error_message =
-				"Error: stat on path '" + path + "': " + std::strerror(errno);
-			throw utils::SystemException(error_message, errno);
-		}
-	} catch (const utils::SystemException &e) {
-		SystemExceptionHandler(e);
+	if (stat(path.c_str(), &stat_buf) == SYSTEM_ERROR) {
+		SystemExceptionHandler(errno);
 	}
 	Stat info(stat_buf);
 	return info;

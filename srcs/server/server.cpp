@@ -9,6 +9,7 @@
 #include "utils.hpp"
 #include "virtual_server.hpp"
 #include <cerrno>
+#include <cstring>      // strerror
 #include <fcntl.h>      // fcntl
 #include <sys/socket.h> // socket
 #include <unistd.h>     // close
@@ -352,7 +353,7 @@ void Server::UpdateConnectionAfterSendResponse(
 void Server::AddEventRead(int sock_fd) {
 	try {
 		event_monitor_.Add(sock_fd, event::EVENT_READ);
-	} catch (const utils::SystemException &e) {
+	} catch (const SystemException &e) {
 		utils::PrintError(e.what());
 		SetInternalServerError(sock_fd);
 	}
@@ -361,7 +362,7 @@ void Server::AddEventRead(int sock_fd) {
 void Server::ReplaceEvent(int client_fd, event::Type type) {
 	try {
 		event_monitor_.Replace(client_fd, type);
-	} catch (const utils::SystemException &e) {
+	} catch (const SystemException &e) {
 		utils::PrintError(e.what());
 		switch (type) {
 		case event::EVENT_READ:
@@ -379,7 +380,7 @@ void Server::ReplaceEvent(int client_fd, event::Type type) {
 void Server::AppendEventWrite(const event::Event &event) {
 	try {
 		event_monitor_.Append(event, event::EVENT_WRITE);
-	} catch (const utils::SystemException &e) {
+	} catch (const SystemException &e) {
 		utils::PrintError(e.what());
 		Disconnect(event.fd);
 	}
@@ -390,7 +391,7 @@ Server::AcceptResult Server::Accept(int server_fd) {
 	try {
 		ClientInfo new_client_info = Connection::Accept(server_fd);
 		result.SetValue(new_client_info);
-	} catch (const utils::SystemException &e) {
+	} catch (const SystemException &e) {
 		result.Set(false);
 		utils::PrintError(e.what());
 		SetInternalServerError(server_fd);
@@ -467,11 +468,11 @@ void Server::Init() {
 void Server::SetNonBlockingMode(int sock_fd) {
 	int flags = fcntl(sock_fd, F_GETFL);
 	if (flags == SYSTEM_ERROR) {
-		throw utils::SystemException(errno);
+		throw SystemException("fcntl F_GETFL failed: " + std::string(std::strerror(errno)));
 	}
 	flags |= O_NONBLOCK;
 	if (fcntl(sock_fd, F_SETFL, flags) == SYSTEM_ERROR) {
-		throw utils::SystemException(errno);
+		throw SystemException("fcntl F_SETFL failed: " + std::string(std::strerror(errno)));
 	}
 }
 
