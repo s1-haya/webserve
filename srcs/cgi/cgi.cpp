@@ -100,8 +100,7 @@ Cgi::PFdMap Cgi::Run() {
 	try {
 		Execve();
 	} catch (const SystemException &e) {
-		throw SystemException(e.what());
-		// todo: server exception
+		throw;
 	}
 	PFdMap pfd_map;
 	pfd_map[READ]  = read_fd_;
