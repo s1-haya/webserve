@@ -76,6 +76,7 @@ Connection::IpList Connection::ResolveHostName(const std::string &hostname) {
 		);
 	}
 
+	AddrInfo *head_result = result;
 	// Temporary std::set for checking duplicate IPs.
 	std::set<std::string> ip_set;
 	for (; result != NULL; result = result->ai_next) {
@@ -83,7 +84,7 @@ Connection::IpList Connection::ResolveHostName(const std::string &hostname) {
 		const std::string   ip    = ConvertToIpv4Str(sa_in->sin_addr);
 		ip_set.insert(ip);
 	}
-	freeaddrinfo(result);
+	freeaddrinfo(head_result);
 	return IpList(ip_set.begin(), ip_set.end());
 }
 
