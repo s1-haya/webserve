@@ -40,7 +40,7 @@ class HttpResponse {
 						   const HttpRequestResult             &request_info);
 	static std::string CreateDefaultBodyMessageFormat(const StatusCode &status_code);
 	static bool        IsConnectionKeep(const HeaderFields &request_header_fields);
-	// static std::string CreateBadRequestResponse(const HttpRequestResult &request_info);
+	static std::string CreateBadRequestResponse(const HttpRequestResult &request_info);
 
   private:
 	HttpResponse();
