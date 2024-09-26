@@ -24,7 +24,7 @@ void MessageManager::AddNewMessage(int client_fd) {
 	message::Message message(client_fd);
 	InsertResult     result = messages_.insert(std::make_pair(client_fd, message));
 	if (result.second == false) {
-		throw std::logic_error("AddNewMessage(): message is already exist");
+		throw std::logic_error("AddNewMessage: message is already exist");
 	}
 }
 
@@ -51,58 +51,98 @@ MessageManager::TimeoutFds MessageManager::GetNewTimeoutFds(double timeout) {
 // todo: 全てのresponse_strをsend()できた場合かつkeep-aliveの場合に呼ばれる想定
 // For Connection: keep-alive
 void MessageManager::UpdateTime(int client_fd) {
-	message::Message &message = messages_.at(client_fd);
-	message.UpdateTime();
+	try {
+		message::Message &message = messages_.at(client_fd);
+		message.UpdateTime();
+	} catch (const std::exception &e) {
+		throw std::logic_error("UpdateTime: " + std::string(e.what()));
+	}
 }
 
 void MessageManager::AddRequestBuf(int client_fd, const std::string &request_buf) {
-	message::Message &message = messages_.at(client_fd);
-	message.AddRequestBuf(request_buf);
+	try {
+		message::Message &message = messages_.at(client_fd);
+		message.AddRequestBuf(request_buf);
+	} catch (const std::exception &e) {
+		throw std::logic_error("AddRequestBuf: " + std::string(e.what()));
+	}
 }
 
 void MessageManager::SetNewRequestBuf(int client_fd, const std::string &request_buf) {
-	message::Message &message = messages_.at(client_fd);
-	message.DeleteRequestBuf();
-	message.AddRequestBuf(request_buf);
+	try {
+		message::Message &message = messages_.at(client_fd);
+		message.DeleteRequestBuf();
+		message.AddRequestBuf(request_buf);
+	} catch (const std::exception &e) {
+		throw std::logic_error("SetNewRequestBuf: " + std::string(e.what()));
+	}
 }
 
 void MessageManager::AddNormalResponse(
 	int client_fd, message::ConnectionState connection_state, const std::string &response
 ) {
-	message::Message &message = messages_.at(client_fd);
-	message.AddBackResponse(connection_state, response);
+	try {
+		message::Message &message = messages_.at(client_fd);
+		message.AddBackResponse(connection_state, response);
+	} catch (const std::exception &e) {
+		throw std::logic_error("AddNormalResponse: " + std::string(e.what()));
+	}
 }
 
 void MessageManager::AddPrimaryResponse(
 	int client_fd, message::ConnectionState connection_state, const std::string &response
 ) {
-	message::Message &message = messages_.at(client_fd);
-	message.AddFrontResponse(connection_state, response);
+	try {
+		message::Message &message = messages_.at(client_fd);
+		message.AddFrontResponse(connection_state, response);
+	} catch (const std::exception &e) {
+		throw std::logic_error("AddPrimaryResponse: " + std::string(e.what()));
+	}
 }
 
 message::Response MessageManager::PopHeadResponse(int client_fd) {
-	message::Message &message = messages_.at(client_fd);
-	return message.PopFrontResponse();
+	try {
+		message::Message &message = messages_.at(client_fd);
+		return message.PopFrontResponse();
+	} catch (const std::exception &e) {
+		throw std::logic_error("PopHeadResponse: " + std::string(e.what()));
+	}
 }
 
 bool MessageManager::IsResponseExist(int client_fd) const {
-	const message::Message &message = messages_.at(client_fd);
-	return message.IsResponseExist();
+	try {
+		const message::Message &message = messages_.at(client_fd);
+		return message.IsResponseExist();
+	} catch (const std::exception &e) {
+		throw std::logic_error("IsResponseExist: " + std::string(e.what()));
+	}
 }
 
 bool MessageManager::IsCompleteRequest(int client_fd) const {
-	const message::Message &message = messages_.at(client_fd);
-	return message.GetIsCompleteRequest();
+	try {
+		const message::Message &message = messages_.at(client_fd);
+		return message.GetIsCompleteRequest();
+	} catch (const std::exception &e) {
+		throw std::logic_error("IsCompleteRequest: " + std::string(e.what()));
+	}
 }
 
 const std::string &MessageManager::GetRequestBuf(int client_fd) const {
-	const message::Message &message = messages_.at(client_fd);
-	return message.GetRequestBuf();
+	try {
+		const message::Message &message = messages_.at(client_fd);
+		return message.GetRequestBuf();
+	} catch (const std::exception &e) {
+		throw std::logic_error("GetRequestBuf: " + std::string(e.what()));
+	}
 }
 
 void MessageManager::SetIsCompleteRequest(int client_fd, bool is_complete_request) {
-	message::Message &message = messages_.at(client_fd);
-	message.SetIsCompleteRequest(is_complete_request);
+	try {
+		message::Message &message = messages_.at(client_fd);
+		message.SetIsCompleteRequest(is_complete_request);
+	} catch (const std::exception &e) {
+		throw std::logic_error("SetIsCompleteRequest: " + std::string(e.what()));
+	}
 }
 
 } // namespace server
