@@ -186,7 +186,10 @@ void Server::HandleExistingConnection(const event::Event &event) {
 		}
 	}
 	if (event.type & event::EVENT_WRITE) {
-		// todo: RunHttp内でDisconnect()されていた場合の処理追加
+		// Prevent SendResponse() if Disconnect() was called during EVENT_READ handling.
+		if (!message_manager_.IsMessageExist(event.fd)) {
+			return;
+		}
 		SendResponse(event.fd);
 	}
 }
