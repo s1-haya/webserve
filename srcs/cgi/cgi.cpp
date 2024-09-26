@@ -88,8 +88,11 @@ Cgi::~Cgi() {
 		Close(write_fd_);
 	}
 	if (pid_ > 0) {
-		Kill(pid_, SIGKILL);
-		Waitpid(pid_, &exit_status_, 0);
+		if (Waitpid(pid_, &exit_status_, WNOHANG) ==
+			0) { // 子プロセスがまだ終了していない場合だけkillする
+			Kill(pid_, SIGKILL);
+			Waitpid(pid_, &exit_status_, 0);
+		}
 	}
 }
 
