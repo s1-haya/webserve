@@ -3,6 +3,28 @@
   <head>
     <meta charset="UTF-8" />
     <title>Web Server</title>
+    <script>
+      function updateFormAction(event, basePath, method) {
+        event.preventDefault();
+        const form = event.target;
+        const filename = form.filename.value;
+        const url = `${basePath}${filename}`;
+        
+        fetch(url, {
+          method: method,
+        })
+        .then(response => {
+          if (response.ok) {
+            alert(`${method} method succeeded for ${filename}`);
+          } else {
+            alert(`${method} method failed for ${filename}`);
+          }
+        })
+        .catch(error => {
+          alert(`${method} method failed due to an error: ${error}`);
+        });
+      }
+    </script>
   </head>
   <body>
     <h1>Hello from webserv!</h1>
@@ -20,17 +42,22 @@
 
     <div class="method">
       <h2>POST</h2>
-      <p>post to post/?</p>
-      <form action="post/" method="POST">
+      <form onsubmit="updateFormAction(event, 'upload/', 'POST')" method="POST">
         <label for="text-input">Enter text</label>
         <input type="text" name="user_text" />
+        <label for="filename">Enter filename</label>
+        <input type="text" name="filename" required />
         <button type="submit">Submit</button>
       </form>
     </div>
 
     <div class="method">
       <h2>DELETE</h2>
-      <p><a href="delete/">link to delete/?</a></p>
+      <form onsubmit="updateFormAction(event, 'upload/', 'DELETE')" method="POST">
+        <label for="filename">Enter filename to delete</label>
+        <input type="text" name="filename" required />
+        <button type="submit">Delete</button>
+      </form>
     </div>
 
     <div class="method">
