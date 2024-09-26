@@ -20,7 +20,280 @@ int TestGetBadRequest1OnlyCrlf(const server::VirtualServerAddrList &server_infos
 	const std::string &expected_response         = CreateHttpResponseFormat(
         expected_status_line, expected_header_fields, expected_body_message
     );
-	http::HttpResult expected = CreateHttpResult(false, false, "", expected_response);
+	http::HttpResult expected = CreateHttpResult(true, false, "", expected_response);
+	return HandleHttpResult(client_infos, server_infos, expected);
+}
+
+int TestGetBadRequest2LowerMethod(const server::VirtualServerAddrList &server_infos) {
+	http::ClientInfos client_infos          = CreateClientInfos(request::GET_400_2_LOWER_METHOD);
+	std::string       expected_status_line  = EXPECTED_STATUS_LINE_BAD_REQUEST;
+	std::string       expected_body_message = EXPECTED_BODY_MESSAGE_BAD_REQUEST;
+	HeaderFields      expected_header_fields;
+	expected_header_fields[http::CONNECTION]     = http::CLOSE;
+	expected_header_fields[http::CONTENT_LENGTH] = utils::ToString(expected_body_message.length());
+	expected_header_fields[http::CONTENT_TYPE]   = "test/html";
+	expected_header_fields[http::SERVER]         = http::SERVER_VERSION;
+	const std::string &expected_response         = CreateHttpResponseFormat(
+        expected_status_line, expected_header_fields, expected_body_message
+    );
+	const std::string &expected_request_buffer = "Host: localhost\r\nConnection: close\r\n\r\n";
+	http::HttpResult   expected =
+		CreateHttpResult(true, false, expected_request_buffer, expected_response);
+	return HandleHttpResult(client_infos, server_infos, expected);
+}
+
+int TestGetBadRequest3NoAsciiMethod(const server::VirtualServerAddrList &server_infos) {
+	http::ClientInfos client_infos          = CreateClientInfos(request::GET_400_3_NO_ASCII_METHOD);
+	std::string       expected_status_line  = EXPECTED_STATUS_LINE_BAD_REQUEST;
+	std::string       expected_body_message = EXPECTED_BODY_MESSAGE_BAD_REQUEST;
+	HeaderFields      expected_header_fields;
+	expected_header_fields[http::CONNECTION]     = http::CLOSE;
+	expected_header_fields[http::CONTENT_LENGTH] = utils::ToString(expected_body_message.length());
+	expected_header_fields[http::CONTENT_TYPE]   = "test/html";
+	expected_header_fields[http::SERVER]         = http::SERVER_VERSION;
+	const std::string &expected_response         = CreateHttpResponseFormat(
+        expected_status_line, expected_header_fields, expected_body_message
+    );
+	const std::string &expected_request_buffer = "Host: localhost\r\nConnection: close\r\n\r\n";
+	http::HttpResult   expected =
+		CreateHttpResult(true, false, expected_request_buffer, expected_response);
+	return HandleHttpResult(client_infos, server_infos, expected);
+}
+
+int TestGetBadRequest4NoRoot(const server::VirtualServerAddrList &server_infos) {
+	http::ClientInfos client_infos          = CreateClientInfos(request::GET_400_4_NO_ROOT);
+	std::string       expected_status_line  = EXPECTED_STATUS_LINE_BAD_REQUEST;
+	std::string       expected_body_message = EXPECTED_BODY_MESSAGE_BAD_REQUEST;
+	HeaderFields      expected_header_fields;
+	expected_header_fields[http::CONNECTION]     = http::CLOSE;
+	expected_header_fields[http::CONTENT_LENGTH] = utils::ToString(expected_body_message.length());
+	expected_header_fields[http::CONTENT_TYPE]   = "test/html";
+	expected_header_fields[http::SERVER]         = http::SERVER_VERSION;
+	const std::string &expected_response         = CreateHttpResponseFormat(
+        expected_status_line, expected_header_fields, expected_body_message
+    );
+	const std::string &expected_request_buffer = "Host: localhost\r\nConnection: close\r\n\r\n";
+	http::HttpResult   expected =
+		CreateHttpResult(true, false, expected_request_buffer, expected_response);
+	return HandleHttpResult(client_infos, server_infos, expected);
+}
+
+int TestGetBadRequest5RelativePath(const server::VirtualServerAddrList &server_infos) {
+	http::ClientInfos client_infos          = CreateClientInfos(request::GET_400_5_RELATIVE_PATH);
+	std::string       expected_status_line  = EXPECTED_STATUS_LINE_BAD_REQUEST;
+	std::string       expected_body_message = EXPECTED_BODY_MESSAGE_BAD_REQUEST;
+	HeaderFields      expected_header_fields;
+	expected_header_fields[http::CONNECTION]     = http::CLOSE;
+	expected_header_fields[http::CONTENT_LENGTH] = utils::ToString(expected_body_message.length());
+	expected_header_fields[http::CONTENT_TYPE]   = "test/html";
+	expected_header_fields[http::SERVER]         = http::SERVER_VERSION;
+	const std::string &expected_response         = CreateHttpResponseFormat(
+        expected_status_line, expected_header_fields, expected_body_message
+    );
+	const std::string &expected_request_buffer = "Host: localhost\r\nConnection: close\r\n\r\n";
+	http::HttpResult   expected =
+		CreateHttpResult(true, false, expected_request_buffer, expected_response);
+	return HandleHttpResult(client_infos, server_infos, expected);
+}
+
+int TestGetBadRequest6LowerHttpVersion(const server::VirtualServerAddrList &server_infos) {
+	http::ClientInfos client_infos          = CreateClientInfos(request::GET_400_6_LOWER_HTTP_VERSION);
+	std::string       expected_status_line  = EXPECTED_STATUS_LINE_BAD_REQUEST;
+	std::string       expected_body_message = EXPECTED_BODY_MESSAGE_BAD_REQUEST;
+	HeaderFields      expected_header_fields;
+	expected_header_fields[http::CONNECTION]     = http::CLOSE;
+	expected_header_fields[http::CONTENT_LENGTH] = utils::ToString(expected_body_message.length());
+	expected_header_fields[http::CONTENT_TYPE]   = "test/html";
+	expected_header_fields[http::SERVER]         = http::SERVER_VERSION;
+	const std::string &expected_response         = CreateHttpResponseFormat(
+        expected_status_line, expected_header_fields, expected_body_message
+    );
+	const std::string &expected_request_buffer = "Host: localhost\r\nConnection: close\r\n\r\n";
+	http::HttpResult   expected =
+		CreateHttpResult(true, false, expected_request_buffer, expected_response);
+	return HandleHttpResult(client_infos, server_infos, expected);
+}
+
+int TestGetBadRequest7WrongHttpName(const server::VirtualServerAddrList &server_infos) {
+	http::ClientInfos client_infos          = CreateClientInfos(request::GET_400_7_WRONG_HTTP_NAME);
+	std::string       expected_status_line  = EXPECTED_STATUS_LINE_BAD_REQUEST;
+	std::string       expected_body_message = EXPECTED_BODY_MESSAGE_BAD_REQUEST;
+	HeaderFields      expected_header_fields;
+	expected_header_fields[http::CONNECTION]     = http::CLOSE;
+	expected_header_fields[http::CONTENT_LENGTH] = utils::ToString(expected_body_message.length());
+	expected_header_fields[http::CONTENT_TYPE]   = "test/html";
+	expected_header_fields[http::SERVER]         = http::SERVER_VERSION;
+	const std::string &expected_response         = CreateHttpResponseFormat(
+        expected_status_line, expected_header_fields, expected_body_message
+    );
+	const std::string &expected_request_buffer = "Host: localhost\r\nConnection: close\r\n\r\n";
+	http::HttpResult   expected =
+		CreateHttpResult(true, false, expected_request_buffer, expected_response);
+	return HandleHttpResult(client_infos, server_infos, expected);
+}
+
+int TestGetBadRequest8WrongHttpVersion(const server::VirtualServerAddrList &server_infos) {
+	http::ClientInfos client_infos          = CreateClientInfos(request::GET_400_8_WRONG_HTTP_VERSION);
+	std::string       expected_status_line  = EXPECTED_STATUS_LINE_BAD_REQUEST;
+	std::string       expected_body_message = EXPECTED_BODY_MESSAGE_BAD_REQUEST;
+	HeaderFields      expected_header_fields;
+	expected_header_fields[http::CONNECTION]     = http::CLOSE;
+	expected_header_fields[http::CONTENT_LENGTH] = utils::ToString(expected_body_message.length());
+	expected_header_fields[http::CONTENT_TYPE]   = "test/html";
+	expected_header_fields[http::SERVER]         = http::SERVER_VERSION;
+	const std::string &expected_response         = CreateHttpResponseFormat(
+        expected_status_line, expected_header_fields, expected_body_message
+    );
+	const std::string &expected_request_buffer = "Host: localhost\r\nConnection: close\r\n\r\n";
+	http::HttpResult   expected =
+		CreateHttpResult(true, false, expected_request_buffer, expected_response);
+	return HandleHttpResult(client_infos, server_infos, expected);
+}
+
+int TestGetBadRequest9NoHost(const server::VirtualServerAddrList &server_infos) {
+	http::ClientInfos client_infos          = CreateClientInfos(request::GET_400_9_NO_HOST);
+	std::string       expected_status_line  = EXPECTED_STATUS_LINE_BAD_REQUEST;
+	std::string       expected_body_message = EXPECTED_BODY_MESSAGE_BAD_REQUEST;
+	HeaderFields      expected_header_fields;
+	expected_header_fields[http::CONNECTION]     = http::CLOSE;
+	expected_header_fields[http::CONTENT_LENGTH] = utils::ToString(expected_body_message.length());
+	expected_header_fields[http::CONTENT_TYPE]   = "test/html";
+	expected_header_fields[http::SERVER]         = http::SERVER_VERSION;
+	const std::string &expected_response         = CreateHttpResponseFormat(
+        expected_status_line, expected_header_fields, expected_body_message
+    );
+	http::HttpResult   expected =
+		CreateHttpResult(true, false, "", expected_response);
+	return HandleHttpResult(client_infos, server_infos, expected);
+}
+
+int TestGetBadRequest10DuplicateHost(const server::VirtualServerAddrList &server_infos) {
+	http::ClientInfos client_infos          = CreateClientInfos(request::GET_400_10_DUPLICATE_HOST);
+	std::string       expected_status_line  = EXPECTED_STATUS_LINE_BAD_REQUEST;
+	std::string       expected_body_message = EXPECTED_BODY_MESSAGE_BAD_REQUEST;
+	HeaderFields      expected_header_fields;
+	expected_header_fields[http::CONNECTION]     = http::CLOSE;
+	expected_header_fields[http::CONTENT_LENGTH] = utils::ToString(expected_body_message.length());
+	expected_header_fields[http::CONTENT_TYPE]   = "test/html";
+	expected_header_fields[http::SERVER]         = http::SERVER_VERSION;
+	const std::string &expected_response         = CreateHttpResponseFormat(
+        expected_status_line, expected_header_fields, expected_body_message
+    );
+	http::HttpResult   expected =
+		CreateHttpResult(true, false, "", expected_response);
+	return HandleHttpResult(client_infos, server_infos, expected);
+}
+
+int TestGetBadRequest11NoHeaderFieldColon(const server::VirtualServerAddrList &server_infos) {
+	http::ClientInfos client_infos          = CreateClientInfos(request::GET_400_11_NO_HEADER_FIELD_COLON);
+	std::string       expected_status_line  = EXPECTED_STATUS_LINE_BAD_REQUEST;
+	std::string       expected_body_message = EXPECTED_BODY_MESSAGE_BAD_REQUEST;
+	HeaderFields      expected_header_fields;
+	expected_header_fields[http::CONNECTION]     = http::CLOSE;
+	expected_header_fields[http::CONTENT_LENGTH] = utils::ToString(expected_body_message.length());
+	expected_header_fields[http::CONTENT_TYPE]   = "test/html";
+	expected_header_fields[http::SERVER]         = http::SERVER_VERSION;
+	const std::string &expected_response         = CreateHttpResponseFormat(
+        expected_status_line, expected_header_fields, expected_body_message
+    );
+	http::HttpResult   expected =
+		CreateHttpResult(true, false, "", expected_response);
+	return HandleHttpResult(client_infos, server_infos, expected);
+}
+
+int TestGetBadRequest12NoConnectionName(const server::VirtualServerAddrList &server_infos) {
+	http::ClientInfos client_infos          = CreateClientInfos(request::GET_400_12_NO_CONNECTION_NAME);
+	std::string       expected_status_line  = EXPECTED_STATUS_LINE_BAD_REQUEST;
+	std::string       expected_body_message = EXPECTED_BODY_MESSAGE_BAD_REQUEST;
+	HeaderFields      expected_header_fields;
+	expected_header_fields[http::CONNECTION]     = http::CLOSE;
+	expected_header_fields[http::CONTENT_LENGTH] = utils::ToString(expected_body_message.length());
+	expected_header_fields[http::CONTENT_TYPE]   = "test/html";
+	expected_header_fields[http::SERVER]         = http::SERVER_VERSION;
+	const std::string &expected_response         = CreateHttpResponseFormat(
+        expected_status_line, expected_header_fields, expected_body_message
+    );
+	http::HttpResult expected = CreateHttpResult(true, false, "", expected_response);
+	return HandleHttpResult(client_infos, server_infos, expected);
+}
+
+int TestGetBadRequest13NoConnectionValue(const server::VirtualServerAddrList &server_infos) {
+	http::ClientInfos client_infos          = CreateClientInfos(request::GET_400_13_NO_CONNECTION_VALUE);
+	std::string       expected_status_line  = EXPECTED_STATUS_LINE_BAD_REQUEST;
+	std::string       expected_body_message = EXPECTED_BODY_MESSAGE_BAD_REQUEST;
+	HeaderFields      expected_header_fields;
+	expected_header_fields[http::CONNECTION]     = http::CLOSE;
+	expected_header_fields[http::CONTENT_LENGTH] = utils::ToString(expected_body_message.length());
+	expected_header_fields[http::CONTENT_TYPE]   = "test/html";
+	expected_header_fields[http::SERVER]         = http::SERVER_VERSION;
+	const std::string &expected_response         = CreateHttpResponseFormat(
+        expected_status_line, expected_header_fields, expected_body_message
+    );
+	http::HttpResult expected = CreateHttpResult(true, false, "", expected_response);
+	return HandleHttpResult(client_infos, server_infos, expected);
+}
+
+int TestGetBadRequest14WrongConnectionValue(const server::VirtualServerAddrList &server_infos) {
+	http::ClientInfos client_infos          = CreateClientInfos(request::GET_400_14_WRONG_CONNECTION_VALUE);
+	std::string       expected_status_line  = EXPECTED_STATUS_LINE_BAD_REQUEST;
+	std::string       expected_body_message = EXPECTED_BODY_MESSAGE_BAD_REQUEST;
+	HeaderFields      expected_header_fields;
+	expected_header_fields[http::CONNECTION]     = http::CLOSE;
+	expected_header_fields[http::CONTENT_LENGTH] = utils::ToString(expected_body_message.length());
+	expected_header_fields[http::CONTENT_TYPE]   = "test/html";
+	expected_header_fields[http::SERVER]         = http::SERVER_VERSION;
+	const std::string &expected_response         = CreateHttpResponseFormat(
+        expected_status_line, expected_header_fields, expected_body_message
+    );
+	http::HttpResult expected = CreateHttpResult(true, false, "", expected_response);
+	return HandleHttpResult(client_infos, server_infos, expected);
+}
+
+int TestGetBadRequest15NotExistHeaderField(const server::VirtualServerAddrList &server_infos) {
+	http::ClientInfos client_infos          = CreateClientInfos(request::GET_400_15_NOT_EXIST_HEADER_FIELD);
+	std::string       expected_status_line  = EXPECTED_STATUS_LINE_BAD_REQUEST;
+	std::string       expected_body_message = EXPECTED_BODY_MESSAGE_BAD_REQUEST;
+	HeaderFields      expected_header_fields;
+	expected_header_fields[http::CONNECTION]     = http::CLOSE;
+	expected_header_fields[http::CONTENT_LENGTH] = utils::ToString(expected_body_message.length());
+	expected_header_fields[http::CONTENT_TYPE]   = "test/html";
+	expected_header_fields[http::SERVER]         = http::SERVER_VERSION;
+	const std::string &expected_response         = CreateHttpResponseFormat(
+        expected_status_line, expected_header_fields, expected_body_message
+    );
+	http::HttpResult expected = CreateHttpResult(true, false, "", expected_response);
+	return HandleHttpResult(client_infos, server_infos, expected);
+}
+
+int TestGetBadRequest16HeaderFieldNameSpaceColon(const server::VirtualServerAddrList &server_infos) {
+	http::ClientInfos client_infos          = CreateClientInfos(request::GET_400_16_HEADER_FIELD_NAME_SPACE_COLON);
+	std::string       expected_status_line  = EXPECTED_STATUS_LINE_BAD_REQUEST;
+	std::string       expected_body_message = EXPECTED_BODY_MESSAGE_BAD_REQUEST;
+	HeaderFields      expected_header_fields;
+	expected_header_fields[http::CONNECTION]     = http::CLOSE;
+	expected_header_fields[http::CONTENT_LENGTH] = utils::ToString(expected_body_message.length());
+	expected_header_fields[http::CONTENT_TYPE]   = "test/html";
+	expected_header_fields[http::SERVER]         = http::SERVER_VERSION;
+	const std::string &expected_response         = CreateHttpResponseFormat(
+        expected_status_line, expected_header_fields, expected_body_message
+    );
+	http::HttpResult expected = CreateHttpResult(true, false, "", expected_response);
+	return HandleHttpResult(client_infos, server_infos, expected);
+}
+
+int TestGetBadRequest17SpaceHeaderFieldName(const server::VirtualServerAddrList &server_infos) {
+	http::ClientInfos client_infos          = CreateClientInfos(request::GET_400_17_SPACE_HEADER_FIELD_NAME);
+	std::string       expected_status_line  = EXPECTED_STATUS_LINE_BAD_REQUEST;
+	std::string       expected_body_message = EXPECTED_BODY_MESSAGE_BAD_REQUEST;
+	HeaderFields      expected_header_fields;
+	expected_header_fields[http::CONNECTION]     = http::CLOSE;
+	expected_header_fields[http::CONTENT_LENGTH] = utils::ToString(expected_body_message.length());
+	expected_header_fields[http::CONTENT_TYPE]   = "test/html";
+	expected_header_fields[http::SERVER]         = http::SERVER_VERSION;
+	const std::string &expected_response         = CreateHttpResponseFormat(
+        expected_status_line, expected_header_fields, expected_body_message
+    );
+	http::HttpResult expected = CreateHttpResult(true, false, "", expected_response);
 	return HandleHttpResult(client_infos, server_infos, expected);
 }
 
@@ -69,7 +342,7 @@ int TestGetTimeout1NoCrlf(const server::VirtualServerAddrList &server_infos) {
 	const std::string &expected_response         = CreateHttpResponseFormat(
         expected_status_line, expected_header_fields, expected_body_message
     );
-	http::HttpResult expected = CreateHttpResult(false, true, "", expected_response);
+	http::HttpResult expected = CreateHttpResult(true, true, "", expected_response);
 	return HandleHttpResult(client_infos, server_infos, expected);
 }
 

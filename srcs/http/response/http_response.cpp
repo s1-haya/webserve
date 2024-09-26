@@ -83,7 +83,7 @@ HttpResponseFormat HttpResponse::CreateHttpResponseFormat(
 		// 	// check the path of error_page
 		// }
 		// for debug
-		std::cout << utils::color::GRAY << "Debug [" << e.what() << "]" << utils::color::RESET
+		std::cerr << utils::color::GRAY << "Debug [" << e.what() << "]" << utils::color::RESET
 				  << std::endl;
 		status_code                            = e.GetStatusCode();
 		response_body_message                  = CreateDefaultBodyMessageFormat(status_code);
@@ -166,9 +166,19 @@ bool HttpResponse::IsCgi(
 	return true;
 }
 
-// std::string HttpResponse::CreateBadRequestResponse(const HttpRequestResult &request_info) {
-// 	HttpResponseFormat response = CreateDefaultHttpResponseFormat(request_info.status_code);
-// 	return CreateHttpResponse(response);
-// }
+std::string HttpResponse::CreateBadRequestResponse(const HttpRequestResult &request_info) {
+	HttpResponseFormat response;
+	response.status_line = StatusLine(
+		HTTP_VERSION,
+		request_info.status_code.GetStatusCode(),
+		request_info.status_code.GetReasonPhrase()
+	);
+	response.header_fields[SERVER]       = SERVER_VERSION;
+	response.header_fields[CONTENT_TYPE] = "test/html";
+	response.header_fields[CONNECTION]   = CLOSE;
+	response.body_message                = CreateDefaultBodyMessageFormat(request_info.status_code);
+	response.header_fields[CONTENT_LENGTH] = utils::ToString(response.body_message.length());
+	return CreateHttpResponse(response);
+}
 
 } // namespace http
