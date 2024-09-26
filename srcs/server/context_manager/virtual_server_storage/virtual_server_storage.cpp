@@ -67,7 +67,11 @@ void VirtualServerStorage::AddMapping(
 const VirtualServerStorage::VirtualServerAddrList &
 VirtualServerStorage::GetVirtualServerAddrList(const HostPortPair &host_port) const {
 	if (virtual_server_addr_list_map_.count(host_port) == 0) {
-		return virtual_server_addr_list_map_.at(std::make_pair(IPV4_ADDR_ANY, host_port.second));
+		const HostPortPair any_ip_and_port = std::make_pair(IPV4_ADDR_ANY, host_port.second);
+		if (virtual_server_addr_list_map_.count(any_ip_and_port) == 0) {
+			throw std::logic_error("GetVirtualServerAddrList: 0.0.0.0:port doesn't exist");
+		}
+		return virtual_server_addr_list_map_.at(any_ip_and_port);
 	}
 	return virtual_server_addr_list_map_.at(host_port);
 }
