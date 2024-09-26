@@ -42,7 +42,7 @@ class Http : public IHttp {
 	bool                  IsHttpRequestFormatComplete(int client_fd);
 	bool                  IsConnectionKeep(int client_fd);
 	HttpRequestParsedData GetClientData(int client_fd);
-	// HttpResult CreateBadRequestResponse(int client_fd);
+	HttpResult            CreateBadRequestResponse(int client_fd);
 };
 
 } // namespace http

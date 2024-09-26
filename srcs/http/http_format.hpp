@@ -13,6 +13,7 @@ struct RequestLine {
 };
 
 struct StatusLine {
+	StatusLine() {};
 	StatusLine(
 		const std::string &version, const std::string &status_code, const std::string &reason_phrase
 	)
@@ -31,6 +32,7 @@ struct HttpRequestFormat {
 };
 
 struct HttpResponseFormat {
+	HttpResponseFormat() {};
 	HttpResponseFormat(
 		const StatusLine   &status_line,
 		const HeaderFields &header_fields,
