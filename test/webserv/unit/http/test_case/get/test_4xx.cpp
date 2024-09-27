@@ -246,11 +246,12 @@ int TestGetBadRequest14WrongConnectionValue(const server::VirtualServerAddrList 
 	return HandleHttpResult(client_infos, server_infos, expected, "400-14");
 }
 
-int TestGetBadRequest15NotExistHeaderField(const server::VirtualServerAddrList &server_infos) {
-	http::ClientInfos client_infos = CreateClientInfos(request::GET_400_15_NOT_EXIST_HEADER_FIELD);
-	std::string       expected_status_line  = EXPECTED_STATUS_LINE_BAD_REQUEST;
-	std::string       expected_body_message = EXPECTED_BODY_MESSAGE_BAD_REQUEST;
-	HeaderFields      expected_header_fields;
+int TestGetBadRequest15SpaceInHeaderFieldName(const server::VirtualServerAddrList &server_infos) {
+	http::ClientInfos client_infos =
+		CreateClientInfos(request::GET_400_15_SPACE_IN_HEADER_FIELD_NAME);
+	std::string  expected_status_line  = EXPECTED_STATUS_LINE_BAD_REQUEST;
+	std::string  expected_body_message = EXPECTED_BODY_MESSAGE_BAD_REQUEST;
+	HeaderFields expected_header_fields;
 	expected_header_fields[http::CONNECTION]     = http::CLOSE;
 	expected_header_fields[http::CONTENT_LENGTH] = utils::ToString(expected_body_message.length());
 	expected_header_fields[http::CONTENT_TYPE]   = http::TEXT_HTML;

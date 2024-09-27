@@ -69,7 +69,7 @@ int  main(void) {
     // ret_code |= test::TestGetBadRequest13NoConnectionValue(server_infos);
     // ret_code |= test::TestGetBadRequest14WrongConnectionValue(server_infos);
     // todo: 対応していないヘッダーフィールドは無視する場合はこのテストを削除する
-    // ret_code |= test::TestGetBadRequest15NotExistHeaderField(server_infos);
+    ret_code |= test::TestGetBadRequest15SpaceInHeaderFieldName(server_infos);
     ret_code |= test::TestGetBadRequest16HeaderFieldNameSpaceColon(server_infos);
     ret_code |= test::TestGetBadRequest17SpaceHeaderFieldName(server_infos);
     // <<<<
