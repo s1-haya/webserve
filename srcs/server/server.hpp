@@ -48,7 +48,7 @@ class Server {
 	void      HandleHttpReadResult(const event::Event &event, const Read::ReadResult &read_result);
 	void      RunHttp(const event::Event &event);
 	void      HandleWriteEvent(int fd);
-	void      SendResponse(int client_fd);
+	void      SendHttpResponse(int client_fd);
 	void      HandleTimeoutMessages();
 	void      SetInternalServerError(int client_fd);
 	void      KeepConnection(int client_fd);
@@ -75,6 +75,7 @@ class Server {
 	void AddEventForCgi(int client_fd);
 	void HandleCgiReadResult(int pipe_fd, const Read::ReadResult &read_result);
 	void SetCgiResponseToHttp(int pipe_fd, const std::string &read_buf);
+	void SendCgiRequest(int pipe_fd);
 
 	// const
 	static const int    SYSTEM_ERROR = -1;
