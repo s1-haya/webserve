@@ -15,7 +15,7 @@ int TestGetNotImplemented1NotExistMethod(const server::VirtualServerAddrList &se
 	HeaderFields      expected_header_fields;
 	expected_header_fields[http::CONNECTION]     = http::CLOSE;
 	expected_header_fields[http::CONTENT_LENGTH] = utils::ToString(expected_body_message.length());
-	expected_header_fields[http::CONTENT_TYPE]   = "test/html";
+	expected_header_fields[http::CONTENT_TYPE]   = http::TEXT_HTML;
 	expected_header_fields[http::SERVER]         = http::SERVER_VERSION;
 	const std::string &expected_response         = CreateHttpResponseFormat(
         expected_status_line, expected_header_fields, expected_body_message

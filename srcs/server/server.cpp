@@ -217,6 +217,7 @@ Read::ReadResult Server::ReadRequest(int client_fd) {
 		return read_result;
 	}
 	message_manager_.AddRequestBuf(client_fd, read_result.GetValue().read_buf);
+	std::cerr << message_manager_.GetRequestBuf(client_fd) << std::endl;
 	return read_result;
 }
 
@@ -239,7 +240,6 @@ void Server::RunHttp(const event::Event &event) {
 	}
 	message_manager_.SetIsCompleteRequest(client_fd, true);
 	utils::Debug("server", "received all request from client", client_fd);
-	std::cerr << message_manager_.GetRequestBuf(client_fd) << std::endl;
 
 	const message::ConnectionState connection_state =
 		http_result.is_connection_keep ? message::KEEP : message::CLOSE;
