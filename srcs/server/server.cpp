@@ -510,12 +510,12 @@ void Server::HandleCgi(int client_fd, const http::CgiResult &cgi_result) {
 		cgi_manager_.AddNewCgi(client_fd, cgi_result.cgi_request);
 		// RunCgi() is called only when a new Cgi is added via AddNewCgi().
 		cgi_manager_.RunCgi(client_fd);
+		AddEventForCgi(client_fd);
 	} catch (const SystemException &e) {
+		utils::PrintError(e.what());
 		cgi_manager_.DeleteCgi(client_fd);
 		SetInternalServerError(client_fd);
-		return;
 	}
-	// AddEventForCgi(client_fd);
 }
 
 void Server::HandleCgiReadResult(int pipe_fd, const Read::ReadResult &read_result) {
@@ -544,6 +544,19 @@ void Server::SetCgiResponseToHttp(int pipe_fd, const std::string &read_buf) {
 	http_.SetCgiResponse(client_fd, cgi_response);
 	cgi_manager_.DeleteCgi(client_fd);
 	event_monitor_.Delete(client_fd);
+}
+
+// throw(SystemException)
+void Server::AddEventForCgi(int client_fd) {
+	const CgiManager::GetFdResult read_fd_result = cgi_manager_.GetReadFd(client_fd);
+	if (read_fd_result.IsOk()) {
+		event_monitor_.Add(read_fd_result.GetValue(), event::EVENT_READ);
+	}
+
+	const CgiManager::GetFdResult write_fd_result = cgi_manager_.GetWriteFd(client_fd);
+	if (write_fd_result.IsOk()) {
+		event_monitor_.Add(write_fd_result.GetValue(), event::EVENT_WRITE);
+	}
 }
 
 } // namespace server
