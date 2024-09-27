@@ -188,17 +188,14 @@ void Server::HandleExistingConnection(const event::Event &event) {
 }
 
 void Server::HandleReadEvent(const event::Event &event) {
-	const int fd = event.fd;
+	const int              fd          = event.fd;
+	const Read::ReadResult read_result = Read::ReadRequest(fd);
 
 	if (IsCgi(fd)) {
-		// todo: 処理
+		HandleCgiReadResult(fd, read_result);
 		return;
 	}
-	// http
-	const Read::ReadResult read_result = ReadRequest(event.fd);
-	if (read_result.IsOk()) {
-		RunHttp(event);
-	}
+	HandleHttpReadResult(event, read_result);
 }
 
 http::ClientInfos Server::GetClientInfos(int client_fd) const {
@@ -212,20 +209,20 @@ VirtualServerAddrList Server::GetVirtualServerList(int client_fd) const {
 	return context_.GetVirtualServerAddrList(client_fd);
 }
 
-Read::ReadResult Server::ReadRequest(int client_fd) {
-	Read::ReadResult read_result = Read::ReadRequest(client_fd);
+void Server::HandleHttpReadResult(const event::Event &event, const Read::ReadResult &read_result) {
+	const int client_fd = event.fd;
+
 	if (!read_result.IsOk()) {
 		SetInternalServerError(client_fd);
-		return read_result;
+		return;
 	}
 	if (read_result.GetValue().read_size == 0) {
 		// clientが正しくshutdownした場合・長さ0のデータグラムを受信した場合などにここに入るらしい
-		read_result.Set(false);
-		return read_result;
+		return;
 	}
 	message_manager_.AddRequestBuf(client_fd, read_result.GetValue().read_buf);
 	std::cerr << message_manager_.GetRequestBuf(client_fd) << std::endl;
-	return read_result;
+	RunHttp(event);
 }
 
 void Server::RunHttp(const event::Event &event) {
@@ -513,6 +510,11 @@ void Server::HandleCgi(int client_fd, const http::CgiResult &cgi_result) {
 	cgi_manager_.AddNewCgi(client_fd, cgi_result.cgi_request);
 	// RunCgi() is called only when a new Cgi is added via AddNewCgi().
 	cgi_manager_.RunCgi(client_fd);
+}
+
+void Server::HandleCgiReadResult(int pipe_fd, const Read::ReadResult &read_result) {
+	(void)pipe_fd;
+	(void)read_result;
 }
 
 } // namespace server
