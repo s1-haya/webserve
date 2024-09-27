@@ -1,12 +1,12 @@
 #include "cgi.hpp"
 #include "cgi_parse.hpp"
 #include "cgi_request.hpp"
-#include "http_format.hpp"
-#include "http_message.hpp"
-#include "status_code.hpp"
 #include "utils.hpp"
+#include <cerrno>
 #include <cstdlib>
+#include <cstring>
 #include <iostream>
+#include <unistd.h>
 
 namespace {
 
@@ -35,6 +35,43 @@ void PrintNg() {
 // cgi_parseから見た相対パス
 const std::string html_dir_path    = "../../../../root/html";
 const std::string cgi_bin_dir_path = "../../../../root/cgi-bin";
+const int         BUF_SIZE         = 1024;
+const int         SYSTEM_ERROR     = -1;
+
+typedef std::map<int, int> PFdMap;
+
+ssize_t Write(int fd, const void *buf, size_t nbyte) {
+	ssize_t bytes_write = write(fd, buf, nbyte);
+	if (bytes_write == SYSTEM_ERROR) {
+		throw std::runtime_error(std::strerror(errno));
+	}
+	return bytes_write;
+}
+
+ssize_t Read(int fd, void *buf, size_t nbyte) {
+	ssize_t bytes_read = read(fd, buf, nbyte);
+	if (bytes_read == SYSTEM_ERROR) {
+		throw std::runtime_error(std::strerror(errno));
+	}
+	return bytes_read;
+}
+
+CgiResponse RunCgi(const CgiRequest &cgi_request) {
+	CgiResponse response;
+	Cgi         cgi(cgi_request);
+	cgi.Run();
+	if (cgi.IsWriteRequired()) {
+		Write(
+			cgi.GetWriteFd(), cgi_request.body_message.c_str(), cgi_request.body_message.length()
+		);
+	}
+	while (!response.is_response_complete) {
+		char    buffer[BUF_SIZE] = {};
+		ssize_t read_bytes       = Read(cgi.GetReadFd(), buffer, BUF_SIZE);
+		response                 = cgi.AddAndGetResponse(std::string(buffer, read_bytes));
+	}
+	return response;
+}
 
 // 出力は目で見て確認(実行が成功していたらテストはOKとしている)
 
@@ -53,17 +90,16 @@ int Test1() {
 	cgi_request.meta_variables[SERVER_PORT]     = "8080";
 	cgi_request.meta_variables[SERVER_PROTOCOL] = "HTTP/1.1";
 
-	std::string response_body_message;
+	CgiResponse response;
 	try {
-		Cgi cgi(cgi_request);
-		cgi.Run(response_body_message);
+		response = RunCgi(cgi_request);
 	} catch (const std::exception &e) {
 		PrintNg();
 		std::cerr << e.what() << '\n';
 		return EXIT_FAILURE;
 	}
 	PrintOk();
-	utils::Debug(response_body_message);
+	utils::Debug(response.response);
 	return EXIT_SUCCESS;
 }
 
@@ -82,17 +118,16 @@ int Test2() {
 	cgi_request.meta_variables[SERVER_PORT]     = "8080";
 	cgi_request.meta_variables[SERVER_PROTOCOL] = "HTTP/1.1";
 
-	std::string response_body_message;
+	CgiResponse response;
 	try {
-		Cgi cgi(cgi_request);
-		cgi.Run(response_body_message);
+		response = RunCgi(cgi_request);
 	} catch (const std::exception &e) {
 		PrintNg();
 		std::cerr << e.what() << '\n';
 		return EXIT_FAILURE;
 	}
 	PrintOk();
-	utils::Debug(response_body_message);
+	utils::Debug(response.response);
 	return EXIT_SUCCESS;
 }
 
@@ -113,17 +148,16 @@ int Test3() {
 	cgi_request.meta_variables[SERVER_PORT]     = "8080";
 	cgi_request.meta_variables[SERVER_PROTOCOL] = "HTTP/1.1";
 
-	std::string response_body_message;
+	CgiResponse response;
 	try {
-		Cgi cgi(cgi_request);
-		cgi.Run(response_body_message);
+		response = RunCgi(cgi_request);
 	} catch (const std::exception &e) {
 		PrintNg();
 		std::cerr << e.what() << '\n';
 		return EXIT_FAILURE;
 	}
 	PrintOk();
-	utils::Debug(response_body_message);
+	utils::Debug(response.response);
 	return EXIT_SUCCESS;
 }
 
@@ -143,17 +177,17 @@ int Test4() {
 	cgi_request.meta_variables[SERVER_PORT]     = "8080";
 	cgi_request.meta_variables[SERVER_PROTOCOL] = "HTTP/1.1";
 
-	std::string response_body_message;
+	CgiResponse response;
 	try {
-		Cgi cgi(cgi_request);
-		cgi.Run(response_body_message);
+		response = RunCgi(cgi_request);
 	} catch (const std::exception &e) {
-		PrintOk();
-		utils::Debug(e.what());
-		return EXIT_SUCCESS;
+		PrintNg();
+		std::cerr << e.what() << '\n';
+		return EXIT_FAILURE;
 	}
-	PrintNg();
-	return EXIT_FAILURE;
+	PrintOk();
+	utils::Debug(response.response);
+	return EXIT_SUCCESS;
 }
 
 } // namespace

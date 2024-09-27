@@ -1,13 +1,13 @@
 #include "cgi.hpp"
 #include "cgi_request.hpp"
-#include "http_exception.hpp"
 #include "http_message.hpp"
 #include "status_code.hpp"
 #include "system_exception.hpp"
+#include "utils.hpp"
 #include <cerrno>
 #include <cstdlib>
 #include <cstring>
-#include <iostream>
+#include <signal.h>
 #include <sys/wait.h>
 #include <unistd.h>
 
@@ -48,20 +48,12 @@ pid_t Fork(void) {
 	return p;
 }
 
-ssize_t Write(int fd, const void *buf, size_t nbyte) {
-	ssize_t bytes_write = write(fd, buf, nbyte);
-	if (bytes_write == SYSTEM_ERROR) {
+int Kill(pid_t pid, int sig) {
+	int status = kill(pid, sig);
+	if (status == SYSTEM_ERROR) {
 		throw SystemException(std::strerror(errno));
 	}
-	return bytes_write;
-}
-
-ssize_t Read(int fd, void *buf, size_t nbyte) {
-	ssize_t bytes_read = read(fd, buf, nbyte);
-	if (bytes_read == SYSTEM_ERROR) {
-		throw SystemException(std::strerror(errno));
-	}
-	return bytes_read;
+	return status;
 }
 
 pid_t Waitpid(pid_t pid, int *stat_loc, int options) {
@@ -82,22 +74,34 @@ Cgi::Cgi(const CgiRequest &request)
 	  env_(SetCgiEnv(request.meta_variables)),
 	  exit_status_(0),
 	  request_body_message_(request.body_message),
+	  pid_(-1),
 	  read_fd_(-1),
 	  write_fd_(-1),
-	  is_response_complete_(true) {}
+	  is_response_complete_(false) {}
 
 Cgi::~Cgi() {
 	Free();
+	if (read_fd_ != -1) {
+		Close(read_fd_);
+	}
+	if (write_fd_ != -1) {
+		Close(write_fd_);
+	}
+	if (pid_ > 0) {
+		if (Waitpid(pid_, &exit_status_, WNOHANG) ==
+			0) { // 子プロセスがまだ終了していない場合だけkillする
+			Kill(pid_, SIGKILL);
+			Waitpid(pid_, &exit_status_, 0);
+		}
+	}
 }
 
-http::StatusCode Cgi::Run(std::string &response_body_message) {
+void Cgi::Run() {
 	try {
 		Execve();
-		response_body_message = response_body_message_;
 	} catch (const SystemException &e) {
-		throw http::HttpException(e.what(), http::StatusCode(http::INTERNAL_SERVER_ERROR));
+		throw;
 	}
-	return http::StatusCode(http::OK);
 }
 
 void Cgi::Execve() {
@@ -108,8 +112,8 @@ void Cgi::Execve() {
 		Pipe(cgi_request);
 	}
 	Pipe(cgi_response);
-	pid_t p = Fork();
-	if (p == 0) {
+	pid_ = Fork();
+	if (pid_ == 0) {
 		if (method_ == http::POST) {
 			Close(cgi_request[WRITE]);
 			Dup2(cgi_request[READ], STDIN_FILENO);
@@ -122,30 +126,10 @@ void Cgi::Execve() {
 	}
 	if (method_ == http::POST) {
 		Close(cgi_request[READ]);
-		write_fd_ = cgi_request[WRITE]; // todo: tmp
-		Write(cgi_request[WRITE], request_body_message_.c_str(), request_body_message_.length());
-		Close(cgi_request[WRITE]);
+		write_fd_ = cgi_request[WRITE];
 	}
-	read_fd_ = cgi_response[READ]; // todo: tmp
 	Close(cgi_response[WRITE]);
-	char    buffer[1024]; // 読み取りバッファ
-	ssize_t bytes_read;
-	while ((bytes_read = Read(cgi_response[READ], buffer, sizeof(buffer))) > 0) {
-		response_body_message_.append(buffer, bytes_read);
-	}
-	Close(cgi_response[READ]);
-	Waitpid(p, &exit_status_, 0);
-	if (WIFEXITED(exit_status_)) {
-		if (WEXITSTATUS(exit_status_) != 0) {
-			// todo:
-			//   WEXITSTATUS(exit_status_)をCgiResultに入れて返す？
-			//   or 子プロセスのexit_statusってhttp_responseに関係ない？
-			throw SystemException("CGI script failed");
-		}
-	} else {
-		throw SystemException("CGI script did not exit normally");
-		// exit_status_にはシグナル番号が入っている
-	}
+	read_fd_ = cgi_response[READ];
 }
 
 void Cgi::Free() {
@@ -202,10 +186,6 @@ char *const *Cgi::SetCgiEnv(const MetaMap &meta_variables) {
 	return cgi_env;
 }
 
-Cgi::CgiResult Cgi::Run() {
-	return CgiResult();
-}
-
 int Cgi::GetReadFd() const {
 	return read_fd_;
 }
@@ -222,20 +202,17 @@ bool Cgi::IsWriteRequired() const {
 	return write_fd_ != -1;
 }
 
-void Cgi::AddReadBuf(const std::string &read_buf) {
-	response_body_message_ += read_buf;
-}
-
-bool Cgi::IsResponseComplete() const {
-	return is_response_complete_;
-}
-
 const std::string &Cgi::GetRequest() const {
 	return request_body_message_;
 }
 
-const std::string &Cgi::GetResponse() const {
-	return response_body_message_;
+CgiResponse Cgi::AddAndGetResponse(const std::string &read_buf) {
+	response_body_message_ += read_buf;
+	if (read_buf.empty()) {
+		is_response_complete_ = true;
+	}
+	return CgiResponse(response_body_message_, "text/plain", is_response_complete_);
+	// text/plainのみ対応
 }
 
 void Cgi::ReplaceNewRequest(const std::string &new_request_str) {
