@@ -1,4 +1,7 @@
 #include "cgi_manager.hpp"
+#include "system_exception.hpp"
+#include <cerrno>
+#include <cstring>   // strerror
 #include <stdexcept> // logic_error
 
 namespace server {
@@ -12,21 +15,23 @@ CgiManager::~CgiManager() {
 }
 
 // todo: 1complete_request(1CGI)につき2回以上この関数が呼ばれないかhttpの実装を確認
+// throw(SystemException)
 void CgiManager::AddNewCgi(int client_fd, const cgi::CgiRequest &request) {
-	// todo: new error handling
-	Cgi *cgi = new Cgi(request);
-
+	Cgi *cgi = new (std::nothrow) Cgi(request);
+	if (cgi == NULL) {
+		throw SystemException(std::strerror(errno));
+	}
 	if (cgi_addr_map_.count(client_fd) != 0) {
 		throw std::logic_error("AddNewCgi: client_fd already exists");
 	}
 	cgi_addr_map_[client_fd] = cgi;
 }
 
+// throw(SystemException)
 void CgiManager::RunCgi(int client_fd) {
 	Cgi *cgi = GetCgi(client_fd);
 
 	cgi->Run();
-	// todo: try catch
 	// pipe_fdとclient_fdの紐づけをFdMapに追加
 	if (cgi->IsReadRequired()) {
 		client_fd_map_[cgi->GetReadFd()] = client_fd;

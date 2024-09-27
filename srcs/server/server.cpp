@@ -506,10 +506,16 @@ void Server::HandleCgi(int client_fd, const http::CgiResult &cgi_result) {
 	if (!cgi_result.is_cgi) {
 		return;
 	}
-	// todo: try-catch
-	cgi_manager_.AddNewCgi(client_fd, cgi_result.cgi_request);
-	// RunCgi() is called only when a new Cgi is added via AddNewCgi().
-	cgi_manager_.RunCgi(client_fd);
+	try {
+		cgi_manager_.AddNewCgi(client_fd, cgi_result.cgi_request);
+		// RunCgi() is called only when a new Cgi is added via AddNewCgi().
+		cgi_manager_.RunCgi(client_fd);
+	} catch (const SystemException &e) {
+		cgi_manager_.DeleteCgi(client_fd);
+		SetInternalServerError(client_fd);
+		return;
+	}
+	// AddEventForCgi(client_fd);
 }
 
 void Server::HandleCgiReadResult(int pipe_fd, const Read::ReadResult &read_result) {
