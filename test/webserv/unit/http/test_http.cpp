@@ -49,10 +49,10 @@ int  main(void) {
     int ret_code = EXIT_SUCCESS;
 
     server::VirtualServerAddrList server_infos = BuildVirtualServerAddrList();
-    // todo: alias ../../../../root/html/ -> /html in build_virtual_server.cpp
-    // ret_code |= test::TestGetOk1ConnectionClose(server_infos);
+    ret_code |= test::TestGetOk1ConnectionClose(server_infos);
     // todo: segv
     // ret_code |= test::TestGetBadRequest1OnlyCrlf(server_infos);
+    ret_code |= test::TestGetOk13ExtraRequest(server_infos);
     ret_code |= test::TestGetBadRequest2LowerMethod(server_infos);
     ret_code |= test::TestGetBadRequest3NoAsciiMethod(server_infos);
     ret_code |= test::TestGetBadRequest4NoRoot(server_infos);
@@ -60,8 +60,8 @@ int  main(void) {
     ret_code |= test::TestGetBadRequest6LowerHttpVersion(server_infos);
     ret_code |= test::TestGetBadRequest7WrongHttpName(server_infos);
     ret_code |= test::TestGetBadRequest8WrongHttpVersion(server_infos);
-	// todo: Fix: std::out_of_range: map::at:  key not found
-	// ret_code |= test::TestGetBadRequest9NoHost(server_infos);
+    // todo: Fix: std::out_of_range: map::at:  key not found
+    // ret_code |= test::TestGetBadRequest9NoHost(server_infos);
     ret_code |= test::TestGetBadRequest10DuplicateHost(server_infos);
     ret_code |= test::TestGetBadRequest11NoHeaderFieldColon(server_infos);
     ret_code |= test::TestGetBadRequest12NoConnectionName(server_infos);

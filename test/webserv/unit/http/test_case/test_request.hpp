@@ -16,6 +16,8 @@ static const std::string &REQUEST_GET = REQUEST + "/get";
 static const std::string &ROOT_2XX = "/2xx";
 static const std::string &GET_200_1_NO_CONNECTION =
 	LoadFileContent(REQUEST_GET + ROOT_2XX + "/200_01_connection_close.txt");
+static const std::string &GET_200_13_EXTRA_REQUEST =
+	LoadFileContent(REQUEST_GET + ROOT_2XX + "/200_13_extra_request.txt");
 
 static const std::string &ROOT_4XX = "/4xx";
 static const std::string &GET_400_1_ONLY_CRLF =
