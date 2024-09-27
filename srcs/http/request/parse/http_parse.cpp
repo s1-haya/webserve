@@ -210,21 +210,14 @@ HeaderFields HttpParse::SetHeaderFields(const std::vector<std::string> &header_f
 	typedef std::vector<std::string>::const_iterator It;
 	for (It it = header_fields_info.begin(); it != header_fields_info.end(); ++it) {
 		std::vector<std::string> header_field_name_and_value = utils::SplitStr(*it, ":");
-		// if (header_field_name_and_value.size() != 2) {
-		// 	throw HttpException(
-		// 		"Error: Missing colon or multiple colons found in header filed",
-		// 		StatusCode(BAD_REQUEST)
-		// 	);
-		// }
-
-		// Todo: `Host: localhost:8080`のような場合どうするのか
-
-		// header_field_valueを初期化してるためheader_field_nameも初期化した
 		const std::string &header_field_name = header_field_name_and_value[0];
 		CheckValidHeaderFieldName(header_fields, header_field_name);
+		// todo:
+		// マルチパートを対応する場合はutils::SplitStrを使用して、セミコロン区切りのstd::vector<std::string>になる。
+		// ex) Content-Type: multipart/form-data; boundary=----WebKitFormBoundary64XhQJfFNRKx7oK7
 		const std::string &header_field_value =
 			StrTrimLeadingOptionalWhitespace(header_field_name_and_value[1]);
-		// to do: #189  ヘッダフィールドをパースする関数（value）-> CheckValidHeaderFieldValue
+		// todo: #189  ヘッダフィールドをパースする関数（value）-> CheckValidHeaderFieldValue
 		typedef std::pair<HeaderFields::const_iterator, bool> Result;
 		Result result = header_fields.insert(std::make_pair(header_field_name, header_field_value));
 		if (result.second == false) {
