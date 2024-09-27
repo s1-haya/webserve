@@ -18,6 +18,9 @@ typedef CgiManager::GetFdResult GetFdResult;
 
 struct Result {
 	Result() : is_success(true) {}
+	Result(bool is_success, const std::string &error_message)
+		: is_success(is_success), error_log(error_message) {}
+
 	bool        is_success;
 	std::string error_log;
 };
@@ -238,6 +241,7 @@ int RunTest3() {
 // - GetClientFd()
 // - GetReadFd()
 // - GetWriteFd()
+// - method == GET
 // -----------------------------------------------------------------------------
 int RunTest4() {
 	int ret_code = EXIT_SUCCESS;
@@ -264,17 +268,17 @@ int RunTest4() {
 	if (read_fd_result.IsOk()) {
 		const int read_pipe_fd = read_fd_result.GetValue();
 		// read_pipe_fdとclient_fdの紐づけ確認
-		ret_code |= Test(IsSameClientFd(cgi_manager, read_pipe_fd, expected_client_fd)
-		); // Test7 or 入らない
+		ret_code |= Test(IsSameClientFd(cgi_manager, read_pipe_fd, expected_client_fd)); // Test7
+	} else {
+		ret_code |= Test(Result(false, "read pipe_fd was not created"));
 	}
 
 	// pipe_fd(write)を取得
 	const GetFdResult write_fd_result = cgi_manager.GetWriteFd(expected_client_fd);
 	if (write_fd_result.IsOk()) {
-		const int write_pipe_fd = write_fd_result.GetValue();
-		// write_pipe_fdとclient_fdの紐づけ確認
-		ret_code |=
-			Test(IsSameClientFd(cgi_manager, write_pipe_fd, expected_client_fd)); // Test7 or Test8
+		ret_code |= Test(Result(false, "write pipe_fd was created")); // GETなのでここには入らない
+	} else {
+		ret_code |= Test(Result()); // Test8
 	}
 
 	return ret_code;
