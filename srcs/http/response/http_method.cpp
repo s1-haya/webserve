@@ -238,7 +238,7 @@ utils::Result<std::string> Method::AutoindexHandler(const std::string &path) {
 	}
 
 	std::string       display_path = path;
-	const std::string root_path    = "root";
+	const std::string root_path    = "/root";
 	size_t            pos          = path.find(root_path);
 	if (pos != std::string::npos) {
 		display_path = path.substr(pos + root_path.length());
