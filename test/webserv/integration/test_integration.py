@@ -74,20 +74,23 @@ not_allowed_response = response_header_405 + not_allowed_file_405.decode('utf-8'
 timeout_response = response_header_408 + timeout_file_408.decode('utf-8')
 not_implemented_response = response_header_501 + not_implemented_file_501.decode('utf-8')
 
-def test_get_root_close_200():
+def test_get_200_01():
     send_request_and_assert_response(
         "test/common/request/get/2xx/200_01_connection_close.txt",
         response_header_get_root_200_close + root_index_file
                                      )
 
 
-def test_get_root_keep_200():
+def test_get_200_02():
     send_request_and_assert_response("test/common/request/get/2xx/200_02_connection_keep.txt", response_header_get_root_200_keep + root_index_file)
 
 
-def test_get_sub_close_200():
+def test_get_200_03():
     send_request_and_assert_response("test/common/request/get/2xx/200_03_sub_connection_close.txt", response_header_get_sub_200_close + sub_index_file)
 
+
+# def test_get_200_04():
+#     send_request_and_assert_response("test/common/request/get/2xx/200_04_connection_keep_alive_and_200_connection_keep_alive.txt", response_header_get_root_200_keep + root_index_file)
 
 # def test_get_400_01():
 #   send_request_and_assert_response("test/common/request/get/4xx/400_01_only_crlf.txt", bad_request_response)
