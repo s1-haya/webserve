@@ -147,15 +147,17 @@ def test_get_405_01():
 def test_get_501_01():
     send_request_and_assert_response("test/common/request/get/5xx/501_01_not_exist_method.txt", not_implemented_response)
 
-def test_webserv():
-    try:
-        test_get_root_close_200()
-        test_get_root_keep_200()
-        test_get_sub_close_200()
-        test_get_404()
-        test_get_405()
-    except Exception as e:
-        print(f"Test failed: {e}")
+
+# >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+# def test_webserv():
+#     try:
+#         test_get_root_close_200()
+#         test_get_root_keep_200()
+#         test_get_sub_close_200()
+#         test_get_404()
+#         test_get_405()
+#     except Exception as e:
+#         print(f"Test failed: {e}")
 
 
 # def test1():
@@ -198,5 +200,7 @@ def test_webserv():
 #     # assert
 
 
-if __name__ == "__main__":
-    test_webserv()
+# if __name__ == "__main__":
+#     test_webserv()
+
+# <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
