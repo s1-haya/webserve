@@ -59,6 +59,15 @@ utils::Result<int> HexToDec(const std::string &hex_str) {
 	return utils::Result<int>(decimal_value);
 }
 
+bool HasSpace(const std::string &str) {
+	for (std::string::const_iterator it = str.begin(); it != str.end(); ++it) {
+		if (std::isspace(*it)) {
+			return true;
+		}
+	}
+	return false;
+}
+
 } // namespace
 
 void HttpParse::ParseRequestLine(HttpRequestParsedData &data) {
@@ -266,6 +275,12 @@ void HttpParse::CheckValidVersion(const std::string &version) {
 }
 
 void HttpParse::CheckValidHeaderFieldName(const HeaderFields &header_fields, const std::string &header_field_name) {
+	if (!header_field_name.size()) {
+		throw HttpException("Error: the name of Header field don't exist.", StatusCode(BAD_REQUEST));
+	}
+	if (HasSpace(header_field_name)) {
+		throw HttpException("Error: the name of Header field has a space.", StatusCode(BAD_REQUEST));
+	}
 	if (header_fields.find(header_field_name) != header_fields.end() && header_field_name == HOST) {
 		throw HttpException(
 			"Error: Host header fields already exists", StatusCode(BAD_REQUEST)
