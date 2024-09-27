@@ -506,7 +506,7 @@ void Server::HandleCgi(int client_fd, const http::CgiResult &cgi_result) {
 	if (!cgi_result.is_cgi) {
 		return;
 	}
-	// todo: try-catch?
+	// todo: try-catch
 	cgi_manager_.AddNewCgi(client_fd, cgi_result.cgi_request);
 	// RunCgi() is called only when a new Cgi is added via AddNewCgi().
 	cgi_manager_.RunCgi(client_fd);
@@ -535,8 +535,7 @@ void Server::SetCgiResponseToHttp(int pipe_fd, const std::string &read_buf) {
 	}
 	utils::Debug("cgi", "Read the entire response from the child process through pipe_fd", pipe_fd);
 
-	// todo: IHttpに作る
-	// http_.SetCgiResponse(client_fd, cgi_response);
+	http_.SetCgiResponse(client_fd, cgi_response);
 	cgi_manager_.DeleteCgi(client_fd);
 	event_monitor_.Delete(client_fd);
 }

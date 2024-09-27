@@ -1,6 +1,7 @@
 #ifndef IHTTP_HPP_
 #define IHTTP_HPP_
 
+#include "cgi.hpp"
 #include "client_infos.hpp"
 #include "virtual_server.hpp"
 
@@ -39,6 +40,7 @@ class IHttp {
 	virtual HttpResult
 	Run(const ClientInfos &client_infos, const server::VirtualServerAddrList &virtual_servers) = 0;
 	virtual HttpResult GetErrorResponse(const ClientInfos &client_info, ErrState state)        = 0;
+	virtual void       SetCgiResponse(int client_fd, const cgi::CgiResponse &cgi_response)     = 0;
 };
 
 } // namespace http
