@@ -181,38 +181,10 @@ void HttpParse::ParseChunkedRequest(HttpRequestParsedData &data) {
 	data.is_request_format.is_body_message = true;
 }
 
-void HttpParse::TmpRun(HttpRequestParsedData &data) {
-	// todo: 外側でHttpParse::TmpRunを呼ぶため try, catchを削除する
-	try {
-		ParseRequestLine(data);
-		ParseHeaderFields(data);
-		ParseBodyMessage(data);
-	} catch (const HttpException &e) {
-		data.request_result.status_code = e.GetStatusCode();
-	}
-}
-
-void HttpParse::TmpRunHttpResultVersion(HttpRequestParsedData &data) {
+void HttpParse::Run(HttpRequestParsedData &data) {
 	ParseRequestLine(data);
 	ParseHeaderFields(data);
 	ParseBodyMessage(data);
-}
-
-// todo: tmp request_
-HttpRequestResult HttpParse::Run(const std::string &read_buf) {
-	HttpRequestResult result;
-	// a: [request_line ＋ header_fields, message-body]
-	// b: [request_line, header_fields]
-	std::vector<std::string> a = utils::SplitStr(read_buf, HEADER_FIELDS_END);
-	std::vector<std::string> b = utils::SplitStr(a[0], CRLF);
-	try {
-		result.request.request_line = SetRequestLine(utils::SplitStr(b[0], SP));
-		const std::vector<std::string> header_fields_info(b.begin() + 1, b.end());
-		result.request.header_fields = SetHeaderFields(header_fields_info);
-	} catch (const HttpException &e) {
-		result.status_code = e.GetStatusCode();
-	}
-	return result;
 }
 
 RequestLine HttpParse::SetRequestLine(const std::vector<std::string> &request_line_info) {
