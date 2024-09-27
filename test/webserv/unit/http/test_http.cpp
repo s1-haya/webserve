@@ -50,9 +50,9 @@ int  main(void) {
 
     server::VirtualServerAddrList server_infos = BuildVirtualServerAddrList();
     ret_code |= test::TestGetOk1ConnectionClose(server_infos);
-    // todo: segv
-    // ret_code |= test::TestGetBadRequest1OnlyCrlf(server_infos);
     ret_code |= test::TestGetOk13ExtraRequest(server_infos);
+
+    ret_code |= test::TestGetBadRequest1OnlyCrlf(server_infos);
     ret_code |= test::TestGetBadRequest2LowerMethod(server_infos);
     ret_code |= test::TestGetBadRequest3NoAsciiMethod(server_infos);
     ret_code |= test::TestGetBadRequest4NoRoot(server_infos);

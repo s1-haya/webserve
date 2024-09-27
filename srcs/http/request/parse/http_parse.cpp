@@ -228,6 +228,9 @@ HeaderFields HttpParse::SetHeaderFields(const std::vector<std::string> &header_f
 }
 
 void HttpParse::CheckValidRequestLine(const std::vector<std::string> &request_line_info) {
+	if (!request_line_info[0].size()) {
+		throw HttpException("Error: Request line don't exist.", StatusCode(BAD_REQUEST));
+	}
 	CheckValidMethod(request_line_info[0]);
 	CheckValidRequestTarget(request_line_info[1]);
 	CheckValidVersion(request_line_info[2]);
@@ -262,8 +265,8 @@ void HttpParse::CheckValidVersion(const std::string &version) {
 	}
 }
 
-void HttpParse::CheckValidHeaderFieldName(const std::string &header_field_value) {
-	(void)header_field_value;
+void HttpParse::CheckValidHeaderFieldName(const std::string &header_field_name) {
+	(void) header_field_name;
 	// todo: 複数指定ありの場合はthrowしないようにする。
 	// if (header_field_value != CONNECTION &&
 	// 	std::find(
