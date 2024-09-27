@@ -3,9 +3,47 @@
   <head>
     <meta charset="UTF-8" />
     <title>Web Server</title>
+    <script>
+      function updateFormAction(event, basePath, method, hasFile = false) {
+        event.preventDefault();
+        const form = event.target;
+        const filename = form.filename ? form.filename.value : '';
+        const url = `${basePath}${filename}`;
+        
+        let formData = new FormData();
+
+        if (hasFile) {
+          const fileInput = form.file;
+          if (fileInput.files.length > 0) {
+            formData.append("file", fileInput.files[0]);
+          }
+        }
+
+        // For text fields
+        const userTextInput = form.user_text;
+        if (userTextInput) {
+          formData.append("user_text", userTextInput.value);
+        }
+
+        fetch(url, {
+          method: method,
+          body: hasFile ? formData : null,
+        })
+        .then(response => {
+          if (response.ok) {
+            alert(`${method} method succeeded for ${filename}`);
+          } else {
+            alert(`${method} method failed for ${filename}`);
+          }
+        })
+        .catch(error => {
+          alert(`${method} method failed due to an error: ${error}`);
+        });
+      }
+    </script>
   </head>
   <body>
-    <h1>Hello from webserv! (tmp)</h1>
+    <h1>Hello from webserv!</h1>
 
     <div class="method">
       <h2>GET</h2>
@@ -14,22 +52,30 @@
         <li>
           <a href="non-existent-path/">link to non-existent-path/ (404)</a>
         </li>
+        <li><a href="upload/">link to upload/</a></li>
       </ul>
     </div>
 
     <div class="method">
-      <h2>POST</h2>
-      <p>post to post/?</p>
-      <form action="post/" method="POST">
+      <h2>POST (with file upload)</h2>
+      <form onsubmit="updateFormAction(event, 'upload/', 'POST', true)" method="POST" enctype="multipart/form-data">
         <label for="text-input">Enter text</label>
         <input type="text" name="user_text" />
+        <label for="filename">Enter filename</label>
+        <input type="text" name="filename" required />
+        <label for="file">Choose file</label>
+        <input type="file" name="file" />
         <button type="submit">Submit</button>
       </form>
     </div>
 
     <div class="method">
       <h2>DELETE</h2>
-      <p><a href="delete/">link to delete/?</a></p>
+      <form onsubmit="updateFormAction(event, 'upload/', 'DELETE')" method="POST">
+        <label for="filename">Enter filename to delete</label>
+        <input type="text" name="filename" required />
+        <button type="submit">Delete</button>
+      </form>
     </div>
 
     <div class="method">
