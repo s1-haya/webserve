@@ -46,12 +46,14 @@ def assert_response(response, expected_response):
 root_index_file, root_index_file_length = read_file("root/html/index.html")
 sub_index_file, sub_index_file_length = read_file("root/html/sub/index.html")
 
+# bad_request_file_400, bad_request_file_400_length = read_file_binary("test/webserv/expected_response/default_body_message/400_bad_request.txt")
 not_found_file_404, not_found_file_404_length = read_file_binary("test/webserv/expected_response/default_body_message/404_not_found.txt")
 not_allowed_file_405, not_allowed_file_405_length = read_file_binary("test/webserv/expected_response/default_body_message/405_method_not_allowed.txt")
 
 response_header_get_root_200_close = f"HTTP/1.1 200 OK\r\nConnection: close\r\nContent-Length: {root_index_file_length}\r\nContent-Type: text/html\r\nServer: webserv/1.1\r\n\r\n"
 response_header_get_root_200_keep = f"HTTP/1.1 200 OK\r\nConnection: keep-alive\r\nContent-Length: {root_index_file_length}\r\nContent-Type: text/html\r\nServer: webserv/1.1\r\n\r\n"
 response_header_get_sub_200_close = f"HTTP/1.1 200 OK\r\nConnection: close\r\nContent-Length: {sub_index_file_length}\r\nContent-Type: text/html\r\nServer: webserv/1.1\r\n\r\n"
+# response_header_get_400 = f"HTTP/1.1 400 Bad Request\r\nConnection: close\r\nContent-Length: {bad_request_file_400_length}\r\nContent-Type: text/html\r\nServer: webserv/1.1\r\n\r\n"
 response_header_get_404 = f"HTTP/1.1 404 Not Found\r\nConnection: close\r\nContent-Length: {not_found_file_404_length}\r\nContent-Type: text/html\r\nServer: webserv/1.1\r\n\r\n"
 response_header_get_405 = f"HTTP/1.1 405 Method Not Allowed\r\nConnection: close\r\nContent-Length: {not_allowed_file_405_length}\r\nContent-Type: text/html\r\nServer: webserv/1.1\r\n\r\n"
 
@@ -82,6 +84,16 @@ def test_get_sub_close_200():
     )
     response = client_instance.SendRequestAndReceiveResponse(request)
     assert_response(response, expected_response)
+
+
+# def test_get_400():
+#     expected_response = response_header_get_400.encode('utf-8') + bad_request_file_400
+#     client_instance = client.Client(8080)
+#     request, _ = read_file_binary("test/common/request/get/4xx/400_01_only_crlf.txt")
+#     response = client_instance.SendRequestAndReceiveResponse(request)
+#     assert (
+#         response.encode('utf-8') == expected_response
+#     ), f"Expected response\n\n {repr(expected_response)}, but got\n\n {repr(response)}"
 
 
 def test_get_404():
