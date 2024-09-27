@@ -53,9 +53,9 @@ not_allowed_file_405, not_allowed_file_405_length = read_file_binary("test/webse
 response_header_get_root_200_close = f"HTTP/1.1 200 OK\r\nConnection: close\r\nContent-Length: {root_index_file_length}\r\nContent-Type: text/html\r\nServer: webserv/1.1\r\n\r\n"
 response_header_get_root_200_keep = f"HTTP/1.1 200 OK\r\nConnection: keep-alive\r\nContent-Length: {root_index_file_length}\r\nContent-Type: text/html\r\nServer: webserv/1.1\r\n\r\n"
 response_header_get_sub_200_close = f"HTTP/1.1 200 OK\r\nConnection: close\r\nContent-Length: {sub_index_file_length}\r\nContent-Type: text/html\r\nServer: webserv/1.1\r\n\r\n"
-# response_header_get_400 = f"HTTP/1.1 400 Bad Request\r\nConnection: close\r\nContent-Length: {bad_request_file_400_length}\r\nContent-Type: text/html\r\nServer: webserv/1.1\r\n\r\n"
-response_header_get_404 = f"HTTP/1.1 404 Not Found\r\nConnection: close\r\nContent-Length: {not_found_file_404_length}\r\nContent-Type: text/html\r\nServer: webserv/1.1\r\n\r\n"
-response_header_get_405 = f"HTTP/1.1 405 Method Not Allowed\r\nConnection: close\r\nContent-Length: {not_allowed_file_405_length}\r\nContent-Type: text/html\r\nServer: webserv/1.1\r\n\r\n"
+# response_header_400 = f"HTTP/1.1 400 Bad Request\r\nConnection: close\r\nContent-Length: {bad_request_file_400_length}\r\nContent-Type: text/html\r\nServer: webserv/1.1\r\n\r\n"
+response_header_404 = f"HTTP/1.1 404 Not Found\r\nConnection: close\r\nContent-Length: {not_found_file_404_length}\r\nContent-Type: text/html\r\nServer: webserv/1.1\r\n\r\n"
+response_header_405 = f"HTTP/1.1 405 Method Not Allowed\r\nConnection: close\r\nContent-Length: {not_allowed_file_405_length}\r\nContent-Type: text/html\r\nServer: webserv/1.1\r\n\r\n"
 
 def test_get_root_close_200():
     expected_response = response_header_get_root_200_close + root_index_file
@@ -86,8 +86,8 @@ def test_get_sub_close_200():
     assert_response(response, expected_response)
 
 
-# def test_get_400():
-#     expected_response = response_header_get_400.encode('utf-8') + bad_request_file_400
+# def test_get_400_01():
+#     expected_response = response_header_400.encode('utf-8') + bad_request_file_400
 #     client_instance = client.Client(8080)
 #     request, _ = read_file_binary("test/common/request/get/4xx/400_01_only_crlf.txt")
 #     response = client_instance.SendRequestAndReceiveResponse(request)
@@ -96,8 +96,8 @@ def test_get_sub_close_200():
 #     ), f"Expected response\n\n {repr(expected_response)}, but got\n\n {repr(response)}"
 
 
-def test_get_404():
-    expected_response = response_header_get_404.encode('utf-8') + not_found_file_404
+def test_get_404_01():
+    expected_response = response_header_404.encode('utf-8') + not_found_file_404
     client_instance = client.Client(8080)
     request, _ = read_file_binary("test/common/request/get/4xx/404_01_not_exist_path.txt")
     response = client_instance.SendRequestAndReceiveResponse(request)
@@ -106,8 +106,8 @@ def test_get_404():
     ), f"Expected response\n\n {repr(expected_response)}, but got\n\n {repr(response)}"
 
 
-def test_get_405():
-    expected_response = response_header_get_405.encode('utf-8') + not_allowed_file_405
+def test_get_405_01():
+    expected_response = response_header_405.encode('utf-8') + not_allowed_file_405
     client_instance = client.Client(8080)
     request, _ = read_file_binary("test/common/request/get/4xx/405_01_not_allowed.txt")
     response = client_instance.SendRequestAndReceiveResponse(request)
