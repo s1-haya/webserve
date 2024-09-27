@@ -57,6 +57,10 @@ response_header_400 = f"HTTP/1.1 400 Bad Request\r\nConnection: close\r\nContent
 response_header_404 = f"HTTP/1.1 404 Not Found\r\nConnection: close\r\nContent-Length: {not_found_file_404_length}\r\nContent-Type: text/html\r\nServer: webserv/1.1\r\n\r\n"
 response_header_405 = f"HTTP/1.1 405 Method Not Allowed\r\nConnection: close\r\nContent-Length: {not_allowed_file_405_length}\r\nContent-Type: text/html\r\nServer: webserv/1.1\r\n\r\n"
 
+bad_request_response = response_header_400.encode('utf-8') + bad_request_file_400
+not_found_response = response_header_404.encode('utf-8') + not_found_file_404
+not_allowed_response = response_header_405.encode('utf-8') + not_allowed_file_405
+
 def test_get_root_close_200():
     expected_response = response_header_get_root_200_close + root_index_file
     client_instance = client.Client(8080)
@@ -87,7 +91,7 @@ def test_get_sub_close_200():
 
 
 # def test_get_400_01():
-#     expected_response = response_header_400.encode('utf-8') + bad_request_file_400
+#     expected_response = bad_request_response
 #     client_instance = client.Client(8080)
 #     request, _ = read_file_binary("test/common/request/get/4xx/400_01_only_crlf.txt")
 #     response = client_instance.SendRequestAndReceiveResponse(request)
@@ -97,7 +101,7 @@ def test_get_sub_close_200():
 
 
 def test_get_400_02():
-    expected_response = response_header_400.encode('utf-8') + bad_request_file_400
+    expected_response = bad_request_response
     client_instance = client.Client(8080)
     request, _ = read_file_binary("test/common/request/get/4xx/400_02_lower_method.txt")
     response = client_instance.SendRequestAndReceiveResponse(request)
@@ -107,7 +111,7 @@ def test_get_400_02():
 
 
 def test_get_400_03():
-    expected_response = response_header_400.encode('utf-8') + bad_request_file_400
+    expected_response = bad_request_response
     client_instance = client.Client(8080)
     request, _ = read_file_binary("test/common/request/get/4xx/400_03_no_ascii_method.txt")
     response = client_instance.SendRequestAndReceiveResponse(request)
@@ -117,7 +121,7 @@ def test_get_400_03():
 
 
 def test_get_400_04():
-    expected_response = response_header_400.encode('utf-8') + bad_request_file_400
+    expected_response = bad_request_response
     client_instance = client.Client(8080)
     request, _ = read_file_binary("test/common/request/get/4xx/400_04_no_root.txt")
     response = client_instance.SendRequestAndReceiveResponse(request)
@@ -127,7 +131,7 @@ def test_get_400_04():
 
 
 def test_get_400_05():
-    expected_response = response_header_400.encode('utf-8') + bad_request_file_400
+    expected_response = bad_request_response
     client_instance = client.Client(8080)
     request, _ = read_file_binary("test/common/request/get/4xx/400_05_relative_path.txt")
     response = client_instance.SendRequestAndReceiveResponse(request)
@@ -137,7 +141,7 @@ def test_get_400_05():
 
 
 def test_get_400_06():
-    expected_response = response_header_400.encode('utf-8') + bad_request_file_400
+    expected_response = bad_request_response
     client_instance = client.Client(8080)
     request, _ = read_file_binary("test/common/request/get/4xx/400_06_lower_http_version.txt")
     response = client_instance.SendRequestAndReceiveResponse(request)
@@ -147,7 +151,7 @@ def test_get_400_06():
 
 
 def test_get_400_07():
-    expected_response = response_header_400.encode('utf-8') + bad_request_file_400
+    expected_response = bad_request_response
     client_instance = client.Client(8080)
     request, _ = read_file_binary("test/common/request/get/4xx/400_07_wrong_http_name.txt")
     response = client_instance.SendRequestAndReceiveResponse(request)
@@ -157,7 +161,7 @@ def test_get_400_07():
 
 
 def test_get_400_08():
-    expected_response = response_header_400.encode('utf-8') + bad_request_file_400
+    expected_response = bad_request_response
     client_instance = client.Client(8080)
     request, _ = read_file_binary("test/common/request/get/4xx/400_08_wrong_http_version.txt")
     response = client_instance.SendRequestAndReceiveResponse(request)
@@ -167,7 +171,7 @@ def test_get_400_08():
 
 
 # def test_get_400_09():
-#     expected_response = response_header_400.encode('utf-8') + bad_request_file_400
+#     expected_response = bad_request_response
 #     client_instance = client.Client(8080)
 #     request, _ = read_file_binary("test/common/request/get/4xx/400_09_no_host.txt")
 #     response = client_instance.SendRequestAndReceiveResponse(request)
@@ -177,7 +181,7 @@ def test_get_400_08():
 
 
 def test_get_400_10():
-    expected_response = response_header_400.encode('utf-8') + bad_request_file_400
+    expected_response = bad_request_response
     client_instance = client.Client(8080)
     request, _ = read_file_binary("test/common/request/get/4xx/400_10_duplicate_host.txt")
     response = client_instance.SendRequestAndReceiveResponse(request)
@@ -187,7 +191,7 @@ def test_get_400_10():
 
 
 # def test_get_400_11():
-#     expected_response = response_header_400.encode('utf-8') + bad_request_file_400
+#     expected_response = bad_request_response
 #     client_instance = client.Client(8080)
 #     request, _ = read_file_binary("test/common/request/get/4xx/400_11_no_header_field_colon.txt")
 #     response = client_instance.SendRequestAndReceiveResponse(request)
@@ -197,7 +201,7 @@ def test_get_400_10():
 
 
 def test_get_404_01():
-    expected_response = response_header_404.encode('utf-8') + not_found_file_404
+    expected_response = not_found_response
     client_instance = client.Client(8080)
     request, _ = read_file_binary("test/common/request/get/4xx/404_01_not_exist_path.txt")
     response = client_instance.SendRequestAndReceiveResponse(request)
@@ -207,7 +211,7 @@ def test_get_404_01():
 
 
 def test_get_405_01():
-    expected_response = response_header_405.encode('utf-8') + not_allowed_file_405
+    expected_response = not_allowed_response
     client_instance = client.Client(8080)
     request, _ = read_file_binary("test/common/request/get/4xx/405_01_not_allowed.txt")
     response = client_instance.SendRequestAndReceiveResponse(request)
