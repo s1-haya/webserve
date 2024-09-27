@@ -4,6 +4,7 @@
 #include "http_result.hpp"
 #include "http_storage.hpp"
 #include "server_infos.hpp"
+#include "status_code.hpp"
 #include <iostream>
 
 namespace http {
@@ -18,7 +19,7 @@ Http::Run(const ClientInfos &client_info, const server::VirtualServerAddrList &s
 	utils::Result<void> parsed_result =
 		ParseHttpRequestFormat(client_info.fd, client_info.request_buf);
 	if (!parsed_result.IsOk()) {
-		return CreateBadRequestResponse(client_info.fd);
+		return GetErrorResponse(client_info, BAD);
 	}
 	if (IsHttpRequestFormatComplete(client_info.fd)) {
 		result = CreateHttpResponse(client_info, server_info);
@@ -26,10 +27,20 @@ Http::Run(const ClientInfos &client_info, const server::VirtualServerAddrList &s
 	return result;
 }
 
-HttpResult Http::GetErrorResponse(const ClientInfos &client_info, ErrState state) {
+HttpResult Http::GetErrorResponse(const ClientInfos &client_info, ErrorState state) {
 	HttpResult result;
-	(void)client_info;
-	(void)state;
+	HttpRequestParsedData data  = storage_.GetClientSaveData(client_info.fd);
+	result.is_response_complete = true;
+	result.is_connection_keep = false;
+	result.request_buf        = data.current_buf;
+	if (state == BAD) {
+		result.response = HttpResponse::CreateErrorResponse(StatusCode(BAD_REQUEST));
+	} else if (state == TIMEOUT) {
+		result.response = HttpResponse::CreateErrorResponse(StatusCode(REQUEST_TIMEOUT));
+	} else if (state == INTERNAL_ERROR) {
+		result.response = HttpResponse::CreateErrorResponse(StatusCode(INTERNAL_SERVER_ERROR));
+	}
+	storage_.DeleteClientSaveData(client_info.fd);
 	return result;
 }
 
@@ -44,42 +55,6 @@ utils::Result<void> Http::ParseHttpRequestFormat(int client_fd, const std::strin
 		result.Set(false);
 	}
 	storage_.UpdateClientSaveData(client_fd, save_data);
-	return result;
-}
-
-// HttpResult CreateTimeoutRequest(client_fd) {
-// HttpResult result;
-// HttpRequestParsedData data = storage_.GetClientSaveData(client_fd);
-// result.is_response_complete = true;
-// result.response = HttpResponse::CreateTimeoutRequest(data.request_result);
-// result.request_buf = data.request_buf;
-// todo: HttpResponse::IsConnectionKeep
-// result.is_connection_keep = ;
-// storage_.DeleteClientSaveData(client_fd);
-// return result;
-// }
-
-// HttpResult CreateInternalServerError(client_fd)
-// HttpResult result;
-// HttpRequestParsedData data = storage_.GetClientSaveData(client_fd);
-// result.is_response_complete = true;
-// result.response = HttpResponse::CreateInternalServerError(data.request_result);;
-// result.request_buf = data.request_buf;
-// todo: HttpResponse::IsConnectionKeep
-// result.is_connection_keep = ;
-// storage_.DeleteClientSaveData(client_fd);
-// return result;
-// }
-
-HttpResult Http::CreateBadRequestResponse(int client_fd) {
-	HttpResult            result;
-	HttpRequestParsedData data  = storage_.GetClientSaveData(client_fd);
-	result.is_response_complete = true;
-	// todo: BadRequestの場合はkeep-aliveにするかcloseにするか(現在はclose)
-	result.is_connection_keep = false;
-	result.request_buf        = data.current_buf;
-	result.response           = HttpResponse::CreateBadRequestResponse(data.request_result);
-	storage_.DeleteClientSaveData(client_fd);
 	return result;
 }
 

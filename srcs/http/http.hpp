@@ -9,17 +9,6 @@
 
 namespace http {
 
-// todo: server
-// Http class {
-// public
-// - Run: リクエスト受信からクライアント作成まで
-// - TimeOut: クライアントのリクエストが一定時間送信されない時
-// - InternalServer: システムコール等が失敗した場合
-
-// private
-// - HttpRequestFormat
-// - HttpResponse
-// }
 struct ClientInfos;
 struct HttpResult;
 
@@ -29,7 +18,7 @@ class Http : public IHttp {
 	~Http();
 	HttpResult
 	Run(const ClientInfos &client_info, const server::VirtualServerAddrList &server_info);
-	HttpResult GetErrorResponse(const ClientInfos &client_info, ErrState state);
+	HttpResult GetErrorResponse(const ClientInfos &client_info, ErrorState state);
 
   private:
 	Http(const Http &other);
@@ -42,7 +31,6 @@ class Http : public IHttp {
 	bool                  IsHttpRequestFormatComplete(int client_fd);
 	bool                  IsConnectionKeep(int client_fd);
 	HttpRequestParsedData GetClientData(int client_fd);
-	HttpResult            CreateBadRequestResponse(int client_fd);
 };
 
 } // namespace http
