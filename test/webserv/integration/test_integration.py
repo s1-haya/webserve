@@ -45,13 +45,13 @@ def assert_response(response, expected_response):
 root_index_file, root_index_file_length = read_file("root/html/index.html")
 sub_index_file, sub_index_file_length = read_file("root/html/sub/index.html")
 
-response_header_get_root_200 = f"HTTP/1.1 200 OK\r\nConnection: close \r\nContent-Length: {root_index_file_length} \r\n\r\n"
-
-response_header_get_sub_200 = f"HTTP/1.1 200 OK\r\nConnection: close \r\nContent-Length: {sub_index_file_length} \r\n\r\n"
+response_header_get_root_200_close = f"HTTP/1.1 200 OK\r\nConnection: close\r\nContent-Length: {root_index_file_length}\r\nContent-Type: text/html\r\nServer: webserv/1.1\r\n\r\n"
+response_header_get_root_200_keep = f"HTTP/1.1 200 OK\r\nConnection: keep-alive\r\nContent-Length: {root_index_file_length}\r\nContent-Type: text/html\r\nServer: webserv/1.1\r\n\r\n"
+response_header_get_sub_200_close = f"HTTP/1.1 200 OK\r\nConnection: close\r\nContent-Length: {sub_index_file_length}\r\nContent-Type: text/html\r\nServer: webserv/1.1\r\n\r\n"
 
 
 def test_get_root_close_200():
-    expected_response = response_header_get_root_200 + root_index_file
+    expected_response = response_header_get_root_200_close + root_index_file
     client_instance = client.Client(8080)
     request = read_file_binary(
         "test/common/request/get/2xx/200_01_connection_close.txt"
@@ -61,18 +61,16 @@ def test_get_root_close_200():
 
 
 def test_get_root_keep_200():
-    expected_response = response_header_get_root_200 + root_index_file
+    expected_response = response_header_get_root_200_keep + root_index_file
     # responseヘッダーもkeepaliveになる？
     client_instance = client.Client(8080)
-    request = read_file_binary(
-        "test/common/request/get/2xx/200_02_connection_keep.txt"
-    )
+    request = read_file_binary("test/common/request/get/2xx/200_02_connection_keep.txt")
     response = client_instance.SendRequestAndReceiveResponse(request)
     assert_response(response, expected_response)
 
 
 def test_get_sub_close_200():
-    expected_response = response_header_get_sub_200 + sub_index_file
+    expected_response = response_header_get_sub_200_close + sub_index_file
     client_instance = client.Client(8080)
     request = read_file_binary(
         "test/common/request/get/2xx/200_03_sub_connection_close.txt"

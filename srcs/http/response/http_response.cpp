@@ -126,7 +126,7 @@ HeaderFields HttpResponse::InitResponseHeaderFields(const HttpRequestResult &req
 	// todo: request_infoから情報取得
 	// GetContentType(request_info);
 	// GetConnection(request_info);
-	response_header_fields[CONTENT_TYPE] = "test/html";
+	response_header_fields[CONTENT_TYPE] = TEXT_HTML;
 	if (IsConnectionKeep(request_info.request.header_fields)) {
 		response_header_fields[CONNECTION] = KEEP_ALIVE;
 	} else {
@@ -174,7 +174,7 @@ std::string HttpResponse::CreateBadRequestResponse(const HttpRequestResult &requ
 		request_info.status_code.GetReasonPhrase()
 	);
 	response.header_fields[SERVER]       = SERVER_VERSION;
-	response.header_fields[CONTENT_TYPE] = "test/html";
+	response.header_fields[CONTENT_TYPE] = TEXT_HTML;
 	response.header_fields[CONNECTION]   = CLOSE;
 	response.body_message                = CreateDefaultBodyMessageFormat(request_info.status_code);
 	response.header_fields[CONTENT_LENGTH] = utils::ToString(response.body_message.length());

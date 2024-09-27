@@ -14,6 +14,7 @@ namespace test {
 
 // 2xx
 int TestGetOk1ConnectionClose(const server::VirtualServerAddrList &server_infos);
+int TestGetOk13ExtraRequest(const server::VirtualServerAddrList &server_infos);
 // 4xx
 int TestGetBadRequest1OnlyCrlf(const server::VirtualServerAddrList &server_infos);
 int TestGetBadRequest2LowerMethod(const server::VirtualServerAddrList &server_infos);
