@@ -48,7 +48,7 @@ bool IsSame(const T &result, const T &expected) {
 	return result == expected;
 }
 
-int HandleResult(const Result &result, const std::string& current_number) {
+int HandleResult(const Result &result, const std::string &current_number) {
 	if (result.is_success) {
 		std::cout << utils::color::GREEN << current_number << ".[OK]" << utils::color::RESET
 				  << std::endl;
