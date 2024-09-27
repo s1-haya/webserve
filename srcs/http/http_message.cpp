@@ -9,6 +9,7 @@ const std::string CRLF                = "\r\n";
 const std::string HEADER_FIELDS_END   = CRLF + CRLF;
 const std::string HTTP_VERSION        = "HTTP/1.1";
 const std::string SERVER_VERSION      = "webserv/1.1";
+const std::string TEXT_HTML           = "text/html";
 
 const std::string GET                       = "GET";
 const std::string DELETE                    = "DELETE";
