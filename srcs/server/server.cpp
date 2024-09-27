@@ -270,7 +270,7 @@ void Server::SendResponse(int client_fd) {
 	const message::ConnectionState connection_state = response.connection_state;
 	const std::string             &response_str     = response.response_str;
 
-	const Send::SendResult send_result = Send::SendResponse(client_fd, response_str);
+	const Send::SendResult send_result = Send::SendStr(client_fd, response_str);
 	if (!send_result.IsOk()) {
 		// Even if sending fails, continue the server
 		// e.g., in case of a SIGPIPE(EPIPE) when the client disconnects
