@@ -17,6 +17,7 @@ WS_HTTP_RESPONSE_DIR	:=	$(WS_HTTP_DIR)/response
 WS_HTTP_PARSE_DIR		:=	$(WS_HTTP_REQUEST_DIR)/parse
 WS_HTTP_SERVER_INFO_CHECK_DIR	:=	$(WS_HTTP_RESPONSE_DIR)/http_serverinfo_check
 WS_VIRTUAL_SERVER_DIR			:=	$(WS_SRCS_DIR)/server/virtual_server
+WS_CGI_DIR				:=	$(WS_SRCS_DIR)/cgi
 
 SRCS				+=	$(WS_EXCEPTION_DIR)/system_exception.cpp \
 						$(WS_UTILS_DIR)/color.cpp \
@@ -33,7 +34,8 @@ SRCS				+=	$(WS_EXCEPTION_DIR)/system_exception.cpp \
 						$(WS_HTTP_RESPONSE_DIR)/stat.cpp \
 						$(WS_HTTP_PARSE_DIR)/http_parse.cpp \
 						$(WS_HTTP_SERVER_INFO_CHECK_DIR)/http_serverinfo_check.cpp \
-						$(WS_VIRTUAL_SERVER_DIR)/virtual_server.cpp
+						$(WS_VIRTUAL_SERVER_DIR)/virtual_server.cpp \
+						$(WS_CGI_DIR)/cgi_request.cpp
 
 # 3. Add unit test files
 SRCS	+=	test_http.cpp \
@@ -47,7 +49,8 @@ SRCS_DIR	:=	$(WS_EXCEPTION_DIR) \
 				$(WS_HTTP_RESPONSE_DIR) \
 				$(WS_HTTP_PARSE_DIR) \
 				$(WS_HTTP_SERVER_INFO_CHECK_DIR) \
-				$(WS_VIRTUAL_SERVER_DIR)
+				$(WS_VIRTUAL_SERVER_DIR) \
+				$(WS_CGI_DIR)
 
 # 3. Add unit test files
 TEST_CASE_DIR := test_case
