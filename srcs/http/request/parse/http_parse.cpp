@@ -212,7 +212,7 @@ HeaderFields HttpParse::SetHeaderFields(const std::vector<std::string> &header_f
 
 		// header_field_valueを初期化してるためheader_field_nameも初期化した
 		const std::string &header_field_name = header_field_name_and_value[0];
-		CheckValidHeaderFieldName(header_field_name);
+		CheckValidHeaderFieldName(header_fields, header_field_name);
 		const std::string &header_field_value =
 			StrTrimLeadingOptionalWhitespace(header_field_name_and_value[1]);
 		// to do: #189  ヘッダフィールドをパースする関数（value）-> CheckValidHeaderFieldValue
@@ -265,21 +265,12 @@ void HttpParse::CheckValidVersion(const std::string &version) {
 	}
 }
 
-void HttpParse::CheckValidHeaderFieldName(const std::string &header_field_name) {
-	(void)header_field_name;
-	// todo: 複数指定ありの場合はthrowしないようにする。
-	// if (header_field_value != CONNECTION &&
-	// 	std::find(
-	// 		REQUEST_HEADER_FIELDS,
-	// 		REQUEST_HEADER_FIELDS + REQUEST_HEADER_FIELDS_SIZE,
-	// 		header_field_value
-	// 	) == REQUEST_HEADER_FIELDS + REQUEST_HEADER_FIELDS_SIZE) {
-	// 	throw HttpException(
-	// 		"Error: the value does not exist in format of header fields", StatusCode(BAD_REQUEST)
-	// 	);
-	// }
-
-	// Todo: ブラウザでデフォルト以外のヘッダーが送られてくることがある
+void HttpParse::CheckValidHeaderFieldName(const HeaderFields &header_fields, const std::string &header_field_name) {
+	if (header_fields.find(header_field_name) != header_fields.end() && header_field_name == HOST) {
+		throw HttpException(
+			"Error: Host header fields already exists", StatusCode(BAD_REQUEST)
+		);
+	}
 }
 
 // status_line && header
