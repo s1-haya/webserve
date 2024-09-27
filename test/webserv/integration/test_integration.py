@@ -56,6 +56,7 @@ sub_index_file, sub_index_file_length = read_file("root/html/sub/index.html")
 bad_request_file_400, bad_request_file_400_length = read_file_binary("test/webserv/expected_response/default_body_message/400_bad_request.txt")
 not_found_file_404, not_found_file_404_length = read_file_binary("test/webserv/expected_response/default_body_message/404_not_found.txt")
 not_allowed_file_405, not_allowed_file_405_length = read_file_binary("test/webserv/expected_response/default_body_message/405_method_not_allowed.txt")
+timeout_file_408, timeout_file_408_length = read_file_binary("test/webserv/expected_response/default_body_message/408_timeout.txt")
 
 response_header_get_root_200_close = f"HTTP/1.1 200 OK\r\nConnection: close\r\nContent-Length: {root_index_file_length}\r\nContent-Type: text/html\r\nServer: webserv/1.1\r\n\r\n"
 response_header_get_root_200_keep = f"HTTP/1.1 200 OK\r\nConnection: keep-alive\r\nContent-Length: {root_index_file_length}\r\nContent-Type: text/html\r\nServer: webserv/1.1\r\n\r\n"
@@ -63,10 +64,12 @@ response_header_get_sub_200_close = f"HTTP/1.1 200 OK\r\nConnection: close\r\nCo
 response_header_400 = f"HTTP/1.1 400 Bad Request\r\nConnection: close\r\nContent-Length: {bad_request_file_400_length}\r\nContent-Type: text/html\r\nServer: webserv/1.1\r\n\r\n"
 response_header_404 = f"HTTP/1.1 404 Not Found\r\nConnection: close\r\nContent-Length: {not_found_file_404_length}\r\nContent-Type: text/html\r\nServer: webserv/1.1\r\n\r\n"
 response_header_405 = f"HTTP/1.1 405 Method Not Allowed\r\nConnection: close\r\nContent-Length: {not_allowed_file_405_length}\r\nContent-Type: text/html\r\nServer: webserv/1.1\r\n\r\n"
+response_header_408 = f"HTTP/1.1 408 Request Timeout\r\nConnection: close\r\nContent-Length: {timeout_file_408_length}\r\nContent-Type: text/html\r\nServer: webserv/1.1\r\n\r\n"
 
 bad_request_response = response_header_400 + bad_request_file_400.decode('utf-8')
 not_found_response = response_header_404 + not_found_file_404.decode('utf-8')
 not_allowed_response = response_header_405 + not_allowed_file_405.decode('utf-8')
+timeout_response = response_header_408 + timeout_file_408.decode('utf-8')
 
 def test_get_root_close_200():
     send_request_and_assert_response(
@@ -135,6 +138,8 @@ def test_get_404_01():
 def test_get_405_01():
     send_request_and_assert_response("test/common/request/get/4xx/405_01_not_allowed.txt", not_allowed_response)
 
+# def test_get_408_01():
+#     send_request_and_assert_response("test/common/request/get/4xx/408_01_no_crlf.txt", timeout_response)
 
 def test_webserv():
     try:
