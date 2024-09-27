@@ -284,6 +284,55 @@ int RunTest4() {
 	return ret_code;
 }
 
+// -----------------------------------------------------------------------------
+// CgiManager classの主なテスト対象関数
+// - RunCgi()
+// - GetReadFd()
+// - GetWriteFd()
+// - method == POST
+// -----------------------------------------------------------------------------
+int RunTest5() {
+	int ret_code = EXIT_SUCCESS;
+
+	const int         expected_client_fd = 10;
+	const std::string expected_request   = "abcde";
+
+	// 最低限のCgiRequest準備
+	CgiRequest cgi_request;
+	cgi_request.meta_variables[REQUEST_METHOD] = "POST";
+	cgi_request.meta_variables[SCRIPT_NAME]    = PATH_DIR_CGI_BIN + "/test.sh";
+	cgi_request.body_message                   = expected_request;
+
+	// CgiManager内で新規Cgiを複数作成
+	CgiManager cgi_manager;
+	cgi_manager.AddNewCgi(expected_client_fd, cgi_request);
+
+	// cgiを実行する(子プロセスで実行 & pipe_fdがclient_fdと紐づけられる)
+	cgi_manager.RunCgi(expected_client_fd);
+
+	// pipe_fd(read)を取得
+	const GetFdResult read_fd_result = cgi_manager.GetReadFd(expected_client_fd);
+	if (read_fd_result.IsOk()) {
+		const int read_pipe_fd = read_fd_result.GetValue();
+		// read_pipe_fdとclient_fdの紐づけ確認
+		ret_code |= Test(IsSameClientFd(cgi_manager, read_pipe_fd, expected_client_fd)); // Test9
+	} else {
+		ret_code |= Test(Result(false, "read pipe_fd was not created"));
+	}
+
+	// pipe_fd(write)を取得
+	const GetFdResult write_fd_result = cgi_manager.GetWriteFd(expected_client_fd);
+	if (write_fd_result.IsOk()) {
+		const int write_pipe_fd = write_fd_result.GetValue();
+		// write_pipe_fdとclient_fdの紐づけ確認
+		ret_code |= Test(IsSameClientFd(cgi_manager, write_pipe_fd, expected_client_fd)); // Test10
+	} else {
+		ret_code |= Test(Result(false, "write pipe_fd was not created"));
+	}
+
+	return ret_code;
+}
+
 } // namespace
 
 int main() {
@@ -293,6 +342,7 @@ int main() {
 	ret_code |= RunTest2();
 	ret_code |= RunTest3();
 	ret_code |= RunTest4();
+	ret_code |= RunTest5();
 
 	return ret_code;
 }
