@@ -513,8 +513,32 @@ void Server::HandleCgi(int client_fd, const http::CgiResult &cgi_result) {
 }
 
 void Server::HandleCgiReadResult(int pipe_fd, const Read::ReadResult &read_result) {
-	(void)pipe_fd;
-	(void)read_result;
+	const int client_fd = cgi_manager_.GetClientFd(pipe_fd);
+
+	if (!read_result.IsOk()) {
+		utils::Debug(
+			"cgi", "Failed to read the response from the child process through pipe_fd", pipe_fd
+		);
+		cgi_manager_.DeleteCgi(client_fd);
+		SetInternalServerError(client_fd);
+		return;
+	}
+	SetCgiResponseToHttp(pipe_fd, read_result.GetValue().read_buf);
+}
+
+void Server::SetCgiResponseToHttp(int pipe_fd, const std::string &read_buf) {
+	const int client_fd = cgi_manager_.GetClientFd(pipe_fd);
+
+	const cgi::CgiResponse cgi_response = cgi_manager_.AddAndGetResponse(client_fd, read_buf);
+	if (!cgi_response.is_response_complete) {
+		return;
+	}
+	utils::Debug("cgi", "Read the entire response from the child process through pipe_fd", pipe_fd);
+
+	// todo: IHttpに作る
+	// http_.SetCgiResponse(client_fd, cgi_response);
+	cgi_manager_.DeleteCgi(client_fd);
+	event_monitor_.Delete(client_fd);
 }
 
 } // namespace server
