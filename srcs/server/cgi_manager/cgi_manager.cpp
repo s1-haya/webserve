@@ -19,7 +19,7 @@ CgiManager::~CgiManager() {
 void CgiManager::AddNewCgi(int client_fd, const cgi::CgiRequest &request) {
 	Cgi *cgi = new (std::nothrow) Cgi(request);
 	if (cgi == NULL) {
-		throw SystemException(std::strerror(errno));
+		throw SystemException("AddNewCgi: Failed to allocate memory");
 	}
 	if (cgi_addr_map_.count(client_fd) != 0) {
 		throw std::logic_error("AddNewCgi: client_fd already exists");
