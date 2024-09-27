@@ -33,6 +33,10 @@ void MessageManager::DeleteMessage(int client_fd) {
 	messages_.erase(client_fd);
 }
 
+bool MessageManager::IsMessageExist(int client_fd) const {
+	return messages_.count(client_fd) != 0;
+}
+
 MessageManager::TimeoutFds MessageManager::GetNewTimeoutFds(double timeout) {
 	TimeoutFds timeout_fds_;
 

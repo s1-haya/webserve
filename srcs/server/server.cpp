@@ -2,7 +2,6 @@
 #include "client_info.hpp"
 #include "define.hpp"
 #include "event.hpp"
-#include "read.hpp"
 #include "send.hpp"
 #include "start_up_exception.hpp"
 #include "system_exception.hpp"
@@ -181,11 +180,16 @@ void Server::HandleExistingConnection(const event::Event &event) {
 		return;
 	}
 	if (event.type & event::EVENT_READ) {
-		ReadRequest(event.fd);
-		RunHttp(event);
+		const Read::ReadResult read_result = ReadRequest(event.fd);
+		if (read_result.IsOk()) {
+			RunHttp(event);
+		}
 	}
 	if (event.type & event::EVENT_WRITE) {
-		// todo: RunHttp内でDisconnect()されていた場合の処理追加
+		// Prevent SendResponse() if Disconnect() was called during EVENT_READ handling.
+		if (!message_manager_.IsMessageExist(event.fd)) {
+			return;
+		}
 		SendResponse(event.fd);
 	}
 }
@@ -201,19 +205,19 @@ VirtualServerAddrList Server::GetVirtualServerList(int client_fd) const {
 	return context_.GetVirtualServerAddrList(client_fd);
 }
 
-void Server::ReadRequest(int client_fd) {
-	const Read::ReadResult read_result = Read::ReadRequest(client_fd);
+Read::ReadResult Server::ReadRequest(int client_fd) {
+	Read::ReadResult read_result = Read::ReadRequest(client_fd);
 	if (!read_result.IsOk()) {
 		SetInternalServerError(client_fd);
-		return;
+		return read_result;
 	}
 	if (read_result.GetValue().read_size == 0) {
-		// todo: not close?
 		// clientが正しくshutdownした場合・長さ0のデータグラムを受信した場合などにここに入るらしい
-		Disconnect(client_fd);
-		return;
+		read_result.Set(false);
+		return read_result;
 	}
 	message_manager_.AddRequestBuf(client_fd, read_result.GetValue().read_buf);
+	return read_result;
 }
 
 void Server::RunHttp(const event::Event &event) {
