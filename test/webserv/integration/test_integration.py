@@ -1,6 +1,8 @@
 import os
 import subprocess
 
+import pytest
+
 
 def build_client_module():
     # client_module ディレクトリに移動
@@ -53,21 +55,28 @@ def send_request_and_assert_response(request_file, expected_response):
 root_index_file, root_index_file_length = read_file("root/html/index.html")
 sub_index_file, sub_index_file_length = read_file("root/html/sub/index.html")
 
-bad_request_file_400, bad_request_file_400_length = read_file_binary(
-    "test/webserv/expected_response/default_body_message/400_bad_request.txt"
-)
-not_found_file_404, not_found_file_404_length = read_file_binary(
-    "test/webserv/expected_response/default_body_message/404_not_found.txt"
-)
-not_allowed_file_405, not_allowed_file_405_length = read_file_binary(
-    "test/webserv/expected_response/default_body_message/405_method_not_allowed.txt"
-)
-timeout_file_408, timeout_file_408_length = read_file_binary(
-    "test/webserv/expected_response/default_body_message/408_timeout.txt"
-)
-not_implemented_file_501, not_implemented_file_501_length = read_file_binary(
-    "test/webserv/expected_response/default_body_message/501_not_implemented.txt"
-)
+error_files = [
+    ("400_bad_request.txt", "bad_request_file_400", "bad_request_file_400_length"),
+    ("404_not_found.txt", "not_found_file_404", "not_found_file_404_length"),
+    (
+        "405_method_not_allowed.txt",
+        "not_allowed_file_405",
+        "not_allowed_file_405_length",
+    ),
+    ("408_timeout.txt", "timeout_file_408", "timeout_file_408_length"),
+    (
+        "501_not_implemented.txt",
+        "not_implemented_file_501",
+        "not_implemented_file_501_length",
+    ),
+]
+
+for filename, data_var, length_var in error_files:
+    data, length = read_file_binary(
+        f"test/webserv/expected_response/default_body_message/{filename}"
+    )
+    globals()[data_var] = data
+    globals()[length_var] = length
 
 response_header_get_root_200_close = f"HTTP/1.1 200 OK\r\nConnection: close\r\nContent-Length: {root_index_file_length}\r\nContent-Type: text/html\r\nServer: webserv/1.1\r\n\r\n"
 response_header_get_root_200_keep = f"HTTP/1.1 200 OK\r\nConnection: keep-alive\r\nContent-Length: {root_index_file_length}\r\nContent-Type: text/html\r\nServer: webserv/1.1\r\n\r\n"
@@ -87,113 +96,51 @@ not_implemented_response = response_header_501 + not_implemented_file_501.decode
 )
 
 
-def test_get_200_01():
-    send_request_and_assert_response(
-        "test/common/request/get/2xx/200_01_connection_close.txt",
-        response_header_get_root_200_close + root_index_file,
-    )
-
-
-def test_get_200_02():
-    send_request_and_assert_response(
-        "test/common/request/get/2xx/200_02_connection_keep.txt",
-        response_header_get_root_200_keep + root_index_file,
-    )
-
-
-def test_get_200_03():
-    send_request_and_assert_response(
-        "test/common/request/get/2xx/200_03_sub_connection_close.txt",
-        response_header_get_sub_200_close + sub_index_file,
-    )
-
-
-# def test_get_200_04():
-#     send_request_and_assert_response("test/common/request/get/2xx/200_04_connection_keep_alive_and_200_connection_keep_alive.txt", response_header_get_root_200_keep + root_index_file)
-
-# def test_get_400_01():
-#   send_request_and_assert_response("test/common/request/get/4xx/400_01_only_crlf.txt", bad_request_response)
-
-
-def test_get_400_02():
-    send_request_and_assert_response(
-        "test/common/request/get/4xx/400_02_lower_method.txt", bad_request_response
-    )
-
-
-def test_get_400_03():
-    send_request_and_assert_response(
-        "test/common/request/get/4xx/400_03_no_ascii_method.txt", bad_request_response
-    )
-
-
-def test_get_400_04():
-    send_request_and_assert_response(
-        "test/common/request/get/4xx/400_04_no_root.txt", bad_request_response
-    )
-
-
-def test_get_400_05():
-    send_request_and_assert_response(
-        "test/common/request/get/4xx/400_05_relative_path.txt", bad_request_response
-    )
-
-
-def test_get_400_06():
-    send_request_and_assert_response(
-        "test/common/request/get/4xx/400_06_lower_http_version.txt",
-        bad_request_response,
-    )
-
-
-def test_get_400_07():
-    send_request_and_assert_response(
-        "test/common/request/get/4xx/400_07_wrong_http_name.txt", bad_request_response
-    )
-
-
-def test_get_400_08():
-    send_request_and_assert_response(
-        "test/common/request/get/4xx/400_08_wrong_http_version.txt",
-        bad_request_response,
-    )
-
-
-# def test_get_400_09():
-#    send_request_and_assert_response("test/common/request/get/4xx/400_09_no_host.txt", bad_request_response)
-
-
-def test_get_400_10():
-    send_request_and_assert_response(
-        "test/common/request/get/4xx/400_10_duplicate_host.txt", bad_request_response
-    )
-
-
-# def test_get_400_11():
-#     send_request_and_assert_response("test/common/request/get/4xx/400_11_no_header_field_colon.txt", bad_request_response)
-
-
-def test_get_404_01():
-    send_request_and_assert_response(
-        "test/common/request/get/4xx/404_01_not_exist_path.txt", not_found_response
-    )
-
-
-def test_get_405_01():
-    send_request_and_assert_response(
-        "test/common/request/get/4xx/405_01_not_allowed.txt", not_allowed_response
-    )
-
-
-# def test_get_408_01():
-#     send_request_and_assert_response("test/common/request/get/4xx/408_01_no_crlf.txt", timeout_response)
-
-
-def test_get_501_01():
-    send_request_and_assert_response(
-        "test/common/request/get/5xx/501_01_not_exist_method.txt",
-        not_implemented_response,
-    )
+@pytest.mark.parametrize(
+    "request_file, expected_response",
+    [
+        (
+            "test/common/request/get/2xx/200_01_connection_close.txt",
+            response_header_get_root_200_close + root_index_file,
+        ),
+        (
+            "test/common/request/get/2xx/200_02_connection_keep.txt",
+            response_header_get_root_200_keep + root_index_file,
+        ),
+        (
+            "test/common/request/get/2xx/200_03_sub_connection_close.txt",
+            response_header_get_sub_200_close + sub_index_file,
+        ),
+        ("test/common/request/get/4xx/400_02_lower_method.txt", bad_request_response),
+        (
+            "test/common/request/get/4xx/400_03_no_ascii_method.txt",
+            bad_request_response,
+        ),
+        ("test/common/request/get/4xx/400_04_no_root.txt", bad_request_response),
+        ("test/common/request/get/4xx/400_05_relative_path.txt", bad_request_response),
+        (
+            "test/common/request/get/4xx/400_06_lower_http_version.txt",
+            bad_request_response,
+        ),
+        (
+            "test/common/request/get/4xx/400_07_wrong_http_name.txt",
+            bad_request_response,
+        ),
+        (
+            "test/common/request/get/4xx/400_08_wrong_http_version.txt",
+            bad_request_response,
+        ),
+        ("test/common/request/get/4xx/400_10_duplicate_host.txt", bad_request_response),
+        ("test/common/request/get/4xx/404_01_not_exist_path.txt", not_found_response),
+        ("test/common/request/get/4xx/405_01_not_allowed.txt", not_allowed_response),
+        (
+            "test/common/request/get/5xx/501_01_not_exist_method.txt",
+            not_implemented_response,
+        ),
+    ],
+)
+def test_get_responses(request_file, expected_response):
+    send_request_and_assert_response(request_file, expected_response)
 
 
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
