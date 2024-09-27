@@ -2,7 +2,6 @@
 #include "client_info.hpp"
 #include "define.hpp"
 #include "event.hpp"
-#include "read.hpp"
 #include "send.hpp"
 #include "start_up_exception.hpp"
 #include "system_exception.hpp"
@@ -181,11 +180,16 @@ void Server::HandleExistingConnection(const event::Event &event) {
 		return;
 	}
 	if (event.type & event::EVENT_READ) {
-		ReadRequest(event.fd);
-		RunHttp(event);
+		const Read::ReadResult read_result = ReadRequest(event.fd);
+		if (read_result.IsOk()) {
+			RunHttp(event);
+		}
 	}
 	if (event.type & event::EVENT_WRITE) {
-		// todo: RunHttp内でDisconnect()されていた場合の処理追加
+		// Prevent SendResponse() if Disconnect() was called during EVENT_READ handling.
+		if (!message_manager_.IsMessageExist(event.fd)) {
+			return;
+		}
 		SendResponse(event.fd);
 	}
 }
@@ -201,20 +205,20 @@ VirtualServerAddrList Server::GetVirtualServerList(int client_fd) const {
 	return context_.GetVirtualServerAddrList(client_fd);
 }
 
-void Server::ReadRequest(int client_fd) {
-	const Read::ReadResult read_result = Read::ReadRequest(client_fd);
+Read::ReadResult Server::ReadRequest(int client_fd) {
+	Read::ReadResult read_result = Read::ReadRequest(client_fd);
 	if (!read_result.IsOk()) {
 		SetInternalServerError(client_fd);
-		return;
+		return read_result;
 	}
 	if (read_result.GetValue().read_size == 0) {
-		// todo: not close?
 		// clientが正しくshutdownした場合・長さ0のデータグラムを受信した場合などにここに入るらしい
-		Disconnect(client_fd);
-		return;
+		read_result.Set(false);
+		return read_result;
 	}
 	message_manager_.AddRequestBuf(client_fd, read_result.GetValue().read_buf);
 	std::cerr << message_manager_.GetRequestBuf(client_fd) << std::endl;
+	return read_result;
 }
 
 void Server::RunHttp(const event::Event &event) {
@@ -225,7 +229,7 @@ void Server::RunHttp(const event::Event &event) {
 	const VirtualServerAddrList &virtual_servers = GetVirtualServerList(client_fd);
 	DebugDto(client_infos, virtual_servers);
 
-	http::HttpResult http_result = mock_http_.Run(client_infos, virtual_servers);
+	http::HttpResult http_result = http_.Run(client_infos, virtual_servers);
 	// Set the unused request_buf in Http.
 	message_manager_.SetNewRequestBuf(client_fd, http_result.request_buf);
 	// Check if it's ready to start write/send.
@@ -286,7 +290,7 @@ void Server::HandleTimeoutMessages() {
 		}
 
 		const http::HttpResult http_result =
-			mock_http_.GetErrorResponse(GetClientInfos(client_fd), http::TIMEOUT);
+			http_.GetErrorResponse(GetClientInfos(client_fd), http::TIMEOUT);
 		message_manager_.AddPrimaryResponse(client_fd, message::CLOSE, http_result.response);
 		ReplaceEvent(client_fd, event::EVENT_WRITE);
 		utils::Debug("server", "timeout client", client_fd);
@@ -296,7 +300,7 @@ void Server::HandleTimeoutMessages() {
 // internal server error用のresponseをセットしてevent監視をWRITEに変更
 void Server::SetInternalServerError(int client_fd) {
 	const http::HttpResult http_result =
-		mock_http_.GetErrorResponse(GetClientInfos(client_fd), http::INTERNAL_ERROR);
+		http_.GetErrorResponse(GetClientInfos(client_fd), http::INTERNAL_ERROR);
 	message_manager_.AddPrimaryResponse(client_fd, message::CLOSE, http_result.response);
 	ReplaceEvent(client_fd, event::EVENT_WRITE);
 	utils::Debug("server", "internal server error to client", client_fd);
@@ -311,7 +315,7 @@ void Server::KeepConnection(int client_fd) {
 void Server::Disconnect(int client_fd) {
 	// todo: client_save_dataがない場合に呼ばれても大丈夫な作りになってるか確認
 	// HttpResult is not used.
-	mock_http_.GetErrorResponse(GetClientInfos(client_fd), http::INTERNAL_ERROR);
+	http_.GetErrorResponse(GetClientInfos(client_fd), http::INTERNAL_ERROR);
 	event_monitor_.Delete(client_fd);
 	message_manager_.DeleteMessage(client_fd);
 	context_.DeleteClientInfo(client_fd);

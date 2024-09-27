@@ -22,14 +22,11 @@ void CgiManager::AddNewCgi(int client_fd, const cgi::CgiRequest &request) {
 	cgi_addr_map_[client_fd] = cgi;
 }
 
-CgiManager::Cgi::CgiResult CgiManager::RunCgi(int client_fd) {
+void CgiManager::RunCgi(int client_fd) {
 	Cgi *cgi = GetCgi(client_fd);
 
-	const Cgi::CgiResult &cgi_result = cgi->Run();
-	if (!cgi_result.IsOk()) {
-		// todo: error handling?
-		return cgi_result;
-	}
+	cgi->Run();
+	// todo: try catch
 	// pipe_fdとclient_fdの紐づけをFdMapに追加
 	if (cgi->IsReadRequired()) {
 		client_fd_map_[cgi->GetReadFd()] = client_fd;
@@ -37,7 +34,6 @@ CgiManager::Cgi::CgiResult CgiManager::RunCgi(int client_fd) {
 	if (cgi->IsWriteRequired()) {
 		client_fd_map_[cgi->GetWriteFd()] = client_fd;
 	}
-	return cgi_result;
 }
 
 void CgiManager::DeleteCgi(int client_fd) {
@@ -54,24 +50,6 @@ void CgiManager::DeleteCgi(int client_fd) {
 	delete cgi;
 	// CgiAddrMapから削除
 	cgi_addr_map_.erase(client_fd);
-}
-
-bool CgiManager::IsResponseComplete(int client_fd) const {
-	try {
-		const Cgi *cgi = cgi_addr_map_.at(client_fd);
-		return cgi->IsResponseComplete();
-	} catch (const std::exception &e) {
-		throw std::logic_error("IsResponseComplete: " + std::string(e.what()));
-	}
-}
-
-void CgiManager::AddReadBuf(int client_fd, const std::string &read_buf) {
-	try {
-		Cgi *cgi = cgi_addr_map_.at(client_fd);
-		cgi->AddReadBuf(read_buf);
-	} catch (const std::exception &e) {
-		throw std::logic_error("AddReadBuf: " + std::string(e.what()));
-	}
 }
 
 CgiManager::GetFdResult CgiManager::GetReadFd(int client_fd) const {
@@ -121,13 +99,12 @@ const std::string &CgiManager::GetRequest(int client_fd) const {
 	}
 }
 
-// todo: 返り値がcgi::CgiResponseになりそう
-const std::string &CgiManager::GetResponse(int client_fd) const {
+cgi::CgiResponse CgiManager::AddAndGetResponse(int client_fd, const std::string &read_buf) {
 	try {
-		const Cgi *cgi = cgi_addr_map_.at(client_fd);
-		return cgi->GetResponse();
+		Cgi *cgi = cgi_addr_map_.at(client_fd);
+		return cgi->AddAndGetResponse(read_buf);
 	} catch (const std::exception &e) {
-		throw std::logic_error("GetResponse: " + std::string(e.what()));
+		throw std::logic_error("AddAndGetResponse: " + std::string(e.what()));
 	}
 }
 
