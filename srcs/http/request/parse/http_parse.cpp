@@ -237,16 +237,15 @@ HeaderFields HttpParse::SetHeaderFields(const std::vector<std::string> &header_f
 }
 
 void HttpParse::CheckValidRequestLine(const std::vector<std::string> &request_line_info) {
-	if (!request_line_info[0].size()) {
-		throw HttpException("Error: Request line don't exist.", StatusCode(BAD_REQUEST));
-	}
 	CheckValidMethod(request_line_info[0]);
 	CheckValidRequestTarget(request_line_info[1]);
 	CheckValidVersion(request_line_info[2]);
 }
 
 void HttpParse::CheckValidMethod(const std::string &method) {
-	// US-ASCIIかまたは大文字かどうか -> 400
+	if (!method.size()) {
+		throw HttpException("Error: the method don't exist.", StatusCode(BAD_REQUEST));
+	}
 	if (IsStringUsAscii(method) == false || IsStringUpper(method) == false) {
 		throw HttpException(
 			"Error: This method contains lowercase or non-USASCII characters.",
@@ -256,7 +255,9 @@ void HttpParse::CheckValidMethod(const std::string &method) {
 }
 
 void HttpParse::CheckValidRequestTarget(const std::string &request_target) {
-	// /が先頭になかったら場合 -> 400
+	if (!request_target.size()) {
+		throw HttpException("Error: the request target don't exist.", StatusCode(BAD_REQUEST));
+	}
 	if (request_target.empty() || request_target[0] != '/') {
 		throw HttpException(
 			"Error: the request target is missing the '/' character at the beginning",
@@ -266,7 +267,9 @@ void HttpParse::CheckValidRequestTarget(const std::string &request_target) {
 }
 
 void HttpParse::CheckValidVersion(const std::string &version) {
-	// HTTP/1.1かどうか -> 400
+	if (!version.size()) {
+		throw HttpException("Error: the http version don't exist.", StatusCode(BAD_REQUEST));
+	}
 	if (version != HTTP_VERSION) {
 		throw HttpException(
 			"Error: The version is not supported by webserv", StatusCode(BAD_REQUEST)
