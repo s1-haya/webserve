@@ -232,7 +232,6 @@ int RunTest3() {
 	return ret_code;
 }
 
-// todo: cgi.Run()が動くまではif文に入らずTest()が呼ばれてない
 // -----------------------------------------------------------------------------
 // CgiManager classの主なテスト対象関数
 // - RunCgi()
@@ -243,7 +242,7 @@ int RunTest3() {
 int RunTest4() {
 	int ret_code = EXIT_SUCCESS;
 
-	const int         expected_client_fd = 3;
+	const int         expected_client_fd = 10; // 3,4はpipe_fdで使われる
 	const std::string expected_request   = "abcde";
 
 	// 最低限のCgiRequest準備
@@ -255,7 +254,7 @@ int RunTest4() {
 	// CgiManager内で新規Cgiを複数作成
 	CgiManager cgi_manager;
 	cgi_manager.AddNewCgi(expected_client_fd, cgi_request);
-	cgi_manager.AddNewCgi(4, cgi_request);
+	cgi_manager.AddNewCgi(11, cgi_request);
 
 	// cgiを実行する(子プロセスで実行 & pipe_fdがclient_fdと紐づけられる)
 	cgi_manager.RunCgi(expected_client_fd);
