@@ -54,7 +54,7 @@ class HttpParse {
 
 	static void CheckValidHeaderFieldName(
 		const HeaderFields &header_fields, const std::string &header_field_name
-	)
+	);
 };
 
 } // namespace http
