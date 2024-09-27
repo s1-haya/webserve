@@ -43,7 +43,7 @@ class HttpResponse {
 	static std::string CreateDefaultBodyMessageFormat(const StatusCode &status_code);
 
   private:
-    HttpResponse();
+	HttpResponse();
 	~HttpResponse();
 
 	static std::string        CreateHttpResponse(const HttpResponseFormat &response);

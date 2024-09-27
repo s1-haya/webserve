@@ -2,8 +2,8 @@
 #define IHTTP_HPP_
 
 #include "client_infos.hpp"
-#include "virtual_server.hpp"
 #include "error_state.hpp"
+#include "virtual_server.hpp"
 
 namespace server {
 
@@ -34,7 +34,7 @@ class IHttp {
 	 */
 	virtual HttpResult
 	Run(const ClientInfos &client_infos, const server::VirtualServerAddrList &virtual_servers) = 0;
-	virtual HttpResult GetErrorResponse(const ClientInfos &client_info, ErrorState state)        = 0;
+	virtual HttpResult GetErrorResponse(const ClientInfos &client_info, ErrorState state)      = 0;
 };
 
 } // namespace http

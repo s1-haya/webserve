@@ -28,11 +28,11 @@ Http::Run(const ClientInfos &client_info, const server::VirtualServerAddrList &s
 }
 
 HttpResult Http::GetErrorResponse(const ClientInfos &client_info, ErrorState state) {
-	HttpResult result;
+	HttpResult            result;
 	HttpRequestParsedData data  = storage_.GetClientSaveData(client_info.fd);
 	result.is_response_complete = true;
-	result.is_connection_keep = false;
-	result.request_buf        = data.current_buf;
+	result.is_connection_keep   = false;
+	result.request_buf          = data.current_buf;
 	if (state == BAD) {
 		result.response = HttpResponse::CreateErrorResponse(StatusCode(BAD_REQUEST));
 	} else if (state == TIMEOUT) {
@@ -62,7 +62,7 @@ HttpResult Http::CreateHttpResponse(
 	const ClientInfos &client_info, const server::VirtualServerAddrList &server_info
 ) {
 	HttpResult            result;
-	HttpRequestParsedData data  = storage_.GetClientSaveData(client_info.fd);
+	HttpRequestParsedData data = storage_.GetClientSaveData(client_info.fd);
 	result.is_connection_keep =
 		HttpResponse::IsConnectionKeep(data.request_result.request.header_fields);
 	result.is_response_complete = true;

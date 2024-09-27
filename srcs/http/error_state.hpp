@@ -9,6 +9,6 @@ enum ErrorState {
 	INTERNAL_ERROR
 };
 
-}
+} // namespace http
 
 #endif
