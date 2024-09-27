@@ -33,7 +33,8 @@ def read_file(file):
 # \r\nをそのまま読み込む用(ヘッダー部分)
 def read_file_binary(file):
     with open(file, "rb") as f:
-        return f.read()
+        data = f.read()
+    return data, len(data)
 
 
 def assert_response(response, expected_response):
@@ -45,15 +46,17 @@ def assert_response(response, expected_response):
 root_index_file, root_index_file_length = read_file("root/html/index.html")
 sub_index_file, sub_index_file_length = read_file("root/html/sub/index.html")
 
+not_found_file_404, not_found_file_404_length = read_file_binary("test/webserv/expected_response/default_body_message/404_not_found.txt")
+
 response_header_get_root_200_close = f"HTTP/1.1 200 OK\r\nConnection: close\r\nContent-Length: {root_index_file_length}\r\nContent-Type: text/html\r\nServer: webserv/1.1\r\n\r\n"
 response_header_get_root_200_keep = f"HTTP/1.1 200 OK\r\nConnection: keep-alive\r\nContent-Length: {root_index_file_length}\r\nContent-Type: text/html\r\nServer: webserv/1.1\r\n\r\n"
 response_header_get_sub_200_close = f"HTTP/1.1 200 OK\r\nConnection: close\r\nContent-Length: {sub_index_file_length}\r\nContent-Type: text/html\r\nServer: webserv/1.1\r\n\r\n"
-
+response_header_get_404 = f"HTTP/1.1 404 Not Found\r\nConnection: close\r\nContent-Length: {not_found_file_404_length}\r\nContent-Type: text/html\r\nServer: webserv/1.1\r\n\r\n"
 
 def test_get_root_close_200():
     expected_response = response_header_get_root_200_close + root_index_file
     client_instance = client.Client(8080)
-    request = read_file_binary(
+    request, _ = read_file_binary(
         "test/common/request/get/2xx/200_01_connection_close.txt"
     )
     response = client_instance.SendRequestAndReceiveResponse(request)
@@ -64,7 +67,7 @@ def test_get_root_keep_200():
     expected_response = response_header_get_root_200_keep + root_index_file
     # responseヘッダーもkeepaliveになる？
     client_instance = client.Client(8080)
-    request = read_file_binary("test/common/request/get/2xx/200_02_connection_keep.txt")
+    request, _ = read_file_binary("test/common/request/get/2xx/200_02_connection_keep.txt")
     response = client_instance.SendRequestAndReceiveResponse(request)
     assert_response(response, expected_response)
 
@@ -72,21 +75,21 @@ def test_get_root_keep_200():
 def test_get_sub_close_200():
     expected_response = response_header_get_sub_200_close + sub_index_file
     client_instance = client.Client(8080)
-    request = read_file_binary(
+    request, _ = read_file_binary(
         "test/common/request/get/2xx/200_03_sub_connection_close.txt"
     )
     response = client_instance.SendRequestAndReceiveResponse(request)
     assert_response(response, expected_response)
 
 
-# def test_get_404():
-#     expected_response = response_header_get_404 + read_file("../../html/sub/index.html")
-#     client_instance = client.Client(8080)
-#     request = read_file_binary("../request_messages/webserv/get/404_not-exist-path_connection-close.txt")
-#     response = client_instance.SendRequestAndReceiveResponse(request)
-#     assert (
-#         response == expected_response
-#     ), f"Expected response\n\n {repr(expected_response)}, but got\n\n {repr(response)}"
+def test_get_404():
+    expected_response = response_header_get_404.encode('utf-8') + not_found_file_404
+    client_instance = client.Client(8080)
+    request, _ = read_file_binary("test/common/request/get/4xx/404_01_not_exist_path.txt")
+    response = client_instance.SendRequestAndReceiveResponse(request)
+    assert (
+        response.encode('utf-8') == expected_response
+    ), f"Expected response\n\n {repr(expected_response)}, but got\n\n {repr(response)}"
 
 
 def test_webserv():
@@ -94,7 +97,7 @@ def test_webserv():
         test_get_root_close_200()
         test_get_root_keep_200()
         test_get_sub_close_200()
-        # test_get_404()
+        test_get_404()
     except Exception as e:
         print(f"Test failed: {e}")
 
