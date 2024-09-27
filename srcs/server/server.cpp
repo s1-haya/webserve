@@ -185,6 +185,10 @@ void Server::HandleExistingConnection(const event::Event &event) {
 	if (event.type & event::EVENT_WRITE) {
 		HandleWriteEvent(event.fd);
 	}
+	// Call RunHttp() if request_buf contains data, even without a read event.
+	if (IsHttpRequestBufExist(event.fd)) {
+		RunHttp(event);
+	}
 }
 
 void Server::HandleReadEvent(const event::Event &event) {
@@ -222,7 +226,13 @@ void Server::HandleHttpReadResult(const event::Event &event, const Read::ReadRes
 	}
 	message_manager_.AddRequestBuf(client_fd, read_result.GetValue().read_buf);
 	std::cerr << message_manager_.GetRequestBuf(client_fd) << std::endl;
-	RunHttp(event);
+}
+
+bool Server::IsHttpRequestBufExist(int fd) const {
+	if (IsCgi(fd)) {
+		return false;
+	}
+	return !message_manager_.GetRequestBuf(fd).empty();
 }
 
 void Server::RunHttp(const event::Event &event) {
