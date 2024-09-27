@@ -3,6 +3,7 @@
 
 #include "client_infos.hpp"
 #include "virtual_server.hpp"
+#include "error_state.hpp"
 
 namespace server {
 
@@ -13,11 +14,6 @@ typedef std::list<const VirtualServer *> VirtualServerAddrList;
 namespace http {
 
 struct HttpResult;
-
-enum ErrState {
-	TIMEOUT,
-	INTERNAL_ERROR
-};
 
 class IHttp {
   public:
@@ -38,7 +34,7 @@ class IHttp {
 	 */
 	virtual HttpResult
 	Run(const ClientInfos &client_infos, const server::VirtualServerAddrList &virtual_servers) = 0;
-	virtual HttpResult GetErrorResponse(const ClientInfos &client_info, ErrState state)        = 0;
+	virtual HttpResult GetErrorResponse(const ClientInfos &client_info, ErrorState state)        = 0;
 };
 
 } // namespace http
