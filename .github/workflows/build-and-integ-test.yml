@@ -1,4 +1,4 @@
-name: build-and-test
+name: build-and-integ-test
 
 on:
   push:
@@ -46,6 +46,6 @@ jobs:
         run:
           make is-running
 
-      - name: Run tests
+      - name: Run e2e tests
         run:
-          make test
+          make e2e

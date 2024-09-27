@@ -49,10 +49,10 @@ int  main(void) {
     int ret_code = EXIT_SUCCESS;
 
     server::VirtualServerAddrList server_infos = BuildVirtualServerAddrList();
-    // todo: alias ../../../../root/html/ -> /html in build_virtual_server.cpp
-    // ret_code |= test::TestGetOk1ConnectionClose(server_infos);
+    ret_code |= test::TestGetOk1ConnectionClose(server_infos);
     // todo: segv
     // ret_code |= test::TestGetBadRequest1OnlyCrlf(server_infos);
+    ret_code |= test::TestGetOk13ExtraRequest(server_infos);
     ret_code |= test::TestGetBadRequest2LowerMethod(server_infos);
     ret_code |= test::TestGetBadRequest3NoAsciiMethod(server_infos);
     ret_code |= test::TestGetBadRequest4NoRoot(server_infos);

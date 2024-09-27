@@ -14,7 +14,6 @@ using namespace cgi;
 const std::string PATH_DIR_CGI_BIN = "../../../../root/cgi-bin";
 
 typedef server::CgiManager      CgiManager;
-typedef cgi::Cgi::CgiResult     CgiResult;
 typedef CgiManager::GetFdResult GetFdResult;
 
 struct Result {
@@ -90,17 +89,29 @@ RunGetRequest(const CgiManager &cgi_manager, int client_fd, const std::string &e
 	return result;
 }
 
-Result
-RunGetResponse(const CgiManager &cgi_manager, int client_fd, const std::string &expected_response) {
+Result RunAddAndGetResponse(
+	CgiManager        &cgi_manager,
+	int                client_fd,
+	const std::string &read_buf,
+	const CgiResponse &expected_response
+) {
 	Result             result;
 	std::ostringstream oss;
 
-	const std::string &cgi_response = cgi_manager.GetResponse(client_fd);
-	if (!IsSame(cgi_response, expected_response)) {
+	const cgi::CgiResponse cgi_response = cgi_manager.AddAndGetResponse(client_fd, read_buf);
+	if (!IsSame(cgi_response.response, expected_response.response) ||
+		!IsSame(cgi_response.content_type, expected_response.content_type) ||
+		!IsSame(cgi_response.is_response_complete, expected_response.is_response_complete)) {
 		result.is_success = false;
 		oss << "response" << std::endl;
-		oss << "- result  : " << cgi_response << std::endl;
-		oss << "- expected: " << expected_response << std::endl;
+		oss << "- result(response)      : " << cgi_response.response << std::endl;
+		oss << "- expected(response)    : " << expected_response.response << std::endl;
+		oss << "- result(content_type)  : " << cgi_response.content_type << std::endl;
+		oss << "- expected(content_type): " << expected_response.content_type << std::endl;
+		oss << "- result(is_response_complete)  : " << cgi_response.is_response_complete
+			<< std::endl;
+		oss << "- expected(is_response_complete): " << expected_response.is_response_complete
+			<< std::endl;
 		result.error_log = oss.str();
 	}
 	return result;
@@ -201,18 +212,21 @@ int RunTest3() {
 	cgi_manager.AddNewCgi(client_fd, cgi_request);
 
 	// "abc"をread()できたとしてresponseに追加
-	std::string expected_response = "abc";
-	cgi_manager.AddReadBuf(client_fd, expected_response);
-
-	// getterを使ってresponseの保持確認
-	ret_code |= Test(RunGetResponse(cgi_manager, client_fd, expected_response));
+	std::string buffer = "abc";
+	// addしてgetterを使ってresponseの保持確認
+	cgi::CgiResponse expected_cgi_response("abc", "text/plain", false);
+	ret_code |= Test(RunAddAndGetResponse(cgi_manager, client_fd, buffer, expected_cgi_response));
 
 	// 追加で"defgh"をread()できたとして,responseが"abc"+"defgh"になってるか確認
-	const std::string appended_response = "defgh";
-	expected_response += appended_response;
-	cgi_manager.AddReadBuf(client_fd, appended_response);
-	// responseに足せてるか確認
-	ret_code |= Test(RunGetResponse(cgi_manager, client_fd, expected_response));
+	const std::string appended_buffer = "defgh";
+	ret_code |= Test(RunAddAndGetResponse(
+		cgi_manager, client_fd, appended_buffer, cgi::CgiResponse("abcdefgh", "text/plain", false)
+	));
+
+	// 最後に""をread()したとして、responseが完成になっているか確認
+	ret_code |= Test(RunAddAndGetResponse(
+		cgi_manager, client_fd, "", cgi::CgiResponse("abcdefgh", "text/plain", true)
+	));
 
 	return ret_code;
 }
@@ -243,7 +257,7 @@ int RunTest4() {
 	cgi_manager.AddNewCgi(4, cgi_request);
 
 	// cgiを実行する(子プロセスで実行 & pipe_fdがclient_fdと紐づけられる)
-	const CgiResult run_cgi_result = cgi_manager.RunCgi(expected_client_fd);
+	cgi_manager.RunCgi(expected_client_fd);
 
 	// pipe_fd(read)を取得
 	const GetFdResult read_fd_result = cgi_manager.GetReadFd(expected_client_fd);
