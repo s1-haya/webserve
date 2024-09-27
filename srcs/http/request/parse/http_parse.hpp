@@ -53,8 +53,8 @@ class HttpParse {
 	static void         CheckValidVersion(const std::string &version);
 
 	static void CheckValidHeaderFieldName(
-        const HeaderFields &header_fields, const std::string &header_field_name
-    )
+		const HeaderFields &header_fields, const std::string &header_field_name
+	)
 };
 
 } // namespace http

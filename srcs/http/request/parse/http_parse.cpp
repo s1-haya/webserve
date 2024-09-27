@@ -210,7 +210,7 @@ HeaderFields HttpParse::SetHeaderFields(const std::vector<std::string> &header_f
 	typedef std::vector<std::string>::const_iterator It;
 	for (It it = header_fields_info.begin(); it != header_fields_info.end(); ++it) {
 		std::vector<std::string> header_field_name_and_value = utils::SplitStr(*it, ":");
-		const std::string &header_field_name = header_field_name_and_value[0];
+		const std::string       &header_field_name           = header_field_name_and_value[0];
 		CheckValidHeaderFieldName(header_fields, header_field_name);
 		// todo:
 		// マルチパートを対応する場合はutils::SplitStrを使用して、セミコロン区切りのstd::vector<std::string>になる。
@@ -270,17 +270,21 @@ void HttpParse::CheckValidVersion(const std::string &version) {
 	}
 }
 
-void HttpParse::CheckValidHeaderFieldName(const HeaderFields &header_fields, const std::string &header_field_name) {
+void HttpParse::CheckValidHeaderFieldName(
+	const HeaderFields &header_fields, const std::string &header_field_name
+) {
 	if (!header_field_name.size()) {
-		throw HttpException("Error: the name of Header field don't exist.", StatusCode(BAD_REQUEST));
+		throw HttpException(
+			"Error: the name of Header field don't exist.", StatusCode(BAD_REQUEST)
+		);
 	}
 	if (HasSpace(header_field_name)) {
-		throw HttpException("Error: the name of Header field has a space.", StatusCode(BAD_REQUEST));
+		throw HttpException(
+			"Error: the name of Header field has a space.", StatusCode(BAD_REQUEST)
+		);
 	}
 	if (header_fields.find(header_field_name) != header_fields.end() && header_field_name == HOST) {
-		throw HttpException(
-			"Error: Host header fields already exists", StatusCode(BAD_REQUEST)
-		);
+		throw HttpException("Error: Host header fields already exists", StatusCode(BAD_REQUEST));
 	}
 }
 
