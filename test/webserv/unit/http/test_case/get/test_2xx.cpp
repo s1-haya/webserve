@@ -21,7 +21,7 @@ int TestGetOk1ConnectionClose(const server::VirtualServerAddrList &server_infos)
         expected_status_line, expected_header_fields, expected_body_message
     );
 	http::HttpResult expected = CreateHttpResult(true, false, "", expected_response);
-	return HandleHttpResult(client_infos, server_infos, expected);
+	return HandleHttpResult(client_infos, server_infos, expected, "200-01");
 }
 
 int TestGetOk13ExtraRequest(const server::VirtualServerAddrList &server_infos) {
@@ -38,7 +38,7 @@ int TestGetOk13ExtraRequest(const server::VirtualServerAddrList &server_infos) {
     );
 	const std::string &request_buffer = "HELLO";
 	http::HttpResult   expected = CreateHttpResult(true, false, request_buffer, expected_response);
-	return HandleHttpResult(client_infos, server_infos, expected);
+	return HandleHttpResult(client_infos, server_infos, expected, "200-13");
 }
 
 } // namespace test

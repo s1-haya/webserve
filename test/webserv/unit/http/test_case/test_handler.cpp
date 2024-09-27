@@ -43,24 +43,18 @@ std::string CreateHttpResponseFormat(
 	return response;
 }
 
-int GetTestCaseNum() {
-	static unsigned int test_case_num = 0;
-	++test_case_num;
-	return test_case_num;
-}
-
 template <typename T>
 bool IsSame(const T &result, const T &expected) {
 	return result == expected;
 }
 
-int HandleResult(const Result &result) {
+int HandleResult(const Result &result, const std::string& current_number) {
 	if (result.is_success) {
-		std::cout << utils::color::GREEN << GetTestCaseNum() << ".[OK]" << utils::color::RESET
+		std::cout << utils::color::GREEN << current_number << ".[OK]" << utils::color::RESET
 				  << std::endl;
 		return EXIT_SUCCESS;
 	} else {
-		std::cerr << utils::color::RED << GetTestCaseNum() << ".[NG] " << utils::color::RESET
+		std::cerr << utils::color::RED << current_number << ".[NG] " << utils::color::RESET
 				  << std::endl;
 		std::cerr << result.error_log;
 		return EXIT_FAILURE;
@@ -162,12 +156,13 @@ Result IsSameHttpResult(const http::HttpResult &http_result, const http::HttpRes
 int HandleHttpResult(
 	const http::ClientInfos             &client_infos,
 	const server::VirtualServerAddrList &server_infos,
-	const http::HttpResult               expected
+	const http::HttpResult               expected,
+	const std::string                   &current_number
 ) {
 	http::Http       http;
 	http::HttpResult http_result = http.Run(client_infos, server_infos);
 	const Result    &result      = IsSameHttpResult(http_result, expected);
-	return HandleResult(result);
+	return HandleResult(result, current_number);
 }
 
 } // namespace test
