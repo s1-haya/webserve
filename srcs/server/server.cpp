@@ -243,6 +243,7 @@ void Server::RunHttp(const event::Event &event) {
 	// If not completed, the request will be re-read by the event_monitor.
 	if (!http_result.is_response_complete) {
 		message_manager_.SetIsCompleteRequest(client_fd, false);
+		HandleCgi(client_fd, http_result.cgi_result);
 		return;
 	}
 	message_manager_.SetIsCompleteRequest(client_fd, true);
@@ -502,6 +503,16 @@ void Server::SetNonBlockingMode(int sock_fd) {
 
 bool Server::IsCgi(int fd) const {
 	return !message_manager_.IsMessageExist(fd);
+}
+
+void Server::HandleCgi(int client_fd, const http::CgiResult &cgi_result) {
+	if (!cgi_result.is_cgi) {
+		return;
+	}
+	// todo: try-catch?
+	cgi_manager_.AddNewCgi(client_fd, cgi_result.cgi_request);
+	// RunCgi() is called only when a new Cgi is added via AddNewCgi().
+	cgi_manager_.RunCgi(client_fd);
 }
 
 } // namespace server

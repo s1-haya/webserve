@@ -1,6 +1,7 @@
 #ifndef SERVER_SERVER_HPP_
 #define SERVER_SERVER_HPP_
 
+#include "cgi_manager.hpp"
 #include "config_parse/context.hpp"
 #include "connection.hpp"
 #include "context_manager.hpp"
@@ -70,6 +71,7 @@ class Server {
 	VirtualServerAddrList GetVirtualServerList(int client_fd) const;
 	// for Cgi
 	bool IsCgi(int fd) const;
+	void HandleCgi(int client_fd, const http::CgiResult &cgi_result);
 
 	// const
 	static const int    SYSTEM_ERROR = -1;
@@ -84,6 +86,8 @@ class Server {
 	http::Http http_;
 	// message manager with time control
 	MessageManager message_manager_;
+	// cgi
+	CgiManager cgi_manager_;
 };
 
 } // namespace server
