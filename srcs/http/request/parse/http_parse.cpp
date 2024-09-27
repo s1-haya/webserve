@@ -266,7 +266,7 @@ void HttpParse::CheckValidVersion(const std::string &version) {
 }
 
 void HttpParse::CheckValidHeaderFieldName(const std::string &header_field_name) {
-	(void) header_field_name;
+	(void)header_field_name;
 	// todo: 複数指定ありの場合はthrowしないようにする。
 	// if (header_field_value != CONNECTION &&
 	// 	std::find(

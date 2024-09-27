@@ -35,7 +35,7 @@ struct HttpRequestParsedData {
 
 class HttpParse {
   public:
-	static void              Run(HttpRequestParsedData &data);
+	static void Run(HttpRequestParsedData &data);
 
   private:
 	HttpParse();
