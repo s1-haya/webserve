@@ -91,132 +91,132 @@ def test_get_sub_close_200():
 
 
 # def test_get_400_01():
-#     expected_response = bad_request_response
+#     expected_response = bad_request_response.decode('utf-8')
 #     client_instance = client.Client(8080)
 #     request, _ = read_file_binary("test/common/request/get/4xx/400_01_only_crlf.txt")
 #     response = client_instance.SendRequestAndReceiveResponse(request)
 #     assert (
-#         response.encode('utf-8') == expected_response
+#         response == expected_response
 #     ), f"Expected response\n\n {repr(expected_response)}, but got\n\n {repr(response)}"
 
 
 def test_get_400_02():
-    expected_response = bad_request_response
+    expected_response = bad_request_response.decode('utf-8')
     client_instance = client.Client(8080)
     request, _ = read_file_binary("test/common/request/get/4xx/400_02_lower_method.txt")
     response = client_instance.SendRequestAndReceiveResponse(request)
     assert (
-        response.encode('utf-8') == expected_response
+        response == expected_response
     ), f"Expected response\n\n {repr(expected_response)}, but got\n\n {repr(response)}"
 
 
 def test_get_400_03():
-    expected_response = bad_request_response
+    expected_response = bad_request_response.decode('utf-8')
     client_instance = client.Client(8080)
     request, _ = read_file_binary("test/common/request/get/4xx/400_03_no_ascii_method.txt")
     response = client_instance.SendRequestAndReceiveResponse(request)
     assert (
-        response.encode('utf-8') == expected_response
+        response == expected_response
     ), f"Expected response\n\n {repr(expected_response)}, but got\n\n {repr(response)}"
 
 
 def test_get_400_04():
-    expected_response = bad_request_response
+    expected_response = bad_request_response.decode('utf-8')
     client_instance = client.Client(8080)
     request, _ = read_file_binary("test/common/request/get/4xx/400_04_no_root.txt")
     response = client_instance.SendRequestAndReceiveResponse(request)
     assert (
-        response.encode('utf-8') == expected_response
+        response == expected_response
     ), f"Expected response\n\n {repr(expected_response)}, but got\n\n {repr(response)}"
 
 
 def test_get_400_05():
-    expected_response = bad_request_response
+    expected_response = bad_request_response.decode('utf-8')
     client_instance = client.Client(8080)
     request, _ = read_file_binary("test/common/request/get/4xx/400_05_relative_path.txt")
     response = client_instance.SendRequestAndReceiveResponse(request)
     assert (
-        response.encode('utf-8') == expected_response
+        response == expected_response
     ), f"Expected response\n\n {repr(expected_response)}, but got\n\n {repr(response)}"
 
 
 def test_get_400_06():
-    expected_response = bad_request_response
+    expected_response = bad_request_response.decode('utf-8')
     client_instance = client.Client(8080)
     request, _ = read_file_binary("test/common/request/get/4xx/400_06_lower_http_version.txt")
     response = client_instance.SendRequestAndReceiveResponse(request)
     assert (
-        response.encode('utf-8') == expected_response
+        response == expected_response
     ), f"Expected response\n\n {repr(expected_response)}, but got\n\n {repr(response)}"
 
 
 def test_get_400_07():
-    expected_response = bad_request_response
+    expected_response = bad_request_response.decode('utf-8')
     client_instance = client.Client(8080)
     request, _ = read_file_binary("test/common/request/get/4xx/400_07_wrong_http_name.txt")
     response = client_instance.SendRequestAndReceiveResponse(request)
     assert (
-        response.encode('utf-8') == expected_response
+        response == expected_response
     ), f"Expected response\n\n {repr(expected_response)}, but got\n\n {repr(response)}"
 
 
 def test_get_400_08():
-    expected_response = bad_request_response
+    expected_response = bad_request_response.decode('utf-8')
     client_instance = client.Client(8080)
     request, _ = read_file_binary("test/common/request/get/4xx/400_08_wrong_http_version.txt")
     response = client_instance.SendRequestAndReceiveResponse(request)
     assert (
-        response.encode('utf-8') == expected_response
+        response == expected_response
     ), f"Expected response\n\n {repr(expected_response)}, but got\n\n {repr(response)}"
 
 
 # def test_get_400_09():
-#     expected_response = bad_request_response
+#     expected_response = bad_request_response.decode('utf-8')
 #     client_instance = client.Client(8080)
 #     request, _ = read_file_binary("test/common/request/get/4xx/400_09_no_host.txt")
 #     response = client_instance.SendRequestAndReceiveResponse(request)
 #     assert (
-#         response.encode('utf-8') == expected_response
+#         response == expected_response
 #     ), f"Expected response\n\n {repr(expected_response)}, but got\n\n {repr(response)}"
 
 
 def test_get_400_10():
-    expected_response = bad_request_response
+    expected_response = bad_request_response.decode('utf-8')
     client_instance = client.Client(8080)
     request, _ = read_file_binary("test/common/request/get/4xx/400_10_duplicate_host.txt")
     response = client_instance.SendRequestAndReceiveResponse(request)
     assert (
-        response.encode('utf-8') == expected_response
+        response == expected_response
     ), f"Expected response\n\n {repr(expected_response)}, but got\n\n {repr(response)}"
 
 
 # def test_get_400_11():
-#     expected_response = bad_request_response
+#     expected_response = bad_request_response.decode('utf-8')
 #     client_instance = client.Client(8080)
 #     request, _ = read_file_binary("test/common/request/get/4xx/400_11_no_header_field_colon.txt")
 #     response = client_instance.SendRequestAndReceiveResponse(request)
 #     assert (
-#         response.encode('utf-8') == expected_response
+#         response == expected_response
 #     ), f"Expected response\n\n {repr(expected_response)}, but got\n\n {repr(response)}"
 
 
 def test_get_404_01():
-    expected_response = not_found_response
+    expected_response = not_found_response.decode('utf-8')
     client_instance = client.Client(8080)
     request, _ = read_file_binary("test/common/request/get/4xx/404_01_not_exist_path.txt")
     response = client_instance.SendRequestAndReceiveResponse(request)
     assert (
-        response.encode('utf-8') == expected_response
+        response == expected_response
     ), f"Expected response\n\n {repr(expected_response)}, but got\n\n {repr(response)}"
 
 
 def test_get_405_01():
-    expected_response = not_allowed_response
+    expected_response = not_allowed_response.decode('utf-8')
     client_instance = client.Client(8080)
     request, _ = read_file_binary("test/common/request/get/4xx/405_01_not_allowed.txt")
     response = client_instance.SendRequestAndReceiveResponse(request)
     assert (
-        response.encode('utf-8') == expected_response
+        response == expected_response
     ), f"Expected response\n\n {repr(expected_response)}, but got\n\n {repr(response)}"
 
 
