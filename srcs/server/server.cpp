@@ -189,7 +189,7 @@ void Server::HandleExistingConnection(const event::Event &event) {
 
 void Server::HandleReadEvent(const event::Event &event) {
 	const int              fd          = event.fd;
-	const Read::ReadResult read_result = Read::ReadRequest(fd);
+	const Read::ReadResult read_result = Read::ReadStr(fd);
 
 	if (IsCgi(fd)) {
 		HandleCgiReadResult(fd, read_result);

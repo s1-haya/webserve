@@ -16,7 +16,7 @@ class Read {
 	typedef utils::Result<ReadBuf> ReadResult;
 
 	// function
-	static ReadResult ReadRequest(int client_fd);
+	static ReadResult ReadStr(int client_fd);
 
   private:
 	Read();
