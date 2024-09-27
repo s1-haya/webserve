@@ -165,7 +165,7 @@ int main(void) {
 		LoadFileContent("../../expected_response/default_status_line/200_ok.txt");
 	std::string expected1_body_message  = LoadFileContent("../../../../root/html/index.html");
 	std::string expected1_header_fields = SetDefaultHeaderFields(
-		http::KEEP_ALIVE, utils::ToString(expected1_body_message.length()), http::TEXT_HTML
+		http::KEEP_ALIVE, utils::ToString(expected1_body_message.length()), "test/html"
 	);
 	const std::string &expected1_response =
 		expected1_status_line + expected1_header_fields + http::CRLF + expected1_body_message;
@@ -181,7 +181,7 @@ int main(void) {
 	std::string expected2_body_message =
 		LoadFileContent("../../expected_response/default_body_message/405_method_not_allowed.txt");
 	std::string expected2_header_fields = SetDefaultHeaderFields(
-		http::KEEP_ALIVE, utils::ToString(expected2_body_message.length()), http::TEXT_HTML
+		http::KEEP_ALIVE, utils::ToString(expected2_body_message.length()), "test/html"
 	);
 	const std::string &expected2_response =
 		expected2_status_line + expected2_header_fields + http::CRLF + expected2_body_message;
