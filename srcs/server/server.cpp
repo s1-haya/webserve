@@ -180,17 +180,24 @@ void Server::HandleExistingConnection(const event::Event &event) {
 		return;
 	}
 	if (event.type & event::EVENT_READ) {
-		const Read::ReadResult read_result = ReadRequest(event.fd);
-		if (read_result.IsOk()) {
-			RunHttp(event);
-		}
+		HandleReadEvent(event);
 	}
 	if (event.type & event::EVENT_WRITE) {
-		// Prevent SendResponse() if Disconnect() was called during EVENT_READ handling.
-		if (!message_manager_.IsMessageExist(event.fd)) {
-			return;
-		}
-		SendResponse(event.fd);
+		HandleWriteEvent(event.fd);
+	}
+}
+
+void Server::HandleReadEvent(const event::Event &event) {
+	const int fd = event.fd;
+
+	if (IsCgi(fd)) {
+		// todo: 処理
+		return;
+	}
+	// http
+	const Read::ReadResult read_result = ReadRequest(event.fd);
+	if (read_result.IsOk()) {
+		RunHttp(event);
 	}
 }
 
@@ -245,6 +252,19 @@ void Server::RunHttp(const event::Event &event) {
 		http_result.is_connection_keep ? message::KEEP : message::CLOSE;
 	message_manager_.AddNormalResponse(client_fd, connection_state, http_result.response);
 	UpdateEventInResponseComplete(connection_state, event);
+}
+
+void Server::HandleWriteEvent(int fd) {
+	// Prevent SendResponse() if Disconnect() was called during EVENT_READ handling.
+	if (!message_manager_.IsMessageExist(fd)) {
+		return;
+	}
+	if (IsCgi(fd)) {
+		// todo: 処理
+		return;
+	}
+	// http
+	SendResponse(fd);
 }
 
 void Server::SendResponse(int client_fd) {
@@ -478,6 +498,10 @@ void Server::SetNonBlockingMode(int sock_fd) {
 	if (fcntl(sock_fd, F_SETFL, flags) == SYSTEM_ERROR) {
 		throw SystemException("fcntl F_SETFL failed: " + std::string(std::strerror(errno)));
 	}
+}
+
+bool Server::IsCgi(int fd) const {
+	return !message_manager_.IsMessageExist(fd);
 }
 
 } // namespace server
