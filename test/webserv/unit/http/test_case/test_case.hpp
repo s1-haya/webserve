@@ -24,8 +24,16 @@ int TestGetOk7DuplicateConnectionKeep(const server::VirtualServerAddrList &serve
 int TestGetOk8DuplicateConnectionClose(const server::VirtualServerAddrList &server_infos);
 int TestGetOk9ConnectionKeepAndClose(const server::VirtualServerAddrList &server_infos);
 int TestGetOk10ConnectionCloseAndKeep(const server::VirtualServerAddrList &server_infos);
+int TestGetOk11UpperAndLowerHeaderFields(const server::VirtualServerAddrList &server_infos);
+int TestGetOk12HeaderFieldValueSpace(const server::VirtualServerAddrList &server_infos);
+int TestGetOk13SpaceHeaderFieldValue(const server::VirtualServerAddrList &server_infos);
 int TestGetOk14ExtraRequest(const server::VirtualServerAddrList &server_infos);
-// int TestGetOkXXNotExistHeaderFieldName(const server::VirtualServerAddrList &server_infos);
+int TestGetOk15BodyMessageDefault(const server::VirtualServerAddrList &server_infos);
+int TestGetOk16BodyMessageCgi(const server::VirtualServerAddrList &server_infos);
+int TestGetOk17NotExistHeaderField(const server::VirtualServerAddrList &server_infos);
+int TestGetOk18CgiScriptInPerl(const server::VirtualServerAddrList &server_infos);
+int TestGetOk19CgiScriptInPython(const server::VirtualServerAddrList &server_infos);
+int TestGetOk20CgiScriptInShell(const server::VirtualServerAddrList &server_infos);
 
 // 4xx
 int TestGetBadRequest1OnlyCrlf(const server::VirtualServerAddrList &server_infos);
