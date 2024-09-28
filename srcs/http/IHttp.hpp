@@ -3,6 +3,7 @@
 
 #include "cgi.hpp"
 #include "client_infos.hpp"
+#include "error_state.hpp"
 #include "virtual_server.hpp"
 
 namespace server {
@@ -14,11 +15,6 @@ typedef std::list<const VirtualServer *> VirtualServerAddrList;
 namespace http {
 
 struct HttpResult;
-
-enum ErrState {
-	TIMEOUT,
-	INTERNAL_ERROR
-};
 
 class IHttp {
   public:
@@ -40,7 +36,7 @@ class IHttp {
 	Run(const ClientInfos &client_infos, const server::VirtualServerAddrList &virtual_servers) = 0;
 
 	// Generates an error HTTP response.
-	virtual HttpResult GetErrorResponse(const ClientInfos &client_info, ErrState state) = 0;
+	virtual HttpResult GetErrorResponse(const ClientInfos &client_info, ErrorState state) = 0;
 
 	// Generates a HTTP response based on the CGI response.
 	virtual HttpResult GetResponseFromCgi(int client_fd, const cgi::CgiResponse &cgi_response) = 0;

@@ -140,7 +140,7 @@ int MethodHandlerResult(const MethodArgument &srcs, const std::string &expected_
 
 	} catch (const http::HttpException &e) {
 		srcs.response_body_message =
-			http::HttpResponse::CreateDefaultBodyMessageFormat(e.GetStatusCode());
+			http::HttpResponse::CreateDefaultBodyMessage(e.GetStatusCode());
 		result = HandleResult(srcs.response_body_message, expected_body_message);
 		std::cerr << utils::color::GRAY << e.what() << utils::color::RESET << std::endl;
 	}
