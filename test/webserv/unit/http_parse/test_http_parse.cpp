@@ -221,7 +221,7 @@ http::HttpRequestParsedData ParseHttpRequestFormat(const std::string &read_buf) 
 	http::HttpRequestParsedData save_data;
 	save_data.current_buf += read_buf;
 	try {
-		http::HttpParse::TmpRunHttpResultVersion(save_data);
+		http::HttpParse::Run(save_data);
 	} catch (const http::HttpException &e) {
 		save_data.request_result.status_code = e.GetStatusCode();
 	}

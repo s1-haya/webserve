@@ -132,7 +132,7 @@ StatusCode Method::PostHandler(
 	if (info.IsDirectory()) {
 		throw HttpException("Error: Forbidden", StatusCode(FORBIDDEN));
 	} else if (info.IsRegularFile()) {
-		response_body_message = HttpResponse::CreateDefaultBodyMessageFormat(status_code);
+		response_body_message = HttpResponse::CreateDefaultBodyMessage(status_code);
 		response_header_fields[CONTENT_LENGTH] = utils::ToString(response_body_message.length());
 	} else {
 		// Location header fields: URI-reference
@@ -158,7 +158,7 @@ StatusCode Method::DeleteHandler(
 	if (std::remove(path.c_str()) == SYSTEM_ERROR) {
 		SystemExceptionHandler(errno);
 	} else {
-		response_body_message = HttpResponse::CreateDefaultBodyMessageFormat(status_code);
+		response_body_message = HttpResponse::CreateDefaultBodyMessage(status_code);
 		response_header_fields[CONTENT_LENGTH] = utils::ToString(response_body_message.length());
 	}
 	return status_code;
@@ -194,7 +194,7 @@ StatusCode Method::FileCreationHandler(
 		}
 		throw HttpException("Error: Forbidden", StatusCode(FORBIDDEN));
 	}
-	response_body_message = HttpResponse::CreateDefaultBodyMessageFormat(status_code);
+	response_body_message                  = HttpResponse::CreateDefaultBodyMessage(status_code);
 	response_header_fields[CONTENT_LENGTH] = utils::ToString(response_body_message.length());
 	return status_code;
 }
@@ -237,13 +237,20 @@ utils::Result<std::string> Method::AutoindexHandler(const std::string &path) {
 		return result;
 	}
 
+	std::string       display_path = path;
+	const std::string root_path    = "/root";
+	size_t            pos          = path.find(root_path);
+	if (pos != std::string::npos) {
+		display_path = path.substr(pos + root_path.length());
+	}
+
 	struct dirent *entry;
 	response_body_message += "<html>\n"
 							 "<head><title>Index of " +
-							 path +
+							 display_path +
 							 "</title></head>\n"
 							 "<body><h1>Index of " +
-							 path +
+							 display_path +
 							 "</h1><hr><pre>"
 							 "<a href=\"../\">../</a>\n";
 
@@ -258,7 +265,7 @@ utils::Result<std::string> Method::AutoindexHandler(const std::string &path) {
 			bool        is_dir     = S_ISDIR(file_stat.st_mode);
 			std::string entry_name = std::string(entry->d_name) + (is_dir ? "/" : "");
 			// エントリ名の幅を固定
-			response_body_message += "<a href=\"" + path + entry_name + "\">" + entry_name + "</a>";
+			response_body_message += "<a href=\"" + entry_name + "\">" + entry_name + "</a>";
 			size_t padding = (entry_name.length() < 50) ? 50 - entry_name.length() : 0;
 			response_body_message += std::string(padding, ' ') + " ";
 

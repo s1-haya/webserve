@@ -185,6 +185,10 @@ void Server::HandleExistingConnection(const event::Event &event) {
 	if (event.type & event::EVENT_WRITE) {
 		HandleWriteEvent(event.fd);
 	}
+	// Call RunHttpAndCgi() if request_buf contains data, even without a read event.
+	if (IsHttpRequestBufExist(event.fd)) {
+		RunHttpAndCgi(event);
+	}
 }
 
 void Server::HandleReadEvent(const event::Event &event) {
@@ -222,10 +226,16 @@ void Server::HandleHttpReadResult(const event::Event &event, const Read::ReadRes
 	}
 	message_manager_.AddRequestBuf(client_fd, read_result.GetValue().read_buf);
 	std::cerr << message_manager_.GetRequestBuf(client_fd) << std::endl;
-	RunHttp(event);
 }
 
-void Server::RunHttp(const event::Event &event) {
+bool Server::IsHttpRequestBufExist(int fd) const {
+	if (IsCgi(fd)) {
+		return false;
+	}
+	return !message_manager_.GetRequestBuf(fd).empty();
+}
+
+void Server::RunHttpAndCgi(const event::Event &event) {
 	const int client_fd = event.fd;
 
 	// Prepare to http.Run()
@@ -517,34 +527,6 @@ void Server::HandleCgi(int client_fd, const http::CgiResult &cgi_result) {
 	}
 }
 
-void Server::HandleCgiReadResult(int pipe_fd, const Read::ReadResult &read_result) {
-	const int client_fd = cgi_manager_.GetClientFd(pipe_fd);
-
-	if (!read_result.IsOk()) {
-		utils::Debug(
-			"cgi", "Failed to read the response from the child process through pipe_fd", pipe_fd
-		);
-		cgi_manager_.DeleteCgi(client_fd);
-		SetInternalServerError(client_fd);
-		return;
-	}
-	SetCgiResponseToHttp(pipe_fd, read_result.GetValue().read_buf);
-}
-
-void Server::SetCgiResponseToHttp(int pipe_fd, const std::string &read_buf) {
-	const int client_fd = cgi_manager_.GetClientFd(pipe_fd);
-
-	const cgi::CgiResponse cgi_response = cgi_manager_.AddAndGetResponse(client_fd, read_buf);
-	if (!cgi_response.is_response_complete) {
-		return;
-	}
-	utils::Debug("cgi", "Read the entire response from the child process through pipe_fd", pipe_fd);
-
-	http_.SetCgiResponse(client_fd, cgi_response);
-	cgi_manager_.DeleteCgi(client_fd);
-	event_monitor_.Delete(client_fd);
-}
-
 // throw(SystemException)
 void Server::AddEventForCgi(int client_fd) {
 	const CgiManager::GetFdResult read_fd_result = cgi_manager_.GetReadFd(client_fd);
@@ -577,6 +559,34 @@ void Server::SendCgiRequest(int pipe_fd) {
 	if (new_request_str.empty()) {
 		ReplaceEvent(pipe_fd, event::EVENT_READ);
 	}
+}
+
+void Server::HandleCgiReadResult(int pipe_fd, const Read::ReadResult &read_result) {
+	const int client_fd = cgi_manager_.GetClientFd(pipe_fd);
+
+	if (!read_result.IsOk()) {
+		utils::Debug(
+			"cgi", "Failed to read the response from the child process through pipe_fd", pipe_fd
+		);
+		cgi_manager_.DeleteCgi(client_fd);
+		SetInternalServerError(client_fd);
+		return;
+	}
+	SetCgiResponseToHttp(pipe_fd, read_result.GetValue().read_buf);
+}
+
+void Server::SetCgiResponseToHttp(int pipe_fd, const std::string &read_buf) {
+	const int client_fd = cgi_manager_.GetClientFd(pipe_fd);
+
+	const cgi::CgiResponse cgi_response = cgi_manager_.AddAndGetResponse(client_fd, read_buf);
+	if (!cgi_response.is_response_complete) {
+		return;
+	}
+	utils::Debug("cgi", "Read the entire response from the child process through pipe_fd", pipe_fd);
+
+	http_.SetCgiResponse(client_fd, cgi_response);
+	cgi_manager_.DeleteCgi(client_fd);
+	event_monitor_.Delete(client_fd);
 }
 
 } // namespace server

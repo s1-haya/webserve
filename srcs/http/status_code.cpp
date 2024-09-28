@@ -13,6 +13,7 @@ StatusCode::ReasonPhrase StatusCode::InitReasonPhrase() {
 	init_reason_phrase[FORBIDDEN]             = "Forbidden";
 	init_reason_phrase[NOT_FOUND]             = "Not Found";
 	init_reason_phrase[METHOD_NOT_ALLOWED]    = "Method Not Allowed";
+	init_reason_phrase[REQUEST_TIMEOUT]       = "Request Timeout";
 	init_reason_phrase[PAYLOAD_TOO_LARGE]     = "Payload Too Large";
 	init_reason_phrase[INTERNAL_SERVER_ERROR] = "Internal Server Error";
 	init_reason_phrase[NOT_IMPLEMENTED]       = "Not Implemented";
