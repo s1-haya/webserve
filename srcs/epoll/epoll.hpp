@@ -19,7 +19,7 @@ class Epoll {
 	event::EventList GetEventList();
 	void             Add(int socket_fd, event::Type type);
 	void             Delete(int socket_fd);
-	void             Replace(int socket_fd, event::Type new_type);
+	void             Replace(int socket_fd, uint32_t new_type);
 	void             Append(const event::Event &event, event::Type new_type);
 
   private:
