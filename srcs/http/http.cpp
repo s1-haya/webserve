@@ -89,8 +89,6 @@ HttpResult Http::CreateBadRequestResponse(int client_fd) {
 	return result;
 }
 
-#include "cgi_request.hpp"
-
 HttpResult Http::CreateHttpResponse(
 	const ClientInfos &client_info, const server::VirtualServerAddrList &server_info
 ) {
