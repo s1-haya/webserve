@@ -17,7 +17,8 @@ int TestGetOk1ConnectionClose(const server::VirtualServerAddrList &server_infos)
 int TestGetOk2ConnectionKeep(const server::VirtualServerAddrList &server_infos);
 int TestGetOk3SubConnectionClose(const server::VirtualServerAddrList &server_infos);
 int TestGetOk4ConnectionKeepAndOkConnectionKeep(const server::VirtualServerAddrList &server_infos);
-int TestGetOk5ConnectionCloseAndOkConnectionClose(const server::VirtualServerAddrList &server_infos);
+int TestGetOk5ConnectionCloseAndOkConnectionClose(const server::VirtualServerAddrList &server_infos
+);
 int TestGetOk6ConnectionKeepAndOkConnectionClose(const server::VirtualServerAddrList &server_infos);
 int TestGetOk7DuplicateConnectionKeep(const server::VirtualServerAddrList &server_infos);
 int TestGetOk8DuplicateConnectionClose(const server::VirtualServerAddrList &server_infos);

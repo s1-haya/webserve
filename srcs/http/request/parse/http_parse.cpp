@@ -218,7 +218,8 @@ HeaderFields HttpParse::SetHeaderFields(const std::vector<std::string> &header_f
 		const std::string &header_field_value =
 			StrTrimLeadingOptionalWhitespace(header_field_name_and_value[1]);
 		// todo: #189  ヘッダフィールドをパースする関数（value）-> CheckValidHeaderFieldValue
-		// keep-aliveの場合のみ上書き可能 / connectionはcloseが一つでもある場合はcloseが適用されるため
+		// keep-aliveの場合のみ上書き可能 /
+		// connectionはcloseが一つでもある場合はcloseが適用されるため
 		if (header_field_name == CONNECTION && HasConnectionKeepInHeaderFields(header_fields)) {
 			header_fields[CONNECTION] = header_field_value;
 		}
@@ -286,9 +287,9 @@ void HttpParse::CheckValidHeaderFieldName(
 	}
 }
 
-bool HttpParse::HasConnectionKeepInHeaderFields(const HeaderFields& header_fields) {
+bool HttpParse::HasConnectionKeepInHeaderFields(const HeaderFields &header_fields) {
 	typedef HeaderFields::const_iterator Itr;
-	Itr it = header_fields.find(CONNECTION);
+	Itr                                  it = header_fields.find(CONNECTION);
 	return (it != header_fields.end() && it->second == KEEP_ALIVE);
 }
 

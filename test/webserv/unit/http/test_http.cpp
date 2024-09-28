@@ -50,17 +50,17 @@ int  main(void) {
 
     server::VirtualServerAddrList server_infos = BuildVirtualServerAddrList();
     ret_code |= test::TestGetOk1ConnectionClose(server_infos);
-	ret_code |= test::TestGetOk2ConnectionKeep(server_infos);
-	ret_code |= test::TestGetOk3SubConnectionClose(server_infos);
-	ret_code |= test::TestGetOk4ConnectionKeepAndOkConnectionKeep(server_infos);
+    ret_code |= test::TestGetOk2ConnectionKeep(server_infos);
+    ret_code |= test::TestGetOk3SubConnectionClose(server_infos);
+    ret_code |= test::TestGetOk4ConnectionKeepAndOkConnectionKeep(server_infos);
     ret_code |= test::TestGetOk5ConnectionCloseAndOkConnectionClose(server_infos);
     ret_code |= test::TestGetOk6ConnectionKeepAndOkConnectionClose(server_infos);
     ret_code |= test::TestGetOk7DuplicateConnectionKeep(server_infos);
     ret_code |= test::TestGetOk8DuplicateConnectionClose(server_infos);
     ret_code |= test::TestGetOk9ConnectionKeepAndClose(server_infos);
-	ret_code |= test::TestGetOk10ConnectionCloseAndKeep(server_infos);
+    ret_code |= test::TestGetOk10ConnectionCloseAndKeep(server_infos);
     ret_code |= test::TestGetOk13ExtraRequest(server_infos);
-	ret_code |= test::TestGetBadRequest1OnlyCrlf(server_infos);
+    ret_code |= test::TestGetBadRequest1OnlyCrlf(server_infos);
     ret_code |= test::TestGetBadRequest2LowerMethod(server_infos);
     ret_code |= test::TestGetBadRequest3NoAsciiMethod(server_infos);
     ret_code |= test::TestGetBadRequest4NoRoot(server_infos);
