@@ -50,8 +50,7 @@ HttpResponseFormat HttpResponse::CreateHttpResponseFormat(
 				server_info_result.cgi_extension,
 				server_info_result.path,
 				request_info.request.request_line.method,
-				server_info_result.allowed_methods,
-				server_info_result.upload_directory
+				server_info_result.allowed_methods
 			)) {
 			// todo: cgi実行
 			// cgi::Run()
@@ -144,18 +143,14 @@ bool HttpResponse::IsCgi(
 	const std::string          &cgi_extension,
 	const std::string          &path,
 	const std::string          &method,
-	const Method::AllowMethods &allowed_methods,
-	const std::string          &upload_directory
+	const Method::AllowMethods &allowed_methods
 ) {
-	// todo:
 	// cgi_extensionがあるかどうか
 	if (cgi_extension.empty()) {
 		return false;
 	}
-	// upload_directory内にpathが存在するかどうか
-	// -> pathがaliasで設定される場合どうなるんだろう。
-	(void)upload_directory;
 	// pathがcgi_extensionで設定された拡張子かどうか
+	// falseの場合はpathに普通のリクエストとして送られる
 	if (cgi_extension != GetExtension(path)) {
 		return false;
 	}

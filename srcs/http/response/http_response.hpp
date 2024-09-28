@@ -57,8 +57,7 @@ class HttpResponse {
 				const std::string          &cgi_extension,
 				const std::string          &path,
 				const std::string          &method,
-				const Method::AllowMethods &allowed_methods,
-				const std::string          &upload_directory
+				const Method::AllowMethods &allowed_methods
 			);
 };
 
