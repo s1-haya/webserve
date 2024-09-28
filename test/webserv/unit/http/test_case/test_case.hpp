@@ -14,7 +14,18 @@ namespace test {
 
 // 2xx
 int TestGetOk1ConnectionClose(const server::VirtualServerAddrList &server_infos);
+int TestGetOk2ConnectionKeep(const server::VirtualServerAddrList &server_infos);
+int TestGetOk3SubConnectionClose(const server::VirtualServerAddrList &server_infos);
+int TestGetOk4ConnectionKeepAndOkConnectionKeep(const server::VirtualServerAddrList &server_infos);
+int TestGetOk5ConnectionCloseAndOkConnectionClose(const server::VirtualServerAddrList &server_infos);
+int TestGetOk6ConnectionKeepAndOkConnectionClose(const server::VirtualServerAddrList &server_infos);
+int TestGetOk7DuplicateConnectionKeep(const server::VirtualServerAddrList &server_infos);
+int TestGetOk8DuplicateConnectionClose(const server::VirtualServerAddrList &server_infos);
+int TestGetOk9ConnectionKeepAndClose(const server::VirtualServerAddrList &server_infos);
+int TestGetOk10ConnectionCloseAndKeep(const server::VirtualServerAddrList &server_infos);
 int TestGetOk13ExtraRequest(const server::VirtualServerAddrList &server_infos);
+// int TestGetOkXXNotExistHeaderFieldName(const server::VirtualServerAddrList &server_infos);
+
 // 4xx
 int TestGetBadRequest1OnlyCrlf(const server::VirtualServerAddrList &server_infos);
 int TestGetBadRequest2LowerMethod(const server::VirtualServerAddrList &server_infos);
