@@ -24,9 +24,11 @@ namespace http {
 std::string HttpResponse::Run(
 	const ClientInfos                   &client_info,
 	const server::VirtualServerAddrList &server_info,
-	const HttpRequestResult             &request_info
+	const HttpRequestResult             &request_info,
+	CgiResult                           &cgi_result
 ) {
-	HttpResponseFormat response = CreateHttpResponseFormat(client_info, server_info, request_info);
+	HttpResponseFormat response =
+		CreateHttpResponseFormat(client_info, server_info, request_info, cgi_result);
 	return CreateHttpResponse(response);
 }
 
@@ -35,7 +37,8 @@ std::string HttpResponse::Run(
 HttpResponseFormat HttpResponse::CreateHttpResponseFormat(
 	const ClientInfos                   &client_info,
 	const server::VirtualServerAddrList &server_info,
-	const HttpRequestResult             &request_info
+	const HttpRequestResult             &request_info,
+	CgiResult                           &cgi_result
 ) {
 	StatusCode   status_code(OK);
 	HeaderFields response_header_fields = InitResponseHeaderFields(request_info);

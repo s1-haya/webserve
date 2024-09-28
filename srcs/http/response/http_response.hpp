@@ -1,6 +1,7 @@
 #ifndef HTTP_RESPONSE_HPP_
 #define HTTP_RESPONSE_HPP_
 
+#include "cgi_request.hpp"
 #include "http_format.hpp"
 #include "http_method.hpp"
 #include "http_serverinfo_check.hpp"
@@ -34,10 +35,12 @@ class Stat;
 class HttpResponse {
   public:
 	typedef std::map<EStatusCode, std::string> ReasonPhrase;
+	typedef utils::Result<cgi::CgiRequest>     CgiResult;
 	static std::string
 					   Run(const ClientInfos                   &client_info,
 						   const server::VirtualServerAddrList &server_info,
-						   const HttpRequestResult             &request_info);
+						   const HttpRequestResult             &request_info,
+						   CgiResult                           &cgi_result);
 	static std::string CreateDefaultBodyMessageFormat(const StatusCode &status_code);
 	static bool        IsConnectionKeep(const HeaderFields &request_header_fields);
 	static std::string CreateBadRequestResponse(const HttpRequestResult &request_info);
@@ -50,7 +53,8 @@ class HttpResponse {
 	static HttpResponseFormat CreateHttpResponseFormat(
 		const ClientInfos                   &client_info,
 		const server::VirtualServerAddrList &server_info,
-		const HttpRequestResult             &request_info
+		const HttpRequestResult             &request_info,
+		CgiResult                           &cgi_result
 	);
 	static HeaderFields InitResponseHeaderFields(const HttpRequestResult &request_info);
 	static bool         IsCgi(
