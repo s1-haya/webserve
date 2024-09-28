@@ -59,6 +59,7 @@ TEST_CASE_FOR_GET := get
 
 SRCS	+=	test_http.cpp \
 			$(TEST_CASE_DIR)/test_handler.cpp \
+			$(TEST_CASE_DIR)/test_get_error_response.cpp \
 			$(TEST_CASE_DIR)/$(TEST_CASE_FOR_GET)/test_2xx.cpp \
 			$(TEST_CASE_DIR)/$(TEST_CASE_FOR_GET)/test_4xx.cpp \
 			$(TEST_CASE_DIR)/$(TEST_CASE_FOR_GET)/test_5xx.cpp
