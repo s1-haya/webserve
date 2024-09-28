@@ -1,6 +1,7 @@
 #ifndef SERVER_SERVER_HPP_
 #define SERVER_SERVER_HPP_
 
+#include "cgi_manager.hpp"
 #include "config_parse/context.hpp"
 #include "connection.hpp"
 #include "context_manager.hpp"
@@ -35,24 +36,26 @@ class Server {
 	Server(const Server &other);
 	Server &operator=(const Server &other);
 	// functions
-	void             AddVirtualServers(const ConfigServers &config_servers);
-	void             AddServerInfoToContext(const VirtualServerList &virtual_server_list);
-	void             ListenAllHostPorts(const VirtualServerList &virtual_server_list);
-	PortIpMap        CreatePortIpMap(const VirtualServerList &virtual_server_list);
-	void             Listen(const HostPortPair &host_port);
-	void             HandleEvent(const event::Event &event);
-	void             HandleNewConnection(int server_fd);
-	void             HandleExistingConnection(const event::Event &event);
-	Read::ReadResult ReadRequest(int client_fd);
-	void             RunHttp(const event::Event &event);
-	void             SendResponse(int client_fd);
-	void             HandleTimeoutMessages();
-	void             SetInternalServerError(int client_fd);
-	void             KeepConnection(int client_fd);
-	void             Disconnect(int client_fd);
-	void             UpdateEventInResponseComplete(
-					const message::ConnectionState connection_state, const event::Event &event
-				);
+	void      AddVirtualServers(const ConfigServers &config_servers);
+	void      AddServerInfoToContext(const VirtualServerList &virtual_server_list);
+	void      ListenAllHostPorts(const VirtualServerList &virtual_server_list);
+	PortIpMap CreatePortIpMap(const VirtualServerList &virtual_server_list);
+	void      Listen(const HostPortPair &host_port);
+	void      HandleEvent(const event::Event &event);
+	void      HandleNewConnection(int server_fd);
+	void      HandleExistingConnection(const event::Event &event);
+	void      HandleReadEvent(const event::Event &event);
+	void      HandleHttpReadResult(const event::Event &event, const Read::ReadResult &read_result);
+	void      RunHttp(const event::Event &event);
+	void      HandleWriteEvent(int fd);
+	void      SendHttpResponse(int client_fd);
+	void      HandleTimeoutMessages();
+	void      SetInternalServerError(int client_fd);
+	void      KeepConnection(int client_fd);
+	void      Disconnect(int client_fd);
+	void      UpdateEventInResponseComplete(
+			 const message::ConnectionState connection_state, const event::Event &event
+		 );
 	void UpdateConnectionAfterSendResponse(
 		int client_fd, const message::ConnectionState connection_state
 	);
@@ -66,6 +69,13 @@ class Server {
 	// for Server to Http
 	http::ClientInfos     GetClientInfos(int client_fd) const;
 	VirtualServerAddrList GetVirtualServerList(int client_fd) const;
+	// for Cgi
+	bool IsCgi(int fd) const;
+	void HandleCgi(int client_fd, const http::CgiResult &cgi_result);
+	void AddEventForCgi(int client_fd);
+	void SendCgiRequest(int pipe_fd);
+	void HandleCgiReadResult(int pipe_fd, const Read::ReadResult &read_result);
+	void SetCgiResponseToHttp(int pipe_fd, const std::string &read_buf);
 
 	// const
 	static const int    SYSTEM_ERROR = -1;
@@ -80,6 +90,8 @@ class Server {
 	http::Http http_;
 	// message manager with time control
 	MessageManager message_manager_;
+	// cgi
+	CgiManager cgi_manager_;
 };
 
 } // namespace server

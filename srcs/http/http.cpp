@@ -33,6 +33,12 @@ HttpResult Http::GetErrorResponse(const ClientInfos &client_info, ErrState state
 	return result;
 }
 
+// todo
+void Http::SetCgiResponse(int client_fd, const cgi::CgiResponse &cgi_response) {
+	(void)client_fd;
+	(void)cgi_response;
+}
+
 utils::Result<void> Http::ParseHttpRequestFormat(int client_fd, const std::string &read_buf) {
 	utils::Result<void>   result;
 	HttpRequestParsedData save_data = storage_.GetClientSaveData(client_fd);

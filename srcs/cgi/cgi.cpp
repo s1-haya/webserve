@@ -156,7 +156,7 @@ char *const *Cgi::SetCgiArgv() {
 	char **argv = new (std::nothrow) char *[2];
 	char  *dest = new (std::nothrow) char[cgi_script_.size() + 1];
 	if (argv == NULL || dest == NULL) {
-		throw SystemException(std::strerror(errno));
+		throw SystemException("SetCgiArgv: Failed to allocate memory");
 	}
 	std::strcpy(dest, cgi_script_.c_str());
 	argv[0] = dest;
@@ -167,16 +167,16 @@ char *const *Cgi::SetCgiArgv() {
 char *const *Cgi::SetCgiEnv(const MetaMap &meta_variables) {
 	char **cgi_env = new (std::nothrow) char *[meta_variables.size() + 1];
 	if (cgi_env == NULL) {
-		throw SystemException(std::strerror(errno));
+		throw SystemException("SetCgiEnv: cgi_env: Failed to allocate memory");
 	}
 	std::size_t i = 0;
 
 	typedef MetaMap::const_iterator It;
-	for (It it = meta_variables.begin(); it != meta_variables.end(); it++) {
+	for (It it = meta_variables.begin(); it != meta_variables.end(); ++it) {
 		const std::string element = it->first + "=" + it->second;
 		char             *dest    = new (std::nothrow) char[element.size() + 1];
 		if (dest == NULL) {
-			throw SystemException(std::strerror(errno));
+			throw SystemException("SetCgiEnv: dest: Failed to allocate memory");
 		}
 		std::strcpy(dest, element.c_str());
 		cgi_env[i] = dest;
