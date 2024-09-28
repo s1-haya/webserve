@@ -101,7 +101,9 @@ HttpResult Http::CreateHttpResponse(
 	result.request_buf          = data.current_buf;
 	result.response =
 		HttpResponse::Run(client_info, server_info, data.request_result, result.cgi_result);
-	storage_.DeleteClientSaveData(client_info.fd);
+	if (!result.cgi_result.is_cgi) { // cgiの場合はcgiのhttp_responseを作るときにsave_dataが必要
+		storage_.DeleteClientSaveData(client_info.fd);
+	}
 	return result;
 }
 

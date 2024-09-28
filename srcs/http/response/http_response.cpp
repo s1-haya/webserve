@@ -69,7 +69,6 @@ HttpResponseFormat HttpResponse::CreateHttpResponseFormat(
 			if (!cgi_parse_result.IsOk()) { // parserが直でthrowするように変更か
 				throw HttpException("CGI Parse Error", StatusCode(BAD_REQUEST));
 			}
-			// parseがokならis_cgiもokになる、リクエストはそのまま渡せる
 			cgi_result.is_cgi      = true;
 			cgi_result.cgi_request = cgi_parse_result.GetValue();
 		} else {
