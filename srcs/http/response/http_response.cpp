@@ -23,13 +23,11 @@ std::string GetExtension(const std::string &path) {
 namespace http {
 
 std::string HttpResponse::Run(
-	const ClientInfos                   &client_info,
 	const server::VirtualServerAddrList &server_info,
 	const HttpRequestResult             &request_info,
 	CgiResult                           &cgi_result
 ) {
-	HttpResponseFormat response =
-		CreateHttpResponseFormat(client_info, server_info, request_info, cgi_result);
+	HttpResponseFormat response = CreateHttpResponseFormat(server_info, request_info, cgi_result);
 	if (cgi_result.is_cgi) {
 		return "";
 	}
@@ -39,7 +37,6 @@ std::string HttpResponse::Run(
 // todo: HttpResponseFormat HttpResponse::CreateHttpResponseFormat(const HttpRequestResult
 // &request_info) 作成
 HttpResponseFormat HttpResponse::CreateHttpResponseFormat(
-	const ClientInfos                   &client_info,
 	const server::VirtualServerAddrList &server_info,
 	const HttpRequestResult             &request_info,
 	CgiResult                           &cgi_result
@@ -59,7 +56,6 @@ HttpResponseFormat HttpResponse::CreateHttpResponseFormat(
 				request_info.request.request_line.method,
 				server_info_result.allowed_methods
 			)) {
-			(void)client_info; // tmp
 			// これはパースした結果
 			utils::Result<cgi::CgiRequest> cgi_parse_result = CgiParse::Parse(
 				request_info.request,
