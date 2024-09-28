@@ -5,6 +5,7 @@
 #include "test_expected_response.hpp"
 #include "test_handler.hpp"
 #include "utils.hpp"
+#include <cstdlib>
 
 namespace test {
 
