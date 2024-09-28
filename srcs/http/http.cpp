@@ -27,12 +27,18 @@ Http::Run(const ClientInfos &client_info, const server::VirtualServerAddrList &s
 	return result;
 }
 
+// todo
+void Http::SetCgiResponse(int client_fd, const cgi::CgiResponse &cgi_response) {
+	(void)client_fd;
+	(void)cgi_response;
+}
+
 utils::Result<void> Http::ParseHttpRequestFormat(int client_fd, const std::string &read_buf) {
 	utils::Result<void>   result;
 	HttpRequestParsedData save_data = storage_.GetClientSaveData(client_fd);
 	save_data.current_buf += read_buf;
 	try {
-		HttpParse::TmpRunHttpResultVersion(save_data);
+		HttpParse::Run(save_data);
 	} catch (const HttpException &e) {
 		save_data.request_result.status_code = e.GetStatusCode();
 		result.Set(false);

@@ -9,7 +9,7 @@ Read::Read() {}
 
 Read::~Read() {}
 
-Read::ReadResult Read::ReadRequest(int client_fd) {
+Read::ReadResult Read::ReadStr(int client_fd) {
 	ReadResult read_result;
 
 	char    buffer[BUFFER_SIZE];

@@ -35,9 +35,7 @@ struct HttpRequestParsedData {
 
 class HttpParse {
   public:
-	static HttpRequestResult Run(const std::string &read_buf);
-	static void              TmpRun(HttpRequestParsedData &data);
-	static void              TmpRunHttpResultVersion(HttpRequestParsedData &data);
+	static void Run(HttpRequestParsedData &data);
 
   private:
 	HttpParse();
@@ -54,7 +52,9 @@ class HttpParse {
 	static void         CheckValidRequestTarget(const std::string &request_target);
 	static void         CheckValidVersion(const std::string &version);
 
-	static void CheckValidHeaderFieldName(const std::string &header_field_value);
+	static void CheckValidHeaderFieldName(
+		const HeaderFields &header_fields, const std::string &header_field_name
+	);
 };
 
 } // namespace http
