@@ -168,8 +168,8 @@ void Server::HandleNewConnection(int server_fd) {
 	AddEventRead(client_fd);
 	utils::Debug(
 		"server",
-		"add new client / listen server: " + new_client_info.GetListenIp() + ":" +
-			utils::ToString(new_client_info.GetListenPort()),
+		"add new client IP: " + new_client_info.GetIp() + " / listen server: " +
+			new_client_info.GetListenIp() + ":" + utils::ToString(new_client_info.GetListenPort()),
 		client_fd
 	);
 }
