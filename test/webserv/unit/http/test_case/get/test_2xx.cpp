@@ -100,7 +100,7 @@ int TestGetOk5ConnectionCloseAndOkConnectionClose(const server::VirtualServerAdd
 int TestGetOk6ConnectionKeepAndOkConnectionClose(const server::VirtualServerAddrList &server_infos
 ) {
 	http::ClientInfos client_infos =
-		CreateClientInfos(request::GET_200_6_CONNECTION_CLOSE_AND_200_CONNECTION_CLOSE);
+		CreateClientInfos(request::GET_200_6_CONNECTION_KEEP_AND_200_CONNECTION_CLOSE);
 	std::string  expected_status_line  = EXPECTED_STATUS_LINE_OK;
 	std::string  expected_body_message = LoadFileContent("../../../../root/html/index.html");
 	HeaderFields expected_header_fields;

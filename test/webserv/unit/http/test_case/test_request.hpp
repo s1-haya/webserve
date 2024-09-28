@@ -26,7 +26,7 @@ static const std::string &GET_200_4_CONNECTION_KEEP_AND_200_CONNECTION_KEEP = Lo
 static const std::string &GET_200_5_CONNECTION_CLOSE_AND_200_CONNECTION_CLOSE = LoadFileContent(
 	REQUEST_GET + ROOT_2XX + "/200_05_connection_close_and_200_connection_close.txt"
 );
-static const std::string &GET_200_6_CONNECTION_CLOSE_AND_200_CONNECTION_CLOSE = LoadFileContent(
+static const std::string &GET_200_6_CONNECTION_KEEP_AND_200_CONNECTION_CLOSE = LoadFileContent(
 	REQUEST_GET + ROOT_2XX + "/200_06_connection_keep_alive_and_200_connection_close.txt"
 );
 static const std::string &GET_200_7_DUPLICATE_CONNECTION_KEEP =
