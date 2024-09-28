@@ -4,6 +4,7 @@
 #include "cgi_request.hpp"
 #include "http_format.hpp"
 #include "http_method.hpp"
+#include "http_result.hpp"
 #include "http_serverinfo_check.hpp"
 #include "status_code.hpp"
 #include "utils.hpp"
@@ -35,7 +36,6 @@ class Stat;
 class HttpResponse {
   public:
 	typedef std::map<EStatusCode, std::string> ReasonPhrase;
-	typedef utils::Result<cgi::CgiRequest>     CgiResult;
 	static std::string
 					   Run(const ClientInfos                   &client_info,
 						   const server::VirtualServerAddrList &server_info,

@@ -30,7 +30,7 @@ std::string HttpResponse::Run(
 ) {
 	HttpResponseFormat response =
 		CreateHttpResponseFormat(client_info, server_info, request_info, cgi_result);
-	if (cgi_result.IsOk()) {
+	if (cgi_result.is_cgi) {
 		return "";
 	}
 	return CreateHttpResponse(response);
@@ -60,7 +60,7 @@ HttpResponseFormat HttpResponse::CreateHttpResponseFormat(
 				server_info_result.allowed_methods
 			)) {
 			// これはパースした結果
-			CgiResult cgi_parse_result = CgiParse::Parse(
+			utils::Result<cgi::CgiRequest> cgi_parse_result = CgiParse::Parse(
 				request_info.request,
 				server_info_result.path,
 				server_info_result.cgi_extension,
@@ -70,7 +70,8 @@ HttpResponseFormat HttpResponse::CreateHttpResponseFormat(
 				throw HttpException("CGI Parse Error", StatusCode(BAD_REQUEST));
 			}
 			// parseがokならis_cgiもokになる、リクエストはそのまま渡せる
-			cgi_result = cgi_parse_result;
+			cgi_result.is_cgi      = true;
+			cgi_result.cgi_request = cgi_parse_result.GetValue();
 		} else {
 			status_code = Method::Handler(
 				server_info_result.path,

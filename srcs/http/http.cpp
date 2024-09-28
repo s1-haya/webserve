@@ -95,15 +95,12 @@ HttpResult Http::CreateHttpResponse(
 	const ClientInfos &client_info, const server::VirtualServerAddrList &server_info
 ) {
 	HttpResult            result;
-	HttpRequestParsedData data = storage_.GetClientSaveData(client_info.fd);
-	// cgiかどうかとcgiリクエストが入っている
-	HttpResponse::CgiResult cgi_result;
-	cgi_result.Set(false);
-
+	HttpRequestParsedData data  = storage_.GetClientSaveData(client_info.fd);
 	result.is_connection_keep   = IsConnectionKeep(client_info.fd);
 	result.is_response_complete = true;
 	result.request_buf          = data.current_buf;
-	result.response = HttpResponse::Run(client_info, server_info, data.request_result, cgi_result);
+	result.response =
+		HttpResponse::Run(client_info, server_info, data.request_result, result.cgi_result);
 	storage_.DeleteClientSaveData(client_info.fd);
 	return result;
 }
