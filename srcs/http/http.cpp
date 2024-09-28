@@ -19,28 +19,11 @@ Http::Run(const ClientInfos &client_info, const server::VirtualServerAddrList &s
 	utils::Result<void> parsed_result =
 		ParseHttpRequestFormat(client_info.fd, client_info.request_buf);
 	if (!parsed_result.IsOk()) {
-		return GetErrorResponse(client_info, BAD);
+		return CreateBadRequestResponse(client_info);
 	}
 	if (IsHttpRequestFormatComplete(client_info.fd)) {
 		result = CreateHttpResponse(client_info, server_info);
 	}
-	return result;
-}
-
-HttpResult Http::GetErrorResponse(const ClientInfos &client_info, ErrorState state) {
-	HttpResult            result;
-	HttpRequestParsedData data  = storage_.GetClientSaveData(client_info.fd);
-	result.is_response_complete = true;
-	result.is_connection_keep   = false;
-	result.request_buf          = data.current_buf;
-	if (state == BAD) {
-		result.response = HttpResponse::CreateErrorResponse(StatusCode(BAD_REQUEST));
-	} else if (state == TIMEOUT) {
-		result.response = HttpResponse::CreateErrorResponse(StatusCode(REQUEST_TIMEOUT));
-	} else if (state == INTERNAL_ERROR) {
-		result.response = HttpResponse::CreateErrorResponse(StatusCode(INTERNAL_SERVER_ERROR));
-	}
-	storage_.DeleteClientSaveData(client_info.fd);
 	return result;
 }
 
@@ -68,6 +51,36 @@ HttpResult Http::CreateHttpResponse(
 	result.is_response_complete = true;
 	result.request_buf          = data.current_buf;
 	result.response             = HttpResponse::Run(client_info, server_info, data.request_result);
+	storage_.DeleteClientSaveData(client_info.fd);
+	return result;
+}
+
+HttpResult Http::GetErrorResponse(const ClientInfos &client_info, ErrorState state) {
+	HttpResult            result;
+	HttpRequestParsedData data  = storage_.GetClientSaveData(client_info.fd);
+	result.is_response_complete = true;
+	result.is_connection_keep   = false;
+	result.request_buf          = data.current_buf;
+	switch (state) {
+	case TIMEOUT:
+		result.response = HttpResponse::CreateErrorResponse(StatusCode(REQUEST_TIMEOUT));
+		break;
+	case INTERNAL_ERROR:
+		result.response = HttpResponse::CreateErrorResponse(StatusCode(INTERNAL_SERVER_ERROR));
+	default :
+		break;
+	}
+	storage_.DeleteClientSaveData(client_info.fd);
+	return result;
+}
+
+HttpResult Http::CreateBadRequestResponse(const ClientInfos &client_info) {
+	HttpResult            result;
+	HttpRequestParsedData data  = storage_.GetClientSaveData(client_info.fd);
+	result.is_response_complete = true;
+	result.is_connection_keep   = false;
+	result.request_buf          = data.current_buf;
+	result.response = HttpResponse::CreateErrorResponse(StatusCode(BAD_REQUEST));
 	storage_.DeleteClientSaveData(client_info.fd);
 	return result;
 }

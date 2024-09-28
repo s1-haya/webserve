@@ -4,7 +4,6 @@
 namespace http {
 
 enum ErrorState {
-	BAD,
 	TIMEOUT,
 	INTERNAL_ERROR
 };
