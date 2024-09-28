@@ -46,25 +46,6 @@ VirtualServer::LocationList ConvertLocations(const config::context::LocationList
 	return location_list;
 }
 
-// todo: tmp for debug
-void DebugVirtualServerNames(
-	const VirtualServerStorage::VirtualServerAddrList &virtual_server_addr_list
-) {
-	typedef VirtualServerStorage::VirtualServerAddrList::const_iterator ItVs;
-	for (ItVs it = virtual_server_addr_list.begin(); it != virtual_server_addr_list.end(); ++it) {
-		const VirtualServer *virtual_server = *it;
-		std::cerr << "[" << *virtual_server->GetServerNameList().begin() << "]"; // todo: tmp
-	}
-	std::cerr << std::endl;
-}
-
-// todo: tmp for debug
-void DebugDto(const http::ClientInfos &client_infos, const VirtualServerAddrList &virtual_servers) {
-	utils::Debug("server", "ClientInfo - fd", client_infos.fd);
-	utils::Debug("server", "received server_names");
-	DebugVirtualServerNames(virtual_servers);
-}
-
 void AddResolvedHostPort(
 	HostPortSet &host_port_set, const Connection::IpList &ip_list, unsigned int port
 ) {
@@ -232,7 +213,6 @@ void Server::RunHttp(const event::Event &event) {
 	// Prepare to http.Run()
 	const http::ClientInfos     &client_infos    = GetClientInfos(client_fd);
 	const VirtualServerAddrList &virtual_servers = GetVirtualServerList(client_fd);
-	DebugDto(client_infos, virtual_servers);
 
 	http::HttpResult http_result = http_.Run(client_infos, virtual_servers);
 	// Set the unused request_buf in Http.
