@@ -11,5 +11,8 @@
 	"[html]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.formatOnSave": true
+	},
+	"files.associations": {
+		"iostream": "cpp"
 	}
 }

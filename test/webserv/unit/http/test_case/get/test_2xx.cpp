@@ -255,7 +255,7 @@ int TestGetOk14ExtraRequest(const server::VirtualServerAddrList &server_infos) {
 }
 
 int TestGetOk15BodyMessageDefault(const server::VirtualServerAddrList &server_infos) {
-	http::ClientInfos client_infos          = CreateClientInfos(request::GET_200_15_BODY_MESSAGE_DEFAULT);
+	http::ClientInfos client_infos = CreateClientInfos(request::GET_200_15_BODY_MESSAGE_DEFAULT);
 	std::string       expected_status_line  = EXPECTED_STATUS_LINE_OK;
 	std::string       expected_body_message = LoadFileContent("../../../../root/html/index.html");
 	HeaderFields      expected_header_fields;
@@ -266,12 +266,12 @@ int TestGetOk15BodyMessageDefault(const server::VirtualServerAddrList &server_in
 	const std::string &expected_response         = CreateHttpResponseFormat(
         expected_status_line, expected_header_fields, expected_body_message
     );
-	http::HttpResult   expected = CreateHttpResult(true, false, "", expected_response);
+	http::HttpResult expected = CreateHttpResult(true, false, "", expected_response);
 	return HandleHttpResult(client_infos, server_infos, expected, "200-15");
 }
 
 int TestGetOk16BodyMessageCgi(const server::VirtualServerAddrList &server_infos) {
-	http::ClientInfos client_infos          = CreateClientInfos(request::GET_200_16_BODY_MESSAGE_CGI);
+	http::ClientInfos client_infos = CreateClientInfos(request::GET_200_16_BODY_MESSAGE_CGI);
 	std::string       expected_status_line  = EXPECTED_STATUS_LINE_OK;
 	std::string       expected_body_message = "OK";
 	HeaderFields      expected_header_fields;
@@ -282,12 +282,12 @@ int TestGetOk16BodyMessageCgi(const server::VirtualServerAddrList &server_infos)
 	const std::string &expected_response         = CreateHttpResponseFormat(
         expected_status_line, expected_header_fields, expected_body_message
     );
-	http::HttpResult   expected = CreateHttpResult(true, false, "", expected_response);
+	http::HttpResult expected = CreateHttpResult(true, false, "", expected_response);
 	return HandleHttpResult(client_infos, server_infos, expected, "200-16");
 }
 
 int TestGetOk17NotExistHeaderField(const server::VirtualServerAddrList &server_infos) {
-	http::ClientInfos client_infos          = CreateClientInfos(request::GET_200_17_NOT_EXIST_HEADER_FIELD);
+	http::ClientInfos client_infos = CreateClientInfos(request::GET_200_17_NOT_EXIST_HEADER_FIELD);
 	std::string       expected_status_line  = EXPECTED_STATUS_LINE_OK;
 	std::string       expected_body_message = LoadFileContent("../../../../root/html/index.html");
 	HeaderFields      expected_header_fields;
@@ -298,12 +298,12 @@ int TestGetOk17NotExistHeaderField(const server::VirtualServerAddrList &server_i
 	const std::string &expected_response         = CreateHttpResponseFormat(
         expected_status_line, expected_header_fields, expected_body_message
     );
-	http::HttpResult   expected = CreateHttpResult(true, false, "", expected_response);
+	http::HttpResult expected = CreateHttpResult(true, false, "", expected_response);
 	return HandleHttpResult(client_infos, server_infos, expected, "200-17");
 }
 
 int TestGetOk18CgiScriptInPerl(const server::VirtualServerAddrList &server_infos) {
-	http::ClientInfos client_infos          = CreateClientInfos(request::GET_200_18_CGI_SCRIPT_IN_PERL);
+	http::ClientInfos client_infos = CreateClientInfos(request::GET_200_18_CGI_SCRIPT_IN_PERL);
 	std::string       expected_status_line  = EXPECTED_STATUS_LINE_OK;
 	std::string       expected_body_message = "OK";
 	HeaderFields      expected_header_fields;
@@ -314,12 +314,12 @@ int TestGetOk18CgiScriptInPerl(const server::VirtualServerAddrList &server_infos
 	const std::string &expected_response         = CreateHttpResponseFormat(
         expected_status_line, expected_header_fields, expected_body_message
     );
-	http::HttpResult   expected = CreateHttpResult(true, false, "", expected_response);
+	http::HttpResult expected = CreateHttpResult(true, false, "", expected_response);
 	return HandleHttpResult(client_infos, server_infos, expected, "200-18");
 }
 
 int TestGetOk19CgiScriptInPython(const server::VirtualServerAddrList &server_infos) {
-	http::ClientInfos client_infos          = CreateClientInfos(request::GET_200_19_CGI_SCRIPT_IN_PYTHON);
+	http::ClientInfos client_infos = CreateClientInfos(request::GET_200_19_CGI_SCRIPT_IN_PYTHON);
 	std::string       expected_status_line  = EXPECTED_STATUS_LINE_OK;
 	std::string       expected_body_message = "OK";
 	HeaderFields      expected_header_fields;
@@ -330,12 +330,12 @@ int TestGetOk19CgiScriptInPython(const server::VirtualServerAddrList &server_inf
 	const std::string &expected_response         = CreateHttpResponseFormat(
         expected_status_line, expected_header_fields, expected_body_message
     );
-	http::HttpResult   expected = CreateHttpResult(true, false, "", expected_response);
+	http::HttpResult expected = CreateHttpResult(true, false, "", expected_response);
 	return HandleHttpResult(client_infos, server_infos, expected, "200-19");
 }
 
 int TestGetOk20CgiScriptInShell(const server::VirtualServerAddrList &server_infos) {
-	http::ClientInfos client_infos          = CreateClientInfos(request::GET_200_20_CGI_SCRIPT_IN_SHELL);
+	http::ClientInfos client_infos = CreateClientInfos(request::GET_200_20_CGI_SCRIPT_IN_SHELL);
 	std::string       expected_status_line  = EXPECTED_STATUS_LINE_OK;
 	std::string       expected_body_message = "OK";
 	HeaderFields      expected_header_fields;
@@ -346,7 +346,7 @@ int TestGetOk20CgiScriptInShell(const server::VirtualServerAddrList &server_info
 	const std::string &expected_response         = CreateHttpResponseFormat(
         expected_status_line, expected_header_fields, expected_body_message
     );
-	http::HttpResult   expected = CreateHttpResult(true, false, "", expected_response);
+	http::HttpResult expected = CreateHttpResult(true, false, "", expected_response);
 	return HandleHttpResult(client_infos, server_infos, expected, "200-20");
 }
 
