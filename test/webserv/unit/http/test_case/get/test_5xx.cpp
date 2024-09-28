@@ -21,7 +21,7 @@ int TestGetNotImplemented1NotExistMethod(const server::VirtualServerAddrList &se
         expected_status_line, expected_header_fields, expected_body_message
     );
 	http::HttpResult expected = CreateHttpResult(true, false, "", expected_response);
-	return HandleHttpResult(client_infos, server_infos, expected);
+	return HandleHttpResult(client_infos, server_infos, expected, "501-01");
 }
 
 } // namespace test

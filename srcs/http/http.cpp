@@ -44,7 +44,7 @@ utils::Result<void> Http::ParseHttpRequestFormat(int client_fd, const std::strin
 	HttpRequestParsedData save_data = storage_.GetClientSaveData(client_fd);
 	save_data.current_buf += read_buf;
 	try {
-		HttpParse::TmpRunHttpResultVersion(save_data);
+		HttpParse::Run(save_data);
 	} catch (const HttpException &e) {
 		save_data.request_result.status_code = e.GetStatusCode();
 		result.Set(false);
