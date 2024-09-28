@@ -166,7 +166,7 @@ bool HttpResponse::IsCgi(
 	return true;
 }
 
-std::string HttpResponse::CreateErrorResponse(StatusCode status_code) {
+std::string HttpResponse::CreateErrorResponse(const StatusCode &status_code) {
 	HttpResponseFormat response;
 	response.status_line =
 		StatusLine(HTTP_VERSION, status_code.GetStatusCode(), status_code.GetReasonPhrase());
