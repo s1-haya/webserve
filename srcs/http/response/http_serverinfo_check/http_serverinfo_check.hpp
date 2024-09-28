@@ -28,6 +28,9 @@ struct CheckServerInfoResult {
 
 	utils::Result< std::pair<unsigned int, std::string> > redirect;
 	utils::Result< std::pair<unsigned int, std::string> > error_page;
+
+	std::string host_name;
+	std::string server_port;
 	CheckServerInfoResult() : autoindex(false) {
 		redirect.Set(false);
 		error_page.Set(false);
