@@ -3,7 +3,6 @@
 #include "http_message.hpp"
 #include "http_result.hpp"
 #include "http_storage.hpp"
-#include "server_infos.hpp"
 #include <iostream>
 
 namespace http {

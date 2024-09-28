@@ -9,7 +9,6 @@
 #include "http.hpp"
 #include "http_result.hpp"
 #include "message_manager.hpp"
-#include "mock_http.hpp"
 #include "read.hpp"
 #include <list>
 #include <string>
