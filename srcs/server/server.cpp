@@ -582,12 +582,24 @@ void Server::SetCgiResponseToHttp(int pipe_fd, const std::string &read_buf) {
 	if (!cgi_response.is_response_complete) {
 		return;
 	}
+	event_monitor_.Delete(pipe_fd);
+	cgi_manager_.DeleteCgi(client_fd);
 	utils::Debug("cgi", "Read the entire response from the child process through pipe_fd", pipe_fd);
 
-	// todo: handle http_result
-	http_.GetResponseFromCgi(client_fd, cgi_response);
-	cgi_manager_.DeleteCgi(client_fd);
-	event_monitor_.Delete(pipe_fd);
+	const http::HttpResult http_result = http_.GetResponseFromCgi(client_fd, cgi_response);
+
+	message_manager_.SetNewRequestBuf(client_fd, http_result.request_buf);
+	if (!http_result.is_response_complete) {
+		throw std::logic_error("GetResponseFromCgi: incorrect HttpResult");
+	}
+	message_manager_.SetIsCompleteRequest(client_fd, true);
+	utils::Debug("server", "received all request from client", client_fd);
+
+	const message::ConnectionState connection_state =
+		http_result.is_connection_keep ? message::KEEP : message::CLOSE;
+	message_manager_.AddNormalResponse(client_fd, connection_state, http_result.response);
+	// todo:
+	// UpdateEventInCgiResponseComplete(connection_state, client_fd);
 }
 
 } // namespace server
