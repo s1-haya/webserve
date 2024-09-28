@@ -185,9 +185,9 @@ void Server::HandleExistingConnection(const event::Event &event) {
 	if (event.type & event::EVENT_WRITE) {
 		HandleWriteEvent(event.fd);
 	}
-	// Call RunHttp() if request_buf contains data, even without a read event.
+	// Call RunHttpAndCgi() if request_buf contains data, even without a read event.
 	if (IsHttpRequestBufExist(event.fd)) {
-		RunHttp(event);
+		RunHttpAndCgi(event);
 	}
 }
 
@@ -235,7 +235,7 @@ bool Server::IsHttpRequestBufExist(int fd) const {
 	return !message_manager_.GetRequestBuf(fd).empty();
 }
 
-void Server::RunHttp(const event::Event &event) {
+void Server::RunHttpAndCgi(const event::Event &event) {
 	const int client_fd = event.fd;
 
 	// Prepare to http.Run()

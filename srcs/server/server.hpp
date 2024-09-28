@@ -47,7 +47,7 @@ class Server {
 	void      HandleReadEvent(const event::Event &event);
 	void      HandleHttpReadResult(const event::Event &event, const Read::ReadResult &read_result);
 	bool      IsHttpRequestBufExist(int fd) const;
-	void      RunHttp(const event::Event &event);
+	void      RunHttpAndCgi(const event::Event &event);
 	void      HandleWriteEvent(int fd);
 	void      SendHttpResponse(int client_fd);
 	void      HandleTimeoutMessages();
