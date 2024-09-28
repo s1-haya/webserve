@@ -587,7 +587,7 @@ void Server::SetCgiResponseToHttp(int pipe_fd, const std::string &read_buf) {
 	// todo: handle http_result
 	http_.GetResponseFromCgi(client_fd, cgi_response);
 	cgi_manager_.DeleteCgi(client_fd);
-	event_monitor_.Delete(client_fd);
+	event_monitor_.Delete(pipe_fd);
 }
 
 } // namespace server
