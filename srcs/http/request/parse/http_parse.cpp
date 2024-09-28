@@ -59,6 +59,15 @@ utils::Result<int> HexToDec(const std::string &hex_str) {
 	return utils::Result<int>(decimal_value);
 }
 
+bool HasSpace(const std::string &str) {
+	for (std::string::const_iterator it = str.begin(); it != str.end(); ++it) {
+		if (std::isspace(*it)) {
+			return true;
+		}
+	}
+	return false;
+}
+
 } // namespace
 
 void HttpParse::ParseRequestLine(HttpRequestParsedData &data) {
@@ -181,38 +190,10 @@ void HttpParse::ParseChunkedRequest(HttpRequestParsedData &data) {
 	data.is_request_format.is_body_message = true;
 }
 
-void HttpParse::TmpRun(HttpRequestParsedData &data) {
-	// todo: 外側でHttpParse::TmpRunを呼ぶため try, catchを削除する
-	try {
-		ParseRequestLine(data);
-		ParseHeaderFields(data);
-		ParseBodyMessage(data);
-	} catch (const HttpException &e) {
-		data.request_result.status_code = e.GetStatusCode();
-	}
-}
-
-void HttpParse::TmpRunHttpResultVersion(HttpRequestParsedData &data) {
+void HttpParse::Run(HttpRequestParsedData &data) {
 	ParseRequestLine(data);
 	ParseHeaderFields(data);
 	ParseBodyMessage(data);
-}
-
-// todo: tmp request_
-HttpRequestResult HttpParse::Run(const std::string &read_buf) {
-	HttpRequestResult result;
-	// a: [request_line ＋ header_fields, message-body]
-	// b: [request_line, header_fields]
-	std::vector<std::string> a = utils::SplitStr(read_buf, HEADER_FIELDS_END);
-	std::vector<std::string> b = utils::SplitStr(a[0], CRLF);
-	try {
-		result.request.request_line = SetRequestLine(utils::SplitStr(b[0], SP));
-		const std::vector<std::string> header_fields_info(b.begin() + 1, b.end());
-		result.request.header_fields = SetHeaderFields(header_fields_info);
-	} catch (const HttpException &e) {
-		result.status_code = e.GetStatusCode();
-	}
-	return result;
 }
 
 RequestLine HttpParse::SetRequestLine(const std::vector<std::string> &request_line_info) {
@@ -229,21 +210,14 @@ HeaderFields HttpParse::SetHeaderFields(const std::vector<std::string> &header_f
 	typedef std::vector<std::string>::const_iterator It;
 	for (It it = header_fields_info.begin(); it != header_fields_info.end(); ++it) {
 		std::vector<std::string> header_field_name_and_value = utils::SplitStr(*it, ":");
-		// if (header_field_name_and_value.size() != 2) {
-		// 	throw HttpException(
-		// 		"Error: Missing colon or multiple colons found in header filed",
-		// 		StatusCode(BAD_REQUEST)
-		// 	);
-		// }
-
-		// Todo: `Host: localhost:8080`のような場合どうするのか
-
-		// header_field_valueを初期化してるためheader_field_nameも初期化した
-		const std::string &header_field_name = header_field_name_and_value[0];
-		CheckValidHeaderFieldName(header_field_name);
+		const std::string       &header_field_name           = header_field_name_and_value[0];
+		CheckValidHeaderFieldName(header_fields, header_field_name);
+		// todo:
+		// マルチパートを対応する場合はutils::SplitStrを使用して、セミコロン区切りのstd::vector<std::string>になる。
+		// ex) Content-Type: multipart/form-data; boundary=----WebKitFormBoundary64XhQJfFNRKx7oK7
 		const std::string &header_field_value =
 			StrTrimLeadingOptionalWhitespace(header_field_name_and_value[1]);
-		// to do: #189  ヘッダフィールドをパースする関数（value）-> CheckValidHeaderFieldValue
+		// todo: #189  ヘッダフィールドをパースする関数（value）-> CheckValidHeaderFieldValue
 		typedef std::pair<HeaderFields::const_iterator, bool> Result;
 		Result result = header_fields.insert(std::make_pair(header_field_name, header_field_value));
 		if (result.second == false) {
@@ -262,7 +236,9 @@ void HttpParse::CheckValidRequestLine(const std::vector<std::string> &request_li
 }
 
 void HttpParse::CheckValidMethod(const std::string &method) {
-	// US-ASCIIかまたは大文字かどうか -> 400
+	if (!method.size()) {
+		throw HttpException("Error: the method don't exist.", StatusCode(BAD_REQUEST));
+	}
 	if (IsStringUsAscii(method) == false || IsStringUpper(method) == false) {
 		throw HttpException(
 			"Error: This method contains lowercase or non-USASCII characters.",
@@ -272,7 +248,9 @@ void HttpParse::CheckValidMethod(const std::string &method) {
 }
 
 void HttpParse::CheckValidRequestTarget(const std::string &request_target) {
-	// /が先頭になかったら場合 -> 400
+	if (!request_target.size()) {
+		throw HttpException("Error: the request target don't exist.", StatusCode(BAD_REQUEST));
+	}
 	if (request_target.empty() || request_target[0] != '/') {
 		throw HttpException(
 			"Error: the request target is missing the '/' character at the beginning",
@@ -282,7 +260,9 @@ void HttpParse::CheckValidRequestTarget(const std::string &request_target) {
 }
 
 void HttpParse::CheckValidVersion(const std::string &version) {
-	// HTTP/1.1かどうか -> 400
+	if (!version.size()) {
+		throw HttpException("Error: the http version don't exist.", StatusCode(BAD_REQUEST));
+	}
 	if (version != HTTP_VERSION) {
 		throw HttpException(
 			"Error: The version is not supported by webserv", StatusCode(BAD_REQUEST)
@@ -290,21 +270,22 @@ void HttpParse::CheckValidVersion(const std::string &version) {
 	}
 }
 
-void HttpParse::CheckValidHeaderFieldName(const std::string &header_field_value) {
-	(void)header_field_value;
-	// todo: 複数指定ありの場合はthrowしないようにする。
-	// if (header_field_value != CONNECTION &&
-	// 	std::find(
-	// 		REQUEST_HEADER_FIELDS,
-	// 		REQUEST_HEADER_FIELDS + REQUEST_HEADER_FIELDS_SIZE,
-	// 		header_field_value
-	// 	) == REQUEST_HEADER_FIELDS + REQUEST_HEADER_FIELDS_SIZE) {
-	// 	throw HttpException(
-	// 		"Error: the value does not exist in format of header fields", StatusCode(BAD_REQUEST)
-	// 	);
-	// }
-
-	// Todo: ブラウザでデフォルト以外のヘッダーが送られてくることがある
+void HttpParse::CheckValidHeaderFieldName(
+	const HeaderFields &header_fields, const std::string &header_field_name
+) {
+	if (!header_field_name.size()) {
+		throw HttpException(
+			"Error: the name of Header field don't exist.", StatusCode(BAD_REQUEST)
+		);
+	}
+	if (HasSpace(header_field_name)) {
+		throw HttpException(
+			"Error: the name of Header field has a space.", StatusCode(BAD_REQUEST)
+		);
+	}
+	if (header_fields.find(header_field_name) != header_fields.end() && header_field_name == HOST) {
+		throw HttpException("Error: Host header fields already exists", StatusCode(BAD_REQUEST));
+	}
 }
 
 // status_line && header
