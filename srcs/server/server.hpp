@@ -73,9 +73,9 @@ class Server {
 	bool IsCgi(int fd) const;
 	void HandleCgi(int client_fd, const http::CgiResult &cgi_result);
 	void AddEventForCgi(int client_fd);
+	void SendCgiRequest(int pipe_fd);
 	void HandleCgiReadResult(int pipe_fd, const Read::ReadResult &read_result);
 	void SetCgiResponseToHttp(int pipe_fd, const std::string &read_buf);
-	void SendCgiRequest(int pipe_fd);
 
 	// const
 	static const int    SYSTEM_ERROR = -1;
