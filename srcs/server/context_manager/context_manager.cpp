@@ -66,4 +66,9 @@ const std::string &ContextManager::GetClientIp(int client_fd) const {
 	return client_info.GetIp();
 }
 
+unsigned int ContextManager::GetListenServerPort(int client_fd) const {
+	const ClientInfo &client_info = sock_context_.GetClientInfo(client_fd);
+	return client_info.GetListenPort();
+}
+
 } // namespace server
