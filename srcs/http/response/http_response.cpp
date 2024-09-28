@@ -1,4 +1,5 @@
 #include "http_response.hpp"
+#include "cgi_parse.hpp"
 #include "client_infos.hpp"
 #include "http_exception.hpp"
 #include "http_message.hpp"
@@ -29,6 +30,9 @@ std::string HttpResponse::Run(
 ) {
 	HttpResponseFormat response =
 		CreateHttpResponseFormat(client_info, server_info, request_info, cgi_result);
+	if (cgi_result.IsOk()) {
+		return "";
+	}
 	return CreateHttpResponse(response);
 }
 
@@ -55,13 +59,18 @@ HttpResponseFormat HttpResponse::CreateHttpResponseFormat(
 				request_info.request.request_line.method,
 				server_info_result.allowed_methods
 			)) {
-			// todo: cgi実行
-			// cgi::Run()
-			// -> Internal　Server Errorを投げる可能性あり
-			// status_code = CgiToServerHandler(header_fields, response_body_message);
-			(void)client_info;
-			(void)server_info_result;
-			(void)status_code;
+			// これはパースした結果
+			CgiResult cgi_parse_result = CgiParse::Parse(
+				request_info.request,
+				server_info_result.path,
+				server_info_result.cgi_extension,
+				"8080" // tmp: server_info_resultにポートを追加する
+			);
+			if (!cgi_parse_result.IsOk()) { // parserが直でthrowするように変更か
+				throw HttpException("CGI Parse Error", StatusCode(BAD_REQUEST));
+			}
+			// parseがokならis_cgiもokになる、リクエストはそのまま渡せる
+			cgi_result = cgi_parse_result;
 		} else {
 			status_code = Method::Handler(
 				server_info_result.path,
