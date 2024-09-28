@@ -39,7 +39,8 @@ http::HttpResult  CreateHttpResult(
 int HandleHttpResult(
 	const http::ClientInfos             &client_infos,
 	const server::VirtualServerAddrList &server_infos,
-	const http::HttpResult               expected
+	const http::HttpResult               expected,
+	const std::string                   &current_number
 );
 
 } // namespace test
