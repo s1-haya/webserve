@@ -37,10 +37,12 @@ const server::VirtualServer *HttpServerInfoCheck::FindVirtualServer(
 ) {
 	typedef server::VirtualServerAddrList::const_iterator VsAddrListItr;
 	for (VsAddrListItr it = virtual_servers.begin(); it != virtual_servers.end(); ++it) {
+		// localhost:8080 -> localhost
+		std::string host_value = header_fields.at(HOST);
+		std::size_t colon_pos  = host_value.find_first_of(':');
+		std::string host_name  = host_value.substr(0, colon_pos);
 		if (std::find(
-				(*it)->GetServerNameList().begin(),
-				(*it)->GetServerNameList().end(),
-				header_fields.at(HOST)
+				(*it)->GetServerNameList().begin(), (*it)->GetServerNameList().end(), host_name
 			) != (*it)->GetServerNameList().end()) {
 			return *it;
 		}
