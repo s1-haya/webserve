@@ -195,7 +195,7 @@ ClientInfo Connection::Accept(int server_fd) {
 	const unsigned int listen_port    = listen_ip_port.second;
 
 	// create new client struct
-	ClientInfo client_info(client_fd, listen_ip, listen_port);
+	ClientInfo client_info(client_fd, "", listen_ip, listen_port); // todo: tmp
 	utils::Debug("server", "new ClientInfo created. fd", client_fd);
 	return client_info;
 }
