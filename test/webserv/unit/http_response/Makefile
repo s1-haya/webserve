@@ -17,7 +17,7 @@ WS_CGI_DIR				:=	$(WS_SRCS_DIR)/cgi
 WS_HTTP_REQUEST_DIR	:=	$(WS_HTTP_DIR)/request
 WS_HTTP_PARSE_DIR	:=	$(WS_HTTP_DIR)/request/parse
 WS_HTTP_RESPONSE_DIR	:=	$(WS_HTTP_DIR)/response
-WS_HTTP_CGI_PARSE	:=	$(WS_HTTP_DIR)/response/cgi_parse
+WS_HTTP_CGI_PARSE_DIR	:=	$(WS_HTTP_RESPONSE_DIR)/cgi_parse
 WS_HTTP_SERVER_INFO_CHECK_DIR	:=	$(WS_HTTP_RESPONSE_DIR)/http_serverinfo_check
 WS_VIRTUAL_SERVER_DIR			:=	$(WS_SRCS_DIR)/server/virtual_server
 
@@ -48,7 +48,7 @@ SRCS_DIR	:=	$(WS_EXCEPTION_DIR) \
 				$(WS_HTTP_PARSE_DIR) \
 				$(WS_HTTP_RESPONSE_DIR) \
 				$(WS_HTTP_SERVER_INFO_CHECK_DIR) \
-				$(WS_HTTP_CGI_PARSE) \
+				$(WS_HTTP_CGI_PARSE_DIR) \
 				$(WS_VIRTUAL_SERVER_DIR)
 
 #--------------------------------------------
