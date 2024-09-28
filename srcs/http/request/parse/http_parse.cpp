@@ -209,15 +209,16 @@ HeaderFields HttpParse::SetHeaderFields(const std::vector<std::string> &header_f
 	HeaderFields                                     header_fields;
 	typedef std::vector<std::string>::const_iterator It;
 	for (It it = header_fields_info.begin(); it != header_fields_info.end(); ++it) {
-		std::vector<std::string> header_field_name_and_value = utils::SplitStr(*it, ":");
-		const std::string       &header_field_name           = header_field_name_and_value[0];
+		std::istringstream stream(*it);
+		std::string        header_field_name;
+		std::string        header_field_value;
+		std::getline(stream, header_field_name, ':');
+		std::getline(stream, header_field_value);
+		header_field_value = StrTrimLeadingOptionalWhitespace(header_field_value);
 		CheckValidHeaderFieldName(header_fields, header_field_name);
 		// todo:
 		// マルチパートを対応する場合はutils::SplitStrを使用して、セミコロン区切りのstd::vector<std::string>になる。
 		// ex) Content-Type: multipart/form-data; boundary=----WebKitFormBoundary64XhQJfFNRKx7oK7
-		const std::string &header_field_value =
-			StrTrimLeadingOptionalWhitespace(header_field_name_and_value[1]);
-		// todo: #189  ヘッダフィールドをパースする関数（value）-> CheckValidHeaderFieldValue
 		typedef std::pair<HeaderFields::const_iterator, bool> Result;
 		Result result = header_fields.insert(std::make_pair(header_field_name, header_field_value));
 		if (result.second == false) {
