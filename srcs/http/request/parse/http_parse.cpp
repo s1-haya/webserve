@@ -218,13 +218,11 @@ HeaderFields HttpParse::SetHeaderFields(const std::vector<std::string> &header_f
 		const std::string &header_field_value =
 			StrTrimLeadingOptionalWhitespace(header_field_name_and_value[1]);
 		// todo: #189  ヘッダフィールドをパースする関数（value）-> CheckValidHeaderFieldValue
-		typedef std::pair<HeaderFields::const_iterator, bool> Result;
-		Result result = header_fields.insert(std::make_pair(header_field_name, header_field_value));
-		if (result.second == false) {
-			throw HttpException(
-				"Error: The value already exists in header fields", StatusCode(BAD_REQUEST)
-			);
+		// keep-aliveの場合のみ上書き可能 / connectionはcloseが一つでもある場合はcloseが適用されるため
+		if (header_field_name == CONNECTION && HasConnectionKeepInHeaderFields(header_fields)) {
+			header_fields[CONNECTION] = header_field_value;
 		}
+		header_fields.insert(std::make_pair(header_field_name, header_field_value));
 	}
 	return header_fields;
 }
@@ -286,6 +284,12 @@ void HttpParse::CheckValidHeaderFieldName(
 	if (header_fields.find(header_field_name) != header_fields.end() && header_field_name == HOST) {
 		throw HttpException("Error: Host header fields already exists", StatusCode(BAD_REQUEST));
 	}
+}
+
+bool HttpParse::HasConnectionKeepInHeaderFields(const HeaderFields& header_fields) {
+	typedef HeaderFields::const_iterator Itr;
+	Itr it = header_fields.find(CONNECTION);
+	return (it != header_fields.end() && it->second == KEEP_ALIVE);
 }
 
 // status_line && header
