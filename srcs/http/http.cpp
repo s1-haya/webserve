@@ -73,7 +73,7 @@ HttpResult Http::GetErrorResponse(const ClientInfos &client_info, ErrorState sta
 		break;
 	case INTERNAL_ERROR:
 		result.response = HttpResponse::CreateErrorResponse(StatusCode(INTERNAL_SERVER_ERROR));
-	default :
+	default:
 		break;
 	}
 	storage_.DeleteClientSaveData(client_info.fd);
@@ -86,7 +86,7 @@ HttpResult Http::CreateBadRequestResponse(const ClientInfos &client_info) {
 	result.is_response_complete = true;
 	result.is_connection_keep   = false;
 	result.request_buf          = data.current_buf;
-	result.response = HttpResponse::CreateErrorResponse(StatusCode(BAD_REQUEST));
+	result.response             = HttpResponse::CreateErrorResponse(StatusCode(BAD_REQUEST));
 	storage_.DeleteClientSaveData(client_info.fd);
 	return result;
 }
