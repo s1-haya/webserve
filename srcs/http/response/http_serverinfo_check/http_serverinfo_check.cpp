@@ -25,6 +25,8 @@ CheckServerInfoResult HttpServerInfoCheck::Check(
 ) {
 	CheckServerInfoResult        result;
 	const server::VirtualServer *vs = FindVirtualServer(server_infos, request.header_fields);
+	result.host_name                = request.header_fields.at(HOST);
+	// todo: server_portを追加
 	CheckVirtualServer(result, *vs, request.header_fields);
 	CheckLocationList(result, vs->GetLocationList(), request.request_line.request_target);
 	return result;
