@@ -181,9 +181,10 @@ void Server::HandleReadEvent(const event::Event &event) {
 
 http::ClientInfos Server::GetClientInfos(int client_fd) const {
 	http::ClientInfos client_infos;
-	client_infos.fd          = client_fd;
-	client_infos.ip          = context_.GetClientIp(client_fd);
-	client_infos.request_buf = message_manager_.GetRequestBuf(client_fd);
+	client_infos.fd                 = client_fd;
+	client_infos.ip                 = context_.GetClientIp(client_fd);
+	client_infos.listen_server_port = context_.GetListenServerPort(client_fd);
+	client_infos.request_buf        = message_manager_.GetRequestBuf(client_fd);
 	return client_infos;
 }
 
