@@ -7,6 +7,7 @@ namespace http {
 
 struct ClientInfos {
 	int         fd;
+	std::string ip;
 	std::string request_buf;
 };
 
