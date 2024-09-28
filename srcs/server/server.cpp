@@ -593,8 +593,22 @@ void Server::SetCgiResponseToHttp(int pipe_fd, const std::string &read_buf) {
 	const message::ConnectionState connection_state =
 		http_result.is_connection_keep ? message::KEEP : message::CLOSE;
 	message_manager_.AddNormalResponse(client_fd, connection_state, http_result.response);
-	// todo:
-	// UpdateEventInCgiResponseComplete(connection_state, client_fd);
+	UpdateEventInCgiResponseComplete(connection_state, client_fd);
+}
+
+void Server::UpdateEventInCgiResponseComplete(
+	const message::ConnectionState connection_state, int client_fd
+) {
+	switch (connection_state) {
+	case message::KEEP:
+		ReplaceEvent(client_fd, event::EVENT_READ | event::EVENT_WRITE);
+		break;
+	case message::CLOSE:
+		ReplaceEvent(client_fd, event::EVENT_WRITE);
+		break;
+	default:
+		break;
+	}
 }
 
 } // namespace server

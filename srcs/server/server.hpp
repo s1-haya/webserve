@@ -77,6 +77,9 @@ class Server {
 	void SendCgiRequest(int pipe_fd);
 	void HandleCgiReadResult(int pipe_fd, const Read::ReadResult &read_result);
 	void SetCgiResponseToHttp(int pipe_fd, const std::string &read_buf);
+	void UpdateEventInCgiResponseComplete(
+		const message::ConnectionState connection_state, int client_fd
+	);
 
 	// const
 	static const int    SYSTEM_ERROR = -1;
