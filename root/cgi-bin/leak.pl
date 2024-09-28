@@ -1,4 +1,4 @@
-test/apache/cgi/leak.pl#!/usr/bin/perl
+#!/usr/bin/perl
 
 my @array;
 while (1) {
