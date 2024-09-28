@@ -59,6 +59,7 @@ HttpResponseFormat HttpResponse::CreateHttpResponseFormat(
 				request_info.request.request_line.method,
 				server_info_result.allowed_methods
 			)) {
+			(void)client_info; // tmp
 			// これはパースした結果
 			utils::Result<cgi::CgiRequest> cgi_parse_result = CgiParse::Parse(
 				request_info.request,

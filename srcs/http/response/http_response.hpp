@@ -1,7 +1,6 @@
 #ifndef HTTP_RESPONSE_HPP_
 #define HTTP_RESPONSE_HPP_
 
-#include "cgi_request.hpp"
 #include "http_format.hpp"
 #include "http_method.hpp"
 #include "http_result.hpp"

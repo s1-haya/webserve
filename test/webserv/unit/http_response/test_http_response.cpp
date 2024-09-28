@@ -2,6 +2,7 @@
 #include "http_message.hpp"
 #include "http_parse.hpp"
 #include "http_response.hpp"
+#include "http_result.hpp"
 #include <cstdlib>
 #include <fstream>
 
@@ -149,6 +150,7 @@ int main(void) {
 	http::ClientInfos                   client_info;
 	const server::VirtualServerAddrList server_info = BuildVirtualServerAddrList();
 	http::HttpRequestResult             request_info;
+	http::CgiResult                     cgi_result;
 
 	// 前提
 	// header_fields[HOST]がないとAborted what():  map::at
@@ -159,7 +161,8 @@ int main(void) {
 	request_info.request.request_line.request_target = "/";
 	request_info.request.request_line.version        = http::HTTP_VERSION;
 	request_info.request.header_fields[http::HOST]   = "sawa";
-	std::string response1 = http::HttpResponse::Run(client_info, server_info, request_info);
+	std::string response1 =
+		http::HttpResponse::Run(client_info, server_info, request_info, cgi_result);
 
 	std::string expected1_status_line =
 		LoadFileContent("../../expected_response/default_status_line/200_ok.txt");
@@ -174,7 +177,8 @@ int main(void) {
 
 	// GETメソッドの許可がないhost2に/html/index.htmlを取得するリクエスト
 	request_info.request.header_fields[http::HOST] = "host2";
-	std::string response2 = http::HttpResponse::Run(client_info, server_info, request_info);
+	std::string response2 =
+		http::HttpResponse::Run(client_info, server_info, request_info, cgi_result);
 
 	std::string expected2_status_line =
 		LoadFileContent("../../expected_response/default_status_line/405_method_not_allowed.txt");
