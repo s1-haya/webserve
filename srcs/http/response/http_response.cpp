@@ -181,7 +181,7 @@ HttpResponseFormat HttpResponse::HandleRedirect(
 	} else {
 		response_header_fields[LOCATION] = "http://" + server_info_result.host_name + url;
 	}
-	// std::cout << "Redirect: " << response_header_fields[LOCATION] << std::endl;
+	utils::Debug("Redirect", response_header_fields[LOCATION]);
 	// サーバーで用意しているステータス以外を指定した場合はbodyやphraseを返さない
 	if (server_info_result.redirect.GetValue().first == MOVED_PERMANENTLY) {
 		throw HttpException("Moved Permanently", StatusCode(MOVED_PERMANENTLY));
