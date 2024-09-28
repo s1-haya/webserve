@@ -37,8 +37,8 @@ static const std::string &GET_200_9_CONNECTION_KEEP_AND_CLOSE =
 	LoadFileContent(REQUEST_GET + ROOT_2XX + "/200_09_connection_keep_alive_and_close.txt");
 static const std::string &GET_200_10_CONNECTION_CLOSE_AND_KEEP =
 	LoadFileContent(REQUEST_GET + ROOT_2XX + "/200_10_connection_close_and_keep_alive.txt");
-static const std::string &GET_200_13_EXTRA_REQUEST =
-	LoadFileContent(REQUEST_GET + ROOT_2XX + "/200_13_extra_request.txt");
+static const std::string &GET_200_14_EXTRA_REQUEST =
+	LoadFileContent(REQUEST_GET + ROOT_2XX + "/200_14_extra_request.txt");
 
 static const std::string &ROOT_4XX = "/4xx";
 static const std::string &GET_400_1_ONLY_CRLF =

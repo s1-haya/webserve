@@ -24,7 +24,7 @@ int TestGetOk7DuplicateConnectionKeep(const server::VirtualServerAddrList &serve
 int TestGetOk8DuplicateConnectionClose(const server::VirtualServerAddrList &server_infos);
 int TestGetOk9ConnectionKeepAndClose(const server::VirtualServerAddrList &server_infos);
 int TestGetOk10ConnectionCloseAndKeep(const server::VirtualServerAddrList &server_infos);
-int TestGetOk13ExtraRequest(const server::VirtualServerAddrList &server_infos);
+int TestGetOk14ExtraRequest(const server::VirtualServerAddrList &server_infos);
 // int TestGetOkXXNotExistHeaderFieldName(const server::VirtualServerAddrList &server_infos);
 
 // 4xx

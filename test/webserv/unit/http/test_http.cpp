@@ -59,7 +59,8 @@ int  main(void) {
     ret_code |= test::TestGetOk8DuplicateConnectionClose(server_infos);
     ret_code |= test::TestGetOk9ConnectionKeepAndClose(server_infos);
     ret_code |= test::TestGetOk10ConnectionCloseAndKeep(server_infos);
-    ret_code |= test::TestGetOk13ExtraRequest(server_infos);
+    ret_code |= test::TestGetOk14ExtraRequest(server_infos);
+
     ret_code |= test::TestGetBadRequest1OnlyCrlf(server_infos);
     ret_code |= test::TestGetBadRequest2LowerMethod(server_infos);
     ret_code |= test::TestGetBadRequest3NoAsciiMethod(server_infos);

@@ -186,8 +186,8 @@ int TestGetOk10ConnectionCloseAndKeep(const server::VirtualServerAddrList &serve
 	return HandleHttpResult(client_infos, server_infos, expected, "200-10");
 }
 
-int TestGetOk13ExtraRequest(const server::VirtualServerAddrList &server_infos) {
-	http::ClientInfos client_infos          = CreateClientInfos(request::GET_200_13_EXTRA_REQUEST);
+int TestGetOk14ExtraRequest(const server::VirtualServerAddrList &server_infos) {
+	http::ClientInfos client_infos          = CreateClientInfos(request::GET_200_14_EXTRA_REQUEST);
 	std::string       expected_status_line  = EXPECTED_STATUS_LINE_OK;
 	std::string       expected_body_message = LoadFileContent("../../../../root/html/index.html");
 	HeaderFields      expected_header_fields;
