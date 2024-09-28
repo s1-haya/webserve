@@ -34,9 +34,10 @@ HttpResult Http::GetErrorResponse(const ClientInfos &client_info, ErrState state
 }
 
 // todo
-void Http::SetCgiResponse(int client_fd, const cgi::CgiResponse &cgi_response) {
+HttpResult Http::GetResponseFromCgi(int client_fd, const cgi::CgiResponse &cgi_response) {
 	(void)client_fd;
 	(void)cgi_response;
+	return HttpResult();
 }
 
 utils::Result<void> Http::ParseHttpRequestFormat(int client_fd, const std::string &read_buf) {

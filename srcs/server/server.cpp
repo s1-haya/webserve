@@ -584,7 +584,8 @@ void Server::SetCgiResponseToHttp(int pipe_fd, const std::string &read_buf) {
 	}
 	utils::Debug("cgi", "Read the entire response from the child process through pipe_fd", pipe_fd);
 
-	http_.SetCgiResponse(client_fd, cgi_response);
+	// todo: handle http_result
+	http_.GetResponseFromCgi(client_fd, cgi_response);
 	cgi_manager_.DeleteCgi(client_fd);
 	event_monitor_.Delete(client_fd);
 }
