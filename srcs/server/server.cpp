@@ -390,20 +390,15 @@ void Server::AddEventRead(int sock_fd) {
 	}
 }
 
-void Server::ReplaceEvent(int client_fd, event::Type type) {
+void Server::ReplaceEvent(int client_fd, uint32_t type) {
 	try {
 		event_monitor_.Replace(client_fd, type);
 	} catch (const SystemException &e) {
 		utils::PrintError(e.what());
-		switch (type) {
-		case event::EVENT_READ:
-			SetInternalServerError(client_fd);
-			break;
-		case event::EVENT_WRITE:
+		if (type & event::EVENT_WRITE) {
 			Disconnect(client_fd);
-			break;
-		default:
-			break;
+		} else {
+			SetInternalServerError(client_fd);
 		}
 	}
 }

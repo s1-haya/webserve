@@ -63,7 +63,7 @@ class Server {
 	void SetNonBlockingMode(int sock_fd);
 	// wrapper for epoll
 	void AddEventRead(int sock_fd);
-	void ReplaceEvent(int client_fd, event::Type type);
+	void ReplaceEvent(int client_fd, uint32_t type);
 	void AppendEventWrite(const event::Event &event);
 	// wrapper for connection
 	AcceptResult Accept(int server_fd);
