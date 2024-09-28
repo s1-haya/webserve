@@ -58,13 +58,20 @@ std::string CreateAutoIndexContent(const std::string &path) {
 	DIR        *dir = opendir(path.c_str());
 	std::string content;
 
+	std::string       display_path = path;
+	const std::string root_path    = "/root";
+	size_t            pos          = path.find(root_path);
+	if (pos != std::string::npos) {
+		display_path = path.substr(pos + root_path.length());
+	}
+
 	struct dirent *entry;
 	content += "<html>\n"
 			   "<head><title>Index of " +
-			   path +
+			   display_path +
 			   "</title></head>\n"
 			   "<body><h1>Index of " +
-			   path +
+			   display_path +
 			   "</h1><hr><pre>"
 			   "<a href=\"../\">../</a>\n";
 	while ((entry = readdir(dir)) != NULL) {
@@ -76,7 +83,7 @@ std::string CreateAutoIndexContent(const std::string &path) {
 		if (stat(full_path.c_str(), &file_stat) == 0) {
 			bool        is_dir     = S_ISDIR(file_stat.st_mode);
 			std::string entry_name = std::string(entry->d_name) + (is_dir ? "/" : "");
-			content += "<a href=\"" + path + entry_name + "\">" + entry_name + "</a>";
+			content += "<a href=\"" + entry_name + "\">" + entry_name + "</a>";
 			size_t padding = (entry_name.length() < 50) ? 50 - entry_name.length() : 0;
 			content += std::string(padding, ' ') + " ";
 			char time_buf[20];
@@ -133,7 +140,7 @@ int MethodHandlerResult(const MethodArgument &srcs, const std::string &expected_
 
 	} catch (const http::HttpException &e) {
 		srcs.response_body_message =
-			http::HttpResponse::CreateDefaultBodyMessageFormat(e.GetStatusCode());
+			http::HttpResponse::CreateDefaultBodyMessage(e.GetStatusCode());
 		result = HandleResult(srcs.response_body_message, expected_body_message);
 		std::cerr << utils::color::GRAY << e.what() << utils::color::RESET << std::endl;
 	}

@@ -124,7 +124,7 @@ HttpResult MockHttp::Run(
 	return result;
 }
 
-HttpResult MockHttp::GetErrorResponse(const ClientInfos &client_info, ErrState state) {
+HttpResult MockHttp::GetErrorResponse(const ClientInfos &client_info, ErrorState state) {
 	(void)client_info;
 	(void)state;
 

@@ -30,7 +30,7 @@ int TestGetBadRequest11NoHeaderFieldColon(const server::VirtualServerAddrList &s
 int TestGetBadRequest12NoConnectionName(const server::VirtualServerAddrList &server_infos);
 int TestGetBadRequest13NoConnectionValue(const server::VirtualServerAddrList &server_infos);
 int TestGetBadRequest14WrongConnectionValue(const server::VirtualServerAddrList &server_infos);
-int TestGetBadRequest15NotExistHeaderField(const server::VirtualServerAddrList &server_infos);
+int TestGetBadRequest15SpaceInHeaderFieldName(const server::VirtualServerAddrList &server_infos);
 int TestGetBadRequest16HeaderFieldNameSpaceColon(const server::VirtualServerAddrList &server_infos);
 int TestGetBadRequest17SpaceHeaderFieldName(const server::VirtualServerAddrList &server_infos);
 
@@ -39,6 +39,10 @@ int TestGetMethodNotAllowed(const server::VirtualServerAddrList &server_infos);
 int TestGetTimeout1NoCrlf(const server::VirtualServerAddrList &server_infos);
 // 5xx
 int TestGetNotImplemented1NotExistMethod(const server::VirtualServerAddrList &server_infos);
+
+// GetErrorResponse
+int TestRequestTimeoutResponse();
+int TestInternalServerErrorResponse();
 
 } // namespace test
 

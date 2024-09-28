@@ -14,7 +14,11 @@ RUN apt-get update && \
     clang-format=1:10.0-50~exp1 \
     valgrind=1:3.15.0-1ubuntu9 \
     cppcheck=1.90-4build1 \
-    tzdata=2024a-0ubuntu0.20.04 --no-install-recommends
+    tzdata=2024a-0ubuntu0.20.04 \
+    siege=4.0.4-1build1 \
+    strace=5.5-3ubuntu1 \
+    net-tools=1.60+git20180626.aebd88e-1ubuntu1 \
+    iputils-ping=3:20190709-3ubuntu1 --no-install-recommends
 
 # ここでないとできない
 RUN apt-get update && apt-get install -y python3.8-dev

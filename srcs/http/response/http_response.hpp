@@ -36,12 +36,12 @@ class HttpResponse {
   public:
 	typedef std::map<EStatusCode, std::string> ReasonPhrase;
 	static std::string
-					   Run(const server::VirtualServerAddrList &server_info,
-						   const HttpRequestResult             &request_info,
-						   CgiResult                           &cgi_result);
-	static std::string CreateDefaultBodyMessageFormat(const StatusCode &status_code);
+					   Run(const ClientInfos                   &client_info,
+						   const server::VirtualServerAddrList &server_info,
+						   const HttpRequestResult             &request_info);
+	static std::string CreateErrorResponse(const StatusCode &status_code);
 	static bool        IsConnectionKeep(const HeaderFields &request_header_fields);
-	static std::string CreateBadRequestResponse(const HttpRequestResult &request_info);
+	static std::string CreateDefaultBodyMessage(const StatusCode &status_code);
 
   private:
 	HttpResponse();
