@@ -73,6 +73,7 @@ HttpResult Http::GetErrorResponse(const ClientInfos &client_info, ErrorState sta
 		break;
 	case INTERNAL_ERROR:
 		result.response = HttpResponse::CreateErrorResponse(StatusCode(INTERNAL_SERVER_ERROR));
+		break;
 	default:
 		break;
 	}
