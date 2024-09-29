@@ -208,9 +208,14 @@ std::string HttpResponse::CreateErrorResponse(const StatusCode &status_code) {
 }
 
 std::string HttpResponse::GetResponseFromCgi(int client_fd, const cgi::CgiResponse &cgi_response) {
-	StatusCode   status_code(OK);
+	StatusCode  status_code(OK);
+	std::string response_body_message = cgi_response.response;
+
 	HeaderFields response_header_fields;
-	std::string  response_body_message;
+	response_header_fields[SERVER]         = SERVER_VERSION;
+	response_header_fields[CONTENT_TYPE]   = cgi_response.content_type;
+	response_header_fields[CONTENT_LENGTH] = utils::ToString(response_body_message.length());
+	// keep-alive or close
 
 	HttpResponseFormat response_format(
 		StatusLine(HTTP_VERSION, status_code.GetStatusCode(), status_code.GetReasonPhrase()),
