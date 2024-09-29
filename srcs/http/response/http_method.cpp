@@ -132,7 +132,7 @@ StatusCode Method::PostHandler(
 	if (info.IsDirectory()) {
 		throw HttpException("Error: Forbidden", StatusCode(FORBIDDEN));
 	} else if (info.IsRegularFile()) {
-		response_body_message = HttpResponse::CreateDefaultBodyMessageFormat(status_code);
+		response_body_message = HttpResponse::CreateDefaultBodyMessage(status_code);
 		response_header_fields[CONTENT_LENGTH] = utils::ToString(response_body_message.length());
 	} else {
 		// Location header fields: URI-reference
@@ -158,7 +158,7 @@ StatusCode Method::DeleteHandler(
 	if (std::remove(path.c_str()) == SYSTEM_ERROR) {
 		SystemExceptionHandler(errno);
 	} else {
-		response_body_message = HttpResponse::CreateDefaultBodyMessageFormat(status_code);
+		response_body_message = HttpResponse::CreateDefaultBodyMessage(status_code);
 		response_header_fields[CONTENT_LENGTH] = utils::ToString(response_body_message.length());
 	}
 	return status_code;
@@ -194,7 +194,7 @@ StatusCode Method::FileCreationHandler(
 		}
 		throw HttpException("Error: Forbidden", StatusCode(FORBIDDEN));
 	}
-	response_body_message = HttpResponse::CreateDefaultBodyMessageFormat(status_code);
+	response_body_message                  = HttpResponse::CreateDefaultBodyMessage(status_code);
 	response_header_fields[CONTENT_LENGTH] = utils::ToString(response_body_message.length());
 	return status_code;
 }
