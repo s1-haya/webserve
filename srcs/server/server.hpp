@@ -41,6 +41,7 @@ class Server {
 	void      ListenAllHostPorts(const VirtualServerList &virtual_server_list);
 	PortIpMap CreatePortIpMap(const VirtualServerList &virtual_server_list);
 	void      Listen(const HostPortPair &host_port);
+	void      HandleErrorEvent(int fd);
 	void      HandleEvent(const event::Event &event);
 	void      HandleNewConnection(int server_fd);
 	void      HandleExistingConnection(const event::Event &event);

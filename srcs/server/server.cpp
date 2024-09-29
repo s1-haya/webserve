@@ -157,8 +157,7 @@ void Server::HandleNewConnection(int server_fd) {
 
 void Server::HandleExistingConnection(const event::Event &event) {
 	if (event.type & event::EVENT_ERROR || event.type & event::EVENT_HANGUP) {
-		// todo: pipe_fdだったらどうするか？
-		Disconnect(event.fd);
+		HandleErrorEvent(event.fd);
 		return;
 	}
 	if (event.type & event::EVENT_READ) {
@@ -184,6 +183,14 @@ bool Server::IsMessageExist(int fd) const {
 	}
 	// disconnected client_fd/pipe_fd
 	return false;
+}
+
+void Server::HandleErrorEvent(int fd) {
+	if (!IsMessageExist(fd)) {
+		return;
+	}
+	const int client_fd = IsCgi(fd) ? cgi_manager_.GetClientFd(fd) : fd;
+	Disconnect(client_fd);
 }
 
 void Server::HandleReadEvent(const event::Event &event) {
@@ -341,6 +348,9 @@ void Server::KeepConnection(int client_fd) {
 
 // delete from event, message, context
 void Server::Disconnect(int client_fd) {
+	if (cgi_manager_.IsCgiExist(client_fd)) {
+		cgi_manager_.DeleteCgi(client_fd);
+	}
 	// todo: client_save_dataがない場合に呼ばれても大丈夫な作りになってるか確認
 	// HttpResult is not used.
 	http_.GetErrorResponse(GetClientInfos(client_fd), http::INTERNAL_ERROR);
@@ -545,7 +555,6 @@ void Server::SendCgiRequest(int write_fd) {
 		utils::Debug(
 			"cgi", "Failed to send the request to the child process through pipe_fd", write_fd
 		);
-		cgi_manager_.DeleteCgi(client_fd);
 		// todo: close()だけしない？
 		Disconnect(client_fd);
 		return;
@@ -574,6 +583,7 @@ void Server::HandleCgiReadResult(int read_fd, const Read::ReadResult &read_resul
 		return;
 	}
 	event_monitor_.Delete(read_fd);
+	// Explicitly delete from cgi_manager
 	cgi_manager_.DeleteCgi(client_fd);
 	GetHttpResponseFromCgiResponse(client_fd, cgi_response_result.GetValue());
 }
