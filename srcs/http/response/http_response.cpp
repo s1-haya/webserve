@@ -1,4 +1,5 @@
 #include "http_response.hpp"
+#include "cgi_parse.hpp"
 #include "client_infos.hpp"
 #include "http_exception.hpp"
 #include "http_message.hpp"
@@ -22,20 +23,23 @@ std::string GetExtension(const std::string &path) {
 namespace http {
 
 std::string HttpResponse::Run(
-	const ClientInfos                   &client_info,
 	const server::VirtualServerAddrList &server_info,
-	const HttpRequestResult             &request_info
+	const HttpRequestResult             &request_info,
+	CgiResult                           &cgi_result
 ) {
-	HttpResponseFormat response = CreateHttpResponseFormat(client_info, server_info, request_info);
+	HttpResponseFormat response = CreateHttpResponseFormat(server_info, request_info, cgi_result);
+	if (cgi_result.is_cgi) {
+		return "";
+	}
 	return CreateHttpResponse(response);
 }
 
 // todo: HttpResponseFormat HttpResponse::CreateHttpResponseFormat(const HttpRequestResult
 // &request_info) 作成
 HttpResponseFormat HttpResponse::CreateHttpResponseFormat(
-	const ClientInfos                   &client_info,
 	const server::VirtualServerAddrList &server_info,
-	const HttpRequestResult             &request_info
+	const HttpRequestResult             &request_info,
+	CgiResult                           &cgi_result
 ) {
 	StatusCode   status_code(OK);
 	HeaderFields response_header_fields = InitResponseHeaderFields(request_info);
@@ -50,16 +54,20 @@ HttpResponseFormat HttpResponse::CreateHttpResponseFormat(
 				server_info_result.cgi_extension,
 				server_info_result.path,
 				request_info.request.request_line.method,
-				server_info_result.allowed_methods,
-				server_info_result.upload_directory
+				server_info_result.allowed_methods
 			)) {
-			// todo: cgi実行
-			// cgi::Run()
-			// -> Internal　Server Errorを投げる可能性あり
-			// status_code = CgiToServerHandler(header_fields, response_body_message);
-			(void)client_info;
-			(void)server_info_result;
-			(void)status_code;
+			// これはパースした結果
+			utils::Result<cgi::CgiRequest> cgi_parse_result = CgiParse::Parse(
+				request_info.request,
+				server_info_result.path,
+				server_info_result.cgi_extension,
+				"8080" // tmp: server_info_resultにポートを追加する
+			);
+			if (!cgi_parse_result.IsOk()) { // parserが直でthrowするように変更か
+				throw HttpException("CGI Parse Error", StatusCode(BAD_REQUEST));
+			}
+			cgi_result.is_cgi      = true;
+			cgi_result.cgi_request = cgi_parse_result.GetValue();
 		} else {
 			status_code = Method::Handler(
 				server_info_result.path,
@@ -144,18 +152,14 @@ bool HttpResponse::IsCgi(
 	const std::string          &cgi_extension,
 	const std::string          &path,
 	const std::string          &method,
-	const Method::AllowMethods &allowed_methods,
-	const std::string          &upload_directory
+	const Method::AllowMethods &allowed_methods
 ) {
-	// todo:
 	// cgi_extensionがあるかどうか
 	if (cgi_extension.empty()) {
 		return false;
 	}
-	// upload_directory内にpathが存在するかどうか
-	// -> pathがaliasで設定される場合どうなるんだろう。
-	(void)upload_directory;
 	// pathがcgi_extensionで設定された拡張子かどうか
+	// falseの場合はpathに普通のリクエストとして送られる
 	if (cgi_extension != GetExtension(path)) {
 		return false;
 	}

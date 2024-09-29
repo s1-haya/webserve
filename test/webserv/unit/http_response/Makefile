@@ -13,9 +13,11 @@ WS_SRCS_DIR		:=	../../../../srcs
 WS_EXCEPTION_DIR:=	$(WS_SRCS_DIR)/exception
 WS_UTILS_DIR	:=	$(WS_SRCS_DIR)/utils
 WS_HTTP_DIR				:=	$(WS_SRCS_DIR)/http
+WS_CGI_DIR				:=	$(WS_SRCS_DIR)/cgi
 WS_HTTP_REQUEST_DIR	:=	$(WS_HTTP_DIR)/request
 WS_HTTP_PARSE_DIR	:=	$(WS_HTTP_DIR)/request/parse
 WS_HTTP_RESPONSE_DIR	:=	$(WS_HTTP_DIR)/response
+WS_HTTP_CGI_PARSE_DIR	:=	$(WS_HTTP_RESPONSE_DIR)/cgi_parse
 WS_HTTP_SERVER_INFO_CHECK_DIR	:=	$(WS_HTTP_RESPONSE_DIR)/http_serverinfo_check
 WS_VIRTUAL_SERVER_DIR			:=	$(WS_SRCS_DIR)/server/virtual_server
 
@@ -26,10 +28,12 @@ SRCS			+=	$(WS_EXCEPTION_DIR)/system_exception.cpp \
 					$(WS_HTTP_DIR)/http_message.cpp \
 					$(WS_HTTP_DIR)/status_code.cpp \
 					$(WS_HTTP_DIR)/http_exception.cpp \
+					$(WS_CGI_DIR)/cgi_request.cpp \
 					$(WS_HTTP_RESPONSE_DIR)/stat.cpp \
 					$(WS_HTTP_RESPONSE_DIR)/http_response.cpp \
 					$(WS_HTTP_RESPONSE_DIR)/http_method.cpp \
 					$(WS_HTTP_SERVER_INFO_CHECK_DIR)/http_serverinfo_check.cpp \
+					$(WS_HTTP_CGI_PARSE)/cgi_parse.cpp \
 					$(WS_VIRTUAL_SERVER_DIR)/virtual_server.cpp
 
 # 3. Add unit test files
@@ -39,10 +43,12 @@ SRCS	+=	test_http_response.cpp
 SRCS_DIR	:=	$(WS_EXCEPTION_DIR) \
 				$(WS_UTILS_DIR) \
 				$(WS_HTTP_DIR) \
+				$(WS_CGI_DIR) \
 				$(WS_HTTP_REQUEST_DIR) \
 				$(WS_HTTP_PARSE_DIR) \
 				$(WS_HTTP_RESPONSE_DIR) \
 				$(WS_HTTP_SERVER_INFO_CHECK_DIR) \
+				$(WS_HTTP_CGI_PARSE_DIR) \
 				$(WS_VIRTUAL_SERVER_DIR)
 
 #--------------------------------------------

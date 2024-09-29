@@ -45,7 +45,7 @@ cgi::MetaMap CgiParse::CreateRequestMetaVariables(
 	request_meta_variables[cgi::PATH_TRANSLATED] =
 		TranslateToHtmlPath(request_meta_variables["PATH_INFO"]);
 	request_meta_variables[cgi::QUERY_STRING]    = "";
-	request_meta_variables[cgi::REMOTE_ADDR]     = ""; // 追加する？
+	request_meta_variables[cgi::REMOTE_ADDR]     = "";
 	request_meta_variables[cgi::REMOTE_HOST]     = "";
 	request_meta_variables[cgi::REMOTE_IDENT]    = "";
 	request_meta_variables[cgi::REMOTE_USER]     = "";
