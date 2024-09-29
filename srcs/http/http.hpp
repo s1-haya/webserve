@@ -19,7 +19,7 @@ class Http : public IHttp {
 	HttpResult
 	Run(const ClientInfos &client_info, const server::VirtualServerAddrList &server_info);
 	HttpResult GetErrorResponse(const ClientInfos &client_info, ErrorState state);
-	void       SetCgiResponse(int client_fd, const cgi::CgiResponse &cgi_response);
+	HttpResult GetResponseFromCgi(int client_fd, const cgi::CgiResponse &cgi_response);
 
   private:
 	Http(const Http &other);

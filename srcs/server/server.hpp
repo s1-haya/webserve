@@ -9,7 +9,6 @@
 #include "http.hpp"
 #include "http_result.hpp"
 #include "message_manager.hpp"
-#include "mock_http.hpp"
 #include "read.hpp"
 #include <list>
 #include <string>
@@ -24,6 +23,7 @@ class Server {
 	typedef std::set<std::string>                   IpSet;
 	typedef std::map<unsigned int, IpSet>           PortIpMap;
 	typedef utils::Result<ClientInfo>               AcceptResult;
+	typedef utils::Result<cgi::CgiResponse>         CgiResponseResult;
 
 	explicit Server(const ConfigServers &config_servers);
 	~Server();
@@ -63,7 +63,7 @@ class Server {
 	void SetNonBlockingMode(int sock_fd);
 	// wrapper for epoll
 	void AddEventRead(int sock_fd);
-	void ReplaceEvent(int client_fd, event::Type type);
+	void ReplaceEvent(int client_fd, uint32_t type);
 	void AppendEventWrite(const event::Event &event);
 	// wrapper for connection
 	AcceptResult Accept(int server_fd);
@@ -71,12 +71,16 @@ class Server {
 	http::ClientInfos     GetClientInfos(int client_fd) const;
 	VirtualServerAddrList GetVirtualServerList(int client_fd) const;
 	// for Cgi
-	bool IsCgi(int fd) const;
-	void HandleCgi(int client_fd, const http::CgiResult &cgi_result);
-	void AddEventForCgi(int client_fd);
-	void SendCgiRequest(int pipe_fd);
-	void HandleCgiReadResult(int pipe_fd, const Read::ReadResult &read_result);
-	void SetCgiResponseToHttp(int pipe_fd, const std::string &read_buf);
+	bool              IsCgi(int fd) const;
+	void              HandleCgi(int client_fd, const http::CgiResult &cgi_result);
+	void              AddEventForCgi(int client_fd);
+	void              SendCgiRequest(int pipe_fd);
+	void              HandleCgiReadResult(int pipe_fd, const Read::ReadResult &read_result);
+	CgiResponseResult AddAndGetCgiResponse(int pipe_fd, const std::string &read_buf);
+	void GetHttpResponseFromCgiResponse(int pipe_fd, const cgi::CgiResponse &cgi_response);
+	void UpdateEventInCgiResponseComplete(
+		const message::ConnectionState connection_state, int client_fd
+	);
 
 	// const
 	static const int    SYSTEM_ERROR = -1;

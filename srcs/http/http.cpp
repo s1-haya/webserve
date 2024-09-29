@@ -3,7 +3,6 @@
 #include "http_message.hpp"
 #include "http_result.hpp"
 #include "http_storage.hpp"
-#include "server_infos.hpp"
 #include "status_code.hpp"
 #include <iostream>
 
@@ -28,9 +27,10 @@ Http::Run(const ClientInfos &client_info, const server::VirtualServerAddrList &s
 }
 
 // todo
-void Http::SetCgiResponse(int client_fd, const cgi::CgiResponse &cgi_response) {
+HttpResult Http::GetResponseFromCgi(int client_fd, const cgi::CgiResponse &cgi_response) {
 	(void)client_fd;
 	(void)cgi_response;
+	return HttpResult();
 }
 
 utils::Result<void> Http::ParseHttpRequestFormat(int client_fd, const std::string &read_buf) {
