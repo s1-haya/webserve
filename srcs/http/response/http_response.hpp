@@ -48,9 +48,8 @@ class HttpResponse {
 	static std::string CreateErrorResponse(const StatusCode &status_code);
 	static bool        IsConnectionKeep(const HeaderFields &request_header_fields);
 	static std::string CreateDefaultBodyMessage(const StatusCode &status_code);
-	static std::string GetResponseFromCgi(
-		int client_fd, const cgi::CgiResponse &cgi_response, const HttpRequestResult &request_info
-	);
+	static std::string
+	GetResponseFromCgi(const cgi::CgiResponse &cgi_response, const HttpRequestResult &request_info);
 
   private:
 	HttpResponse();
