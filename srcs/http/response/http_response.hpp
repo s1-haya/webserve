@@ -60,6 +60,9 @@ class HttpResponse {
 				const std::string          &method,
 				const Method::AllowMethods &allowed_methods
 			);
+	static HttpResponseFormat HandleRedirect(
+		HeaderFields &response_header_fields, const CheckServerInfoResult &server_info_result
+	);
 };
 
 } // namespace http

@@ -47,9 +47,9 @@ HttpResponseFormat HttpResponse::CreateHttpResponseFormat(
 	try {
 		const CheckServerInfoResult &server_info_result =
 			HttpServerInfoCheck::Check(server_info, request_info.request);
-		// todo: if redirect
-		// if (server_info_result.redirect.IsOk()) {
-		// 	result = RedirectHandler();
+		if (server_info_result.redirect.IsOk()) {
+			HandleRedirect(response_header_fields, server_info_result);
+		}
 		if (IsCgi(
 				server_info_result.cgi_extension,
 				server_info_result.path,
@@ -168,6 +168,24 @@ bool HttpResponse::IsCgi(
 		return false;
 	}
 	return true;
+}
+
+HttpResponseFormat HttpResponse::HandleRedirect(
+	HeaderFields &response_header_fields, const CheckServerInfoResult &server_info_result
+) {
+	// response_header_fields[LOCATION] = server_info_result.redirect.GetValue().second;
+	// httpがない場合は現在のサーバーに送り、httpがある場合はそのまま
+	response_header_fields[LOCATION] = "http://localhost:8080/";
+	// サーバーで用意しているステータス以外を指定した場合はbodyやphraseを返さない
+	if (server_info_result.redirect.GetValue().first == MOVED_PERMANENTLY) {
+		throw HttpException("Moved Permanently", StatusCode(MOVED_PERMANENTLY));
+	} else {
+		const std::string redirect_status_code =
+			utils::ToString(server_info_result.redirect.GetValue().first);
+		return HttpResponseFormat(
+			StatusLine(HTTP_VERSION, redirect_status_code, ""), response_header_fields, ""
+		);
+	}
 }
 
 std::string HttpResponse::CreateErrorResponse(const StatusCode &status_code) {
