@@ -44,6 +44,7 @@ class Server {
 	void      HandleEvent(const event::Event &event);
 	void      HandleNewConnection(int server_fd);
 	void      HandleExistingConnection(const event::Event &event);
+	bool      IsMessageExist(int fd) const;
 	void      HandleReadEvent(const event::Event &event);
 	void      HandleHttpReadResult(const event::Event &event, const Read::ReadResult &read_result);
 	bool      IsHttpRequestBufExist(int fd) const;
