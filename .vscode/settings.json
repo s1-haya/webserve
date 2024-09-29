@@ -9,10 +9,7 @@
     },
     "isort.args":["--profile", "black"],
 	"[html]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.formatOnSave": true
-	},
-	"files.associations": {
-		"iostream": "cpp"
+		"editor.defaultFormatter": "esbenp.prettier-vscode",
+		"editor.formatOnSave": true
 	}
 }
