@@ -179,7 +179,7 @@ HttpResponseFormat HttpResponse::HandleRedirect(
 	if (url.compare(0, prefix.size(), prefix) == 0) {
 		response_header_fields[LOCATION] = server_info_result.redirect.GetValue().second;
 	} else {
-		response_header_fields[LOCATION] = "http://" + server_info_result.host_name + url;
+		response_header_fields[LOCATION] = prefix + server_info_result.host_name + url;
 	}
 	utils::Debug("Redirect", response_header_fields[LOCATION]);
 	// サーバーで用意しているステータス以外を指定した場合はbodyやphraseを返さない
