@@ -25,14 +25,10 @@ int HandleResult(const T &result, const T &expected, int number) {
 	}
 }
 
+/* これらのテストではHttpStorageは未使用(Parseからの一連の流れは別のテストを作成) */
 int TestGetResponseFromCgi1() {
 	const std::string &response = "response";
 	cgi::CgiResponse   cgi_response(response, "text/html", true);
-
-	http::HttpRequestParsedData data;
-	data.request_result.request.header_fields[http::CONNECTION]     = http::KEEP_ALIVE;
-	data.request_result.request.header_fields[http::CONTENT_TYPE]   = "text/html";
-	data.request_result.request.header_fields[http::CONTENT_LENGTH] = "8";
 
 	HeaderFields expected_header_fields;
 	expected_header_fields[http::CONNECTION]     = http::KEEP_ALIVE;
@@ -45,6 +41,23 @@ int TestGetResponseFromCgi1() {
 	http::Http       http;
 	http::HttpResult result = http.GetResponseFromCgi(1, cgi_response);
 	return HandleResult(result.response, expected_response, 1);
+}
+
+int TestGetResponseFromCgi2() {
+	const std::string &response = "Hello World";
+	cgi::CgiResponse   cgi_response(response, "text/plain", true);
+
+	HeaderFields expected_header_fields;
+	expected_header_fields[http::CONNECTION]     = http::KEEP_ALIVE;
+	expected_header_fields[http::CONTENT_LENGTH] = utils::ToString(response.length());
+	expected_header_fields[http::CONTENT_TYPE]   = "text/plain"; // todo: http::TEXT_HTML;
+	expected_header_fields[http::SERVER]         = http::SERVER_VERSION;
+	const std::string &expected_response =
+		CreateHttpResponseFormat(EXPECTED_STATUS_LINE_OK, expected_header_fields, response);
+
+	http::Http       http;
+	http::HttpResult result = http.GetResponseFromCgi(2, cgi_response);
+	return HandleResult(result.response, expected_response, 2);
 }
 
 } // namespace test

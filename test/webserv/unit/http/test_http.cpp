@@ -110,5 +110,6 @@ int  main(void) {
     // test GetResponseFromCgi
     std::cout << "\n\033[44;37m[ Test GetResponseFromCgi ]\033[m" << std::endl;
     ret_code |= test::TestGetResponseFromCgi1();
+    ret_code |= test::TestGetResponseFromCgi2();
     return ret_code;
 }
