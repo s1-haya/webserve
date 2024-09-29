@@ -349,6 +349,7 @@ void Server::KeepConnection(int client_fd) {
 // delete from event, message, context
 void Server::Disconnect(int client_fd) {
 	if (cgi_manager_.IsCgiExist(client_fd)) {
+		// Call Cgi's destructor -> close pipe_fd -> automatically deleted from epoll
 		cgi_manager_.DeleteCgi(client_fd);
 	}
 	// todo: client_save_dataがない場合に呼ばれても大丈夫な作りになってるか確認
@@ -562,6 +563,7 @@ void Server::SendCgiRequest(int write_fd) {
 	const std::string &new_request_str = send_result.GetValue();
 	cgi_manager_.ReplaceNewRequest(client_fd, new_request_str);
 	if (new_request_str.empty()) {
+		// Explicitly delete from epoll
 		event_monitor_.Delete(write_fd);
 	}
 }
@@ -582,7 +584,6 @@ void Server::HandleCgiReadResult(int read_fd, const Read::ReadResult &read_resul
 	if (!cgi_response_result.IsOk()) {
 		return;
 	}
-	event_monitor_.Delete(read_fd);
 	// Explicitly delete from cgi_manager
 	cgi_manager_.DeleteCgi(client_fd);
 	GetHttpResponseFromCgiResponse(client_fd, cgi_response_result.GetValue());
