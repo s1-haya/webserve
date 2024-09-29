@@ -33,7 +33,8 @@ HttpResult Http::GetResponseFromCgi(int client_fd, const cgi::CgiResponse &cgi_r
 		HttpResponse::IsConnectionKeep(data.request_result.request.header_fields);
 	result.is_response_complete = true;
 	result.request_buf          = data.current_buf;
-	result.response             = ""; // todo
+	result.response =
+		HttpResponse::GetResponseFromCgi(client_fd, cgi_response, data.request_result);
 	storage_.DeleteClientSaveData(client_fd);
 	return result;
 }
