@@ -39,7 +39,6 @@ const VirtualServer::ServerNameList &VirtualServer::GetServerNameList() const {
 	return server_names_;
 }
 
-// todo: not used yet
 const VirtualServer::LocationList &VirtualServer::GetLocationList() const {
 	return locations_;
 }
