@@ -292,7 +292,6 @@ void Server::SendHttpResponse(int client_fd) {
 		// Even if sending fails, continue the server
 		// e.g., in case of a SIGPIPE(EPIPE) when the client disconnects
 		utils::Debug("server", "failed to send response to client", client_fd);
-		// todo: close()だけしない？
 		Disconnect(client_fd);
 		return;
 	}
@@ -556,7 +555,6 @@ void Server::SendCgiRequest(int write_fd) {
 		utils::Debug(
 			"cgi", "Failed to send the request to the child process through pipe_fd", write_fd
 		);
-		// todo: close()だけしない？
 		Disconnect(client_fd);
 		return;
 	}
