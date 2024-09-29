@@ -38,7 +38,8 @@ class Connection {
 	AddrInfo         *GetAddrInfoList(const HostPortPair &host_port) const;
 	BindResult        TryBind(AddrInfo *addrinfo) const;
 	ListenResult      Listen(int server_fd);
-	static IpPortPair GetListenIpPort(int client_fd);
+	static IpPortPair GetIpPort(struct sockaddr_storage &sock_addr);
+	static IpPortPair GetListenServerIpPort(int client_fd);
 	// const
 	static const int SYSTEM_ERROR   = -1;
 	static const int LISTEN_BACKLOG = 512;
