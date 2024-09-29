@@ -207,7 +207,9 @@ std::string HttpResponse::CreateErrorResponse(const StatusCode &status_code) {
 	return CreateHttpResponse(response);
 }
 
-std::string HttpResponse::GetResponseFromCgi(int client_fd, const cgi::CgiResponse &cgi_response) {
+std::string HttpResponse::GetResponseFromCgi(
+	int client_fd, const cgi::CgiResponse &cgi_response, const HttpRequestResult &request_info
+) {
 	StatusCode  status_code(OK);
 	std::string response_body_message = cgi_response.response;
 
@@ -215,7 +217,11 @@ std::string HttpResponse::GetResponseFromCgi(int client_fd, const cgi::CgiRespon
 	response_header_fields[SERVER]         = SERVER_VERSION;
 	response_header_fields[CONTENT_TYPE]   = cgi_response.content_type;
 	response_header_fields[CONTENT_LENGTH] = utils::ToString(response_body_message.length());
-	// keep-alive or close
+	if (IsConnectionKeep(request_info.request.header_fields)) {
+		response_header_fields[CONNECTION] = KEEP_ALIVE;
+	} else {
+		response_header_fields[CONNECTION] = CLOSE;
+	} // InitResponseHeaderFields が完成したらそれを使う
 
 	HttpResponseFormat response_format(
 		StatusLine(HTTP_VERSION, status_code.GetStatusCode(), status_code.GetReasonPhrase()),
