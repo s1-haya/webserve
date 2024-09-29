@@ -26,11 +26,16 @@ Http::Run(const ClientInfos &client_info, const server::VirtualServerAddrList &s
 	return result;
 }
 
-// todo
 HttpResult Http::GetResponseFromCgi(int client_fd, const cgi::CgiResponse &cgi_response) {
-	(void)client_fd;
-	(void)cgi_response;
-	return HttpResult();
+	HttpResult            result;
+	HttpRequestParsedData data = storage_.GetClientSaveData(client_fd);
+	result.is_connection_keep =
+		HttpResponse::IsConnectionKeep(data.request_result.request.header_fields);
+	result.is_response_complete = true;
+	result.request_buf          = data.current_buf;
+	result.response             = ""; // todo
+	storage_.DeleteClientSaveData(client_fd);
+	return result;
 }
 
 utils::Result<void> Http::ParseHttpRequestFormat(int client_fd, const std::string &read_buf) {
