@@ -517,14 +517,14 @@ void Server::AddEventForCgi(int client_fd) {
 	}
 }
 
-void Server::SendCgiRequest(int pipe_fd) {
-	const int          client_fd   = cgi_manager_.GetClientFd(pipe_fd);
+void Server::SendCgiRequest(int write_fd) {
+	const int          client_fd   = cgi_manager_.GetClientFd(write_fd);
 	const std::string &request_str = cgi_manager_.GetRequest(client_fd);
 
-	const Send::SendResult send_result = Send::SendStr(pipe_fd, request_str);
+	const Send::SendResult send_result = Send::SendStr(write_fd, request_str);
 	if (!send_result.IsOk()) {
 		utils::Debug(
-			"cgi", "Failed to send the request to the child process through pipe_fd", pipe_fd
+			"cgi", "Failed to send the request to the child process through pipe_fd", write_fd
 		);
 		cgi_manager_.DeleteCgi(client_fd);
 		// todo: close()だけしない？
@@ -534,31 +534,31 @@ void Server::SendCgiRequest(int pipe_fd) {
 	const std::string &new_request_str = send_result.GetValue();
 	cgi_manager_.ReplaceNewRequest(client_fd, new_request_str);
 	if (new_request_str.empty()) {
-		event_monitor_.Delete(pipe_fd);
+		event_monitor_.Delete(write_fd);
 	}
 }
 
-void Server::HandleCgiReadResult(int pipe_fd, const Read::ReadResult &read_result) {
-	const int client_fd = cgi_manager_.GetClientFd(pipe_fd);
+void Server::HandleCgiReadResult(int read_fd, const Read::ReadResult &read_result) {
+	const int client_fd = cgi_manager_.GetClientFd(read_fd);
 
 	if (!read_result.IsOk()) {
 		utils::Debug(
-			"cgi", "Failed to read the response from the child process through pipe_fd", pipe_fd
+			"cgi", "Failed to read the response from the child process through pipe_fd", read_fd
 		);
 		cgi_manager_.DeleteCgi(client_fd);
 		SetInternalServerError(client_fd);
 		return;
 	}
 	const CgiResponseResult cgi_response_result =
-		AddAndGetCgiResponse(pipe_fd, read_result.GetValue().read_buf);
+		AddAndGetCgiResponse(read_fd, read_result.GetValue().read_buf);
 	if (!cgi_response_result.IsOk()) {
 		return;
 	}
-	GetHttpResponseFromCgiResponse(pipe_fd, cgi_response_result.GetValue());
+	GetHttpResponseFromCgiResponse(read_fd, cgi_response_result.GetValue());
 }
 
-Server::CgiResponseResult Server::AddAndGetCgiResponse(int pipe_fd, const std::string &read_buf) {
-	const int client_fd = cgi_manager_.GetClientFd(pipe_fd);
+Server::CgiResponseResult Server::AddAndGetCgiResponse(int read_fd, const std::string &read_buf) {
+	const int client_fd = cgi_manager_.GetClientFd(read_fd);
 
 	CgiResponseResult      cgi_response_result;
 	const cgi::CgiResponse cgi_response = cgi_manager_.AddAndGetResponse(client_fd, read_buf);
@@ -568,14 +568,14 @@ Server::CgiResponseResult Server::AddAndGetCgiResponse(int pipe_fd, const std::s
 	}
 	cgi_response_result.Set(true, cgi_response);
 
-	event_monitor_.Delete(pipe_fd);
+	event_monitor_.Delete(read_fd);
 	cgi_manager_.DeleteCgi(client_fd);
-	utils::Debug("cgi", "Read the entire response from the child process through pipe_fd", pipe_fd);
+	utils::Debug("cgi", "Read the entire response from the child process through pipe_fd", read_fd);
 	return cgi_response_result;
 }
 
-void Server::GetHttpResponseFromCgiResponse(int pipe_fd, const cgi::CgiResponse &cgi_response) {
-	const int client_fd = cgi_manager_.GetClientFd(pipe_fd);
+void Server::GetHttpResponseFromCgiResponse(int read_fd, const cgi::CgiResponse &cgi_response) {
+	const int client_fd = cgi_manager_.GetClientFd(read_fd);
 
 	const http::HttpResult http_result = http_.GetResponseFromCgi(client_fd, cgi_response);
 	message_manager_.SetNewRequestBuf(client_fd, http_result.request_buf);

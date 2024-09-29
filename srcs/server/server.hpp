@@ -74,10 +74,10 @@ class Server {
 	bool              IsCgi(int fd) const;
 	void              HandleCgi(int client_fd, const http::CgiResult &cgi_result);
 	void              AddEventForCgi(int client_fd);
-	void              SendCgiRequest(int pipe_fd);
-	void              HandleCgiReadResult(int pipe_fd, const Read::ReadResult &read_result);
-	CgiResponseResult AddAndGetCgiResponse(int pipe_fd, const std::string &read_buf);
-	void GetHttpResponseFromCgiResponse(int pipe_fd, const cgi::CgiResponse &cgi_response);
+	void              SendCgiRequest(int write_fd);
+	void              HandleCgiReadResult(int read_fd, const Read::ReadResult &read_result);
+	CgiResponseResult AddAndGetCgiResponse(int read_fd, const std::string &read_buf);
+	void GetHttpResponseFromCgiResponse(int read_fd, const cgi::CgiResponse &cgi_response);
 	void UpdateEventInCgiResponseComplete(
 		const message::ConnectionState connection_state, int client_fd
 	);
