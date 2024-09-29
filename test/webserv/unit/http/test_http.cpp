@@ -1,5 +1,6 @@
 #include "test_case.hpp"
 #include <cstdlib>
+#include <iostream>
 
 /**
  * @brief Test Http class: HttpResultの返り値を確認するテスト。
@@ -102,7 +103,12 @@ int  main(void) {
     DeleteVirtualServerAddrList(server_infos);
 
     // test GetErrorResponse
+    std::cout << "\n\033[44;37m[ Test GetErrorResponse ]\033[m" << std::endl;
     ret_code |= test::TestRequestTimeoutResponse();
     ret_code |= test::TestInternalServerErrorResponse();
+
+    // test GetResponseFromCgi
+    std::cout << "\n\033[44;37m[ Test GetResponseFromCgi ]\033[m" << std::endl;
+    ret_code |= test::TestGetResponseFromCgi1();
     return ret_code;
 }
