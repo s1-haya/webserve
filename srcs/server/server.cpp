@@ -333,6 +333,11 @@ void Server::HandleTimeoutMessages() {
 
 // internal server error用のresponseをセットしてevent監視をWRITEに変更
 void Server::SetInternalServerError(int client_fd) {
+	if (cgi_manager_.IsCgiExist(client_fd)) {
+		// Call Cgi's destructor -> close pipe_fd -> automatically deleted from epoll
+		cgi_manager_.DeleteCgi(client_fd);
+	}
+
 	const http::HttpResult http_result =
 		http_.GetErrorResponse(GetClientInfos(client_fd), http::INTERNAL_ERROR);
 	message_manager_.AddPrimaryResponse(client_fd, message::CLOSE, http_result.response);
@@ -528,7 +533,6 @@ void Server::HandleCgi(int client_fd, const http::CgiResult &cgi_result) {
 		AddEventForCgi(client_fd);
 	} catch (const SystemException &e) {
 		utils::PrintError(e.what());
-		cgi_manager_.DeleteCgi(client_fd);
 		SetInternalServerError(client_fd);
 	}
 }
@@ -573,7 +577,6 @@ void Server::HandleCgiReadResult(int read_fd, const Read::ReadResult &read_resul
 		utils::Debug(
 			"cgi", "Failed to read the response from the child process through pipe_fd", read_fd
 		);
-		cgi_manager_.DeleteCgi(client_fd);
 		SetInternalServerError(client_fd);
 		return;
 	}
