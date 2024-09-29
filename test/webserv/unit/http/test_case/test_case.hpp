@@ -44,6 +44,9 @@ int TestGetNotImplemented1NotExistMethod(const server::VirtualServerAddrList &se
 int TestRequestTimeoutResponse();
 int TestInternalServerErrorResponse();
 
+// GetResponseFromCgi
+int TestGetResponseFromCgi1();
+
 } // namespace test
 
 #endif
