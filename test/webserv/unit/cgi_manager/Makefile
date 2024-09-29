@@ -16,11 +16,8 @@ SRCS				+=	$(WS_UTILS_DIR)/color.cpp \
 WS_EXCEPTION_DIR	:=	$(WS_SRCS_DIR)/exception
 SRCS				+=	$(WS_EXCEPTION_DIR)/system_exception.cpp
 
-# todo: remove (http_excetion.cpp, status_code.cpp)
 WS_HTTP_DIR			:=	$(WS_SRCS_DIR)/http
-SRCS				+=	$(WS_HTTP_DIR)/http_exception.cpp \
-						$(WS_HTTP_DIR)/http_message.cpp \
-						$(WS_HTTP_DIR)/status_code.cpp
+SRCS				+=	$(WS_HTTP_DIR)/http_message.cpp
 
 WS_CGI_DIR			:=	$(WS_SRCS_DIR)/cgi
 SRCS				+=	$(WS_CGI_DIR)/cgi.cpp \

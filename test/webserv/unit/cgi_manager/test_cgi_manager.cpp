@@ -1,7 +1,5 @@
 #include "cgi_manager.hpp"
-#include "http_exception.hpp" // todo: remove
 #include "http_message.hpp"
-#include "status_code.hpp" // todo: remove
 #include "utils.hpp"
 #include <cstdlib>
 #include <iostream>
