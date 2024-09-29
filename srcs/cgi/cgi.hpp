@@ -2,7 +2,6 @@
 #define CGI_HPP_
 
 #include "cgi_request.hpp"
-#include <map>
 #include <string>
 
 namespace cgi {

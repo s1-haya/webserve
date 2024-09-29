@@ -20,8 +20,6 @@ SRCS				+=	$(WS_CGI_DIR)/cgi.cpp \
 						$(WS_CGI_DIR)/cgi_request.cpp \
 						$(WS_HTTP_CGI_PARSE_DIR)/cgi_parse.cpp \
 						$(WS_HTTP_DIR)/http_message.cpp \
-						$(WS_HTTP_DIR)/http_exception.cpp \
-						$(WS_HTTP_DIR)/status_code.cpp \
 						$(WS_UTILS_DIR)/color.cpp \
 						$(WS_EXCEPTION_DIR)/system_exception.cpp
 
