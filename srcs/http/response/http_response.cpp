@@ -184,9 +184,8 @@ std::string HttpResponse::CreateErrorResponse(const StatusCode &status_code) {
 }
 
 std::string HttpResponse::GetResponseFromCgi(
-	int client_fd, const cgi::CgiResponse &cgi_response, const HttpRequestResult &request_info
+	const cgi::CgiResponse &cgi_response, const HttpRequestResult &request_info
 ) {
-	(void)client_fd;
 	StatusCode  status_code(OK);
 	std::string response_body_message = cgi_response.response;
 
