@@ -534,7 +534,7 @@ void Server::SendCgiRequest(int pipe_fd) {
 	const std::string &new_request_str = send_result.GetValue();
 	cgi_manager_.ReplaceNewRequest(client_fd, new_request_str);
 	if (new_request_str.empty()) {
-		ReplaceEvent(pipe_fd, event::EVENT_READ);
+		event_monitor_.Delete(pipe_fd);
 	}
 }
 
