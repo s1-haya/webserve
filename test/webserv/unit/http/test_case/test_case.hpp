@@ -46,6 +46,7 @@ int TestInternalServerErrorResponse();
 
 // GetResponseFromCgi
 int TestGetResponseFromCgi1();
+int TestGetResponseFromCgi2();
 
 } // namespace test
 
