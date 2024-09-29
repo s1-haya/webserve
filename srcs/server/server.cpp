@@ -157,6 +157,7 @@ void Server::HandleNewConnection(int server_fd) {
 
 void Server::HandleExistingConnection(const event::Event &event) {
 	if (event.type & event::EVENT_ERROR || event.type & event::EVENT_HANGUP) {
+		// todo: pipe_fdだったらどうするか？
 		Disconnect(event.fd);
 		return;
 	}
@@ -172,10 +173,27 @@ void Server::HandleExistingConnection(const event::Event &event) {
 	}
 }
 
-void Server::HandleReadEvent(const event::Event &event) {
-	const int              fd          = event.fd;
-	const Read::ReadResult read_result = Read::ReadStr(fd);
+bool Server::IsMessageExist(int fd) const {
+	// client_fd
+	if (message_manager_.IsMessageExist(fd)) {
+		return true;
+	}
+	// pipe_fd
+	if (cgi_manager_.IsCgiExist(fd)) {
+		return true;
+	}
+	// disconnected client_fd/pipe_fd
+	return false;
+}
 
+void Server::HandleReadEvent(const event::Event &event) {
+	const int fd = event.fd;
+	// Prevent ReadStr() if Disconnect() was called during EVENT_WRITE handling.
+	if (!IsMessageExist(fd)) {
+		return;
+	}
+
+	const Read::ReadResult read_result = Read::ReadStr(fd);
 	if (IsCgi(fd)) {
 		HandleCgiReadResult(fd, read_result);
 		return;
@@ -246,9 +264,10 @@ void Server::RunHttpAndCgi(const event::Event &event) {
 
 void Server::HandleWriteEvent(int fd) {
 	// Prevent SendStr() if Disconnect() was called during EVENT_READ handling.
-	if (!message_manager_.IsMessageExist(fd)) {
+	if (!IsMessageExist(fd)) {
 		return;
 	}
+
 	if (IsCgi(fd)) {
 		SendCgiRequest(fd);
 		return;
