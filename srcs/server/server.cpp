@@ -573,7 +573,9 @@ void Server::HandleCgiReadResult(int read_fd, const Read::ReadResult &read_resul
 	if (!cgi_response_result.IsOk()) {
 		return;
 	}
-	GetHttpResponseFromCgiResponse(read_fd, cgi_response_result.GetValue());
+	event_monitor_.Delete(read_fd);
+	cgi_manager_.DeleteCgi(client_fd);
+	GetHttpResponseFromCgiResponse(client_fd, cgi_response_result.GetValue());
 }
 
 Server::CgiResponseResult Server::AddAndGetCgiResponse(int read_fd, const std::string &read_buf) {
@@ -585,18 +587,14 @@ Server::CgiResponseResult Server::AddAndGetCgiResponse(int read_fd, const std::s
 		cgi_response_result.Set(false);
 		return cgi_response_result;
 	}
-	cgi_response_result.Set(true, cgi_response);
-
-	event_monitor_.Delete(read_fd);
-	cgi_manager_.DeleteCgi(client_fd);
 	utils::Debug("cgi", "Read the entire response from the child process through pipe_fd", read_fd);
+	cgi_response_result.Set(true, cgi_response);
 	return cgi_response_result;
 }
 
-void Server::GetHttpResponseFromCgiResponse(int read_fd, const cgi::CgiResponse &cgi_response) {
-	const int client_fd = cgi_manager_.GetClientFd(read_fd);
-
+void Server::GetHttpResponseFromCgiResponse(int client_fd, const cgi::CgiResponse &cgi_response) {
 	const http::HttpResult http_result = http_.GetResponseFromCgi(client_fd, cgi_response);
+
 	message_manager_.SetNewRequestBuf(client_fd, http_result.request_buf);
 	if (!http_result.is_response_complete) {
 		throw std::logic_error("GetResponseFromCgi: incorrect HttpResult");
