@@ -182,4 +182,18 @@ std::string HttpResponse::CreateErrorResponse(const StatusCode &status_code) {
 	return CreateHttpResponse(response);
 }
 
+std::string HttpResponse::GetResponseFromCgi(int client_fd, const cgi::CgiResponse &cgi_response) {
+	StatusCode   status_code(OK);
+	HeaderFields response_header_fields;
+	std::string  response_body_message;
+
+	HttpResponseFormat response_format(
+		StatusLine(HTTP_VERSION, status_code.GetStatusCode(), status_code.GetReasonPhrase()),
+		response_header_fields,
+		response_body_message
+	);
+
+	return CreateHttpResponse(response_format);
+}
+
 } // namespace http
