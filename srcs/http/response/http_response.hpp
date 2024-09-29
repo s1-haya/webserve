@@ -10,6 +10,12 @@
 #include <map>
 #include <string>
 
+namespace cgi {
+
+struct CgiResponse;
+
+}
+
 namespace http {
 
 struct HttpRequestResult;
@@ -31,8 +37,6 @@ class Stat;
 //    GetTimeoutRequestBodyMessage();
 //    GetInternalServerErrorBodyMessage();
 // };
-
-#include "cgi.hpp"
 
 class HttpResponse {
   public:
