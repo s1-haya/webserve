@@ -29,6 +29,7 @@ class CgiManager {
 	const std::string &GetRequest(int client_fd) const;
 	cgi::CgiResponse   AddAndGetResponse(int client_fd, const std::string &read_buf);
 	void               ReplaceNewRequest(int client_fd, const std::string &new_request_str);
+	bool               IsCgiExist(int fd) const;
 
   private:
 	// Prohibit copy
