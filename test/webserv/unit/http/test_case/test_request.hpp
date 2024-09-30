@@ -57,6 +57,8 @@ static const std::string &GET_200_19_CGI_SCRIPT_IN_PYTHON =
 	LoadFileContent(REQUEST_GET + ROOT_2XX + "/200_19_cgi_script_in_py.txt");
 static const std::string &GET_200_20_CGI_SCRIPT_IN_SHELL =
 	LoadFileContent(REQUEST_GET + ROOT_2XX + "/200_20_cgi_script_in_sh.txt");
+static const std::string &GET_200_21_NO_CONNECTION =
+	LoadFileContent(REQUEST_GET + ROOT_2XX + "/200_21_no_connection.txt");
 
 static const std::string &ROOT_4XX = "/4xx";
 static const std::string &GET_400_1_ONLY_CRLF =

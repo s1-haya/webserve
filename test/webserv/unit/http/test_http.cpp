@@ -71,6 +71,7 @@ int  main(void) {
     // ret_code |= test::TestGetOk18CgiScriptInPerl(server_infos);
     // ret_code |= test::TestGetOk19CgiScriptInPython(server_infos);
     // ret_code |= test::TestGetOk20CgiScriptInShell(server_infos);
+    ret_code |= test::TestGetOk21NoConnection(server_infos);
 
     ret_code |= test::TestGetBadRequest1OnlyCrlf(server_infos);
     ret_code |= test::TestGetBadRequest2LowerMethod(server_infos);

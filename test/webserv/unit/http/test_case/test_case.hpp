@@ -34,6 +34,7 @@ int TestGetOk17NotExistHeaderField(const server::VirtualServerAddrList &server_i
 int TestGetOk18CgiScriptInPerl(const server::VirtualServerAddrList &server_infos);
 int TestGetOk19CgiScriptInPython(const server::VirtualServerAddrList &server_infos);
 int TestGetOk20CgiScriptInShell(const server::VirtualServerAddrList &server_infos);
+int TestGetOk21NoConnection(const server::VirtualServerAddrList &server_infos);
 
 // 4xx
 int TestGetBadRequest1OnlyCrlf(const server::VirtualServerAddrList &server_infos);
