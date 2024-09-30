@@ -95,6 +95,10 @@ static const std::string &GET_400_16_HEADER_FIELD_NAME_SPACE_COLON =
 	LoadFileContent(REQUEST_GET + ROOT_4XX + "/400_16_header_field_name_space_colon.txt");
 static const std::string &GET_400_17_SPACE_HEADER_FIELD_NAME =
 	LoadFileContent(REQUEST_GET + ROOT_4XX + "/400_17_space_header_field_name.txt");
+static const std::string &GET_400_18_NON_VCHR_HEADER_FIELD_NAME =
+	LoadFileContent(REQUEST_GET + ROOT_4XX + "/400_18_non_vchr_header_field_name.txt");
+static const std::string &GET_400_19_NON_VCHR_HEADER_FIELD_VALUE =
+	LoadFileContent(REQUEST_GET + ROOT_4XX + "/400_19_non_vchr_header_field_value.txt");
 
 static const std::string &GET_404_1_NOT_EXIST_PATH_CONNECTION_CLOSE =
 	LoadFileContent(REQUEST_GET + ROOT_4XX + "/404_01_not_exist_path.txt");

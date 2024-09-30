@@ -93,7 +93,9 @@ int  main(void) {
     ret_code |= test::TestGetBadRequest15SpaceInHeaderFieldName(server_infos);
     ret_code |= test::TestGetBadRequest16HeaderFieldNameSpaceColon(server_infos);
     ret_code |= test::TestGetBadRequest17SpaceHeaderFieldName(server_infos);
-    // <<<<
+    ret_code |= test::TestGetBadRequest18NonVchrHeaderFieldName(server_infos);
+    ret_code |= test::TestGetBadRequest19NonVchrHeaderFieldValue(server_infos);
+
     ret_code |= test::TestGetNotFound1NotExistFile(server_infos);
     ret_code |= test::TestGetMethodNotAllowed(server_infos);
     // todo: HttpResponse::CreateTimeoutResponse
