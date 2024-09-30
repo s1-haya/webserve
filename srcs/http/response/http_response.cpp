@@ -103,8 +103,6 @@ HttpResponseFormat HttpResponse::CreateHttpResponseFormat(
 		}
 	} catch (const HttpException &e) {
 		// ステータスコードが300番台以上の場合
-		// feature: header_fieldとerror_pageとの関連性がわかり次第変更あり
-		// 返り値: response 引数:error_page, status_code
 		// for debug
 		std::cerr << utils::color::GRAY << "Debug [" << e.what() << "]" << utils::color::RESET
 				  << std::endl;
