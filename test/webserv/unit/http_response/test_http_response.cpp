@@ -133,12 +133,18 @@ void DeleteAddrList(const server::VirtualServerAddrList &virtual_servers) {
 }
 
 std::string SetDefaultHeaderFields(
-	const std::string &connection, const std::string &length, const std::string &type
+	const std::string &connection,
+	const std::string &length,
+	const std::string &type,
+	const std::string &location = ""
 ) {
 	std::string header_fields;
 	header_fields += http::CONNECTION + ": " + connection + http::CRLF;
 	header_fields += http::CONTENT_LENGTH + ": " + length + http::CRLF;
 	header_fields += http::CONTENT_TYPE + ": " + type + http::CRLF;
+	if (!location.empty()) {
+		header_fields += http::LOCATION + ": " + location + http::CRLF;
+	}
 	header_fields += http::SERVER + ": " + http::SERVER_VERSION + http::CRLF;
 	return header_fields;
 }
@@ -187,6 +193,27 @@ int main(void) {
 	const std::string &expected2_response =
 		expected2_status_line + expected2_header_fields + http::CRLF + expected2_body_message;
 	ret_code |= HandleResult(response2, expected2_response);
+
+	// Redirectのテスト
+	request_info.request.request_line.method         = http::POST;
+	request_info.request.request_line.request_target = "/www/";
+	request_info.request.request_line.version        = http::HTTP_VERSION;
+	request_info.request.header_fields[http::HOST]   = "host1";
+	std::string response3 = http::HttpResponse::Run(server_info, request_info, cgi_result);
+
+	std::string expected3_status_line =
+		LoadFileContent("../../expected_response/default_status_line/301_redirect.txt");
+	std::string expected3_body_message =
+		LoadFileContent("../../expected_response/default_body_message/301_redirect.txt");
+	std::string expected3_header_fields = SetDefaultHeaderFields(
+		http::KEEP_ALIVE,
+		utils::ToString(expected3_body_message.length()),
+		http::TEXT_HTML,
+		"http://host1/"
+	);
+	const std::string &expected3_response =
+		expected3_status_line + expected3_header_fields + http::CRLF + expected3_body_message;
+	ret_code |= HandleResult(response3, expected3_response);
 
 	DeleteAddrList(server_info);
 	return ret_code;
