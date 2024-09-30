@@ -2,7 +2,8 @@ NAME			:=	a.out
 
 # 1. Set each directory name
 TEST_DIR		:=	method
-TEST_CASE_DIR		:=	test
+TEST_CASE_DIR		:=	root
+UPLOAD_DIR		:=	$(TEST_CASE_DIR)/upload
 
 LOG_DIR			:=	log
 LOG_FILE_NAME	:=	$(TEST_DIR).log
@@ -93,6 +94,7 @@ clean-test:
 	-$(RM) $(TEST_CASE_DIR)/no_authority_file
 	-@chmod 700 $(TEST_CASE_DIR)/no_authority_directory
 	-$(RM) -r $(TEST_CASE_DIR)/no_authority_directory
+	-$(RM) $(UPLOAD_DIR)/*
 
 .PHONY	: fclean
 fclean: clean
