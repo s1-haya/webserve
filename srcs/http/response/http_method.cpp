@@ -49,7 +49,8 @@ StatusCode Method::Handler(
 	std::string        &response_body_message,
 	HeaderFields       &response_header_fields,
 	const std::string  &index_file_path,
-	bool                autoindex_on
+	bool                autoindex_on,
+	const std::string  &upload_directory
 ) {
 	StatusCode status_code(OK);
 	if (!IsSupportedMethod(method)) {

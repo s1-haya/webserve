@@ -21,7 +21,8 @@ class Method {
 					 std::string        &response_body_message,
 					 HeaderFields       &response_header_fields,
 					 const std::string  &index_file_path,
-					 bool                autoindex_on
+					 bool                autoindex_on,
+					 const std::string  &upload_directory
 				 );
 	static bool IsSupportedMethod(const std::string &method);
 	static bool

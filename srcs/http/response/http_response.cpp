@@ -77,7 +77,8 @@ HttpResponseFormat HttpResponse::CreateHttpResponseFormat(
 				response_body_message,
 				response_header_fields,
 				server_info_result.index,
-				server_info_result.autoindex
+				server_info_result.autoindex,
+				server_info_result.upload_directory
 			);
 		}
 	} catch (const HttpException &e) {
