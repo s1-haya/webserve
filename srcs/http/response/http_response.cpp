@@ -64,7 +64,8 @@ HttpResponseFormat HttpResponse::CreateHttpResponseFormat(
 				request_info.request,
 				server_info_result.path,
 				server_info_result.cgi_extension,
-				utils::ToString(client_info.listen_server_port)
+				utils::ToString(client_info.listen_server_port),
+				client_info.ip
 			);
 			if (!cgi_parse_result.IsOk()) { // parserが直でthrowするように変更か
 				throw HttpException("CGI Parse Error", StatusCode(BAD_REQUEST));
