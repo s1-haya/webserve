@@ -29,14 +29,6 @@ static const std::string &GET_200_5_CONNECTION_CLOSE_AND_200_CONNECTION_CLOSE = 
 static const std::string &GET_200_6_CONNECTION_KEEP_AND_200_CONNECTION_CLOSE = LoadFileContent(
 	REQUEST_GET + ROOT_2XX + "/200_06_connection_keep_alive_and_200_connection_close.txt"
 );
-static const std::string &GET_200_7_DUPLICATE_CONNECTION_KEEP =
-	LoadFileContent(REQUEST_GET + ROOT_2XX + "/200_07_duplicate_connection_keep.txt");
-static const std::string &GET_200_8_DUPLICATE_CONNECTION_CLOSE =
-	LoadFileContent(REQUEST_GET + ROOT_2XX + "/200_08_duplicate_connection_close.txt");
-static const std::string &GET_200_9_CONNECTION_KEEP_AND_CLOSE =
-	LoadFileContent(REQUEST_GET + ROOT_2XX + "/200_09_connection_keep_alive_and_close.txt");
-static const std::string &GET_200_10_CONNECTION_CLOSE_AND_KEEP =
-	LoadFileContent(REQUEST_GET + ROOT_2XX + "/200_10_connection_close_and_keep_alive.txt");
 static const std::string &GET_200_11_UPPER_AND_LOWER_HEADER_FIELDS =
 	LoadFileContent(REQUEST_GET + ROOT_2XX + "/200_11_upper_and_lower_header_fields.txt");
 static const std::string &GET_200_12_HEADER_FIELD_VALUE_SPACE =
