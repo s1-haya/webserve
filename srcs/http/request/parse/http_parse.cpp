@@ -281,9 +281,6 @@ void HttpParse::CheckValidHeaderFieldName(
 			"Error: the name of Header field has a space.", StatusCode(BAD_REQUEST)
 		);
 	}
-	if (header_fields.find(header_field_name) != header_fields.end() && header_field_name == HOST) {
-		throw HttpException("Error: Host header fields already exists", StatusCode(BAD_REQUEST));
-	}
 }
 
 // status_line && header
