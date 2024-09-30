@@ -64,8 +64,13 @@ StatusCode Method::Handler(
 			path, response_body_message, response_header_fields, index_file_path, autoindex_on
 		);
 	} else if (method == POST) {
-		status_code =
-			PostHandler(path, request_body_message, response_body_message, response_header_fields);
+		status_code = PostHandler(
+			path,
+			request_body_message,
+			response_body_message,
+			response_header_fields,
+			upload_directory
+		);
 	} else if (method == DELETE) {
 		status_code = DeleteHandler(path, response_body_message, response_header_fields);
 	}
@@ -121,14 +126,23 @@ StatusCode Method::PostHandler(
 	const std::string &path,
 	const std::string &request_body_message,
 	std::string       &response_body_message,
-	HeaderFields      &response_header_fields
+	HeaderFields      &response_header_fields,
+	const std::string &upload_directory
 ) {
+	// ex. test.txt
+	const std::string file_name = path.substr(path.find_last_of('/') + 1);
+	// ex. srcs/http/response/http_serverinfo_check/../../../../root
+	const std::string root_path = path.substr(0, path.find("root/") + 4);
+	// ex. srcs/http/response/http_serverinfo_check/../../../../root/save/test.txt
+	const std::string upload_path = root_path + upload_directory + "/" + file_name;
+
+	std::cout << "upload_path: " << upload_path << std::endl;
 	if (!IsExistPath(path)) {
 		return FileCreationHandler(
-			path, request_body_message, response_body_message, response_header_fields
+			upload_path, request_body_message, response_body_message, response_header_fields
 		);
 	}
-	const Stat &info = TryStat(path);
+	const Stat &info = TryStat(upload_path);
 	StatusCode  status_code(NO_CONTENT);
 	if (info.IsDirectory()) {
 		throw HttpException("Error: Forbidden", StatusCode(FORBIDDEN));
@@ -140,7 +154,7 @@ StatusCode Method::PostHandler(
 		// ex) POST /save/test.txt HTTP/1.1
 		// Location: /save/test.txt;
 		status_code = FileCreationHandler(
-			path, request_body_message, response_body_message, response_header_fields
+			upload_path, request_body_message, response_body_message, response_header_fields
 		);
 	}
 	return status_code;

@@ -40,7 +40,8 @@ class Method {
 		const std::string &path,
 		const std::string &request_body_message,
 		std::string       &response_body_message,
-		HeaderFields      &response_header_fields
+		HeaderFields      &response_header_fields,
+		const std::string &upload_directory
 	);
 	static StatusCode DeleteHandler(
 		const std::string &path,
