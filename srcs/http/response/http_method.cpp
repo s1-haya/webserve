@@ -29,11 +29,6 @@ std::string FileToString(const std::ifstream &file) {
 
 std::string ReadFile(const std::string &file_path) {
 	std::ifstream file(file_path.c_str());
-	if (!file) {
-		// todo: default error page?
-		std::ifstream error_file("root/html/404.html");
-		return FileToString(error_file);
-	}
 	return FileToString(file);
 }
 

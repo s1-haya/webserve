@@ -5,6 +5,7 @@
 #include "http_exception.hpp"
 #include "http_message.hpp"
 #include "http_parse.hpp"
+#include <fstream>
 #include <iostream>
 #include <sstream>
 
@@ -17,6 +18,22 @@ std::string GetExtension(const std::string &path) {
 		return "";
 	}
 	return path.substr(pos + 1);
+}
+
+std::string GetCwd() {
+	const char            *file_path = __FILE__;
+	std::string            path(file_path);
+	std::string::size_type pos       = path.find_last_of("/\\");
+	std::string            directory = (pos != std::string::npos) ? path.substr(0, pos) : "";
+	return directory;
+}
+
+std::string ReadErrorFile(const std::string &file_path) {
+	const std::string root_path = GetCwd() + "/../../../root";
+	std::ifstream     file((root_path + file_path).c_str());
+	std::stringstream ss;
+	ss << file.rdbuf();
+	return ss.str();
 }
 
 } // namespace
@@ -45,9 +62,12 @@ HttpResponseFormat HttpResponse::CreateHttpResponseFormat(
 	StatusCode   status_code(OK);
 	HeaderFields response_header_fields = InitResponseHeaderFields(request_info);
 	std::string  response_body_message;
+	utils::Result< std::pair<unsigned int, std::string> > error_page;
+
 	try {
 		const CheckServerInfoResult &server_info_result =
 			HttpServerInfoCheck::Check(server_info, request_info.request);
+		error_page = server_info_result.error_page;
 		if (server_info_result.redirect.IsOk()) {
 			return HandleRedirect(response_header_fields, server_info_result);
 		}
@@ -85,17 +105,18 @@ HttpResponseFormat HttpResponse::CreateHttpResponseFormat(
 		// ステータスコードが300番台以上の場合
 		// feature: header_fieldとerror_pageとの関連性がわかり次第変更あり
 		// 返り値: response 引数:error_page, status_code
-		// todo: error_page status_code classに対応
-		// if (server_info.error_page.IsOk() &&
-		// 	status_code.GetEStatusCode() == server_info.error_page.GetValue().first) {
-		// 	response_message = ReadFile(server_info.error_page.GetValue().second);
-		// 	// check the path of error_page
-		// }
 		// for debug
 		std::cerr << utils::color::GRAY << "Debug [" << e.what() << "]" << utils::color::RESET
 				  << std::endl;
-		status_code                            = e.GetStatusCode();
-		response_body_message                  = CreateDefaultBodyMessage(status_code);
+
+		status_code = e.GetStatusCode();
+		if (error_page.IsOk() && status_code.GetEStatusCode() == error_page.GetValue().first &&
+			!ReadErrorFile(error_page.GetValue().second).empty()) {
+			utils::Debug("ErrorPage", error_page.GetValue().second);
+			response_body_message = ReadErrorFile(error_page.GetValue().second);
+		} else {
+			response_body_message = CreateDefaultBodyMessage(status_code);
+		}
 		response_header_fields[CONTENT_LENGTH] = utils::ToString(response_body_message.length());
 	}
 	return HttpResponseFormat(
