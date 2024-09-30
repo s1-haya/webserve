@@ -68,6 +68,16 @@ bool HasSpace(const std::string &str) {
 	return false;
 }
 
+// 各文字が印字可能文字(VCHR)かどうかをチェック
+bool IsVString(const std::string &str) {
+	for (std::string::const_iterator it = str.begin(); it != str.end(); ++it) {
+		if (!std::isprint(*it)) {
+			return false;
+		}
+	}
+	return true;
+}
+
 } // namespace
 
 void HttpParse::ParseRequestLine(HttpRequestParsedData &data) {
@@ -215,7 +225,7 @@ HeaderFields HttpParse::SetHeaderFields(const std::vector<std::string> &header_f
 		std::string header_field_name  = (*it).substr(0, colon_pos);
 		std::string header_field_value = (*it).substr(colon_pos + 1);
 		header_field_value             = StrTrimLeadingOptionalWhitespace(header_field_value);
-		CheckValidHeaderFieldName(header_fields, header_field_name);
+		CheckValidHeaderFieldNameAndValue(header_field_name, header_field_value);
 		// todo:
 		// マルチパートを対応する場合はutils::SplitStrを使用して、セミコロン区切りのstd::vector<std::string>になる。
 		// ex) Content-Type: multipart/form-data; boundary=----WebKitFormBoundary64XhQJfFNRKx7oK7
@@ -268,12 +278,18 @@ void HttpParse::CheckValidVersion(const std::string &version) {
 	}
 }
 
-void HttpParse::CheckValidHeaderFieldName(
-	const HeaderFields &header_fields, const std::string &header_field_name
+void HttpParse::CheckValidHeaderFieldNameAndValue(
+	const std::string &header_field_name, const std::string &header_field_value
 ) {
 	if (!header_field_name.size()) {
 		throw HttpException(
 			"Error: the name of Header field don't exist.", StatusCode(BAD_REQUEST)
+		);
+	}
+	if (!IsVString(header_field_name) || !IsVString(header_field_value)) {
+		throw HttpException(
+			"Error: the name or value of Header field contains non-VCHR characters.",
+			StatusCode(BAD_REQUEST)
 		);
 	}
 	if (HasSpace(header_field_name)) {
