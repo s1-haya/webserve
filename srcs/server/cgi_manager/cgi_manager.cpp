@@ -122,6 +122,18 @@ void CgiManager::ReplaceNewRequest(int client_fd, const std::string &new_request
 	}
 }
 
+bool CgiManager::IsCgiExist(int fd) const {
+	// fd: client_fd
+	if (cgi_addr_map_.count(fd) != 0) {
+		return true;
+	}
+	// fd: pipe_fd
+	if (client_fd_map_.count(fd) != 0) {
+		return true;
+	}
+	return false;
+}
+
 CgiManager::Cgi *CgiManager::GetCgi(int client_fd) {
 	try {
 		return cgi_addr_map_.at(client_fd);

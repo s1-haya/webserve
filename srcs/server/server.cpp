@@ -157,7 +157,7 @@ void Server::HandleNewConnection(int server_fd) {
 
 void Server::HandleExistingConnection(const event::Event &event) {
 	if (event.type & event::EVENT_ERROR || event.type & event::EVENT_HANGUP) {
-		Disconnect(event.fd);
+		HandleErrorEvent(event.fd);
 		return;
 	}
 	if (event.type & event::EVENT_READ) {
@@ -172,10 +172,35 @@ void Server::HandleExistingConnection(const event::Event &event) {
 	}
 }
 
-void Server::HandleReadEvent(const event::Event &event) {
-	const int              fd          = event.fd;
-	const Read::ReadResult read_result = Read::ReadStr(fd);
+bool Server::IsMessageExist(int fd) const {
+	// client_fd
+	if (message_manager_.IsMessageExist(fd)) {
+		return true;
+	}
+	// pipe_fd
+	if (cgi_manager_.IsCgiExist(fd)) {
+		return true;
+	}
+	// disconnected client_fd/pipe_fd
+	return false;
+}
 
+void Server::HandleErrorEvent(int fd) {
+	if (!IsMessageExist(fd)) {
+		return;
+	}
+	const int client_fd = IsCgi(fd) ? cgi_manager_.GetClientFd(fd) : fd;
+	Disconnect(client_fd);
+}
+
+void Server::HandleReadEvent(const event::Event &event) {
+	const int fd = event.fd;
+	// Prevent ReadStr() if Disconnect() was called during EVENT_WRITE handling.
+	if (!IsMessageExist(fd)) {
+		return;
+	}
+
+	const Read::ReadResult read_result = Read::ReadStr(fd);
 	if (IsCgi(fd)) {
 		HandleCgiReadResult(fd, read_result);
 		return;
@@ -246,9 +271,10 @@ void Server::RunHttpAndCgi(const event::Event &event) {
 
 void Server::HandleWriteEvent(int fd) {
 	// Prevent SendStr() if Disconnect() was called during EVENT_READ handling.
-	if (!message_manager_.IsMessageExist(fd)) {
+	if (!IsMessageExist(fd)) {
 		return;
 	}
+
 	if (IsCgi(fd)) {
 		SendCgiRequest(fd);
 		return;
@@ -266,7 +292,6 @@ void Server::SendHttpResponse(int client_fd) {
 		// Even if sending fails, continue the server
 		// e.g., in case of a SIGPIPE(EPIPE) when the client disconnects
 		utils::Debug("server", "failed to send response to client", client_fd);
-		// todo: close()だけしない？
 		Disconnect(client_fd);
 		return;
 	}
@@ -308,6 +333,11 @@ void Server::HandleTimeoutMessages() {
 
 // internal server error用のresponseをセットしてevent監視をWRITEに変更
 void Server::SetInternalServerError(int client_fd) {
+	if (cgi_manager_.IsCgiExist(client_fd)) {
+		// Call Cgi's destructor -> close pipe_fd -> automatically deleted from epoll
+		cgi_manager_.DeleteCgi(client_fd);
+	}
+
 	const http::HttpResult http_result =
 		http_.GetErrorResponse(GetClientInfos(client_fd), http::INTERNAL_ERROR);
 	message_manager_.AddPrimaryResponse(client_fd, message::CLOSE, http_result.response);
@@ -322,6 +352,10 @@ void Server::KeepConnection(int client_fd) {
 
 // delete from event, message, context
 void Server::Disconnect(int client_fd) {
+	if (cgi_manager_.IsCgiExist(client_fd)) {
+		// Call Cgi's destructor -> close pipe_fd -> automatically deleted from epoll
+		cgi_manager_.DeleteCgi(client_fd);
+	}
 	// todo: client_save_dataがない場合に呼ばれても大丈夫な作りになってるか確認
 	// HttpResult is not used.
 	http_.GetErrorResponse(GetClientInfos(client_fd), http::INTERNAL_ERROR);
@@ -499,7 +533,6 @@ void Server::HandleCgi(int client_fd, const http::CgiResult &cgi_result) {
 		AddEventForCgi(client_fd);
 	} catch (const SystemException &e) {
 		utils::PrintError(e.what());
-		cgi_manager_.DeleteCgi(client_fd);
 		SetInternalServerError(client_fd);
 	}
 }
@@ -517,48 +550,48 @@ void Server::AddEventForCgi(int client_fd) {
 	}
 }
 
-void Server::SendCgiRequest(int pipe_fd) {
-	const int          client_fd   = cgi_manager_.GetClientFd(pipe_fd);
+void Server::SendCgiRequest(int write_fd) {
+	const int          client_fd   = cgi_manager_.GetClientFd(write_fd);
 	const std::string &request_str = cgi_manager_.GetRequest(client_fd);
 
-	const Send::SendResult send_result = Send::SendStr(pipe_fd, request_str);
+	const Send::SendResult send_result = Send::SendStr(write_fd, request_str);
 	if (!send_result.IsOk()) {
 		utils::Debug(
-			"cgi", "Failed to send the request to the child process through pipe_fd", pipe_fd
+			"cgi", "Failed to send the request to the child process through pipe_fd", write_fd
 		);
-		cgi_manager_.DeleteCgi(client_fd);
-		// todo: close()だけしない？
 		Disconnect(client_fd);
 		return;
 	}
 	const std::string &new_request_str = send_result.GetValue();
 	cgi_manager_.ReplaceNewRequest(client_fd, new_request_str);
 	if (new_request_str.empty()) {
-		ReplaceEvent(pipe_fd, event::EVENT_READ);
+		// Explicitly delete from epoll
+		event_monitor_.Delete(write_fd);
 	}
 }
 
-void Server::HandleCgiReadResult(int pipe_fd, const Read::ReadResult &read_result) {
-	const int client_fd = cgi_manager_.GetClientFd(pipe_fd);
+void Server::HandleCgiReadResult(int read_fd, const Read::ReadResult &read_result) {
+	const int client_fd = cgi_manager_.GetClientFd(read_fd);
 
 	if (!read_result.IsOk()) {
 		utils::Debug(
-			"cgi", "Failed to read the response from the child process through pipe_fd", pipe_fd
+			"cgi", "Failed to read the response from the child process through pipe_fd", read_fd
 		);
-		cgi_manager_.DeleteCgi(client_fd);
 		SetInternalServerError(client_fd);
 		return;
 	}
 	const CgiResponseResult cgi_response_result =
-		AddAndGetCgiResponse(pipe_fd, read_result.GetValue().read_buf);
+		AddAndGetCgiResponse(read_fd, read_result.GetValue().read_buf);
 	if (!cgi_response_result.IsOk()) {
 		return;
 	}
-	GetHttpResponseFromCgiResponse(pipe_fd, cgi_response_result.GetValue());
+	// Explicitly delete from cgi_manager
+	cgi_manager_.DeleteCgi(client_fd);
+	GetHttpResponseFromCgiResponse(client_fd, cgi_response_result.GetValue());
 }
 
-Server::CgiResponseResult Server::AddAndGetCgiResponse(int pipe_fd, const std::string &read_buf) {
-	const int client_fd = cgi_manager_.GetClientFd(pipe_fd);
+Server::CgiResponseResult Server::AddAndGetCgiResponse(int read_fd, const std::string &read_buf) {
+	const int client_fd = cgi_manager_.GetClientFd(read_fd);
 
 	CgiResponseResult      cgi_response_result;
 	const cgi::CgiResponse cgi_response = cgi_manager_.AddAndGetResponse(client_fd, read_buf);
@@ -566,18 +599,14 @@ Server::CgiResponseResult Server::AddAndGetCgiResponse(int pipe_fd, const std::s
 		cgi_response_result.Set(false);
 		return cgi_response_result;
 	}
+	utils::Debug("cgi", "Read the entire response from the child process through pipe_fd", read_fd);
 	cgi_response_result.Set(true, cgi_response);
-
-	event_monitor_.Delete(pipe_fd);
-	cgi_manager_.DeleteCgi(client_fd);
-	utils::Debug("cgi", "Read the entire response from the child process through pipe_fd", pipe_fd);
 	return cgi_response_result;
 }
 
-void Server::GetHttpResponseFromCgiResponse(int pipe_fd, const cgi::CgiResponse &cgi_response) {
-	const int client_fd = cgi_manager_.GetClientFd(pipe_fd);
-
+void Server::GetHttpResponseFromCgiResponse(int client_fd, const cgi::CgiResponse &cgi_response) {
 	const http::HttpResult http_result = http_.GetResponseFromCgi(client_fd, cgi_response);
+
 	message_manager_.SetNewRequestBuf(client_fd, http_result.request_buf);
 	if (!http_result.is_response_complete) {
 		throw std::logic_error("GetResponseFromCgi: incorrect HttpResult");
