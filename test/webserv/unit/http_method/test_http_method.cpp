@@ -332,7 +332,7 @@ int main(void) {
 	// ディレクトリ内にファイルが存在してる場合
 	ret_code |= MethodHandlerResult(
 		MethodArgument(
-			"test", http::DELETE, allow_methods, request, response, response_header_fields
+			"root", http::DELETE, allow_methods, request, response, response_header_fields
 		),
 		expected_forbidden
 	);
