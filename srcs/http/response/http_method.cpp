@@ -40,11 +40,30 @@ std::string ReadFile(const std::string &file_path) {
 // ファイルの拡張子に基づいてContent-Typeを決定する関数: デフォルトはtext/plain
 std::string determineContentType(const std::string &path) {
 	const std::string html_extension = ".html";
+	const std::string json_extension = ".json";
+	const std::string pdf_extension  = ".pdf";
+	const std::string jpg_extension  = ".jpg";
+
 	if (path.size() >= html_extension.length() &&
 		path.compare(
 			path.size() - html_extension.length(), html_extension.length(), html_extension
 		) == 0) {
 		return "text/html";
+	} else if (path.size() >= json_extension.length() &&
+			   path.compare(
+				   path.size() - json_extension.length(), json_extension.length(), json_extension
+			   ) == 0) {
+		return "application/json";
+	} else if (path.size() >= pdf_extension.length() &&
+			   path.compare(
+				   path.size() - pdf_extension.length(), pdf_extension.length(), pdf_extension
+			   ) == 0) {
+		return "application/pdf";
+	} else if (path.size() >= jpg_extension.length() &&
+			   path.compare(
+				   path.size() - jpg_extension.length(), jpg_extension.length(), jpg_extension
+			   ) == 0) {
+		return "image/jpeg";
 	}
 	return "text/plain";
 }
