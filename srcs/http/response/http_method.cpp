@@ -42,7 +42,6 @@ std::string determineContentType(const std::string &path) {
 	const std::string html_extension = ".html";
 	const std::string json_extension = ".json";
 	const std::string pdf_extension  = ".pdf";
-	const std::string jpg_extension  = ".jpg";
 
 	if (path.size() >= html_extension.length() &&
 		path.compare(
@@ -59,11 +58,6 @@ std::string determineContentType(const std::string &path) {
 				   path.size() - pdf_extension.length(), pdf_extension.length(), pdf_extension
 			   ) == 0) {
 		return "application/pdf";
-	} else if (path.size() >= jpg_extension.length() &&
-			   path.compare(
-				   path.size() - jpg_extension.length(), jpg_extension.length(), jpg_extension
-			   ) == 0) {
-		return "image/jpeg";
 	}
 	return "text/plain";
 }
