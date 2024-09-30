@@ -189,8 +189,20 @@ void Server::HandleErrorEvent(int fd) {
 	if (!IsMessageExist(fd)) {
 		return;
 	}
-	const int client_fd = IsCgi(fd) ? cgi_manager_.GetClientFd(fd) : fd;
-	Disconnect(client_fd);
+	if (IsCgi(fd)) {
+		const int client_fd = cgi_manager_.GetClientFd(fd);
+		// todo: EPOLL errorだからといってread pipeが空とは限らないのかもしれない？
+		const CgiResponseResult cgi_response_result = AddAndGetCgiResponse(client_fd, "");
+		if (!cgi_response_result.IsOk()) {
+			throw std::logic_error("HandleErrorEvent: Invalid result from cgi response");
+		}
+		// Explicitly delete from cgi_manager
+		cgi_manager_.DeleteCgi(client_fd);
+		GetHttpResponseFromCgiResponse(client_fd, cgi_response_result.GetValue());
+		return;
+	}
+	// fd == client_fd
+	Disconnect(fd);
 }
 
 void Server::HandleReadEvent(const event::Event &event) {
