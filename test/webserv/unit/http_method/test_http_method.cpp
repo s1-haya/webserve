@@ -20,8 +20,9 @@ struct MethodArgument {
 		const std::string                &request_body_message,
 		std::string                      &response_body_message,
 		http::HeaderFields               &response_header_fields,
-		const std::string                &index_file_path = "",
-		bool                              autoindex_on    = false
+		const std::string                &index_file_path  = "",
+		bool                              autoindex_on     = false,
+		const std::string                &upload_directory = "/upload"
 	)
 		: path(path),
 		  method(method),
@@ -30,7 +31,8 @@ struct MethodArgument {
 		  response_body_message(response_body_message),
 		  response_header_fields(response_header_fields),
 		  index_file_path(index_file_path),
-		  autoindex_on(autoindex_on) {
+		  autoindex_on(autoindex_on),
+		  upload_directory(upload_directory) {
 		response_body_message.clear();
 	}
 	const std::string                &path;
@@ -41,6 +43,7 @@ struct MethodArgument {
 	http::HeaderFields               &response_header_fields;
 	const std::string                &index_file_path;
 	bool                              autoindex_on;
+	const std::string                &upload_directory;
 };
 
 std::string LoadFileContent(const std::string &file_path) {
@@ -134,7 +137,8 @@ int MethodHandlerResult(const MethodArgument &srcs, const std::string &expected_
 			srcs.response_body_message,
 			srcs.response_header_fields,
 			srcs.index_file_path,
-			srcs.autoindex_on
+			srcs.autoindex_on,
+			srcs.upload_directory
 		);
 		result = HandleResult(srcs.response_body_message, expected_body_message);
 
@@ -243,12 +247,15 @@ int main(void) {
 	const std::string &post_test1_request_body_message = "OK";
 	ret_code |= MethodHandlerResult(
 		MethodArgument(
-			"200_ok.txt",
+			"./root/upload/200_ok.txt",
 			http::POST,
 			allow_methods,
 			post_test1_request_body_message,
 			response,
-			response_header_fields
+			response_header_fields,
+			"",
+			false,
+			"/upload"
 		),
 		expected_created
 	);
@@ -257,14 +264,34 @@ int main(void) {
 	const std::string &post_test2_request_body_message = "OK";
 	ret_code |= MethodHandlerResult(
 		MethodArgument(
-			"200_ok.txt",
+			"./root/upload/200_ok.txt",
 			http::POST,
 			allow_methods,
 			post_test2_request_body_message,
 			response,
-			response_header_fields
+			response_header_fields,
+			"",
+			false,
+			"/upload"
 		),
 		expected_no_content
+	);
+
+	// 新しいファイルをアップロードする場合で、アップロード先ディレクトリが指定されている場合
+	const std::string &post_test3_request_body_message = "OK";
+	ret_code |= MethodHandlerResult(
+		MethodArgument(
+			"./root/200_ok.txt",
+			http::POST,
+			allow_methods,
+			post_test3_request_body_message,
+			response,
+			response_header_fields,
+			"",
+			false,
+			"/save"
+		),
+		expected_created
 	);
 
 	// ディレクトリの場合
