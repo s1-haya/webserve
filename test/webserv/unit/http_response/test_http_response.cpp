@@ -94,15 +94,13 @@ server::VirtualServer *BuildVirtualServer2() {
 	// LocationList
 	server::VirtualServer::LocationList locationlist;
 	// リソースの取得位置によって(srcs/http/response/http_method.cpp)によって出力結果が決まる
-	std::string                         alias = "../../../../root/html/index.html";
+	std::string                         alias = "/upload/";
 	server::Location::AllowedMethodList allowed_methods;
-	allowed_methods.push_back("POST");
-	server::Location::Redirect redirect;
-	server::Location::Redirect redirect_on(301, "/");
-	server::Location           location1 =
+	server::Location::Redirect          redirect;
+	server::Location                    location1 =
 		BuildLocation("/", alias, "index.html", false, allowed_methods, redirect);
-	server::Location location2 = // redirect_on
-		BuildLocation("/www/", alias, "index.html", true, allowed_methods, redirect_on);
+	server::Location location2 =
+		BuildLocation("/www/", alias, "index.html", true, allowed_methods, redirect);
 	locationlist.push_back(location1);
 	locationlist.push_back(location2);
 
@@ -152,7 +150,7 @@ std::string SetDefaultHeaderFields(
 } // namespace
 
 int main(void) {
-	int                                 ret_code    = 0;
+	int                                 ret_code    = EXIT_SUCCESS;
 	const server::VirtualServerAddrList server_info = BuildVirtualServerAddrList();
 	http::HttpRequestResult             request_info;
 	http::CgiResult                     cgi_result;
@@ -179,7 +177,8 @@ int main(void) {
 
 	ret_code |= HandleResult(response1, expected1_response);
 
-	// GETメソッドの許可がないhost2に/html/index.htmlを取得するリクエスト
+	// DELETEメソッドの許可がないhost2にリクエスト
+	request_info.request.request_line.method       = http::DELETE;
 	request_info.request.header_fields[http::HOST] = "host2";
 	std::string response2 = http::HttpResponse::Run(server_info, request_info, cgi_result);
 
@@ -214,6 +213,25 @@ int main(void) {
 	const std::string &expected3_response =
 		expected3_status_line + expected3_header_fields + http::CRLF + expected3_body_message;
 	ret_code |= HandleResult(response3, expected3_response);
+	expected2_status_line + expected2_header_fields + http::CRLF + expected2_body_message;
+	ret_code |= HandleResult(response2, expected2_response);
+
+	// ContentTypeのテスト
+	request_info.request.request_line.method         = http::GET;
+	request_info.request.request_line.request_target = "/www/delete_file";
+	request_info.request.request_line.version        = http::HTTP_VERSION;
+	request_info.request.header_fields[http::HOST]   = "host2";
+	std::string response4 = http::HttpResponse::Run(server_info, request_info, cgi_result);
+
+	std::string expected4_status_line =
+		LoadFileContent("../../expected_response/default_status_line/200_ok.txt");
+	std::string expected4_body_message  = LoadFileContent("../../../../root/upload/delete_file");
+	std::string expected4_header_fields = SetDefaultHeaderFields(
+		http::KEEP_ALIVE, utils::ToString(expected4_body_message.length()), "text/plain"
+	);
+	const std::string &expected4_response =
+		expected4_status_line + expected4_header_fields + http::CRLF + expected4_body_message;
+	ret_code |= HandleResult(response4, expected4_response);
 
 	DeleteAddrList(server_info);
 	return ret_code;
