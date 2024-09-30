@@ -130,12 +130,8 @@ std::string HttpResponse::CreateHttpResponse(const HttpResponseFormat &response)
 
 HeaderFields HttpResponse::InitResponseHeaderFields(const HttpRequestResult &request_info) {
 	HeaderFields response_header_fields;
-	response_header_fields[SERVER] = SERVER_VERSION;
-	(void)request_info;
-	// todo: request_infoから情報取得
-	// GetContentType(request_info);
-	// GetConnection(request_info);
-	response_header_fields[CONTENT_TYPE] = TEXT_HTML;
+	response_header_fields[SERVER]       = SERVER_VERSION;
+	response_header_fields[CONTENT_TYPE] = "text/plain";
 	if (IsConnectionKeep(request_info.request.header_fields)) {
 		response_header_fields[CONNECTION] = KEEP_ALIVE;
 	} else {
