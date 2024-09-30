@@ -133,6 +133,21 @@ Result IsSameClientFd(const CgiManager &cgi_manager, int pipe_fd, int expected_c
 	return result;
 }
 
+Result RunIsCgiExist(const CgiManager &cgi_manager, int fd, bool expected_result_is_cgi_exist) {
+	Result             result;
+	std::ostringstream oss;
+
+	const bool result_is_cgi_exist = cgi_manager.IsCgiExist(fd);
+	if (result_is_cgi_exist != expected_result_is_cgi_exist) {
+		result.is_success = false;
+		oss << "is_cgi_exist" << std::endl;
+		oss << "- result  : " << std::boolalpha << result_is_cgi_exist << std::endl;
+		oss << "- expected: " << expected_result_is_cgi_exist << std::endl;
+		result.error_log = oss.str();
+	}
+	return result;
+}
+
 // -----------------------------------------------------------------------------
 // CgiManager classの主なテスト対象関数
 // - AddNewCgi()
@@ -301,7 +316,7 @@ int RunTest5() {
 	cgi_request.meta_variables[SCRIPT_NAME]    = PATH_DIR_CGI_BIN + "/test.sh";
 	cgi_request.body_message                   = expected_request;
 
-	// CgiManager内で新規Cgiを複数作成
+	// CgiManager内で新規Cgiを作成
 	CgiManager cgi_manager;
 	cgi_manager.AddNewCgi(expected_client_fd, cgi_request);
 
@@ -331,6 +346,69 @@ int RunTest5() {
 	return ret_code;
 }
 
+// -----------------------------------------------------------------------------
+// CgiManager classの主なテスト対象関数
+// - IsCgiExist()
+// -----------------------------------------------------------------------------
+int RunTest6() {
+	int ret_code = EXIT_SUCCESS;
+
+	const int         expected_client_fd1 = 10;
+	const int         expected_client_fd2 = 11;
+	const std::string expected_request    = "abcde";
+
+	// 最低限のCgiRequest準備
+	CgiRequest cgi_request;
+	cgi_request.meta_variables[REQUEST_METHOD] = "GET";
+	cgi_request.meta_variables[SCRIPT_NAME]    = PATH_DIR_CGI_BIN + "/test.sh";
+	cgi_request.body_message                   = expected_request;
+
+	// CgiManager内で新規Cgiを複数作成
+	CgiManager cgi_manager;
+	cgi_manager.AddNewCgi(expected_client_fd1, cgi_request);
+	cgi_manager.AddNewCgi(expected_client_fd2, cgi_request);
+
+	// cgiを実行する(子プロセスで実行 & pipe_fdがclient_fdと紐づけられる)
+	cgi_manager.RunCgi(expected_client_fd1);
+
+	// client_fdからIsCgiExist()==trueになるか確認
+	ret_code |= Test(RunIsCgiExist(cgi_manager, expected_client_fd1, true)); // Test11
+	ret_code |= Test(RunIsCgiExist(cgi_manager, expected_client_fd2, true)); // Test12
+
+	// client_fd1のpipe_fd(read)を取得
+	int               read_pipe_fd1  = -1;
+	const GetFdResult read_fd_result = cgi_manager.GetReadFd(expected_client_fd1);
+	if (read_fd_result.IsOk()) {
+		read_pipe_fd1 = read_fd_result.GetValue();
+		// read_pipe_fdからIsCgiExist()==trueになるか確認
+		ret_code |= Test(RunIsCgiExist(cgi_manager, read_pipe_fd1, true)); // Test13
+	} else {
+		ret_code |=
+			Test(Result(false, "read pipe_fd was not created")); // GETなのでここには入らない
+	}
+
+	// client_fd1のpipe_fd(write)を取得
+	const GetFdResult write_fd_result = cgi_manager.GetWriteFd(expected_client_fd1);
+	if (write_fd_result.IsOk()) {
+		ret_code |= Test(Result(false, "write pipe_fd was created")); // GETなのでここには入らない
+	} else {
+		// write_pipe_fdは取得できないので適当な大きめfdでfalseが返ることを確認
+		ret_code |= Test(RunIsCgiExist(cgi_manager, 20, false)); // Test14
+	}
+
+	// client_fd1を削除してみて
+	cgi_manager.DeleteCgi(expected_client_fd1);
+
+	// client_fd1だけIsCgiExist()==falseになるか確認
+	ret_code |= Test(RunIsCgiExist(cgi_manager, expected_client_fd1, false)); // Test15
+	ret_code |= Test(RunIsCgiExist(cgi_manager, expected_client_fd2, true));  // Test16
+
+	// client_fd1のread_pipe_fd1からもIsCgiExist()==falseになるか確認
+	ret_code |= Test(RunIsCgiExist(cgi_manager, read_pipe_fd1, false)); // Test17
+
+	return ret_code;
+}
+
 } // namespace
 
 int main() {
@@ -341,6 +419,7 @@ int main() {
 	ret_code |= RunTest3();
 	ret_code |= RunTest4();
 	ret_code |= RunTest5();
+	ret_code |= RunTest6();
 
 	return ret_code;
 }
