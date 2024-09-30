@@ -56,7 +56,8 @@ HttpResult Http::CreateHttpResponse(
 		HttpResponse::IsConnectionKeep(data.request_result.request.header_fields);
 	result.is_response_complete = true;
 	result.request_buf          = data.current_buf;
-	result.response = HttpResponse::Run(server_info, data.request_result, result.cgi_result);
+	result.response =
+		HttpResponse::Run(client_info, server_info, data.request_result, result.cgi_result);
 	if (!result.cgi_result.is_cgi) { // cgiの場合はcgiのhttp_responseを作るときにsave_dataが必要
 		storage_.DeleteClientSaveData(client_info.fd);
 	}

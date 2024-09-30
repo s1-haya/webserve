@@ -36,7 +36,8 @@ class HttpResponse {
   public:
 	typedef std::map<EStatusCode, std::string> ReasonPhrase;
 	static std::string
-					   Run(const server::VirtualServerAddrList &server_info,
+					   Run(const http::ClientInfos             &client_info,
+						   const server::VirtualServerAddrList &server_info,
 						   const HttpRequestResult             &request_info,
 						   CgiResult                           &cgi_result);
 	static std::string CreateErrorResponse(const StatusCode &status_code);
@@ -49,6 +50,7 @@ class HttpResponse {
 
 	static std::string        CreateHttpResponse(const HttpResponseFormat &response);
 	static HttpResponseFormat CreateHttpResponseFormat(
+		const http::ClientInfos             &client_info,
 		const server::VirtualServerAddrList &server_info,
 		const HttpRequestResult             &request_info,
 		CgiResult                           &cgi_result
