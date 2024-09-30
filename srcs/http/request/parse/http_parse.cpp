@@ -160,7 +160,7 @@ void HttpParse::ParseChunkedRequest(HttpRequestParsedData &data) {
 			"Error: chunk size is not a hexadecimal number", StatusCode(BAD_REQUEST)
 		);
 	}
-	while (chunk_size > 0) {
+	while (chunk_size > 0 && data.current_buf != "\0") {
 		std::string::size_type end_of_chunk_data_pos = data.current_buf.find(CRLF);
 		std::string            chunk_data = data.current_buf.substr(0, end_of_chunk_data_pos);
 		data.current_buf.erase(0, chunk_data.size() + CRLF.size());
@@ -174,13 +174,15 @@ void HttpParse::ParseChunkedRequest(HttpRequestParsedData &data) {
 		chunk_size_str        = data.current_buf.substr(0, end_of_chunk_size_pos);
 		data.current_buf.erase(0, chunk_size_str.size() + CRLF.size());
 		chunk_size = HexToDec(chunk_size_str).GetValue();
-		if (HexToDec(chunk_size_str).IsOk() == false) {
+		if (HexToDec(chunk_size_str).IsOk() == false && data.current_buf != "\0") {
 			throw HttpException(
 				"Error: chunk size is not a hexadecimal number", StatusCode(BAD_REQUEST)
 			);
 		}
 	}
-	if (data.current_buf != CRLF) { // 終端に0\r\n\r\nの\r\nがあるはず
+	if (data.current_buf == "\0") {
+		return;                            // is_request_format.is_body_message = false;
+	} else if (data.current_buf != CRLF) { // 終端に0\r\n\r\nの\r\nがあるはず
 		throw HttpException(
 			"Error: Missing or incorrect chunked transfer encoding terminator",
 			StatusCode(BAD_REQUEST)
@@ -209,18 +211,15 @@ HeaderFields HttpParse::SetHeaderFields(const std::vector<std::string> &header_f
 	HeaderFields                                     header_fields;
 	typedef std::vector<std::string>::const_iterator It;
 	for (It it = header_fields_info.begin(); it != header_fields_info.end(); ++it) {
-		std::vector<std::string> header_field_name_and_value = utils::SplitStr(*it, ":");
-		const std::string       &header_field_name           = header_field_name_and_value[0];
+		std::size_t colon_pos          = (*it).find_first_of(':');
+		std::string header_field_name  = (*it).substr(0, colon_pos);
+		std::string header_field_value = (*it).substr(colon_pos + 1);
+		header_field_value             = StrTrimLeadingOptionalWhitespace(header_field_value);
 		CheckValidHeaderFieldName(header_fields, header_field_name);
 		// todo:
 		// マルチパートを対応する場合はutils::SplitStrを使用して、セミコロン区切りのstd::vector<std::string>になる。
 		// ex) Content-Type: multipart/form-data; boundary=----WebKitFormBoundary64XhQJfFNRKx7oK7
-		const std::string &header_field_value =
-			StrTrimLeadingOptionalWhitespace(header_field_name_and_value[1]);
-		// todo: #189  ヘッダフィールドをパースする関数（value）-> CheckValidHeaderFieldValue
-		// keep-aliveの場合のみ上書き可能 /
-		// connectionはcloseが一つでもある場合はcloseが適用されるため
-		if (header_field_name == CONNECTION && HasConnectionKeepInHeaderFields(header_fields)) {
+		if (header_field_name == CONNECTION && header_field_value == CLOSE) {
 			header_fields[CONNECTION] = header_field_value;
 		}
 		header_fields.insert(std::make_pair(header_field_name, header_field_value));

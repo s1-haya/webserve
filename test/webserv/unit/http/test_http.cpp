@@ -99,5 +99,9 @@ int  main(void) {
     // ret_code |= test::TestGetTimeout1NoCrlf(server_infos);
     ret_code |= test::TestGetNotImplemented1NotExistMethod(server_infos);
     DeleteVirtualServerAddrList(server_infos);
+
+    // test GetErrorResponse
+    ret_code |= test::TestRequestTimeoutResponse();
+    ret_code |= test::TestInternalServerErrorResponse();
     return ret_code;
 }

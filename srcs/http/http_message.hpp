@@ -34,6 +34,7 @@ extern const std::string CONTENT_TYPE;
 extern const std::string CONTENT_LENGTH;
 extern const std::string TRANSFER_ENCODING;
 extern const std::string CHUNKED;
+extern const std::string LOCATION;
 extern const std::string AUTHORIZATION;
 extern const std::string REQUEST_HEADER_FIELDS[];
 extern const std::size_t REQUEST_HEADER_FIELDS_SIZE;

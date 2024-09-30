@@ -32,6 +32,7 @@ const std::string CONTENT_TYPE            = "Content-Type";
 const std::string CONTENT_LENGTH          = "Content-Length";
 const std::string TRANSFER_ENCODING       = "Transfer-Encoding";
 const std::string CHUNKED                 = "chunked";
+const std::string LOCATION                = "Location";
 const std::string AUTHORIZATION           = "Authorization";
 const std::string REQUEST_HEADER_FIELDS[] = {
 	HOST,
@@ -42,6 +43,7 @@ const std::string REQUEST_HEADER_FIELDS[] = {
 	CONTENT_TYPE,
 	CONTENT_LENGTH,
 	TRANSFER_ENCODING,
+	LOCATION,
 	AUTHORIZATION
 };
 const std::size_t REQUEST_HEADER_FIELDS_SIZE =

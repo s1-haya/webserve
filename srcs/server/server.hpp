@@ -1,6 +1,7 @@
 #ifndef SERVER_SERVER_HPP_
 #define SERVER_SERVER_HPP_
 
+#include "cgi_manager.hpp"
 #include "config_parse/context.hpp"
 #include "connection.hpp"
 #include "context_manager.hpp"
@@ -8,7 +9,6 @@
 #include "http.hpp"
 #include "http_result.hpp"
 #include "message_manager.hpp"
-#include "mock_http.hpp"
 #include "read.hpp"
 #include <list>
 #include <string>
@@ -23,6 +23,7 @@ class Server {
 	typedef std::set<std::string>                   IpSet;
 	typedef std::map<unsigned int, IpSet>           PortIpMap;
 	typedef utils::Result<ClientInfo>               AcceptResult;
+	typedef utils::Result<cgi::CgiResponse>         CgiResponseResult;
 
 	explicit Server(const ConfigServers &config_servers);
 	~Server();
@@ -35,37 +36,51 @@ class Server {
 	Server(const Server &other);
 	Server &operator=(const Server &other);
 	// functions
-	void             AddVirtualServers(const ConfigServers &config_servers);
-	void             AddServerInfoToContext(const VirtualServerList &virtual_server_list);
-	void             ListenAllHostPorts(const VirtualServerList &virtual_server_list);
-	PortIpMap        CreatePortIpMap(const VirtualServerList &virtual_server_list);
-	void             Listen(const HostPortPair &host_port);
-	void             HandleEvent(const event::Event &event);
-	void             HandleNewConnection(int server_fd);
-	void             HandleExistingConnection(const event::Event &event);
-	Read::ReadResult ReadRequest(int client_fd);
-	void             RunHttp(const event::Event &event);
-	void             SendResponse(int client_fd);
-	void             HandleTimeoutMessages();
-	void             SetInternalServerError(int client_fd);
-	void             KeepConnection(int client_fd);
-	void             Disconnect(int client_fd);
-	void             UpdateEventInResponseComplete(
-					const message::ConnectionState connection_state, const event::Event &event
-				);
+	void      AddVirtualServers(const ConfigServers &config_servers);
+	void      AddServerInfoToContext(const VirtualServerList &virtual_server_list);
+	void      ListenAllHostPorts(const VirtualServerList &virtual_server_list);
+	PortIpMap CreatePortIpMap(const VirtualServerList &virtual_server_list);
+	void      Listen(const HostPortPair &host_port);
+	void      HandleEvent(const event::Event &event);
+	void      HandleNewConnection(int server_fd);
+	void      HandleExistingConnection(const event::Event &event);
+	void      HandleReadEvent(const event::Event &event);
+	void      HandleHttpReadResult(const event::Event &event, const Read::ReadResult &read_result);
+	bool      IsHttpRequestBufExist(int fd) const;
+	void      RunHttpAndCgi(const event::Event &event);
+	void      HandleWriteEvent(int fd);
+	void      SendHttpResponse(int client_fd);
+	void      HandleTimeoutMessages();
+	void      SetInternalServerError(int client_fd);
+	void      KeepConnection(int client_fd);
+	void      Disconnect(int client_fd);
+	void      UpdateEventInResponseComplete(
+			 const message::ConnectionState connection_state, const event::Event &event
+		 );
 	void UpdateConnectionAfterSendResponse(
 		int client_fd, const message::ConnectionState connection_state
 	);
 	void SetNonBlockingMode(int sock_fd);
 	// wrapper for epoll
 	void AddEventRead(int sock_fd);
-	void ReplaceEvent(int client_fd, event::Type type);
+	void ReplaceEvent(int client_fd, uint32_t type);
 	void AppendEventWrite(const event::Event &event);
 	// wrapper for connection
 	AcceptResult Accept(int server_fd);
 	// for Server to Http
 	http::ClientInfos     GetClientInfos(int client_fd) const;
 	VirtualServerAddrList GetVirtualServerList(int client_fd) const;
+	// for Cgi
+	bool              IsCgi(int fd) const;
+	void              HandleCgi(int client_fd, const http::CgiResult &cgi_result);
+	void              AddEventForCgi(int client_fd);
+	void              SendCgiRequest(int pipe_fd);
+	void              HandleCgiReadResult(int pipe_fd, const Read::ReadResult &read_result);
+	CgiResponseResult AddAndGetCgiResponse(int pipe_fd, const std::string &read_buf);
+	void GetHttpResponseFromCgiResponse(int pipe_fd, const cgi::CgiResponse &cgi_response);
+	void UpdateEventInCgiResponseComplete(
+		const message::ConnectionState connection_state, int client_fd
+	);
 
 	// const
 	static const int    SYSTEM_ERROR = -1;
@@ -80,6 +95,8 @@ class Server {
 	http::Http http_;
 	// message manager with time control
 	MessageManager message_manager_;
+	// cgi
+	CgiManager cgi_manager_;
 };
 
 } // namespace server

@@ -6,8 +6,10 @@
 namespace http {
 
 struct ClientInfos {
-	int         fd;
-	std::string request_buf;
+	int          fd;
+	std::string  ip;
+	unsigned int listen_server_port;
+	std::string  request_buf;
 };
 
 } // namespace http

@@ -18,6 +18,9 @@ typedef CgiManager::GetFdResult GetFdResult;
 
 struct Result {
 	Result() : is_success(true) {}
+	Result(bool is_success, const std::string &error_message)
+		: is_success(is_success), error_log(error_message) {}
+
 	bool        is_success;
 	std::string error_log;
 };
@@ -155,13 +158,13 @@ int RunTest1() {
 	cgi_manager.AddNewCgi(client_fd, cgi_request);
 
 	// getterを使ってrequestの保持確認
-	ret_code |= Test(RunGetRequest(cgi_manager, client_fd, expected_request));
+	ret_code |= Test(RunGetRequest(cgi_manager, client_fd, expected_request)); // Test1
 
 	// "abc"だけwrite()できたと仮定し,残りのrequest("de")で置き換え
 	const std::string expected_new_request = "de";
 	cgi_manager.ReplaceNewRequest(client_fd, expected_new_request);
 	// 置き換えできてるか確認
-	ret_code |= Test(RunGetRequest(cgi_manager, client_fd, expected_new_request));
+	ret_code |= Test(RunGetRequest(cgi_manager, client_fd, expected_new_request)); // Test2
 
 	return ret_code;
 }
@@ -187,15 +190,14 @@ int RunTest2() {
 	// cgiを削除
 	cgi_manager.DeleteCgi(client_fd);
 	// 存在しないcgiにアクセスしようとしてthrowされることを確認
-	ret_code |= TestThrow(&CgiManager::GetRequest, cgi_manager, client_fd);
+	ret_code |= TestThrow(&CgiManager::GetRequest, cgi_manager, client_fd); // Test3
 
 	return ret_code;
 }
 
 // -----------------------------------------------------------------------------
 // CgiManager classの主なテスト対象関数
-// - AddReadBuf()
-// - GetResponse()
+// - AddAndGetResponse()
 // -----------------------------------------------------------------------------
 int RunTest3() {
 	int ret_code = EXIT_SUCCESS;
@@ -215,34 +217,36 @@ int RunTest3() {
 	std::string buffer = "abc";
 	// addしてgetterを使ってresponseの保持確認
 	cgi::CgiResponse expected_cgi_response("abc", "text/plain", false);
-	ret_code |= Test(RunAddAndGetResponse(cgi_manager, client_fd, buffer, expected_cgi_response));
+	ret_code |=
+		Test(RunAddAndGetResponse(cgi_manager, client_fd, buffer, expected_cgi_response)); // Test4
 
 	// 追加で"defgh"をread()できたとして,responseが"abc"+"defgh"になってるか確認
 	const std::string appended_buffer = "defgh";
+	buffer += appended_buffer;
 	ret_code |= Test(RunAddAndGetResponse(
-		cgi_manager, client_fd, appended_buffer, cgi::CgiResponse("abcdefgh", "text/plain", false)
-	));
+		cgi_manager, client_fd, appended_buffer, cgi::CgiResponse(buffer, "text/plain", false)
+	)); // Test5
 
 	// 最後に""をread()したとして、responseが完成になっているか確認
 	ret_code |= Test(RunAddAndGetResponse(
-		cgi_manager, client_fd, "", cgi::CgiResponse("abcdefgh", "text/plain", true)
-	));
+		cgi_manager, client_fd, "", cgi::CgiResponse(buffer, "text/plain", true)
+	)); // Test6
 
 	return ret_code;
 }
 
-// todo: cgi.Run()が動くまではif文に入らずTest()が呼ばれてない
 // -----------------------------------------------------------------------------
 // CgiManager classの主なテスト対象関数
 // - RunCgi()
 // - GetClientFd()
 // - GetReadFd()
 // - GetWriteFd()
+// - method == GET
 // -----------------------------------------------------------------------------
 int RunTest4() {
 	int ret_code = EXIT_SUCCESS;
 
-	const int         expected_client_fd = 3;
+	const int         expected_client_fd = 10; // 3,4はpipe_fdで使われる
 	const std::string expected_request   = "abcde";
 
 	// 最低限のCgiRequest準備
@@ -254,7 +258,7 @@ int RunTest4() {
 	// CgiManager内で新規Cgiを複数作成
 	CgiManager cgi_manager;
 	cgi_manager.AddNewCgi(expected_client_fd, cgi_request);
-	cgi_manager.AddNewCgi(4, cgi_request);
+	cgi_manager.AddNewCgi(11, cgi_request);
 
 	// cgiを実行する(子プロセスで実行 & pipe_fdがclient_fdと紐づけられる)
 	cgi_manager.RunCgi(expected_client_fd);
@@ -264,7 +268,56 @@ int RunTest4() {
 	if (read_fd_result.IsOk()) {
 		const int read_pipe_fd = read_fd_result.GetValue();
 		// read_pipe_fdとclient_fdの紐づけ確認
-		ret_code |= Test(IsSameClientFd(cgi_manager, read_pipe_fd, expected_client_fd));
+		ret_code |= Test(IsSameClientFd(cgi_manager, read_pipe_fd, expected_client_fd)); // Test7
+	} else {
+		ret_code |= Test(Result(false, "read pipe_fd was not created"));
+	}
+
+	// pipe_fd(write)を取得
+	const GetFdResult write_fd_result = cgi_manager.GetWriteFd(expected_client_fd);
+	if (write_fd_result.IsOk()) {
+		ret_code |= Test(Result(false, "write pipe_fd was created")); // GETなのでここには入らない
+	} else {
+		ret_code |= Test(Result()); // Test8
+	}
+
+	return ret_code;
+}
+
+// -----------------------------------------------------------------------------
+// CgiManager classの主なテスト対象関数
+// - RunCgi()
+// - GetReadFd()
+// - GetWriteFd()
+// - method == POST
+// -----------------------------------------------------------------------------
+int RunTest5() {
+	int ret_code = EXIT_SUCCESS;
+
+	const int         expected_client_fd = 10;
+	const std::string expected_request   = "abcde";
+
+	// 最低限のCgiRequest準備
+	CgiRequest cgi_request;
+	cgi_request.meta_variables[REQUEST_METHOD] = "POST";
+	cgi_request.meta_variables[SCRIPT_NAME]    = PATH_DIR_CGI_BIN + "/test.sh";
+	cgi_request.body_message                   = expected_request;
+
+	// CgiManager内で新規Cgiを複数作成
+	CgiManager cgi_manager;
+	cgi_manager.AddNewCgi(expected_client_fd, cgi_request);
+
+	// cgiを実行する(子プロセスで実行 & pipe_fdがclient_fdと紐づけられる)
+	cgi_manager.RunCgi(expected_client_fd);
+
+	// pipe_fd(read)を取得
+	const GetFdResult read_fd_result = cgi_manager.GetReadFd(expected_client_fd);
+	if (read_fd_result.IsOk()) {
+		const int read_pipe_fd = read_fd_result.GetValue();
+		// read_pipe_fdとclient_fdの紐づけ確認
+		ret_code |= Test(IsSameClientFd(cgi_manager, read_pipe_fd, expected_client_fd)); // Test9
+	} else {
+		ret_code |= Test(Result(false, "read pipe_fd was not created"));
 	}
 
 	// pipe_fd(write)を取得
@@ -272,21 +325,13 @@ int RunTest4() {
 	if (write_fd_result.IsOk()) {
 		const int write_pipe_fd = write_fd_result.GetValue();
 		// write_pipe_fdとclient_fdの紐づけ確認
-		ret_code |= Test(IsSameClientFd(cgi_manager, write_pipe_fd, expected_client_fd));
+		ret_code |= Test(IsSameClientFd(cgi_manager, write_pipe_fd, expected_client_fd)); // Test10
+	} else {
+		ret_code |= Test(Result(false, "write pipe_fd was not created"));
 	}
 
 	return ret_code;
 }
-
-// todo: Cgi classの実装が終わったら作成
-// -----------------------------------------------------------------------------
-// CgiManager classの主なテスト対象関数
-// - IsResponseComplete()
-// -----------------------------------------------------------------------------
-// int RunTest5() {
-// 	int ret_code = EXIT_SUCCESS;
-// 	return ret_code;
-// }
 
 } // namespace
 
@@ -297,7 +342,7 @@ int main() {
 	ret_code |= RunTest2();
 	ret_code |= RunTest3();
 	ret_code |= RunTest4();
-	// ret_code |= RunTest5();
+	ret_code |= RunTest5();
 
 	return ret_code;
 }

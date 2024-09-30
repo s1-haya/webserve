@@ -46,25 +46,6 @@ VirtualServer::LocationList ConvertLocations(const config::context::LocationList
 	return location_list;
 }
 
-// todo: tmp for debug
-void DebugVirtualServerNames(
-	const VirtualServerStorage::VirtualServerAddrList &virtual_server_addr_list
-) {
-	typedef VirtualServerStorage::VirtualServerAddrList::const_iterator ItVs;
-	for (ItVs it = virtual_server_addr_list.begin(); it != virtual_server_addr_list.end(); ++it) {
-		const VirtualServer *virtual_server = *it;
-		std::cerr << "[" << *virtual_server->GetServerNameList().begin() << "]"; // todo: tmp
-	}
-	std::cerr << std::endl;
-}
-
-// todo: tmp for debug
-void DebugDto(const http::ClientInfos &client_infos, const VirtualServerAddrList &virtual_servers) {
-	utils::Debug("server", "ClientInfo - fd", client_infos.fd);
-	utils::Debug("server", "received server_names");
-	DebugVirtualServerNames(virtual_servers);
-}
-
 void AddResolvedHostPort(
 	HostPortSet &host_port_set, const Connection::IpList &ip_list, unsigned int port
 ) {
@@ -168,8 +149,8 @@ void Server::HandleNewConnection(int server_fd) {
 	AddEventRead(client_fd);
 	utils::Debug(
 		"server",
-		"add new client / listen server: " + new_client_info.GetListenIp() + ":" +
-			utils::ToString(new_client_info.GetListenPort()),
+		"add new client IP: " + new_client_info.GetIp() + " / listen server: " +
+			new_client_info.GetListenIp() + ":" + utils::ToString(new_client_info.GetListenPort()),
 		client_fd
 	);
 }
@@ -180,24 +161,34 @@ void Server::HandleExistingConnection(const event::Event &event) {
 		return;
 	}
 	if (event.type & event::EVENT_READ) {
-		const Read::ReadResult read_result = ReadRequest(event.fd);
-		if (read_result.IsOk()) {
-			RunHttp(event);
-		}
+		HandleReadEvent(event);
 	}
 	if (event.type & event::EVENT_WRITE) {
-		// Prevent SendResponse() if Disconnect() was called during EVENT_READ handling.
-		if (!message_manager_.IsMessageExist(event.fd)) {
-			return;
-		}
-		SendResponse(event.fd);
+		HandleWriteEvent(event.fd);
 	}
+	// Call RunHttpAndCgi() if request_buf contains data, even without a read event.
+	if (IsHttpRequestBufExist(event.fd)) {
+		RunHttpAndCgi(event);
+	}
+}
+
+void Server::HandleReadEvent(const event::Event &event) {
+	const int              fd          = event.fd;
+	const Read::ReadResult read_result = Read::ReadStr(fd);
+
+	if (IsCgi(fd)) {
+		HandleCgiReadResult(fd, read_result);
+		return;
+	}
+	HandleHttpReadResult(event, read_result);
 }
 
 http::ClientInfos Server::GetClientInfos(int client_fd) const {
 	http::ClientInfos client_infos;
-	client_infos.fd          = client_fd;
-	client_infos.request_buf = message_manager_.GetRequestBuf(client_fd);
+	client_infos.fd                 = client_fd;
+	client_infos.ip                 = context_.GetClientIp(client_fd);
+	client_infos.listen_server_port = context_.GetListenServerPort(client_fd);
+	client_infos.request_buf        = message_manager_.GetRequestBuf(client_fd);
 	return client_infos;
 }
 
@@ -205,29 +196,34 @@ VirtualServerAddrList Server::GetVirtualServerList(int client_fd) const {
 	return context_.GetVirtualServerAddrList(client_fd);
 }
 
-Read::ReadResult Server::ReadRequest(int client_fd) {
-	Read::ReadResult read_result = Read::ReadRequest(client_fd);
+void Server::HandleHttpReadResult(const event::Event &event, const Read::ReadResult &read_result) {
+	const int client_fd = event.fd;
+
 	if (!read_result.IsOk()) {
 		SetInternalServerError(client_fd);
-		return read_result;
+		return;
 	}
 	if (read_result.GetValue().read_size == 0) {
 		// clientが正しくshutdownした場合・長さ0のデータグラムを受信した場合などにここに入るらしい
-		read_result.Set(false);
-		return read_result;
+		return;
 	}
 	message_manager_.AddRequestBuf(client_fd, read_result.GetValue().read_buf);
 	std::cerr << message_manager_.GetRequestBuf(client_fd) << std::endl;
-	return read_result;
 }
 
-void Server::RunHttp(const event::Event &event) {
+bool Server::IsHttpRequestBufExist(int fd) const {
+	if (IsCgi(fd)) {
+		return false;
+	}
+	return !message_manager_.GetRequestBuf(fd).empty();
+}
+
+void Server::RunHttpAndCgi(const event::Event &event) {
 	const int client_fd = event.fd;
 
 	// Prepare to http.Run()
 	const http::ClientInfos     &client_infos    = GetClientInfos(client_fd);
 	const VirtualServerAddrList &virtual_servers = GetVirtualServerList(client_fd);
-	DebugDto(client_infos, virtual_servers);
 
 	http::HttpResult http_result = http_.Run(client_infos, virtual_servers);
 	// Set the unused request_buf in Http.
@@ -236,6 +232,7 @@ void Server::RunHttp(const event::Event &event) {
 	// If not completed, the request will be re-read by the event_monitor.
 	if (!http_result.is_response_complete) {
 		message_manager_.SetIsCompleteRequest(client_fd, false);
+		HandleCgi(client_fd, http_result.cgi_result);
 		return;
 	}
 	message_manager_.SetIsCompleteRequest(client_fd, true);
@@ -247,12 +244,24 @@ void Server::RunHttp(const event::Event &event) {
 	UpdateEventInResponseComplete(connection_state, event);
 }
 
-void Server::SendResponse(int client_fd) {
+void Server::HandleWriteEvent(int fd) {
+	// Prevent SendStr() if Disconnect() was called during EVENT_READ handling.
+	if (!message_manager_.IsMessageExist(fd)) {
+		return;
+	}
+	if (IsCgi(fd)) {
+		SendCgiRequest(fd);
+		return;
+	}
+	SendHttpResponse(fd);
+}
+
+void Server::SendHttpResponse(int client_fd) {
 	message::Response              response         = message_manager_.PopHeadResponse(client_fd);
 	const message::ConnectionState connection_state = response.connection_state;
 	const std::string             &response_str     = response.response_str;
 
-	const Send::SendResult send_result = Send::SendResponse(client_fd, response_str);
+	const Send::SendResult send_result = Send::SendStr(client_fd, response_str);
 	if (!send_result.IsOk()) {
 		// Even if sending fails, continue the server
 		// e.g., in case of a SIGPIPE(EPIPE) when the client disconnects
@@ -363,20 +372,15 @@ void Server::AddEventRead(int sock_fd) {
 	}
 }
 
-void Server::ReplaceEvent(int client_fd, event::Type type) {
+void Server::ReplaceEvent(int client_fd, uint32_t type) {
 	try {
 		event_monitor_.Replace(client_fd, type);
 	} catch (const SystemException &e) {
 		utils::PrintError(e.what());
-		switch (type) {
-		case event::EVENT_READ:
-			SetInternalServerError(client_fd);
-			break;
-		case event::EVENT_WRITE:
+		if (type & event::EVENT_WRITE) {
 			Disconnect(client_fd);
-			break;
-		default:
-			break;
+		} else {
+			SetInternalServerError(client_fd);
 		}
 	}
 }
@@ -477,6 +481,128 @@ void Server::SetNonBlockingMode(int sock_fd) {
 	flags |= O_NONBLOCK;
 	if (fcntl(sock_fd, F_SETFL, flags) == SYSTEM_ERROR) {
 		throw SystemException("fcntl F_SETFL failed: " + std::string(std::strerror(errno)));
+	}
+}
+
+bool Server::IsCgi(int fd) const {
+	return !message_manager_.IsMessageExist(fd);
+}
+
+void Server::HandleCgi(int client_fd, const http::CgiResult &cgi_result) {
+	if (!cgi_result.is_cgi) {
+		return;
+	}
+	try {
+		cgi_manager_.AddNewCgi(client_fd, cgi_result.cgi_request);
+		// RunCgi() is called only when a new Cgi is added via AddNewCgi().
+		cgi_manager_.RunCgi(client_fd);
+		AddEventForCgi(client_fd);
+	} catch (const SystemException &e) {
+		utils::PrintError(e.what());
+		cgi_manager_.DeleteCgi(client_fd);
+		SetInternalServerError(client_fd);
+	}
+}
+
+// throw(SystemException)
+void Server::AddEventForCgi(int client_fd) {
+	const CgiManager::GetFdResult read_fd_result = cgi_manager_.GetReadFd(client_fd);
+	if (read_fd_result.IsOk()) {
+		event_monitor_.Add(read_fd_result.GetValue(), event::EVENT_READ);
+	}
+
+	const CgiManager::GetFdResult write_fd_result = cgi_manager_.GetWriteFd(client_fd);
+	if (write_fd_result.IsOk()) {
+		event_monitor_.Add(write_fd_result.GetValue(), event::EVENT_WRITE);
+	}
+}
+
+void Server::SendCgiRequest(int pipe_fd) {
+	const int          client_fd   = cgi_manager_.GetClientFd(pipe_fd);
+	const std::string &request_str = cgi_manager_.GetRequest(client_fd);
+
+	const Send::SendResult send_result = Send::SendStr(pipe_fd, request_str);
+	if (!send_result.IsOk()) {
+		utils::Debug(
+			"cgi", "Failed to send the request to the child process through pipe_fd", pipe_fd
+		);
+		cgi_manager_.DeleteCgi(client_fd);
+		// todo: close()だけしない？
+		Disconnect(client_fd);
+		return;
+	}
+	const std::string &new_request_str = send_result.GetValue();
+	cgi_manager_.ReplaceNewRequest(client_fd, new_request_str);
+	if (new_request_str.empty()) {
+		ReplaceEvent(pipe_fd, event::EVENT_READ);
+	}
+}
+
+void Server::HandleCgiReadResult(int pipe_fd, const Read::ReadResult &read_result) {
+	const int client_fd = cgi_manager_.GetClientFd(pipe_fd);
+
+	if (!read_result.IsOk()) {
+		utils::Debug(
+			"cgi", "Failed to read the response from the child process through pipe_fd", pipe_fd
+		);
+		cgi_manager_.DeleteCgi(client_fd);
+		SetInternalServerError(client_fd);
+		return;
+	}
+	const CgiResponseResult cgi_response_result =
+		AddAndGetCgiResponse(pipe_fd, read_result.GetValue().read_buf);
+	if (!cgi_response_result.IsOk()) {
+		return;
+	}
+	GetHttpResponseFromCgiResponse(pipe_fd, cgi_response_result.GetValue());
+}
+
+Server::CgiResponseResult Server::AddAndGetCgiResponse(int pipe_fd, const std::string &read_buf) {
+	const int client_fd = cgi_manager_.GetClientFd(pipe_fd);
+
+	CgiResponseResult      cgi_response_result;
+	const cgi::CgiResponse cgi_response = cgi_manager_.AddAndGetResponse(client_fd, read_buf);
+	if (!cgi_response.is_response_complete) {
+		cgi_response_result.Set(false);
+		return cgi_response_result;
+	}
+	cgi_response_result.Set(true, cgi_response);
+
+	event_monitor_.Delete(pipe_fd);
+	cgi_manager_.DeleteCgi(client_fd);
+	utils::Debug("cgi", "Read the entire response from the child process through pipe_fd", pipe_fd);
+	return cgi_response_result;
+}
+
+void Server::GetHttpResponseFromCgiResponse(int pipe_fd, const cgi::CgiResponse &cgi_response) {
+	const int client_fd = cgi_manager_.GetClientFd(pipe_fd);
+
+	const http::HttpResult http_result = http_.GetResponseFromCgi(client_fd, cgi_response);
+	message_manager_.SetNewRequestBuf(client_fd, http_result.request_buf);
+	if (!http_result.is_response_complete) {
+		throw std::logic_error("GetResponseFromCgi: incorrect HttpResult");
+	}
+	message_manager_.SetIsCompleteRequest(client_fd, true);
+	utils::Debug("server", "received all request from client", client_fd);
+
+	const message::ConnectionState connection_state =
+		http_result.is_connection_keep ? message::KEEP : message::CLOSE;
+	message_manager_.AddNormalResponse(client_fd, connection_state, http_result.response);
+	UpdateEventInCgiResponseComplete(connection_state, client_fd);
+}
+
+void Server::UpdateEventInCgiResponseComplete(
+	const message::ConnectionState connection_state, int client_fd
+) {
+	switch (connection_state) {
+	case message::KEEP:
+		ReplaceEvent(client_fd, event::EVENT_READ | event::EVENT_WRITE);
+		break;
+	case message::CLOSE:
+		ReplaceEvent(client_fd, event::EVENT_WRITE);
+		break;
+	default:
+		break;
 	}
 }
 
