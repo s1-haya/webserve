@@ -581,25 +581,23 @@ void Server::HandleCgiReadResult(int read_fd, const Read::ReadResult &read_resul
 		return;
 	}
 	const CgiResponseResult cgi_response_result =
-		AddAndGetCgiResponse(read_fd, read_result.GetValue().read_buf);
+		AddAndGetCgiResponse(client_fd, read_result.GetValue().read_buf);
 	if (!cgi_response_result.IsOk()) {
 		return;
 	}
+	utils::Debug("cgi", "Read the entire response from the child process through pipe_fd", read_fd);
 	// Explicitly delete from cgi_manager
 	cgi_manager_.DeleteCgi(client_fd);
 	GetHttpResponseFromCgiResponse(client_fd, cgi_response_result.GetValue());
 }
 
-Server::CgiResponseResult Server::AddAndGetCgiResponse(int read_fd, const std::string &read_buf) {
-	const int client_fd = cgi_manager_.GetClientFd(read_fd);
-
+Server::CgiResponseResult Server::AddAndGetCgiResponse(int client_fd, const std::string &read_buf) {
 	CgiResponseResult      cgi_response_result;
 	const cgi::CgiResponse cgi_response = cgi_manager_.AddAndGetResponse(client_fd, read_buf);
 	if (!cgi_response.is_response_complete) {
 		cgi_response_result.Set(false);
 		return cgi_response_result;
 	}
-	utils::Debug("cgi", "Read the entire response from the child process through pipe_fd", read_fd);
 	cgi_response_result.Set(true, cgi_response);
 	return cgi_response_result;
 }
