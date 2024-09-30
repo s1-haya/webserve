@@ -8,6 +8,59 @@
  *         and containing the response data.
  */
 
+/** この設定を再現
+server {
+	# the port only
+	listen 8080;
+	server_name host host.com;
+
+	# error_page
+	error_page 404 /error_pages/404.html;
+
+	# client_max_body_size (default 1m)
+	client_max_body_size 2024;
+
+	# alias
+	# index
+	location / {
+		alias /html/;
+		index index.html;
+	}
+
+	# upload_directory
+	# allow_methods
+	# autoindex
+	location /upload {
+		upload_dir /upload;
+		allowed_methods GET POST DELETE;
+		autoindex on;
+	}
+
+	# cgi_extension
+	location /cgi-bin {
+		cgi_extension .pl;
+		allowed_methods GET POST;
+	}
+
+	# GET method not allowed
+	location /get_not_allowed {
+		allowed_methods DELETE;
+	}
+}
+
+server {
+	# the port and host
+	listen 127.0.0.1:8000;
+	server_name host2;
+
+	# return
+	location / {
+		alias /html/;
+		return 301 index.html;
+	}
+}
+ */
+
 #include "http_message.hpp"
 #include "virtual_server.hpp"
 
