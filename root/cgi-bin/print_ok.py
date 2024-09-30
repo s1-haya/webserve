@@ -3,8 +3,8 @@
 import os
 
 def print_ok():
-	print(f"Content-type: text/plain\n\n")
-	print(f"OK")
+	print("Content-type: text/plain\n\n")
+	print("OK")
 
 
 if __name__ == "__main__":
