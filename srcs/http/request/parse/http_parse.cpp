@@ -286,12 +286,6 @@ void HttpParse::CheckValidHeaderFieldName(
 	}
 }
 
-bool HttpParse::HasConnectionKeepInHeaderFields(const HeaderFields &header_fields) {
-	typedef HeaderFields::const_iterator Itr;
-	Itr                                  it = header_fields.find(CONNECTION);
-	return (it != header_fields.end() && it->second == KEEP_ALIVE);
-}
-
 // status_line && header
 // message-body
 
