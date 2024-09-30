@@ -1,4 +1,5 @@
 #include "http_response.hpp"
+#include "cgi.hpp"
 #include "cgi_parse.hpp"
 #include "client_infos.hpp"
 #include "http_exception.hpp"
@@ -205,6 +206,31 @@ std::string HttpResponse::CreateErrorResponse(const StatusCode &status_code) {
 	response.body_message                  = CreateDefaultBodyMessage(status_code);
 	response.header_fields[CONTENT_LENGTH] = utils::ToString(response.body_message.length());
 	return CreateHttpResponse(response);
+}
+
+std::string HttpResponse::GetResponseFromCgi(
+	const cgi::CgiResponse &cgi_response, const HttpRequestResult &request_info
+) {
+	StatusCode  status_code(OK);
+	std::string response_body_message = cgi_response.response;
+
+	HeaderFields response_header_fields;
+	response_header_fields[SERVER]         = SERVER_VERSION;
+	response_header_fields[CONTENT_TYPE]   = cgi_response.content_type;
+	response_header_fields[CONTENT_LENGTH] = utils::ToString(response_body_message.length());
+	if (IsConnectionKeep(request_info.request.header_fields)) {
+		response_header_fields[CONNECTION] = KEEP_ALIVE;
+	} else {
+		response_header_fields[CONNECTION] = CLOSE;
+	} // InitResponseHeaderFields が完成したらそれを使う
+
+	HttpResponseFormat response_format(
+		StatusLine(HTTP_VERSION, status_code.GetStatusCode(), status_code.GetReasonPhrase()),
+		response_header_fields,
+		response_body_message
+	);
+
+	return CreateHttpResponse(response_format);
 }
 
 } // namespace http

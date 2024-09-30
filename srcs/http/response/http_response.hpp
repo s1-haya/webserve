@@ -10,6 +10,12 @@
 #include <map>
 #include <string>
 
+namespace cgi {
+
+struct CgiResponse;
+
+}
+
 namespace http {
 
 struct HttpRequestResult;
@@ -42,6 +48,8 @@ class HttpResponse {
 	static std::string CreateErrorResponse(const StatusCode &status_code);
 	static bool        IsConnectionKeep(const HeaderFields &request_header_fields);
 	static std::string CreateDefaultBodyMessage(const StatusCode &status_code);
+	static std::string
+	GetResponseFromCgi(const cgi::CgiResponse &cgi_response, const HttpRequestResult &request_info);
 
   private:
 	HttpResponse();
