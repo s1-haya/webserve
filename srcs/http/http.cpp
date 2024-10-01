@@ -60,7 +60,8 @@ HttpResult Http::CreateHttpResponse(
 	result.is_connection_keep =
 		HttpResponse::IsConnectionKeep(data.request_result.request.header_fields);
 	result.request_buf = data.current_buf;
-	result.response    = HttpResponse::Run(server_info, data.request_result, result.cgi_result);
+	result.response =
+		HttpResponse::Run(client_info, server_info, data.request_result, result.cgi_result);
 	// todo: 仮。CGI実行中はfalseにしたい
 	result.is_response_complete = !result.cgi_result.is_cgi;
 	if (!result.cgi_result.is_cgi) { // cgiの場合はcgiのhttp_responseを作るときにsave_dataが必要
