@@ -37,26 +37,22 @@ std::string ReadFile(const std::string &file_path) {
 	return FileToString(file);
 }
 
+bool EndWith(const std::string &str, const std::string &suffix) {
+	return str.size() >= suffix.size() &&
+		   str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0;
+}
+
 // ファイルの拡張子に基づいてContent-Typeを決定する関数: デフォルトはtext/plain
 std::string DetermineContentType(const std::string &path) {
 	const std::string html_extension = ".html";
 	const std::string json_extension = ".json";
 	const std::string pdf_extension  = ".pdf";
 
-	if (path.size() >= html_extension.length() &&
-		path.compare(
-			path.size() - html_extension.length(), html_extension.length(), html_extension
-		) == 0) {
-		return "text/html";
-	} else if (path.size() >= json_extension.length() &&
-			   path.compare(
-				   path.size() - json_extension.length(), json_extension.length(), json_extension
-			   ) == 0) {
+	if (EndWith(path, html_extension)) {
+		return http::TEXT_HTML;
+	} else if (EndWith(path, json_extension)) {
 		return "application/json";
-	} else if (path.size() >= pdf_extension.length() &&
-			   path.compare(
-				   path.size() - pdf_extension.length(), pdf_extension.length(), pdf_extension
-			   ) == 0) {
+	} else if (EndWith(path, pdf_extension)) {
 		return "application/pdf";
 	}
 	return "text/plain";
