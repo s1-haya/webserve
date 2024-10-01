@@ -218,22 +218,6 @@ int TestGetOk17NotExistHeaderField(const server::VirtualServerAddrList &server_i
 	return HandleHttpResult(client_infos, server_infos, expected, "200-17");
 }
 
-int TestGetOk20CgiScriptInShell(const server::VirtualServerAddrList &server_infos) {
-	http::ClientInfos client_infos = CreateClientInfos(request::GET_200_20_CGI_SCRIPT_IN_SHELL);
-	std::string       expected_status_line  = EXPECTED_STATUS_LINE_OK;
-	std::string       expected_body_message = "OK";
-	HeaderFields      expected_header_fields;
-	expected_header_fields[http::CONNECTION]     = http::CLOSE;
-	expected_header_fields[http::CONTENT_LENGTH] = utils::ToString(expected_body_message.length());
-	expected_header_fields[http::CONTENT_TYPE]   = http::TEXT_PLAIN;
-	expected_header_fields[http::SERVER]         = http::SERVER_VERSION;
-	const std::string &expected_response         = CreateHttpResponseFormat(
-        expected_status_line, expected_header_fields, expected_body_message
-    );
-	http::HttpResult expected = CreateHttpResult(true, false, "", expected_response);
-	return HandleHttpResult(client_infos, server_infos, expected, "200-20");
-}
-
 int TestGetOk21NoConnection(const server::VirtualServerAddrList &server_infos) {
 	http::ClientInfos client_infos          = CreateClientInfos(request::GET_200_21_NO_CONNECTION);
 	std::string       expected_status_line  = EXPECTED_STATUS_LINE_OK;

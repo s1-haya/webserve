@@ -57,4 +57,20 @@ int TestCgiGetOk3PrintOkInPython(const server::VirtualServerAddrList &server_inf
 	return HandleHttpResult(client_infos, server_infos, expected, "200-03");
 }
 
+int TestCgiGetOk4PrintOkInShell(const server::VirtualServerAddrList &server_infos) {
+	http::ClientInfos client_infos = CreateClientInfos(request::cgi::GET_200_04_PRINT_OK_SHELL);
+	std::string       expected_status_line  = EXPECTED_STATUS_LINE_OK;
+	std::string       expected_body_message = "OK";
+	HeaderFields      expected_header_fields;
+	expected_header_fields[http::CONNECTION]     = http::CLOSE;
+	expected_header_fields[http::CONTENT_LENGTH] = utils::ToString(expected_body_message.length());
+	expected_header_fields[http::CONTENT_TYPE]   = http::TEXT_PLAIN;
+	expected_header_fields[http::SERVER]         = http::SERVER_VERSION;
+	const std::string &expected_response         = CreateHttpResponseFormat(
+        expected_status_line, expected_header_fields, expected_body_message
+    );
+	http::HttpResult expected = CreateHttpResult(true, false, "", expected_response);
+	return HandleHttpResult(client_infos, server_infos, expected, "200-04");
+}
+
 } // namespace test
