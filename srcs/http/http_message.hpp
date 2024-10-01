@@ -13,6 +13,7 @@ extern const std::string HEADER_FIELDS_END;
 extern const std::string HTTP_VERSION;
 extern const std::string SERVER_VERSION;
 extern const std::string TEXT_HTML;
+extern const std::string TEXT_PLAIN;
 
 extern const std::string GET;
 extern const std::string DELETE;

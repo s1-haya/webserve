@@ -51,7 +51,28 @@ int  main(void) {
 
     server::VirtualServerAddrList server_infos = BuildVirtualServerAddrList();
     ret_code |= test::TestGetOk1ConnectionClose(server_infos);
-    ret_code |= test::TestGetOk13ExtraRequest(server_infos);
+    ret_code |= test::TestGetOk2ConnectionKeep(server_infos);
+    ret_code |= test::TestGetOk3SubConnectionClose(server_infos);
+    ret_code |= test::TestGetOk4ConnectionKeepAndOkConnectionKeep(server_infos);
+    ret_code |= test::TestGetOk5ConnectionCloseAndOkConnectionClose(server_infos);
+    ret_code |= test::TestGetOk6ConnectionKeepAndOkConnectionClose(server_infos);
+    ret_code |= test::TestGetOk7DuplicateConnectionKeep(server_infos);
+    ret_code |= test::TestGetOk8DuplicateConnectionClose(server_infos);
+    ret_code |= test::TestGetOk9ConnectionKeepAndClose(server_infos);
+    ret_code |= test::TestGetOk10ConnectionCloseAndKeep(server_infos);
+    // todo: ヘッダーフィールド大文字、小文字対応する？(優先度は低い)
+    // ret_code |= test::TestGetOk11UpperAndLowerHeaderFields(server_infos);
+    ret_code |= test::TestGetOk12HeaderFieldValueSpace(server_infos);
+    ret_code |= test::TestGetOk13SpaceHeaderFieldValue(server_infos);
+    ret_code |= test::TestGetOk14ExtraRequest(server_infos);
+    ret_code |= test::TestGetOk15BodyMessageDefault(server_infos);
+    // todo: cgi
+    // ret_code |= test::TestGetOk16BodyMessageCgi(server_infos);
+    ret_code |= test::TestGetOk17NotExistHeaderField(server_infos);
+    // ret_code |= test::TestGetOk18CgiScriptInPerl(server_infos);
+    // ret_code |= test::TestGetOk19CgiScriptInPython(server_infos);
+    // ret_code |= test::TestGetOk20CgiScriptInShell(server_infos);
+    ret_code |= test::TestGetOk21NoConnection(server_infos);
 
     ret_code |= test::TestGetBadRequest1OnlyCrlf(server_infos);
     ret_code |= test::TestGetBadRequest2LowerMethod(server_infos);

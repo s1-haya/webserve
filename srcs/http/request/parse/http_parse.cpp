@@ -219,13 +219,10 @@ HeaderFields HttpParse::SetHeaderFields(const std::vector<std::string> &header_f
 		// todo:
 		// マルチパートを対応する場合はutils::SplitStrを使用して、セミコロン区切りのstd::vector<std::string>になる。
 		// ex) Content-Type: multipart/form-data; boundary=----WebKitFormBoundary64XhQJfFNRKx7oK7
-		typedef std::pair<HeaderFields::const_iterator, bool> Result;
-		Result result = header_fields.insert(std::make_pair(header_field_name, header_field_value));
-		if (result.second == false) {
-			throw HttpException(
-				"Error: The value already exists in header fields", StatusCode(BAD_REQUEST)
-			);
+		if (header_field_name == CONNECTION && header_field_value == CLOSE) {
+			header_fields[CONNECTION] = header_field_value;
 		}
+		header_fields.insert(std::make_pair(header_field_name, header_field_value));
 	}
 	return header_fields;
 }
