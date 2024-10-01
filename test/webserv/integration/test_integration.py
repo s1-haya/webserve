@@ -78,6 +78,10 @@ for filename, data_var, length_var in error_files:
     globals()[data_var] = data
     globals()[length_var] = length
 
+
+REQUEST_DIR = "test/common/request/"
+REQUEST_GET_2XX_DIR = REQUEST_DIR + "get/2xx/"
+
 response_header_get_root_200_close = f"HTTP/1.1 200 OK\r\nConnection: close\r\nContent-Length: {root_index_file_length}\r\nContent-Type: text/html\r\nServer: webserv/1.1\r\n\r\n"
 response_header_get_root_200_keep = f"HTTP/1.1 200 OK\r\nConnection: keep-alive\r\nContent-Length: {root_index_file_length}\r\nContent-Type: text/html\r\nServer: webserv/1.1\r\n\r\n"
 response_header_get_sub_200_close = f"HTTP/1.1 200 OK\r\nConnection: close\r\nContent-Length: {sub_index_file_length}\r\nContent-Type: text/html\r\nServer: webserv/1.1\r\n\r\n"
@@ -100,35 +104,35 @@ not_implemented_response = response_header_501 + not_implemented_file_501.decode
     "request_file, expected_response",
     [
         (
-            "test/common/request/get/2xx/200_01_connection_close.txt",
+            REQUEST_GET_2XX_DIR + "200_01_connection_close.txt",
             response_header_get_root_200_close + root_index_file,
         ),
         (
-            "test/common/request/get/2xx/200_02_connection_keep.txt",
+            REQUEST_GET_2XX_DIR + "200_02_connection_keep.txt",
             response_header_get_root_200_keep + root_index_file,
         ),
         (
-            "test/common/request/get/2xx/200_03_sub_connection_close.txt",
+            REQUEST_GET_2XX_DIR + "200_03_sub_connection_close.txt",
             response_header_get_sub_200_close + sub_index_file,
         ),
         (
-            "test/common/request/get/2xx/200_12_header_field_value_space.txt",
+            REQUEST_GET_2XX_DIR + "200_12_header_field_value_space.txt",
             response_header_get_root_200_close + root_index_file,
         ),
         (
-            "test/common/request/get/2xx/200_13_space_header_field_value.txt",
+            REQUEST_GET_2XX_DIR + "200_13_space_header_field_value.txt",
             response_header_get_root_200_close + root_index_file,
         ),
         (
-            "test/common/request/get/2xx/200_14_extra_request.txt",
+            REQUEST_GET_2XX_DIR + "200_14_extra_request.txt",
             response_header_get_root_200_close + root_index_file,
         ),
         (
-            "test/common/request/get/2xx/200_15_body_message_default.txt",
+            REQUEST_GET_2XX_DIR + "200_15_body_message_default.txt",
             response_header_get_root_200_close + root_index_file,
         ),
         (
-            "test/common/request/get/2xx/200_17_not_exist_header_field.txt",
+            REQUEST_GET_2XX_DIR + "200_17_not_exist_header_field.txt",
             response_header_get_root_200_close + root_index_file,
         ),
         ("test/common/request/get/4xx/400_02_lower_method.txt", bad_request_response),
