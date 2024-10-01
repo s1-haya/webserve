@@ -39,8 +39,6 @@ static const std::string &GET_200_14_EXTRA_REQUEST =
 	LoadFileContent(REQUEST_GET + ROOT_2XX + "/200_14_extra_request.txt");
 static const std::string &GET_200_15_BODY_MESSAGE_DEFAULT =
 	LoadFileContent(REQUEST_GET + ROOT_2XX + "/200_15_body_message_default.txt");
-static const std::string &GET_200_16_BODY_MESSAGE_CGI =
-	LoadFileContent(REQUEST_GET + ROOT_2XX + "/200_16_body_message_cgi.txt");
 static const std::string &GET_200_17_NOT_EXIST_HEADER_FIELD =
 	LoadFileContent(REQUEST_GET + ROOT_2XX + "/200_17_not_exist_header_field.txt");
 static const std::string &GET_200_18_CGI_SCRIPT_IN_PERL =
@@ -103,8 +101,16 @@ static const std::string &ROOT_5XX = "/5xx";
 static const std::string &GET_501_1_NOT_EXIST_METHOD =
 	LoadFileContent(REQUEST_GET + ROOT_5XX + "/501_01_not_exist_method.txt");
 
-} // namespace request
+namespace cgi {
 
+static const std::string &REQUEST_CGI = REQUEST + "/cgi";
+static const std::string &CGI_GET     = REQUEST_CGI + "/get";
+
+static const std::string &GET_200_01_PRINT_OK_PL_BODY_MESSAGE =
+	LoadFileContent(CGI_GET + "/200_01_print_ok_pl_body_message.txt");
+
+} // namespace cgi
+} // namespace request
 } // namespace test
 
 #endif

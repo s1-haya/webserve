@@ -62,8 +62,6 @@ int  main(void) {
     ret_code |= test::TestGetOk13SpaceHeaderFieldValue(server_infos);
     ret_code |= test::TestGetOk14ExtraRequest(server_infos);
     ret_code |= test::TestGetOk15BodyMessageDefault(server_infos);
-    // todo: cgi
-    // ret_code |= test::TestGetOk16BodyMessageCgi(server_infos);
     ret_code |= test::TestGetOk17NotExistHeaderField(server_infos);
     // ret_code |= test::TestGetOk18CgiScriptInPerl(server_infos);
     // ret_code |= test::TestGetOk19CgiScriptInPython(server_infos);
@@ -98,6 +96,10 @@ int  main(void) {
     // todo: HttpResponse::CreateTimeoutResponse
     // ret_code |= test::TestGetTimeout1NoCrlf(server_infos);
     ret_code |= test::TestGetNotImplemented1NotExistMethod(server_infos);
+
+    // test cgi
+    std::cout << "\n\033[44;37m[ Test Cgi ]\033[m" << std::endl;
+    // ret_code |= test::TestCgiGetOk1PrintOkBodyMessage(server_infos);
     DeleteVirtualServerAddrList(server_infos);
 
     // test GetErrorResponse

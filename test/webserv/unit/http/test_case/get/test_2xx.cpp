@@ -202,22 +202,6 @@ int TestGetOk15BodyMessageDefault(const server::VirtualServerAddrList &server_in
 	return HandleHttpResult(client_infos, server_infos, expected, "200-15");
 }
 
-int TestGetOk16BodyMessageCgi(const server::VirtualServerAddrList &server_infos) {
-	http::ClientInfos client_infos = CreateClientInfos(request::GET_200_16_BODY_MESSAGE_CGI);
-	std::string       expected_status_line  = EXPECTED_STATUS_LINE_OK;
-	std::string       expected_body_message = "OK";
-	HeaderFields      expected_header_fields;
-	expected_header_fields[http::CONNECTION]     = http::CLOSE;
-	expected_header_fields[http::CONTENT_LENGTH] = utils::ToString(expected_body_message.length());
-	expected_header_fields[http::CONTENT_TYPE]   = http::TEXT_PLAIN;
-	expected_header_fields[http::SERVER]         = http::SERVER_VERSION;
-	const std::string &expected_response         = CreateHttpResponseFormat(
-        expected_status_line, expected_header_fields, expected_body_message
-    );
-	http::HttpResult expected = CreateHttpResult(true, false, "", expected_response);
-	return HandleHttpResult(client_infos, server_infos, expected, "200-16");
-}
-
 int TestGetOk17NotExistHeaderField(const server::VirtualServerAddrList &server_infos) {
 	http::ClientInfos client_infos = CreateClientInfos(request::GET_200_17_NOT_EXIST_HEADER_FIELD);
 	std::string       expected_status_line  = EXPECTED_STATUS_LINE_OK;
