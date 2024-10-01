@@ -132,7 +132,10 @@ not_implemented_response = response_header_501 + not_implemented_file_501.decode
         ),
         ("test/common/request/get/4xx/400_10_duplicate_host.txt", bad_request_response),
         ("test/common/request/get/4xx/404_01_not_exist_path.txt", not_found_response),
-        ("test/common/request/get/4xx/405_01_not_allowed.txt", not_allowed_response),
+        (
+            "test/common/request/get/4xx/405_01_method_not_allowed_for_uri.txt",
+            not_allowed_response,
+        ),
         (
             "test/common/request/get/5xx/501_01_not_exist_method.txt",
             not_implemented_response,
