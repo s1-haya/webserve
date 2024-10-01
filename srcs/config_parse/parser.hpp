@@ -57,9 +57,11 @@ class Parser {
 	static const int STATUS_CODE_MAX = 599;
 
 	/* For duplicated parameter */
-	typedef std::set<std::string> DirectiveSet;
-	DirectiveSet                  server_directive_set_;
-	DirectiveSet                  location_directive_set_;
+	typedef std::set<std::string>  DirectiveSet;
+	DirectiveSet                   server_directive_set_;
+	DirectiveSet                   location_directive_set_;
+	typedef std::list<std::string> LocationUriList;
+	LocationUriList                location_uri_list_;
 
   public:
 	explicit Parser(std::list<node::Node> &);

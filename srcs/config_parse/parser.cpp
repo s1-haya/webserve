@@ -55,6 +55,7 @@ context::ServerCon Parser::CreateServerContext(NodeItr &it) {
 	context::ServerCon server;
 
 	server_directive_set_.clear();
+	location_uri_list_.clear();
 	if ((*it).token_type != node::L_BRACKET) {
 		throw std::runtime_error("expect { after server");
 	}
@@ -197,7 +198,11 @@ context::LocationCon Parser::CreateLocationContext(NodeItr &it) {
 	if ((*it).token_type != node::WORD) {
 		throw std::runtime_error("invalid number of arguments in 'location' directive");
 	}
+	if (FindDuplicated(location_uri_list_, (*it).token)) {
+		throw std::runtime_error("a duplicated parameter in 'location' directive: " + (*it).token);
+	}
 	location.request_uri = (*it).token;
+	location_uri_list_.push_back((*it).token);
 	++it; // skip /www/
 	if ((*it).token_type != node::L_BRACKET) {
 		throw std::runtime_error("expect { after location argument");
