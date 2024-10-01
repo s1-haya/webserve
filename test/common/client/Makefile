@@ -1,14 +1,18 @@
 NAME		:=	client
 
-UTILS_DIR	:=	../../../srcs/utils
+WS_SRCS_DIR		:=	../../../srcs
+WS_UTILS_DIR	:=	$(WS_SRCS_DIR)/utils
+
 SRCS		:=	client.cpp \
 				main.cpp \
-				$(UTILS_DIR)/color.cpp
+				$(WS_UTILS_DIR)/color.cpp
 
 OBJ_DIR		:=	objs
-OBJS		:=	$(SRCS:%.cpp=$(OBJ_DIR)/%.o)
+OBJS		:=	$(patsubst %.cpp, $(OBJ_DIR)/%.o, $(notdir $(SRCS)))
 
-INCLUDES	:=	-I. -I$(UTILS_DIR)/
+SRCS_DIR	:=	$(WS_UTILS_DIR)
+
+INCLUDES	:=	$(addprefix -I, $(SRCS_DIR))
 
 CXX			:=	c++
 CXXFLAGS	:=	-std=c++98 -Wall -Wextra -Werror -MMD -MP -pedantic
@@ -20,6 +24,7 @@ MKDIR		:=	mkdir -p
 .PHONY	: all
 all		: $(NAME)
 
+vpath %.cpp $(SRCS_DIR)
 $(OBJ_DIR)/%.o: %.cpp
 	@$(MKDIR) $(dir $@)
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
