@@ -38,7 +38,7 @@ std::string ReadFile(const std::string &file_path) {
 }
 
 // ファイルの拡張子に基づいてContent-Typeを決定する関数: デフォルトはtext/plain
-std::string determineContentType(const std::string &path) {
+std::string DetermineContentType(const std::string &path) {
 	const std::string html_extension = ".html";
 	const std::string json_extension = ".json";
 	const std::string pdf_extension  = ".pdf";
@@ -113,7 +113,7 @@ StatusCode Method::GetHandler(
 			response_body_message = ReadFile(path + index_file_path);
 			response_header_fields[CONTENT_LENGTH] =
 				utils::ToString(response_body_message.length());
-			response_header_fields[CONTENT_TYPE] = determineContentType(path + index_file_path);
+			response_header_fields[CONTENT_TYPE] = DetermineContentType(path + index_file_path);
 		} else if (autoindex_on) {
 			utils::Result<std::string> result = AutoindexHandler(path);
 			response_body_message             = result.GetValue();
@@ -134,7 +134,7 @@ StatusCode Method::GetHandler(
 			response_body_message = ReadFile(path);
 			response_header_fields[CONTENT_LENGTH] =
 				utils::ToString(response_body_message.length());
-			response_header_fields[CONTENT_TYPE] = determineContentType(path);
+			response_header_fields[CONTENT_TYPE] = DetermineContentType(path);
 		}
 	} else {
 		throw HttpException("Error: Not Found", StatusCode(NOT_FOUND));
