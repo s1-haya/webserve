@@ -16,7 +16,7 @@ std::string GetExtension(const std::string &path) {
 	if (pos == std::string::npos || pos == path.length() - 1) {
 		return "";
 	}
-	return path.substr(pos + 1);
+	return path.substr(pos);
 }
 
 } // namespace

@@ -57,6 +57,8 @@ InputIt Next(InputIt it, typename std::iterator_traits<InputIt>::difference_type
 const std::string html_dir_path    = "../../../../html";
 const std::string cgi_bin_dir_path = "../../../../cgi-bin";
 
+// todo: TranslateToCgiPath()アップデートしてから
+/*
 int Test1() {
 	// request
 	const RequestLine request_line = {"GET", "/", "HTTP/1.1"};
@@ -95,6 +97,7 @@ int Test1() {
 	PrintOk();
 	return EXIT_SUCCESS;
 }
+*/
 
 /* 不足しているフィールドがある場合 */
 int Test2() {
@@ -140,7 +143,7 @@ int Test2() {
 int main() {
 	int ret = EXIT_SUCCESS;
 
-	ret |= Test1();
+	// ret |= Test1();
 	ret |= Test2();
 
 	return ret;

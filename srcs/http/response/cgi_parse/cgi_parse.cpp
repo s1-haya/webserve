@@ -13,14 +13,18 @@ std::string CreatePathInfo(const std::string &cgi_extension, const std::string &
 	return "";
 }
 
+// todo: Server-Cgiを動かすため一旦前の実装をコメントアウト
 std::string
 TranslateToCgiPath(const std::string &cgi_extension, const std::string &request_target) {
 	// from cgi_parse dir to cgi dir
-	std::string::size_type pos = request_target.find(cgi_extension);
-	if (pos != std::string::npos) { // for /aa.cgi/bb only return /aa.cgi
-		return "../../../../cgi-bin" + request_target.substr(0, pos + cgi_extension.length());
-	}
-	return "../../../../cgi-bin" + request_target;
+	// std::string::size_type pos = request_target.find(cgi_extension);
+	// if (pos != std::string::npos) { // for /aa.cgi/bb only return /aa.cgi
+	// 	return "../../../../cgi-bin" + request_target.substr(0, pos + cgi_extension.length());
+	// }
+	// return "../../../../cgi-bin" + request_target;
+	(void)cgi_extension;
+	const std::string::size_type pos = request_target.find("root/cgi-bin/");
+	return request_target.substr(pos);
 }
 
 std::string TranslateToHtmlPath(const std::string &request_target) {
