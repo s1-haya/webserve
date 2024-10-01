@@ -151,6 +151,34 @@ not_implemented_response = response_header_501 + not_implemented_file_501.decode
             bad_request_response,
         ),
         ("test/common/request/get/4xx/400_10_duplicate_host.txt", bad_request_response),
+        (
+            "test/common/request/get/4xx/400_11_no_header_field_colon.txt",
+            bad_request_response,
+        ),
+        (
+            "test/common/request/get/4xx/400_12_no_connection_name.txt",
+            bad_request_response,
+        ),
+        (
+            "test/common/request/get/4xx/400_15_space_in_header_field_name.txt",
+            bad_request_response,
+        ),
+        (
+            "test/common/request/get/4xx/400_16_header_field_name_space_colon.txt",
+            bad_request_response,
+        ),
+        (
+            "test/common/request/get/4xx/400_17_space_header_field_name.txt",
+            bad_request_response,
+        ),
+        (
+            "test/common/request/get/4xx/400_18_non_vchr_header_field_name.txt",
+            bad_request_response,
+        ),
+        (
+            "test/common/request/get/4xx/400_19_non_vchr_header_field_value.txt",
+            bad_request_response,
+        ),
         ("test/common/request/get/4xx/404_01_not_exist_path.txt", not_found_response),
         ("test/common/request/get/4xx/405_01_not_allowed.txt", not_allowed_response),
         (
