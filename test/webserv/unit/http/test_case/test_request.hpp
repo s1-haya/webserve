@@ -95,7 +95,7 @@ static const std::string &GET_400_19_NON_VCHR_HEADER_FIELD_VALUE =
 static const std::string &GET_404_1_NOT_EXIST_PATH_CONNECTION_CLOSE =
 	LoadFileContent(REQUEST_GET + ROOT_4XX + "/404_01_not_exist_path.txt");
 static const std::string &GET_405_1_NOT_ALLOWED =
-	LoadFileContent(REQUEST_GET + ROOT_4XX + "/405_01_not_allowed.txt");
+	LoadFileContent(REQUEST_GET + ROOT_4XX + "/405_01_method_not_allowed_for_uri.txt");
 static const std::string &GET_408_1_NO_CRLF =
 	LoadFileContent(REQUEST_GET + ROOT_4XX + "/408_01_no_crlf.txt");
 
