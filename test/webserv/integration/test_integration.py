@@ -111,6 +111,26 @@ not_implemented_response = response_header_501 + not_implemented_file_501.decode
             "test/common/request/get/2xx/200_03_sub_connection_close.txt",
             response_header_get_sub_200_close + sub_index_file,
         ),
+        (
+            "test/common/request/get/2xx/200_12_header_field_value_space.txt",
+            response_header_get_root_200_close + root_index_file,
+        ),
+        (
+            "test/common/request/get/2xx/200_13_space_header_field_value.txt",
+            response_header_get_root_200_close + root_index_file,
+        ),
+        (
+            "test/common/request/get/2xx/200_14_extra_request.txt",
+            response_header_get_root_200_close + root_index_file,
+        ),
+        (
+            "test/common/request/get/2xx/200_15_body_message_default.txt",
+            response_header_get_root_200_close + root_index_file,
+        ),
+        (
+            "test/common/request/get/2xx/200_17_not_exist_header_field.txt",
+            response_header_get_root_200_close + root_index_file,
+        ),
         ("test/common/request/get/4xx/400_02_lower_method.txt", bad_request_response),
         (
             "test/common/request/get/4xx/400_03_no_ascii_method.txt",
