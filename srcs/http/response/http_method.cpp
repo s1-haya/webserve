@@ -55,7 +55,7 @@ std::string DetermineContentType(const std::string &path) {
 	} else if (EndWith(path, pdf_extension)) {
 		return "application/pdf";
 	}
-	return "text/plain";
+	return http::TEXT_PLAIN;
 }
 
 } // namespace
