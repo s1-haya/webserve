@@ -24,11 +24,13 @@ std::string GetExtension(const std::string &path) {
 namespace http {
 
 std::string HttpResponse::Run(
+	const http::ClientInfos             &client_info,
 	const server::VirtualServerAddrList &server_info,
 	const HttpRequestResult             &request_info,
 	CgiResult                           &cgi_result
 ) {
-	HttpResponseFormat response = CreateHttpResponseFormat(server_info, request_info, cgi_result);
+	HttpResponseFormat response =
+		CreateHttpResponseFormat(client_info, server_info, request_info, cgi_result);
 	if (cgi_result.is_cgi) {
 		return "";
 	}
@@ -38,6 +40,7 @@ std::string HttpResponse::Run(
 // todo: HttpResponseFormat HttpResponse::CreateHttpResponseFormat(const HttpRequestResult
 // &request_info) 作成
 HttpResponseFormat HttpResponse::CreateHttpResponseFormat(
+	const http::ClientInfos             &client_info,
 	const server::VirtualServerAddrList &server_info,
 	const HttpRequestResult             &request_info,
 	CgiResult                           &cgi_result
@@ -62,7 +65,8 @@ HttpResponseFormat HttpResponse::CreateHttpResponseFormat(
 				request_info.request,
 				server_info_result.path,
 				server_info_result.cgi_extension,
-				"8080" // tmp: server_info_resultにポートを追加する
+				utils::ToString(client_info.listen_server_port),
+				client_info.ip
 			);
 			if (!cgi_parse_result.IsOk()) { // parserが直でthrowするように変更か
 				throw HttpException("CGI Parse Error", StatusCode(BAD_REQUEST));

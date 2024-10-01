@@ -70,9 +70,10 @@ int Test1() {
 	std::string cgi_path_info = "/aa/b";
 	std::string cgi_extension = ".cgi";
 	std::string server_port   = "8080";
+	std::string client_ip     = "127.0.0.1";
 
 	utils::Result<cgi::CgiRequest> parse_result =
-		CgiParse::Parse(request, cgi_script + cgi_path_info, cgi_extension, server_port);
+		CgiParse::Parse(request, cgi_script + cgi_path_info, cgi_extension, server_port, client_ip);
 	cgi::MetaMap meta_variables = parse_result.GetValue().meta_variables;
 
 	try {
@@ -80,6 +81,7 @@ int Test1() {
 		COMPARE(meta_variables.at(cgi::CONTENT_TYPE), request.header_fields.at(CONTENT_TYPE));
 		COMPARE(meta_variables.at(cgi::PATH_INFO), cgi_path_info);
 		COMPARE(meta_variables.at(cgi::PATH_TRANSLATED), html_dir_path + cgi_path_info);
+		COMPARE(meta_variables.at(cgi::REMOTE_ADDR), client_ip);
 		COMPARE(meta_variables.at(cgi::REQUEST_METHOD), request_line.method);
 		COMPARE(meta_variables.at(cgi::SCRIPT_NAME), cgi_bin_dir_path + cgi_script);
 		COMPARE(meta_variables.at(cgi::SERVER_NAME), request.header_fields.at(HOST));
@@ -107,9 +109,10 @@ int Test2() {
 	std::string cgi_path_info = "/aa/b";
 	std::string cgi_extension = ".cgi";
 	std::string server_port   = "8080";
+	std::string client_ip     = "127.0.0.2";
 
 	utils::Result<cgi::CgiRequest> parse_result =
-		CgiParse::Parse(request, cgi_script + cgi_path_info, cgi_extension, server_port);
+		CgiParse::Parse(request, cgi_script + cgi_path_info, cgi_extension, server_port, client_ip);
 	cgi::MetaMap meta_variables = parse_result.GetValue().meta_variables;
 
 	try {
@@ -117,6 +120,7 @@ int Test2() {
 		COMPARE(meta_variables.at(cgi::CONTENT_TYPE), request.header_fields.at(CONTENT_TYPE));
 		COMPARE(meta_variables.at(cgi::PATH_INFO), cgi_path_info);
 		COMPARE(meta_variables.at(cgi::PATH_TRANSLATED), html_dir_path + cgi_path_info);
+		COMPARE(meta_variables.at(cgi::REMOTE_ADDR), client_ip);
 		COMPARE(meta_variables.at(cgi::REQUEST_METHOD), request_line.method);
 		COMPARE(meta_variables.at(cgi::SCRIPT_NAME), cgi_bin_dir_path + cgi_script);
 		COMPARE(meta_variables.at(cgi::SERVER_NAME), request.header_fields.at(HOST));
