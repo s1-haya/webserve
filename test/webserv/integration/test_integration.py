@@ -81,6 +81,8 @@ for filename, data_var, length_var in error_files:
 
 REQUEST_DIR = "test/common/request/"
 REQUEST_GET_2XX_DIR = REQUEST_DIR + "get/2xx/"
+REQUEST_GET_4XX_DIR = REQUEST_DIR + "get/4xx/"
+REQUEST_GET_5XX_DIR = REQUEST_DIR + "get/5xx/"
 
 response_header_get_root_200_close = f"HTTP/1.1 200 OK\r\nConnection: close\r\nContent-Length: {root_index_file_length}\r\nContent-Type: text/html\r\nServer: webserv/1.1\r\n\r\n"
 response_header_get_root_200_keep = f"HTTP/1.1 200 OK\r\nConnection: keep-alive\r\nContent-Length: {root_index_file_length}\r\nContent-Type: text/html\r\nServer: webserv/1.1\r\n\r\n"
@@ -135,58 +137,58 @@ not_implemented_response = response_header_501 + not_implemented_file_501.decode
             REQUEST_GET_2XX_DIR + "200_17_not_exist_header_field.txt",
             response_header_get_root_200_close + root_index_file,
         ),
-        ("test/common/request/get/4xx/400_02_lower_method.txt", bad_request_response),
+        (REQUEST_GET_4XX_DIR + "400_02_lower_method.txt", bad_request_response),
         (
-            "test/common/request/get/4xx/400_03_no_ascii_method.txt",
+            REQUEST_GET_4XX_DIR + "400_03_no_ascii_method.txt",
             bad_request_response,
         ),
-        ("test/common/request/get/4xx/400_04_no_root.txt", bad_request_response),
-        ("test/common/request/get/4xx/400_05_relative_path.txt", bad_request_response),
+        (REQUEST_GET_4XX_DIR + "400_04_no_root.txt", bad_request_response),
+        (REQUEST_GET_4XX_DIR + "400_05_relative_path.txt", bad_request_response),
         (
-            "test/common/request/get/4xx/400_06_lower_http_version.txt",
-            bad_request_response,
-        ),
-        (
-            "test/common/request/get/4xx/400_07_wrong_http_name.txt",
+            REQUEST_GET_4XX_DIR + "400_06_lower_http_version.txt",
             bad_request_response,
         ),
         (
-            "test/common/request/get/4xx/400_08_wrong_http_version.txt",
-            bad_request_response,
-        ),
-        ("test/common/request/get/4xx/400_10_duplicate_host.txt", bad_request_response),
-        (
-            "test/common/request/get/4xx/400_11_no_header_field_colon.txt",
+            REQUEST_GET_4XX_DIR + "400_07_wrong_http_name.txt",
             bad_request_response,
         ),
         (
-            "test/common/request/get/4xx/400_12_no_connection_name.txt",
+            REQUEST_GET_4XX_DIR + "400_08_wrong_http_version.txt",
+            bad_request_response,
+        ),
+        (REQUEST_GET_4XX_DIR + "400_10_duplicate_host.txt", bad_request_response),
+        (
+            REQUEST_GET_4XX_DIR + "400_11_no_header_field_colon.txt",
             bad_request_response,
         ),
         (
-            "test/common/request/get/4xx/400_15_space_in_header_field_name.txt",
+            REQUEST_GET_4XX_DIR + "400_12_no_connection_name.txt",
             bad_request_response,
         ),
         (
-            "test/common/request/get/4xx/400_16_header_field_name_space_colon.txt",
+            REQUEST_GET_4XX_DIR + "400_15_space_in_header_field_name.txt",
             bad_request_response,
         ),
         (
-            "test/common/request/get/4xx/400_17_space_header_field_name.txt",
+            REQUEST_GET_4XX_DIR + "400_16_header_field_name_space_colon.txt",
             bad_request_response,
         ),
         (
-            "test/common/request/get/4xx/400_18_non_vchr_header_field_name.txt",
+            REQUEST_GET_4XX_DIR + "400_17_space_header_field_name.txt",
             bad_request_response,
         ),
         (
-            "test/common/request/get/4xx/400_19_non_vchr_header_field_value.txt",
+            REQUEST_GET_4XX_DIR + "400_18_non_vchr_header_field_name.txt",
             bad_request_response,
         ),
-        ("test/common/request/get/4xx/404_01_not_exist_path.txt", not_found_response),
-        ("test/common/request/get/4xx/405_01_not_allowed.txt", not_allowed_response),
         (
-            "test/common/request/get/5xx/501_01_not_exist_method.txt",
+            REQUEST_GET_4XX_DIR + "400_19_non_vchr_header_field_value.txt",
+            bad_request_response,
+        ),
+        (REQUEST_GET_4XX_DIR + "404_01_not_exist_path.txt", not_found_response),
+        (REQUEST_GET_4XX_DIR + "405_01_not_allowed.txt", not_allowed_response),
+        (
+            REQUEST_GET_5XX_DIR + "501_01_not_exist_method.txt",
             not_implemented_response,
         ),
     ],
