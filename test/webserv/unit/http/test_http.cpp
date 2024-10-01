@@ -63,7 +63,6 @@ int  main(void) {
     ret_code |= test::TestGetOk14ExtraRequest(server_infos);
     ret_code |= test::TestGetOk15BodyMessageDefault(server_infos);
     ret_code |= test::TestGetOk17NotExistHeaderField(server_infos);
-    // ret_code |= test::TestGetOk18CgiScriptInPerl(server_infos);
     // ret_code |= test::TestGetOk19CgiScriptInPython(server_infos);
     // ret_code |= test::TestGetOk20CgiScriptInShell(server_infos);
     ret_code |= test::TestGetOk21NoConnection(server_infos);
@@ -100,6 +99,7 @@ int  main(void) {
     // test cgi
     std::cout << "\n\033[44;37m[ Test Cgi ]\033[m" << std::endl;
     // ret_code |= test::TestCgiGetOk1PrintOkBodyMessage(server_infos);
+    // ret_code |= test::TestCgiGetOk2PrintOkInPerl(server_infos);
     DeleteVirtualServerAddrList(server_infos);
 
     // test GetErrorResponse
