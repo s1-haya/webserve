@@ -201,7 +201,8 @@ int main(void) {
 	request_info.request.request_line.request_target = "/www/";
 	request_info.request.request_line.version        = http::HTTP_VERSION;
 	request_info.request.header_fields[http::HOST]   = "host1";
-	std::string response3 = http::HttpResponse::Run(server_info, request_info, cgi_result);
+	std::string response3 =
+		http::HttpResponse::Run(client_infos, server_info, request_info, cgi_result);
 
 	std::string expected3_status_line =
 		LoadFileContent("../../expected_response/default_status_line/301_redirect.txt");
@@ -224,7 +225,8 @@ int main(void) {
 	request_info.request.request_line.request_target = "/www/delete_file";
 	request_info.request.request_line.version        = http::HTTP_VERSION;
 	request_info.request.header_fields[http::HOST]   = "host2";
-	std::string response4 = http::HttpResponse::Run(server_info, request_info, cgi_result);
+	std::string response4 =
+		http::HttpResponse::Run(client_infos, server_info, request_info, cgi_result);
 
 	std::string expected4_status_line =
 		LoadFileContent("../../expected_response/default_status_line/200_ok.txt");
