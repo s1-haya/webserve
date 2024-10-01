@@ -37,6 +37,27 @@ std::string ReadFile(const std::string &file_path) {
 	return FileToString(file);
 }
 
+bool EndWith(const std::string &str, const std::string &suffix) {
+	return str.size() >= suffix.size() &&
+		   str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0;
+}
+
+// ファイルの拡張子に基づいてContent-Typeを決定する関数: デフォルトはtext/plain
+std::string DetermineContentType(const std::string &path) {
+	const std::string html_extension = ".html";
+	const std::string json_extension = ".json";
+	const std::string pdf_extension  = ".pdf";
+
+	if (EndWith(path, html_extension)) {
+		return http::TEXT_HTML;
+	} else if (EndWith(path, json_extension)) {
+		return "application/json";
+	} else if (EndWith(path, pdf_extension)) {
+		return "application/pdf";
+	}
+	return http::TEXT_PLAIN;
+}
+
 } // namespace
 
 namespace http {
@@ -77,7 +98,6 @@ StatusCode Method::Handler(
 	return status_code;
 }
 
-// todo: refactor
 StatusCode Method::GetHandler(
 	const std::string &path,
 	std::string       &response_body_message,
@@ -95,6 +115,7 @@ StatusCode Method::GetHandler(
 			response_body_message = ReadFile(path + index_file_path);
 			response_header_fields[CONTENT_LENGTH] =
 				utils::ToString(response_body_message.length());
+			response_header_fields[CONTENT_TYPE] = DetermineContentType(path + index_file_path);
 		} else if (autoindex_on) {
 			utils::Result<std::string> result = AutoindexHandler(path);
 			response_body_message             = result.GetValue();
@@ -115,6 +136,7 @@ StatusCode Method::GetHandler(
 			response_body_message = ReadFile(path);
 			response_header_fields[CONTENT_LENGTH] =
 				utils::ToString(response_body_message.length());
+			response_header_fields[CONTENT_TYPE] = DetermineContentType(path);
 		}
 	} else {
 		throw HttpException("Error: Not Found", StatusCode(NOT_FOUND));
