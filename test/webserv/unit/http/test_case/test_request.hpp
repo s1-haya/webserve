@@ -41,8 +41,6 @@ static const std::string &GET_200_15_BODY_MESSAGE_DEFAULT =
 	LoadFileContent(REQUEST_GET + ROOT_2XX + "/200_15_body_message_default.txt");
 static const std::string &GET_200_17_NOT_EXIST_HEADER_FIELD =
 	LoadFileContent(REQUEST_GET + ROOT_2XX + "/200_17_not_exist_header_field.txt");
-static const std::string &GET_200_19_CGI_SCRIPT_IN_PYTHON =
-	LoadFileContent(REQUEST_GET + ROOT_2XX + "/200_19_cgi_script_in_py.txt");
 static const std::string &GET_200_20_CGI_SCRIPT_IN_SHELL =
 	LoadFileContent(REQUEST_GET + ROOT_2XX + "/200_20_cgi_script_in_sh.txt");
 static const std::string &GET_200_21_NO_CONNECTION =
@@ -108,6 +106,8 @@ static const std::string &GET_200_01_PRINT_OK_PL_BODY_MESSAGE =
 	LoadFileContent(CGI_GET + "/200_01_print_ok_pl_body_message.txt");
 static const std::string &GET_200_02_PRINT_OK_PERL =
 	LoadFileContent(CGI_GET + "/200_02_print_ok_pl.txt");
+static const std::string &GET_200_03_PRINT_OK_PYTHON =
+	LoadFileContent(CGI_GET + "/200_03_print_ok_py.txt");
 
 } // namespace cgi
 } // namespace request
