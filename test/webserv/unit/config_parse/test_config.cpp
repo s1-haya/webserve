@@ -555,6 +555,9 @@ int LocationDirectiveErrorTests() {
 	ret_code |=
 		RunErrorTest("location/location_multi_params.conf", "location/location_multi_params.conf");
 	ret_code |= RunErrorTest(
+		"location/location_duplicated_param.conf", "location/location_duplicated_param.conf"
+	);
+	ret_code |= RunErrorTest(
 		"location/location_no_end_bracket.conf", "location/location_no_end_bracket.conf"
 	);
 	ret_code |= RunErrorTest(
