@@ -15,7 +15,7 @@ std::string CreatePathInfo(const std::string &cgi_extension, const std::string &
 }
 
 std::string
-TranslateToCgiPath(const std::string &cgi_extension, const std::string &request_target) {
+TranslateToScriptName(const std::string &cgi_extension, const std::string &request_target) {
 	// from cgi_parse dir to cgi dir
 	const std::string::size_type extension_pos = request_target.find(cgi_extension);
 	const std::string::size_type root_pos      = request_target.find("root/cgi-bin/");
@@ -26,9 +26,12 @@ TranslateToCgiPath(const std::string &cgi_extension, const std::string &request_
 	return script_name;
 }
 
-std::string TranslateToHtmlPath(const std::string &request_target) {
-	// from cgi_parse dir to html dir
-	return "../../../../html" + request_target;
+std::string TranslatePathInfo(const std::string &request_target) {
+	// from cgi_parse dir to root dir
+	if (request_target.empty()) {
+		return "";
+	}
+	return "root" + request_target;
 }
 
 std::string FindValueFromMap(const cgi::MetaMap &map, const std::string &key) {
@@ -58,18 +61,15 @@ cgi::MetaMap CgiParse::CreateRequestMetaVariables(
 	} // bodyがない場合はunset
 	request_meta_variables[cgi::GATEWAY_INTERFACE] = "CGI/1.1";
 	request_meta_variables[cgi::PATH_INFO]         = CreatePathInfo(cgi_extension, cgi_script);
-	std::cout << "PATH_INFO: " << request_meta_variables["PATH_INFO"] << std::endl;
 	request_meta_variables[cgi::PATH_TRANSLATED] =
-		TranslateToHtmlPath(request_meta_variables["PATH_INFO"]);
-	std::cout << "PATH_TRANSLATED: " << request_meta_variables["PATH_TRANSLATED"] << std::endl;
-	request_meta_variables[cgi::QUERY_STRING]   = "";
-	request_meta_variables[cgi::REMOTE_ADDR]    = client_ip;
-	request_meta_variables[cgi::REMOTE_HOST]    = "";
-	request_meta_variables[cgi::REMOTE_IDENT]   = "";
-	request_meta_variables[cgi::REMOTE_USER]    = "";
-	request_meta_variables[cgi::REQUEST_METHOD] = request.request_line.method;
-	request_meta_variables[cgi::SCRIPT_NAME]    = TranslateToCgiPath(cgi_extension, cgi_script);
-	std::cout << "SCRIPT_NAME: " << request_meta_variables["SCRIPT_NAME"] << std::endl;
+		TranslatePathInfo(request_meta_variables["PATH_INFO"]);
+	request_meta_variables[cgi::QUERY_STRING]    = "";
+	request_meta_variables[cgi::REMOTE_ADDR]     = client_ip;
+	request_meta_variables[cgi::REMOTE_HOST]     = "";
+	request_meta_variables[cgi::REMOTE_IDENT]    = "";
+	request_meta_variables[cgi::REMOTE_USER]     = "";
+	request_meta_variables[cgi::REQUEST_METHOD]  = request.request_line.method;
+	request_meta_variables[cgi::SCRIPT_NAME]     = TranslateToScriptName(cgi_extension, cgi_script);
 	request_meta_variables[cgi::SERVER_NAME]     = FindValueFromMap(request.header_fields, "Host");
 	request_meta_variables[cgi::SERVER_PORT]     = server_port;
 	request_meta_variables[cgi::SERVER_PROTOCOL] = request.request_line.version;
