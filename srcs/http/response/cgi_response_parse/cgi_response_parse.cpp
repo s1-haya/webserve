@@ -58,6 +58,9 @@ void CgiResponseParse::ParseBody(const std::string &body, ParsedData &parsed_dat
 		parsed_data.body = body.substr(0, content_length);
 		return;
 	}
+	// Content-Lengthがない場合は全てのbodyを格納
+	parsed_data.body = body;
+	return;
 }
 
 std::string &CgiResponseParse::TrimOWS(std::string &s) {

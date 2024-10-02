@@ -123,6 +123,16 @@ int TestParseBodyLongerThanContentLength() {
 	return HandleTestResult(CompareParsedData(expected, result));
 }
 
+int TestParseNoContentLength() {
+	std::string                  response = "Content-Type: text/plain\r\n\r\nHello, world!";
+	CgiResponseParse::ParsedData result   = CgiResponseParse::Parse(response);
+
+	CgiResponseParse::ParsedData expected;
+	expected.header_fields["Content-Type"] = "text/plain";
+	expected.body                          = "Hello, world!";
+	return HandleTestResult(CompareParsedData(expected, result));
+}
+
 // todo: Error
 
 // void TestParseBodyOnlyResponse() {
@@ -155,6 +165,7 @@ int main() {
 	ret |= TestParseValidResponse();
 	ret |= TestParseHeaderOnlyResponse();
 	ret |= TestParseBodyLongerThanContentLength();
+	ret |= TestParseNoContentLength();
 	// testParseBodyOnlyResponse();
 	// testParseInvalidResponse();
 
