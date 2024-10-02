@@ -14,19 +14,15 @@ class CgiResponseParse {
 		std::string  body;
 	};
 
-	CgiResponseParse();
-	~CgiResponseParse();
-	ParsedData Parse(const std::string &response);
+	static ParsedData Parse(const std::string &response);
 
   private:
-	CgiResponseParse(const CgiResponseParse &other);
-	CgiResponseParse &operator=(const CgiResponseParse &other);
+	CgiResponseParse();
+	~CgiResponseParse();
 
-	void         ParseHeaderFields(const std::string &header);
-	void         ParseBody(const std::string &body);
-	std::string &TrimOWS(std::string &s);
-
-	ParsedData parsed_data_;
+	static void         ParseHeaderFields(const std::string &header, ParsedData &parsed_data);
+	static void         ParseBody(const std::string &body, ParsedData &parsed_data);
+	static std::string &TrimOWS(std::string &s);
 
 	static const std::string CRLF;
 	static const std::string HEADER_FIELDS_END;

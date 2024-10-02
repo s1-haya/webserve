@@ -12,19 +12,19 @@ CgiResponseParse::CgiResponseParse() {}
 CgiResponseParse::~CgiResponseParse() {}
 
 CgiResponseParse::ParsedData CgiResponseParse::Parse(const std::string &response) {
-	parsed_data_.header_fields.clear();
-	parsed_data_.body.clear();
-	size_t pos = response.find(HEADER_FIELDS_END);
+	ParsedData parsed_data;
+	size_t     pos = response.find(HEADER_FIELDS_END);
+	// todo: throw
 	if (pos == std::string::npos) {
-		return parsed_data_;
+		return parsed_data;
 	}
 	std::string header = response.substr(0, pos + CRLF.size()); // CRLFも含めたいため
-	ParseHeaderFields(header);
-	ParseBody(response.substr(pos + HEADER_FIELDS_END.size()));
-	return parsed_data_;
+	ParseHeaderFields(header, parsed_data);
+	ParseBody(response.substr(pos + HEADER_FIELDS_END.size()), parsed_data);
+	return parsed_data;
 }
 
-void CgiResponseParse::ParseHeaderFields(const std::string &header) {
+void CgiResponseParse::ParseHeaderFields(const std::string &header, ParsedData &parsed_data) {
 	std::string::size_type pos = 0;
 	// todo: err でthrow
 	while (pos < header.size()) {
@@ -42,20 +42,20 @@ void CgiResponseParse::ParseHeaderFields(const std::string &header) {
 		std::string value = line.substr(colon_pos + 1);
 		value             = TrimOWS(value);
 		// todo: validation(HttpParseの処理をそのまま使う)
-		parsed_data_.header_fields[key] = value;
+		parsed_data.header_fields[key] = value;
 	}
 }
 
-void CgiResponseParse::ParseBody(const std::string &body) {
-	HeaderFields::iterator it = parsed_data_.header_fields.find("Content-Length");
-	if (it != parsed_data_.header_fields.end()) {
+void CgiResponseParse::ParseBody(const std::string &body, ParsedData &parsed_data) {
+	HeaderFields::iterator it = parsed_data.header_fields.find("Content-Length");
+	if (it != parsed_data.header_fields.end()) {
 		std::string::size_type content_length = utils::ConvertStrToSize(it->second).GetValue();
 		// todo: ConvertStrToSize is Not Ok
 		if (content_length > body.size()) {
-			parsed_data_.body = body;
+			parsed_data.body = body;
 			return;
 		}
-		parsed_data_.body = body.substr(0, content_length);
+		parsed_data.body = body.substr(0, content_length);
 		return;
 	}
 }
