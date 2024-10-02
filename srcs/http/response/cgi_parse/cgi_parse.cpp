@@ -19,12 +19,17 @@ TranslateToScriptName(const std::string &cgi_extension, const std::string &reque
 	// from root path
 	const std::string::size_type extension_pos = request_target.find(cgi_extension);
 	const std::string::size_type root_pos      = request_target.find("root/cgi-bin/");
-	const std::string            script_name   = request_target.substr(root_pos);
-	if (extension_pos != std::string::npos &&
-		root_pos != std::string::npos) { // for /aa.cgi/bb only return /aa.cgi
-		return script_name.substr(0, extension_pos + cgi_extension.length());
+	if (root_pos != std::string::npos) {
+		const std::string script_name = request_target.substr(root_pos);
+		if (extension_pos != std::string::npos) {
+			// /aa.cgi/bb の場合、/aa.cgi のみを返す
+			return script_name.substr(0, extension_pos + cgi_extension.length());
+		}
+		return script_name;
+	} else {
+		// root_pos が見つからない場合は request_target をそのまま返す
+		return request_target;
 	}
-	return script_name;
 }
 
 std::string TranslatePathInfo(const std::string &request_target) {
