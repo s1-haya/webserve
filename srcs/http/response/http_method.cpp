@@ -15,6 +15,7 @@
 #include <sys/stat.h>
 #include <unistd.h> // access
 
+namespace http {
 namespace {
 
 bool IsExistPath(const std::string &path) {
@@ -45,12 +46,10 @@ std::string DetermineContentType(const std::string &path) {
 	} else if (EndWith(path, pdf_extension)) {
 		return "application/pdf";
 	}
-	return http::TEXT_PLAIN;
+	return TEXT_PLAIN;
 }
 
 } // namespace
-
-namespace http {
 
 StatusCode Method::Handler(
 	const std::string  &path,
