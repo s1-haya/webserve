@@ -5,10 +5,20 @@
 #include "test_handler.hpp"
 #include "test_request.hpp"
 #include "utils.hpp"
+#include <cstdlib>
 #include <fstream>
 #include <unistd.h>
 
 namespace test {
+
+bool HandleWhetherFileDelete(const std::string& file) {
+	if (access(file.c_str(), F_OK) == 0) {
+		std::cerr << utils::color::RED << "Error: cann't delete the file in delete test case." << utils::color::RESET << std::endl;
+		return EXIT_FAILURE;
+	} else {
+		return EXIT_SUCCESS;
+	}
+}
 
 int TestDeleteNoContent1ExistingFile(const server::VirtualServerAddrList &server_infos) {
 	int                ret_code  = EXIT_SUCCESS;
@@ -31,7 +41,7 @@ int TestDeleteNoContent1ExistingFile(const server::VirtualServerAddrList &server
     );
 	http::HttpResult expected = CreateHttpResult(true, false, "", expected_response);
 	ret_code |= HandleHttpResult(client_infos, server_infos, expected, "204-01");
-	ret_code |= (access(file_name.c_str(), F_OK) != 0);
+	ret_code |= HandleWhetherFileDelete(file_name);
 	return ret_code;
 }
 
@@ -59,7 +69,7 @@ int TestDeleteNoContent2ExistingFileWithBodyMessage(
     );
 	http::HttpResult expected = CreateHttpResult(true, false, "", expected_response);
 	ret_code |= HandleHttpResult(client_infos, server_infos, expected, "204-02");
-	ret_code |= (access(file_name.c_str(), F_OK) != 0);
+	ret_code |= HandleWhetherFileDelete(file_name);
 	return ret_code;
 }
 
@@ -91,7 +101,7 @@ int TestDeleteNoContent3ExistingFileThenNotFoundOnSecondAttempt(
 	http::HttpResult expected_no_content =
 		CreateHttpResult(true, true, request_buffer, expected_response_no_content);
 	ret_code |= HandleHttpResult(client_infos, server_infos, expected_no_content, "204-03-1");
-	ret_code |= (access(file_name.c_str(), F_OK) != 0);
+	ret_code |= HandleWhetherFileDelete(file_name);
 
 	client_infos.request_buf                    = request_buffer;
 	std::string expected_status_line_not_found  = EXPECTED_STATUS_LINE_NOT_FOUND;
