@@ -111,3 +111,41 @@ def test_timeout_no_request() -> None:
         if con:
             con.close()
 
+
+# serverがその後も正常に動いていればOK
+def test_incomplete_request_disconnect() -> None:
+    try:
+        con = HTTPConnection("localhost", 8080)
+        con.connect()
+
+        # 完全ではないrequestを送信
+        con.sock.send(b"GET / HTTP/1.1\r\nHost: localhost\r\nConnectio")
+
+        # 完全なリクエストを送る前に接続を切断
+        con.close()
+
+    except HTTPException as e:
+        print(f"Request failed: {e}")
+        assert False
+    finally:
+        if con:
+            con.close()
+
+
+# serverがその後も正常に動いていればOK
+def test_timeout_no_request_disconnect() -> None:
+    try:
+        con = HTTPConnection("localhost", 8080)
+        con.connect()
+
+        # requestを何も送らない
+
+        # 何も送らずに接続を切断
+        con.close()
+
+    except HTTPException as e:
+        print(f"Request failed: {e}")
+        assert False
+    finally:
+        if con:
+            con.close()
