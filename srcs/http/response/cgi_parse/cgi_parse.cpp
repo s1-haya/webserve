@@ -20,7 +20,8 @@ TranslateToScriptName(const std::string &cgi_extension, const std::string &reque
 	const std::string::size_type extension_pos = request_target.find(cgi_extension);
 	const std::string::size_type root_pos      = request_target.find("root/cgi-bin/");
 	const std::string            script_name   = request_target.substr(root_pos);
-	if (extension_pos != std::string::npos) { // for /aa.cgi/bb only return /aa.cgi
+	if (extension_pos != std::string::npos &&
+		root_pos != std::string::npos) { // for /aa.cgi/bb only return /aa.cgi
 		return script_name.substr(0, extension_pos + cgi_extension.length());
 	}
 	return script_name;
