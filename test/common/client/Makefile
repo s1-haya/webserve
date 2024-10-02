@@ -47,15 +47,15 @@ re: fclean all
 DEFAULT_PORT	:=	8080
 PORT			:=	$(DEFAULT_PORT)
 
-# ex) make run INFILE_PATH=../request_messages/webserver/get/200_get_sub.txt
-# ex) make run PORT=4242 INFILE_PATH=../request_messages/apache_root/get/200/connection-close.txt
+# ex) make run REQUEST=../request/get/2xx/200_01_connection_close.txt
+# ex) make run PORT=4242 REQUEST=../request/get/2xx/200_01_connection_close.txt
 .PHONY	: run
 run: all
-	@./$(NAME) $(PORT) $(INFILE_PATH)
+	@./$(NAME) $(PORT) $(REQUEST)
 
 .PHONY	: val
 val: all
-	@valgrind ./$(NAME) $(PORT) $(INFILE_PATH)
+	@valgrind ./$(NAME) $(PORT) $(REQUEST)
 
 .PHONY	: check
 check:
