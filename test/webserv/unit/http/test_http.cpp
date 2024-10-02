@@ -49,6 +49,7 @@ void DeleteVirtualServerAddrList(const server::VirtualServerAddrList &virtual_se
 int  main(void) {
     int ret_code = EXIT_SUCCESS;
 
+    std::cout << "\033[44;37m[ Test Run ]\033[m" << std::endl;
     server::VirtualServerAddrList server_infos = BuildVirtualServerAddrList();
     ret_code |= test::TestGetOk1ConnectionClose(server_infos);
     ret_code |= test::TestGetOk2ConnectionKeep(server_infos);
@@ -95,7 +96,7 @@ int  main(void) {
     ret_code |= test::TestGetNotImplemented1NotExistMethod(server_infos);
 
     // test cgi
-    std::cout << "\n\033[44;37m[ Test Cgi ]\033[m" << std::endl;
+    std::cout << std::endl;
     // ret_code |= test::TestCgiGetOk1PrintOkBodyMessage(server_infos);
     // ret_code |= test::TestCgiGetOk2PrintOkInPerl(server_infos);
     // ret_code |= test::TestCgiGetOk3PrintOkInPython(server_infos);

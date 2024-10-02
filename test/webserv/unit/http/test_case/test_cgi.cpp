@@ -22,7 +22,7 @@ int TestCgiGetOk1PrintOkBodyMessage(const server::VirtualServerAddrList &server_
         expected_status_line, expected_header_fields, expected_body_message
     );
 	http::HttpResult expected = CreateHttpResult(true, false, "", expected_response);
-	return HandleHttpResult(client_infos, server_infos, expected, "200-01");
+	return HandleHttpResult(client_infos, server_infos, expected, "cgi/200-01");
 }
 
 int TestCgiGetOk2PrintOkInPerl(const server::VirtualServerAddrList &server_infos) {
@@ -38,7 +38,7 @@ int TestCgiGetOk2PrintOkInPerl(const server::VirtualServerAddrList &server_infos
         expected_status_line, expected_header_fields, expected_body_message
     );
 	http::HttpResult expected = CreateHttpResult(true, false, "", expected_response);
-	return HandleHttpResult(client_infos, server_infos, expected, "200-02");
+	return HandleHttpResult(client_infos, server_infos, expected, "cgi/200-02");
 }
 
 int TestCgiGetOk3PrintOkInPython(const server::VirtualServerAddrList &server_infos) {
@@ -54,7 +54,7 @@ int TestCgiGetOk3PrintOkInPython(const server::VirtualServerAddrList &server_inf
         expected_status_line, expected_header_fields, expected_body_message
     );
 	http::HttpResult expected = CreateHttpResult(true, false, "", expected_response);
-	return HandleHttpResult(client_infos, server_infos, expected, "200-03");
+	return HandleHttpResult(client_infos, server_infos, expected, "cgi/200-03");
 }
 
 int TestCgiGetOk4PrintOkInShell(const server::VirtualServerAddrList &server_infos) {
@@ -70,7 +70,7 @@ int TestCgiGetOk4PrintOkInShell(const server::VirtualServerAddrList &server_info
         expected_status_line, expected_header_fields, expected_body_message
     );
 	http::HttpResult expected = CreateHttpResult(true, false, "", expected_response);
-	return HandleHttpResult(client_infos, server_infos, expected, "200-04");
+	return HandleHttpResult(client_infos, server_infos, expected, "cgi/200-04");
 }
 
 } // namespace test
