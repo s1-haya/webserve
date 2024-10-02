@@ -74,25 +74,19 @@ cgi::MetaMap CgiParse::CreateRequestMetaVariables(
 	return request_meta_variables;
 }
 
-utils::Result<cgi::CgiRequest> CgiParse::Parse(
+cgi::CgiRequest CgiParse::Parse(
 	const http::HttpRequestFormat &request,
 	const std::string             &cgi_script,
 	const std::string             &cgi_extension,
 	const std::string             &server_port,
 	const std::string             &client_ip
 ) {
-	cgi::CgiRequest                cgi_request;
-	utils::Result<cgi::CgiRequest> result;
+	cgi::CgiRequest cgi_request;
 
-	try {
-		cgi_request.meta_variables =
-			CreateRequestMetaVariables(request, cgi_script, cgi_extension, server_port, client_ip);
-		cgi_request.body_message = request.body_message;
-		result.SetValue(cgi_request);
-	} catch (const std::exception &e) {
-		result.Set(false); // atで例外が投げられる
-	}
-	return result;
+	cgi_request.meta_variables =
+		CreateRequestMetaVariables(request, cgi_script, cgi_extension, server_port, client_ip);
+	cgi_request.body_message = request.body_message;
+	return cgi_request;
 }
 
 } // namespace http
