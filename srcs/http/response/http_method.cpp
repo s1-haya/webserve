@@ -35,29 +35,25 @@ std::string ReadFile(const std::string &file_path) {
 	return FileToString(file);
 }
 
+bool EndWith(const std::string &str, const std::string &suffix) {
+	return str.size() >= suffix.size() &&
+		   str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0;
+}
+
 // ファイルの拡張子に基づいてContent-Typeを決定する関数: デフォルトはtext/plain
-std::string determineContentType(const std::string &path) {
+std::string DetermineContentType(const std::string &path) {
 	const std::string html_extension = ".html";
 	const std::string json_extension = ".json";
 	const std::string pdf_extension  = ".pdf";
 
-	if (path.size() >= html_extension.length() &&
-		path.compare(
-			path.size() - html_extension.length(), html_extension.length(), html_extension
-		) == 0) {
-		return "text/html";
-	} else if (path.size() >= json_extension.length() &&
-			   path.compare(
-				   path.size() - json_extension.length(), json_extension.length(), json_extension
-			   ) == 0) {
+	if (EndWith(path, html_extension)) {
+		return http::TEXT_HTML;
+	} else if (EndWith(path, json_extension)) {
 		return "application/json";
-	} else if (path.size() >= pdf_extension.length() &&
-			   path.compare(
-				   path.size() - pdf_extension.length(), pdf_extension.length(), pdf_extension
-			   ) == 0) {
+	} else if (EndWith(path, pdf_extension)) {
 		return "application/pdf";
 	}
-	return "text/plain";
+	return http::TEXT_PLAIN;
 }
 
 } // namespace
@@ -72,7 +68,8 @@ StatusCode Method::Handler(
 	std::string        &response_body_message,
 	HeaderFields       &response_header_fields,
 	const std::string  &index_file_path,
-	bool                autoindex_on
+	bool                autoindex_on,
+	const std::string  &upload_directory
 ) {
 	StatusCode status_code(OK);
 	if (!IsSupportedMethod(method)) {
@@ -86,8 +83,13 @@ StatusCode Method::Handler(
 			path, response_body_message, response_header_fields, index_file_path, autoindex_on
 		);
 	} else if (method == POST) {
-		status_code =
-			PostHandler(path, request_body_message, response_body_message, response_header_fields);
+		status_code = PostHandler(
+			path,
+			request_body_message,
+			response_body_message,
+			response_header_fields,
+			upload_directory
+		);
 	} else if (method == DELETE) {
 		status_code = DeleteHandler(path, response_body_message, response_header_fields);
 	}
@@ -111,7 +113,7 @@ StatusCode Method::GetHandler(
 			response_body_message = ReadFile(path + index_file_path);
 			response_header_fields[CONTENT_LENGTH] =
 				utils::ToString(response_body_message.length());
-			response_header_fields[CONTENT_TYPE] = determineContentType(path + index_file_path);
+			response_header_fields[CONTENT_TYPE] = DetermineContentType(path + index_file_path);
 		} else if (autoindex_on) {
 			utils::Result<std::string> result = AutoindexHandler(path);
 			response_body_message             = result.GetValue();
@@ -132,7 +134,7 @@ StatusCode Method::GetHandler(
 			response_body_message = ReadFile(path);
 			response_header_fields[CONTENT_LENGTH] =
 				utils::ToString(response_body_message.length());
-			response_header_fields[CONTENT_TYPE] = determineContentType(path);
+			response_header_fields[CONTENT_TYPE] = DetermineContentType(path);
 		}
 	} else {
 		throw HttpException("Error: Not Found", StatusCode(NOT_FOUND));
@@ -144,14 +146,22 @@ StatusCode Method::PostHandler(
 	const std::string &path,
 	const std::string &request_body_message,
 	std::string       &response_body_message,
-	HeaderFields      &response_header_fields
+	HeaderFields      &response_header_fields,
+	const std::string &upload_directory
 ) {
+	// ex. test.txt
+	const std::string file_name = path.substr(path.find_last_of('/') + 1);
+	// ex. srcs/http/response/http_serverinfo_check/../../../../root
+	const std::string root_path = path.substr(0, path.find("root/") + 4);
+	// ex. srcs/http/response/http_serverinfo_check/../../../../root/save/test.txt
+	const std::string upload_path = root_path + upload_directory + "/" + file_name;
+
 	if (!IsExistPath(path)) {
 		return FileCreationHandler(
-			path, request_body_message, response_body_message, response_header_fields
+			upload_path, request_body_message, response_body_message, response_header_fields
 		);
 	}
-	const Stat &info = TryStat(path);
+	const Stat &info = TryStat(upload_path);
 	StatusCode  status_code(NO_CONTENT);
 	if (info.IsDirectory()) {
 		throw HttpException("Error: Forbidden", StatusCode(FORBIDDEN));
@@ -163,7 +173,7 @@ StatusCode Method::PostHandler(
 		// ex) POST /save/test.txt HTTP/1.1
 		// Location: /save/test.txt;
 		status_code = FileCreationHandler(
-			path, request_body_message, response_body_message, response_header_fields
+			upload_path, request_body_message, response_body_message, response_header_fields
 		);
 	}
 	return status_code;

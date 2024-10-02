@@ -20,8 +20,9 @@ struct MethodArgument {
 		const std::string                &request_body_message,
 		std::string                      &response_body_message,
 		http::HeaderFields               &response_header_fields,
-		const std::string                &index_file_path = "",
-		bool                              autoindex_on    = false
+		const std::string                &index_file_path  = "",
+		bool                              autoindex_on     = false,
+		const std::string                &upload_directory = "/upload"
 	)
 		: path(path),
 		  method(method),
@@ -30,7 +31,8 @@ struct MethodArgument {
 		  response_body_message(response_body_message),
 		  response_header_fields(response_header_fields),
 		  index_file_path(index_file_path),
-		  autoindex_on(autoindex_on) {
+		  autoindex_on(autoindex_on),
+		  upload_directory(upload_directory) {
 		response_body_message.clear();
 	}
 	const std::string                &path;
@@ -41,6 +43,7 @@ struct MethodArgument {
 	http::HeaderFields               &response_header_fields;
 	const std::string                &index_file_path;
 	bool                              autoindex_on;
+	const std::string                &upload_directory;
 };
 
 std::string LoadFileContent(const std::string &file_path) {
@@ -134,7 +137,8 @@ int MethodHandlerResult(const MethodArgument &srcs, const std::string &expected_
 			srcs.response_body_message,
 			srcs.response_header_fields,
 			srcs.index_file_path,
-			srcs.autoindex_on
+			srcs.autoindex_on,
+			srcs.upload_directory
 		);
 		result = HandleResult(srcs.response_body_message, expected_body_message);
 
@@ -163,9 +167,9 @@ int main(void) {
 
 	// http_method/expected
 	// LF:   exist target resourse file
-	std::string expected_file       = LoadFileContent("test/file.txt");
-	std::string expected_index_file = LoadFileContent("test/index.txt");
-	std::string expected_autoindex  = CreateAutoIndexContent("test/");
+	std::string expected_file       = LoadFileContent("root/file.txt");
+	std::string expected_index_file = LoadFileContent("root/index.txt");
+	std::string expected_autoindex  = CreateAutoIndexContent("root/");
 	// CRLF: use default status code file
 	std::string expected_created =
 		LoadFileContent("../../expected_response/default_body_message/201_created.txt");
@@ -182,7 +186,7 @@ int main(void) {
 	// ファイルが存在する場合
 	ret_code |= MethodHandlerResult(
 		MethodArgument(
-			"test/file.txt", http::GET, allow_methods, request, response, response_header_fields
+			"root/file.txt", http::GET, allow_methods, request, response, response_header_fields
 		),
 		expected_file
 	);
@@ -190,7 +194,7 @@ int main(void) {
 	// ファイルが存在しない場合
 	ret_code |= MethodHandlerResult(
 		MethodArgument(
-			"test/a", http::GET, allow_methods, request, response, response_header_fields
+			"root/a", http::GET, allow_methods, request, response, response_header_fields
 		),
 		expected_not_found
 	);
@@ -198,7 +202,7 @@ int main(void) {
 	// ディレクトリの場合かつ'/'がない場合
 	ret_code |= MethodHandlerResult(
 		MethodArgument(
-			"test/directory", http::GET, allow_methods, request, response, response_header_fields
+			"root/directory", http::GET, allow_methods, request, response, response_header_fields
 		),
 		expected_redirect
 	);
@@ -206,7 +210,7 @@ int main(void) {
 	// ファイルが権限ない場合
 	ret_code |= MethodHandlerResult(
 		MethodArgument(
-			"test/no_authority_file",
+			"root/no_authority_file",
 			http::GET,
 			allow_methods,
 			request,
@@ -219,7 +223,7 @@ int main(void) {
 	// ディレクトリで'/'があり、indexがある場合
 	ret_code |= MethodHandlerResult(
 		MethodArgument(
-			"test/",
+			"root/",
 			http::GET,
 			allow_methods,
 			request,
@@ -233,7 +237,7 @@ int main(void) {
 	// ディレクトリで'/'があり、autoindexがある場合
 	ret_code |= MethodHandlerResult(
 		MethodArgument(
-			"test/", http::GET, allow_methods, request, response, response_header_fields, "", true
+			"root/", http::GET, allow_methods, request, response, response_header_fields, "", true
 		),
 		expected_autoindex
 	);
@@ -243,12 +247,15 @@ int main(void) {
 	const std::string &post_test1_request_body_message = "OK";
 	ret_code |= MethodHandlerResult(
 		MethodArgument(
-			"200_ok.txt",
+			"root/directory/200_ok.txt",
 			http::POST,
 			allow_methods,
 			post_test1_request_body_message,
 			response,
-			response_header_fields
+			response_header_fields,
+			"",
+			false,
+			"/directory"
 		),
 		expected_created
 	);
@@ -257,20 +264,40 @@ int main(void) {
 	const std::string &post_test2_request_body_message = "OK";
 	ret_code |= MethodHandlerResult(
 		MethodArgument(
-			"200_ok.txt",
+			"root/directory/200_ok.txt",
 			http::POST,
 			allow_methods,
 			post_test2_request_body_message,
 			response,
-			response_header_fields
+			response_header_fields,
+			"",
+			false,
+			"/directory"
 		),
 		expected_no_content
+	);
+
+	// 新しいファイルをアップロードする場合で、アップロード先ディレクトリが指定されている場合
+	const std::string &post_test3_request_body_message = "OK";
+	ret_code |= MethodHandlerResult(
+		MethodArgument(
+			"root/200_ok.txt",
+			http::POST,
+			allow_methods,
+			post_test3_request_body_message,
+			response,
+			response_header_fields,
+			"",
+			false,
+			"/upload"
+		),
+		expected_created
 	);
 
 	// ディレクトリの場合
 	ret_code |= MethodHandlerResult(
 		MethodArgument(
-			"test/directory", http::POST, allow_methods, request, response, response_header_fields
+			"root/directory/", http::POST, allow_methods, request, response, response_header_fields
 		),
 		expected_forbidden
 	);
@@ -279,7 +306,12 @@ int main(void) {
 	// ファイルが存在するかつ親ディレクトリが書き込み権限あるとき
 	ret_code |= MethodHandlerResult(
 		MethodArgument(
-			"200_ok.txt", http::DELETE, allow_methods, request, response, response_header_fields
+			"root/directory/200_ok.txt",
+			http::DELETE,
+			allow_methods,
+			request,
+			response,
+			response_header_fields
 		),
 		expected_no_content
 	);
@@ -300,7 +332,7 @@ int main(void) {
 	// ディレクトリ内にファイルが存在してる場合
 	ret_code |= MethodHandlerResult(
 		MethodArgument(
-			"test", http::DELETE, allow_methods, request, response, response_header_fields
+			"root", http::DELETE, allow_methods, request, response, response_header_fields
 		),
 		expected_forbidden
 	);
@@ -308,7 +340,7 @@ int main(void) {
 	// ディレクトリ内にファイルが存在してない場合
 	ret_code |= MethodHandlerResult(
 		MethodArgument(
-			"test/s", http::DELETE, allow_methods, request, response, response_header_fields
+			"root/s", http::DELETE, allow_methods, request, response, response_header_fields
 		),
 		expected_forbidden
 	);
@@ -329,7 +361,7 @@ int main(void) {
 	// 書き込み権限がないディレクトリの中にあるファイル場合
 	ret_code |= MethodHandlerResult(
 		MethodArgument(
-			"test/no_authority_directory/test.txt",
+			"root/no_authority_directory/test.txt",
 			http::DELETE,
 			allow_methods,
 			request,

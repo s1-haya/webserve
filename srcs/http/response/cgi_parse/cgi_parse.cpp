@@ -13,14 +13,18 @@ std::string CreatePathInfo(const std::string &cgi_extension, const std::string &
 	return "";
 }
 
+// todo: Server-Cgiを動かすため一旦前の実装をコメントアウト
 std::string
 TranslateToCgiPath(const std::string &cgi_extension, const std::string &request_target) {
 	// from cgi_parse dir to cgi dir
-	std::string::size_type pos = request_target.find(cgi_extension);
-	if (pos != std::string::npos) { // for /aa.cgi/bb only return /aa.cgi
-		return "../../../../cgi-bin" + request_target.substr(0, pos + cgi_extension.length());
-	}
-	return "../../../../cgi-bin" + request_target;
+	// std::string::size_type pos = request_target.find(cgi_extension);
+	// if (pos != std::string::npos) { // for /aa.cgi/bb only return /aa.cgi
+	// 	return "../../../../cgi-bin" + request_target.substr(0, pos + cgi_extension.length());
+	// }
+	// return "../../../../cgi-bin" + request_target;
+	(void)cgi_extension;
+	const std::string::size_type pos = request_target.find("root/cgi-bin/");
+	return request_target.substr(pos);
 }
 
 std::string TranslateToHtmlPath(const std::string &request_target) {
@@ -34,7 +38,8 @@ cgi::MetaMap CgiParse::CreateRequestMetaVariables(
 	const http::HttpRequestFormat &request,
 	const std::string             &cgi_script,
 	const std::string             &cgi_extension,
-	const std::string             &server_port
+	const std::string             &server_port,
+	const std::string             &client_ip
 ) {
 	cgi::MetaMap request_meta_variables;
 	request_meta_variables[cgi::AUTH_TYPE]         = "";
@@ -45,7 +50,7 @@ cgi::MetaMap CgiParse::CreateRequestMetaVariables(
 	request_meta_variables[cgi::PATH_TRANSLATED] =
 		TranslateToHtmlPath(request_meta_variables["PATH_INFO"]);
 	request_meta_variables[cgi::QUERY_STRING]    = "";
-	request_meta_variables[cgi::REMOTE_ADDR]     = "";
+	request_meta_variables[cgi::REMOTE_ADDR]     = client_ip;
 	request_meta_variables[cgi::REMOTE_HOST]     = "";
 	request_meta_variables[cgi::REMOTE_IDENT]    = "";
 	request_meta_variables[cgi::REMOTE_USER]     = "";
@@ -62,14 +67,15 @@ utils::Result<cgi::CgiRequest> CgiParse::Parse(
 	const http::HttpRequestFormat &request,
 	const std::string             &cgi_script,
 	const std::string             &cgi_extension,
-	const std::string             &server_port
+	const std::string             &server_port,
+	const std::string             &client_ip
 ) {
 	cgi::CgiRequest                cgi_request;
 	utils::Result<cgi::CgiRequest> result;
 
 	try {
 		cgi_request.meta_variables =
-			CreateRequestMetaVariables(request, cgi_script, cgi_extension, server_port);
+			CreateRequestMetaVariables(request, cgi_script, cgi_extension, server_port, client_ip);
 		cgi_request.body_message = request.body_message;
 		result.SetValue(cgi_request);
 	} catch (const std::exception &e) {
