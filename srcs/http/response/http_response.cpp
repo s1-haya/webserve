@@ -130,7 +130,8 @@ HttpResponseFormat HttpResponse::CreateHttpResponseFormat(
 				  << std::endl;
 
 		status_code = e.GetStatusCode();
-		if (error_page.IsOk() && status_code.GetEStatusCode() == error_page.GetValue().first) {
+		if (error_page.IsOk() && status_code.GetEStatusCode() == error_page.GetValue().first &&
+			!error_page_content.empty()) {
 			utils::Debug("ErrorPage", error_page.GetValue().second);
 			response_body_message = error_page_content;
 		} else {
