@@ -74,11 +74,12 @@ SRCS	+=	test_http.cpp \
 
 # 4. Add unit test directory for INCLUDE
 SRCS_DIR += $(TEST_CASE_DIR) \
-			$(TEST_CASE_DIR)/$(TEST_CASE_FOR_GET)
+			$(TEST_CASE_DIR)/$(TEST_CASE_FOR_GET) \
+			$(TEST_CASE_DIR)/$(TEST_CASE_FOR_DELETE)
 
 #--------------------------------------------
 OBJ_DIR		:=	objs
-OBJS		:=	$(patsubst %.cpp, $(OBJ_DIR)/%.o, $(notdir $(SRCS)))
+OBJS		:=	$(patsubst %.cpp, $(OBJ_DIR)/%.o, $(SRCS))
 
 INCLUDES	:=	$(addprefix -I, $(SRCS_DIR))
 

@@ -97,9 +97,9 @@ int  main(void) {
     ret_code |= test::TestGetNotImplemented1NotExistMethod(server_infos);
 
     std::cout << "\n\033[44;37m[ Test DELETE ]\033[m" << std::endl;
-
-    // test cgi
-    std::cout << std::endl;
+	ret_code |= test::TestDeleteNoContent1ExistingFile(server_infos);
+	// test cgi
+    std::cout << "\n\033[44;37m[ Test Cgi ]\033[m" << std::endl;
     // ret_code |= test::TestCgiGetOk1PrintOkBodyMessage(server_infos);
     // ret_code |= test::TestCgiGetOk2PrintOkInPerl(server_infos);
     // ret_code |= test::TestCgiGetOk3PrintOkInPython(server_infos);
