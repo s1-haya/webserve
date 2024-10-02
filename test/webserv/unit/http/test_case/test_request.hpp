@@ -11,9 +11,13 @@ namespace request {
 
 static const std::string &COMMON      = "../../../common";
 static const std::string &REQUEST     = COMMON + "/request";
-static const std::string &REQUEST_GET = REQUEST + "/get";
 
 static const std::string &ROOT_2XX = "/2xx";
+static const std::string &ROOT_4XX = "/4xx";
+static const std::string &ROOT_5XX = "/5xx";
+
+static const std::string &REQUEST_GET = REQUEST + "/get";
+
 static const std::string &GET_200_1_CONNECTION_CLOSE =
 	LoadFileContent(REQUEST_GET + ROOT_2XX + "/200_01_connection_close.txt");
 static const std::string &GET_200_2_CONNECTION_KEEP =
@@ -44,7 +48,6 @@ static const std::string &GET_200_17_NOT_EXIST_HEADER_FIELD =
 static const std::string &GET_200_21_NO_CONNECTION =
 	LoadFileContent(REQUEST_GET + ROOT_2XX + "/200_21_no_connection.txt");
 
-static const std::string &ROOT_4XX = "/4xx";
 static const std::string &GET_400_1_ONLY_CRLF =
 	LoadFileContent(REQUEST_GET + ROOT_4XX + "/400_01_only_crlf.txt");
 static const std::string &GET_400_2_LOWER_METHOD =
@@ -83,7 +86,6 @@ static const std::string &GET_400_18_NON_VCHR_HEADER_FIELD_NAME =
 	LoadFileContent(REQUEST_GET + ROOT_4XX + "/400_18_non_vchr_header_field_name.txt");
 static const std::string &GET_400_19_NON_VCHR_HEADER_FIELD_VALUE =
 	LoadFileContent(REQUEST_GET + ROOT_4XX + "/400_19_non_vchr_header_field_value.txt");
-
 static const std::string &GET_404_1_NOT_EXIST_PATH_CONNECTION_CLOSE =
 	LoadFileContent(REQUEST_GET + ROOT_4XX + "/404_01_not_exist_path.txt");
 static const std::string &GET_405_1_NOT_ALLOWED =
@@ -91,9 +93,25 @@ static const std::string &GET_405_1_NOT_ALLOWED =
 static const std::string &GET_408_1_NO_CRLF =
 	LoadFileContent(REQUEST_GET + ROOT_4XX + "/408_01_no_crlf.txt");
 
-static const std::string &ROOT_5XX = "/5xx";
 static const std::string &GET_501_1_NOT_EXIST_METHOD =
 	LoadFileContent(REQUEST_GET + ROOT_5XX + "/501_01_not_exist_method.txt");
+
+
+
+static const std::string &REQUEST_DELETE = REQUEST + "/delete";
+
+static const std::string &DELETE_200_1_EXISTING_FILE =
+	LoadFileContent(REQUEST_DELETE + ROOT_2XX + "/200_01_delete_existing_file.txt");
+static const std::string &DELETE_200_2_EXISTING_FILE_WITH_BODY_MESSAGE =
+	LoadFileContent(REQUEST_DELETE + ROOT_2XX + "/200_02_delete_existing_file_with_body_message.txt");
+static const std::string &DELETE_200_3_EXISTING_FILE_THEN_404_ON_SECOND_ATTEMPT =
+	LoadFileContent(REQUEST_DELETE + ROOT_2XX + "/200_03_delete_existing_file_then_404_on_second_attempt.txt");
+static const std::string &DELETE_403_1_DIRECTORY = 
+	LoadFileContent(REQUEST_DELETE + ROOT_4XX + "/403_01_delete_directory.txt");
+static const std::string &DELETE_404_1_NONEXISTENT_FILE = 
+	LoadFileContent(REQUEST_DELETE + ROOT_4XX + "/404_01_delete_nonexistent_file.txt");
+static const std::string &DELETE_405_NOT_ALLOWED = 
+	LoadFileContent(REQUEST_DELETE + ROOT_4XX + "/405_01_method_not_allowed_for_uri.txt");
 
 namespace cgi {
 
