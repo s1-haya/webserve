@@ -103,6 +103,7 @@ int  main(void) {
     
     ret_code |= test::TestDelete1ForbiddenDirectory(server_infos);
     ret_code |= test::TestDelete1NotFoundNonexistentFile(server_infos);
+    ret_code |= test::TestDeleteMethodNotAllowed(server_infos);
 	// test cgi
     std::cout << "\n\033[44;37m[ Test Cgi ]\033[m" << std::endl;
     // ret_code |= test::TestCgiGetOk1PrintOkBodyMessage(server_infos);
