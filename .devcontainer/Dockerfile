@@ -8,6 +8,7 @@ RUN apt-get update && \
     git=1:2.34.1-1ubuntu1.11 \
     python3=3.10.6-1~22.04.1 \
     python3-pip=22.0.2+dfsg-1ubuntu0.4 \
+    python3.10-dev=3.10.12-1~22.04.6 \
     build-essential=12.9ubuntu3 \
     curl=7.81.0-1ubuntu1.18 \
     vim=2:8.2.3995-1ubuntu2.19 \
@@ -19,9 +20,6 @@ RUN apt-get update && \
     strace=5.16-0ubuntu3 \
     net-tools=1.60+git20181103.0eebece-1ubuntu5 \
     iputils-ping=3:20211215-1 --no-install-recommends
-
-# ここでないとできない
-RUN apt-get update && apt-get install -y python3.8-dev
 
 WORKDIR /workspaces/webserv
 
