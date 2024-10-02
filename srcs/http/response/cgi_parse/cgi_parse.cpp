@@ -32,6 +32,14 @@ std::string TranslateToHtmlPath(const std::string &request_target) {
 	return "../../../../html" + request_target;
 }
 
+std::string FindValueFromMap(const cgi::MetaMap &map, const std::string &key) {
+	cgi::MetaMap::const_iterator it = map.find(key);
+	if (it != map.end()) {
+		return it->second;
+	}
+	return "";
+}
+
 } // namespace
 
 cgi::MetaMap CgiParse::CreateRequestMetaVariables(
@@ -42,9 +50,12 @@ cgi::MetaMap CgiParse::CreateRequestMetaVariables(
 	const std::string             &client_ip
 ) {
 	cgi::MetaMap request_meta_variables;
-	request_meta_variables[cgi::AUTH_TYPE]         = "";
-	request_meta_variables[cgi::CONTENT_LENGTH]    = request.header_fields.at("Content-Length");
-	request_meta_variables[cgi::CONTENT_TYPE]      = request.header_fields.at("Content-Type");
+	request_meta_variables[cgi::AUTH_TYPE] = "";
+	if (!request.body_message.empty()) {
+		request_meta_variables[cgi::CONTENT_LENGTH] = std::to_string(request.body_message.length());
+		request_meta_variables[cgi::CONTENT_TYPE] =
+			FindValueFromMap(request.header_fields, "Content-Type");
+	} // bodyがない場合はunset
 	request_meta_variables[cgi::GATEWAY_INTERFACE] = "CGI/1.1";
 	request_meta_variables[cgi::PATH_INFO]         = CreatePathInfo(cgi_extension, cgi_script);
 	request_meta_variables[cgi::PATH_TRANSLATED] =
@@ -56,7 +67,7 @@ cgi::MetaMap CgiParse::CreateRequestMetaVariables(
 	request_meta_variables[cgi::REMOTE_USER]     = "";
 	request_meta_variables[cgi::REQUEST_METHOD]  = request.request_line.method;
 	request_meta_variables[cgi::SCRIPT_NAME]     = TranslateToCgiPath(cgi_extension, cgi_script);
-	request_meta_variables[cgi::SERVER_NAME]     = request.header_fields.at("Host");
+	request_meta_variables[cgi::SERVER_NAME]     = FindValueFromMap(request.header_fields, "Host");
 	request_meta_variables[cgi::SERVER_PORT]     = server_port;
 	request_meta_variables[cgi::SERVER_PROTOCOL] = request.request_line.version;
 	request_meta_variables[cgi::SERVER_SOFTWARE] = "Webserv/1.1";
