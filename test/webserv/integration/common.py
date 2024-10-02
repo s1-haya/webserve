@@ -17,6 +17,10 @@ def assert_response(response, expected_response):
     ), f"Expected response\n\n {repr(expected_response)}, but got\n\n {repr(response)}"
 
 
+def create_response_header(status_code, reason_phrase, connection, content_length):
+    return f"HTTP/1.1 {status_code} {reason_phrase}\r\nConnection: {connection}\r\nContent-Length: {content_length}\r\nContent-Type: text/html\r\nServer: webserv/1.1\r\n\r\n"
+
+
 root_index_file, root_index_file_length = read_file("root/html/index.html")
 sub_index_file, sub_index_file_length = read_file("root/html/sub/index.html")
 
@@ -49,14 +53,33 @@ REQUEST_GET_2XX_DIR = REQUEST_DIR + "get/2xx/"
 REQUEST_GET_4XX_DIR = REQUEST_DIR + "get/4xx/"
 REQUEST_GET_5XX_DIR = REQUEST_DIR + "get/5xx/"
 
-response_header_get_root_200_close = f"HTTP/1.1 200 OK\r\nConnection: close\r\nContent-Length: {root_index_file_length}\r\nContent-Type: text/html\r\nServer: webserv/1.1\r\n\r\n"
-response_header_get_root_200_keep = f"HTTP/1.1 200 OK\r\nConnection: keep-alive\r\nContent-Length: {root_index_file_length}\r\nContent-Type: text/html\r\nServer: webserv/1.1\r\n\r\n"
-response_header_get_sub_200_close = f"HTTP/1.1 200 OK\r\nConnection: close\r\nContent-Length: {sub_index_file_length}\r\nContent-Type: text/html\r\nServer: webserv/1.1\r\n\r\n"
-response_header_400 = f"HTTP/1.1 400 Bad Request\r\nConnection: close\r\nContent-Length: {bad_request_file_400_length}\r\nContent-Type: text/html\r\nServer: webserv/1.1\r\n\r\n"
-response_header_404 = f"HTTP/1.1 404 Not Found\r\nConnection: close\r\nContent-Length: {not_found_file_404_length}\r\nContent-Type: text/html\r\nServer: webserv/1.1\r\n\r\n"
-response_header_405 = f"HTTP/1.1 405 Method Not Allowed\r\nConnection: close\r\nContent-Length: {not_allowed_file_405_length}\r\nContent-Type: text/html\r\nServer: webserv/1.1\r\n\r\n"
-response_header_408 = f"HTTP/1.1 408 Request Timeout\r\nConnection: close\r\nContent-Length: {timeout_file_408_length}\r\nContent-Type: text/html\r\nServer: webserv/1.1\r\n\r\n"
-response_header_501 = f"HTTP/1.1 501 Not Implemented\r\nConnection: close\r\nContent-Length: {not_implemented_file_501_length}\r\nContent-Type: text/html\r\nServer: webserv/1.1\r\n\r\n"
+KEEP_ALIVE = "keep-alive"
+CLOSE = "close"
+
+response_header_get_root_200_close = create_response_header(
+    200, "OK", CLOSE, root_index_file_length
+)
+response_header_get_root_200_keep = create_response_header(
+    200, "OK", KEEP_ALIVE, root_index_file_length
+)
+response_header_get_sub_200_close = create_response_header(
+    200, "OK", CLOSE, sub_index_file_length
+)
+response_header_400 = create_response_header(
+    400, "Bad Request", CLOSE, bad_request_file_400_length
+)
+response_header_404 = create_response_header(
+    404, "Not Found", CLOSE, not_found_file_404_length
+)
+response_header_405 = create_response_header(
+    405, "Method Not Allowed", CLOSE, not_allowed_file_405_length
+)
+response_header_408 = create_response_header(
+    408, "Request Timeout", CLOSE, timeout_file_408_length
+)
+response_header_501 = create_response_header(
+    501, "Not Implemented", CLOSE, not_implemented_file_501_length
+)
 
 bad_request_response = response_header_400 + bad_request_file_400.decode("utf-8")
 not_found_response = response_header_404 + not_found_file_404.decode("utf-8")
