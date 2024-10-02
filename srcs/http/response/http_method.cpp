@@ -29,6 +29,9 @@ std::string FileToString(const std::ifstream &file) {
 
 std::string ReadFile(const std::string &file_path) {
 	std::ifstream file(file_path.c_str());
+	if (!file.is_open()) {
+		throw http::HttpException("Error: Not Found", http::StatusCode(http::NOT_FOUND));
+	}
 	return FileToString(file);
 }
 
