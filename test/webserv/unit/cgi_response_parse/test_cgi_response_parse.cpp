@@ -43,14 +43,16 @@ Result CompareHeaderFields(const HeaderFields &expected, const HeaderFields &act
 	Result result;
 	if (expected.size() != actual.size()) {
 		result.is_success = false;
-		result.error_log  = "The number of header fields is different.";
+		result.error_log  = "The number of header fields is different, expected: " +
+						   utils::ToString(expected.size()) +
+						   ", actual: " + utils::ToString(actual.size());
 		return result;
 	}
 	for (HeaderFields::const_iterator it = expected.begin(); it != expected.end(); ++it) {
 		HeaderFields::const_iterator actual_it = actual.find(it->first);
 		if (actual_it == actual.end()) {
 			result.is_success = false;
-			result.error_log  = "The key does not exist.";
+			result.error_log  = "The key does not exist: " + it->first;
 			return result;
 		}
 		if (it->second != actual_it->second) {
