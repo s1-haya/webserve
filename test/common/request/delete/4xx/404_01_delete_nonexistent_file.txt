@@ -1,4 +1,4 @@
-DELETE /not_found HTTP/1.1
+DELETE /upload/not_found HTTP/1.1
 Host: localhost
 Connection: close
 
