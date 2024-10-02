@@ -11,9 +11,10 @@
 
 namespace test {
 
-bool HandleWhetherFileDelete(const std::string& file) {
+bool HandleWhetherFileDelete(const std::string &file) {
 	if (access(file.c_str(), F_OK) == 0) {
-		std::cerr << utils::color::RED << "Error: cann't delete the file in delete test case." << utils::color::RESET << std::endl;
+		std::cerr << utils::color::RED << "Error: cann't delete the file in delete test case."
+				  << utils::color::RESET << std::endl;
 		return EXIT_FAILURE;
 	} else {
 		return EXIT_SUCCESS;
