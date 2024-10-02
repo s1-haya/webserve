@@ -1,10 +1,4 @@
-POST /upload/delete_file HTTP/1.1
-Host: localhost
-Connection: keep-alive
-Content-Type: text/plain
-Content-Length: 5
-
-abcdeDELETE /upload/delete_file HTTP/1.1
+DELETE /upload/delete_file HTTP/1.1
 Host: localhost
 Connection: close
 Content-Type: text/plain
