@@ -6,6 +6,7 @@ from common import (
     assert_response,
     response_header_get_root_200_keep,
     root_index_file,
+    timeout_response,
 )
 
 
@@ -25,6 +26,7 @@ def receive_with_timeout(sock) -> Optional[str]:
         return None
 
 
+# ------------------------------------------------------------------------------
 # 通常のkeep-aliveを送信(各関数の説明付き)
 def test_timeout_keep_alive() -> None:
     try:
@@ -56,6 +58,29 @@ def test_timeout_keep_alive() -> None:
         else:
             # timeout秒経過前にserverから何も送られてこなかったらOK(接続が切れたという判断はできないかも？)
             assert len(next_response) == 0
+
+    except HTTPException as e:
+        print(f"Request failed: {e}")
+        assert False
+    finally:
+        if con:
+            con.close()
+
+
+def test_timeout_incomplete_request() -> None:
+    try:
+        con = HTTPConnection("localhost", 8080)
+        con.connect()
+
+        # 完全ではないrequestを送信
+        con.sock.send(b"GET / HTTP/1.1\r\nHost: localhost\r\nConnectio")
+
+        response = receive_with_timeout(con.sock)
+        if response is None:
+            assert False
+        else:
+            # serverがtimeout responseを返したことを確認
+            assert_response(response, timeout_response)
 
     except HTTPException as e:
         print(f"Request failed: {e}")
