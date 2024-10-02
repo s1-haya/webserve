@@ -100,12 +100,12 @@ static const std::string &GET_501_1_NOT_EXIST_METHOD =
 
 static const std::string &REQUEST_DELETE = REQUEST + "/delete";
 
-static const std::string &DELETE_200_1_EXISTING_FILE =
-	LoadFileContent(REQUEST_DELETE + ROOT_2XX + "/200_01_delete_existing_file.txt");
-static const std::string &DELETE_200_2_EXISTING_FILE_WITH_BODY_MESSAGE =
-	LoadFileContent(REQUEST_DELETE + ROOT_2XX + "/200_02_delete_existing_file_with_body_message.txt");
-static const std::string &DELETE_200_3_EXISTING_FILE_THEN_404_ON_SECOND_ATTEMPT =
-	LoadFileContent(REQUEST_DELETE + ROOT_2XX + "/200_03_delete_existing_file_then_404_on_second_attempt.txt");
+static const std::string &DELETE_204_1_EXISTING_FILE =
+	LoadFileContent(REQUEST_DELETE + ROOT_2XX + "/204_01_delete_existing_file.txt");
+static const std::string &DELETE_204_2_EXISTING_FILE_WITH_BODY_MESSAGE =
+	LoadFileContent(REQUEST_DELETE + ROOT_2XX + "/204_02_delete_existing_file_with_body_message.txt");
+static const std::string &DELETE_204_3_EXISTING_FILE_THEN_404_ON_SECOND_ATTEMPT =
+	LoadFileContent(REQUEST_DELETE + ROOT_2XX + "/204_03_delete_existing_file_then_404_on_second_attempt.txt");
 static const std::string &DELETE_403_1_DIRECTORY = 
 	LoadFileContent(REQUEST_DELETE + ROOT_4XX + "/403_01_delete_directory.txt");
 static const std::string &DELETE_404_1_NONEXISTENT_FILE = 

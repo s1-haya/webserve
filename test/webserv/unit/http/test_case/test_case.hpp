@@ -60,9 +60,9 @@ int TestGetNotImplemented1NotExistMethod(const server::VirtualServerAddrList &se
 
 // delete
 // 2xx
-int TestDeleteOk1ExistingFile(const server::VirtualServerAddrList &server_infos);
-int TestDeleteOk2ExistingFileWithBodyMessage(const server::VirtualServerAddrList &server_infos);
-int TestDeleteOk3ExistingFileThenNotFoundOnSecondAttempt(const server::VirtualServerAddrList &server_infos);
+int TestDeleteNoContent1ExistingFile(const server::VirtualServerAddrList &server_infos);
+int TestDeleteNoContent2ExistingFileWithBodyMessage(const server::VirtualServerAddrList &server_infos);
+int TestDeleteNoContent3ExistingFileThenNotFoundOnSecondAttempt(const server::VirtualServerAddrList &server_infos);
 // 4xx
 int TestDelete1ForbiddenDirectory(const server::VirtualServerAddrList &server_infos);
 int TestDelete1NotFoundNonexistentFile(const server::VirtualServerAddrList &server_infos);
