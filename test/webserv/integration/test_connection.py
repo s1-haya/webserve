@@ -89,3 +89,25 @@ def test_timeout_incomplete_request() -> None:
         if con:
             con.close()
 
+
+def test_timeout_no_request() -> None:
+    try:
+        con = HTTPConnection("localhost", 8080)
+        con.connect()
+
+        # requestを何も送らない
+
+        response = receive_with_timeout(con.sock)
+        if response is None:
+            assert False
+        else:
+            # serverが何も送らず接続を切断したらOK
+            assert len(response) == 0
+
+    except HTTPException as e:
+        print(f"Request failed: {e}")
+        assert False
+    finally:
+        if con:
+            con.close()
+
