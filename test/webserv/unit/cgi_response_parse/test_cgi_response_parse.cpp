@@ -1,5 +1,6 @@
 #include "cgi_response_parse.hpp"
 #include "utils.hpp"
+#include <cstdlib>
 #include <iostream>
 #include <map>
 #include <string>
