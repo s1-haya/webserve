@@ -98,7 +98,9 @@ int  main(void) {
 
     std::cout << "\n\033[44;37m[ Test DELETE ]\033[m" << std::endl;
     ret_code |= test::TestDeleteNoContent1ExistingFile(server_infos);
-    // test cgi
+	ret_code |= test::TestDeleteNoContent2ExistingFileWithBodyMessage(server_infos);
+	ret_code |= test::TestDeleteNoContent3ExistingFileThenNotFoundOnSecondAttempt(server_infos);
+	// test cgi
     std::cout << "\n\033[44;37m[ Test Cgi ]\033[m" << std::endl;
     // ret_code |= test::TestCgiGetOk1PrintOkBodyMessage(server_infos);
     // ret_code |= test::TestCgiGetOk2PrintOkInPerl(server_infos);
