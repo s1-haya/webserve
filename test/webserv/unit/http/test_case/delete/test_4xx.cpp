@@ -13,4 +13,4 @@ int TestDelete1ForbiddenDirectory(const server::VirtualServerAddrList &server_in
 int TestDelete1NotFoundNonexistentFile(const server::VirtualServerAddrList &server_infos);
 int TestDeleteMethodNotAllowed(const server::VirtualServerAddrList &server_infos);
 
-}
+} // namespace test

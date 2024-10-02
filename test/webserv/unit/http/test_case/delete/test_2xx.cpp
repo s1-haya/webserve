@@ -11,9 +11,9 @@
 namespace test {
 
 int TestDeleteNoContent1ExistingFile(const server::VirtualServerAddrList &server_infos) {
-	int ret_code = EXIT_SUCCESS;
-	const std::string                                         &file_name = "../../../../root/upload/delete_file";
-	std::ofstream file(file_name.c_str(), std::ios::binary);
+	int                ret_code  = EXIT_SUCCESS;
+	const std::string &file_name = "../../../../root/upload/delete_file";
+	std::ofstream      file(file_name.c_str(), std::ios::binary);
 	if (file.fail()) {
 		utils::Debug("Error: fail to create file in delete test case.");
 		return EXIT_FAILURE;
@@ -35,10 +35,12 @@ int TestDeleteNoContent1ExistingFile(const server::VirtualServerAddrList &server
 	return ret_code;
 }
 
-int TestDeleteNoContent2ExistingFileWithBodyMessage(const server::VirtualServerAddrList &server_infos);
+int TestDeleteNoContent2ExistingFileWithBodyMessage(
+	const server::VirtualServerAddrList &server_infos
+);
 
 int TestDeleteNoContent3ExistingFileThenNotFoundOnSecondAttempt(
 	const server::VirtualServerAddrList &server_infos
 );
 
-}
+} // namespace test

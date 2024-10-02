@@ -9,8 +9,8 @@ std::string LoadFileContent(const std::string &file_path);
 
 namespace request {
 
-static const std::string &COMMON      = "../../../common";
-static const std::string &REQUEST     = COMMON + "/request";
+static const std::string &COMMON  = "../../../common";
+static const std::string &REQUEST = COMMON + "/request";
 
 static const std::string &ROOT_2XX = "/2xx";
 static const std::string &ROOT_4XX = "/4xx";
@@ -96,21 +96,21 @@ static const std::string &GET_408_1_NO_CRLF =
 static const std::string &GET_501_1_NOT_EXIST_METHOD =
 	LoadFileContent(REQUEST_GET + ROOT_5XX + "/501_01_not_exist_method.txt");
 
-
-
 static const std::string &REQUEST_DELETE = REQUEST + "/delete";
 
 static const std::string &DELETE_204_1_EXISTING_FILE =
 	LoadFileContent(REQUEST_DELETE + ROOT_2XX + "/204_01_delete_existing_file.txt");
-static const std::string &DELETE_204_2_EXISTING_FILE_WITH_BODY_MESSAGE =
-	LoadFileContent(REQUEST_DELETE + ROOT_2XX + "/204_02_delete_existing_file_with_body_message.txt");
-static const std::string &DELETE_204_3_EXISTING_FILE_THEN_404_ON_SECOND_ATTEMPT =
-	LoadFileContent(REQUEST_DELETE + ROOT_2XX + "/204_03_delete_existing_file_then_404_on_second_attempt.txt");
-static const std::string &DELETE_403_1_DIRECTORY = 
+static const std::string &DELETE_204_2_EXISTING_FILE_WITH_BODY_MESSAGE = LoadFileContent(
+	REQUEST_DELETE + ROOT_2XX + "/204_02_delete_existing_file_with_body_message.txt"
+);
+static const std::string &DELETE_204_3_EXISTING_FILE_THEN_404_ON_SECOND_ATTEMPT = LoadFileContent(
+	REQUEST_DELETE + ROOT_2XX + "/204_03_delete_existing_file_then_404_on_second_attempt.txt"
+);
+static const std::string &DELETE_403_1_DIRECTORY =
 	LoadFileContent(REQUEST_DELETE + ROOT_4XX + "/403_01_delete_directory.txt");
-static const std::string &DELETE_404_1_NONEXISTENT_FILE = 
+static const std::string &DELETE_404_1_NONEXISTENT_FILE =
 	LoadFileContent(REQUEST_DELETE + ROOT_4XX + "/404_01_delete_nonexistent_file.txt");
-static const std::string &DELETE_405_NOT_ALLOWED = 
+static const std::string &DELETE_405_NOT_ALLOWED =
 	LoadFileContent(REQUEST_DELETE + ROOT_4XX + "/405_01_method_not_allowed_for_uri.txt");
 
 namespace cgi {
