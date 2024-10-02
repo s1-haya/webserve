@@ -51,6 +51,7 @@ int  main(void) {
 
     std::cout << "\033[44;37m[ Test Run ]\033[m" << std::endl;
     server::VirtualServerAddrList server_infos = BuildVirtualServerAddrList();
+    std::cout << "\n\033[44;37m[ Test GET ]\033[m" << std::endl;
     ret_code |= test::TestGetOk1ConnectionClose(server_infos);
     ret_code |= test::TestGetOk2ConnectionKeep(server_infos);
     ret_code |= test::TestGetOk3SubConnectionClose(server_infos);
@@ -94,6 +95,8 @@ int  main(void) {
     // todo: HttpResponse::CreateTimeoutResponse
     // ret_code |= test::TestGetTimeout1NoCrlf(server_infos);
     ret_code |= test::TestGetNotImplemented1NotExistMethod(server_infos);
+
+    std::cout << "\n\033[44;37m[ Test DELETE ]\033[m" << std::endl;
 
     // test cgi
     std::cout << std::endl;

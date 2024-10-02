@@ -59,6 +59,7 @@ SRCS_DIR	:=	$(WS_EXCEPTION_DIR) \
 TEST_CASE_DIR := test_case
 # method
 TEST_CASE_FOR_GET := get
+TEST_CASE_FOR_DELETE := delete
 
 SRCS	+=	test_http.cpp \
 			$(TEST_CASE_DIR)/test_handler.cpp \
@@ -67,6 +68,8 @@ SRCS	+=	test_http.cpp \
 			$(TEST_CASE_DIR)/$(TEST_CASE_FOR_GET)/test_2xx.cpp \
 			$(TEST_CASE_DIR)/$(TEST_CASE_FOR_GET)/test_4xx.cpp \
 			$(TEST_CASE_DIR)/$(TEST_CASE_FOR_GET)/test_5xx.cpp \
+			$(TEST_CASE_DIR)/$(TEST_CASE_FOR_DELETE)/test_2xx.cpp \
+			$(TEST_CASE_DIR)/$(TEST_CASE_FOR_DELETE)/test_4xx.cpp \
 			$(TEST_CASE_DIR)/test_cgi.cpp
 
 # 4. Add unit test directory for INCLUDE
