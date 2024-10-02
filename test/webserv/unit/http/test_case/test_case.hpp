@@ -12,6 +12,7 @@ typedef std::list<const VirtualServer *> VirtualServerAddrList;
 
 namespace test {
 
+// get
 // 2xx
 int TestGetOk1ConnectionClose(const server::VirtualServerAddrList &server_infos);
 int TestGetOk2ConnectionKeep(const server::VirtualServerAddrList &server_infos);
@@ -31,7 +32,6 @@ int TestGetOk14ExtraRequest(const server::VirtualServerAddrList &server_infos);
 int TestGetOk15BodyMessageDefault(const server::VirtualServerAddrList &server_infos);
 int TestGetOk17NotExistHeaderField(const server::VirtualServerAddrList &server_infos);
 int TestGetOk21NoConnection(const server::VirtualServerAddrList &server_infos);
-
 // 4xx
 int TestGetBadRequest1OnlyCrlf(const server::VirtualServerAddrList &server_infos);
 int TestGetBadRequest2LowerMethod(const server::VirtualServerAddrList &server_infos);
@@ -52,12 +52,21 @@ int TestGetBadRequest16HeaderFieldNameSpaceColon(const server::VirtualServerAddr
 int TestGetBadRequest17SpaceHeaderFieldName(const server::VirtualServerAddrList &server_infos);
 int TestGetBadRequest18NonVchrHeaderFieldName(const server::VirtualServerAddrList &server_infos);
 int TestGetBadRequest19NonVchrHeaderFieldValue(const server::VirtualServerAddrList &server_infos);
-
 int TestGetNotFound1NotExistFile(const server::VirtualServerAddrList &server_infos);
 int TestGetMethodNotAllowed(const server::VirtualServerAddrList &server_infos);
 int TestGetTimeout1NoCrlf(const server::VirtualServerAddrList &server_infos);
 // 5xx
 int TestGetNotImplemented1NotExistMethod(const server::VirtualServerAddrList &server_infos);
+
+// delete
+// 2xx
+int TestDeleteOk1ExistingFile(const server::VirtualServerAddrList &server_infos);
+int TestDeleteOk2ExistingFileWithBodyMessage(const server::VirtualServerAddrList &server_infos);
+int TestDeleteOk3ExistingFileThenNotFoundOnSecondAttempt(const server::VirtualServerAddrList &server_infos);
+// 4xx
+int TestDelete1ForbiddenDirectory(const server::VirtualServerAddrList &server_infos);
+int TestDelete1NotFoundNonexistentFile(const server::VirtualServerAddrList &server_infos);
+int TestDeleteMethodNotAllowed(const server::VirtualServerAddrList &server_infos);
 
 // cgi
 int TestCgiGetOk1PrintOkBodyMessage(const server::VirtualServerAddrList &server_infos);
