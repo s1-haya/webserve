@@ -16,7 +16,7 @@ std::string CreatePathInfo(const std::string &cgi_extension, const std::string &
 
 std::string
 TranslateToScriptName(const std::string &cgi_extension, const std::string &request_target) {
-	// from cgi_parse dir to cgi dir
+	// from root path
 	const std::string::size_type extension_pos = request_target.find(cgi_extension);
 	const std::string::size_type root_pos      = request_target.find("root/cgi-bin/");
 	const std::string            script_name   = request_target.substr(root_pos);
@@ -28,7 +28,7 @@ TranslateToScriptName(const std::string &cgi_extension, const std::string &reque
 }
 
 std::string TranslatePathInfo(const std::string &request_target) {
-	// from cgi_parse dir to root dir
+	// from root path
 	if (request_target.empty()) {
 		return "";
 	}
