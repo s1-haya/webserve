@@ -29,22 +29,17 @@ std::string GetCwd() {
 	return directory;
 }
 
-void SystemExceptionHandler(int error_number) {
-	if (error_number == EACCES || error_number == EPERM) {
-		throw HttpException("Error: Forbidden", StatusCode(FORBIDDEN));
-	} else if (error_number == ENOENT || error_number == ENOTDIR || error_number == ELOOP ||
-			   error_number == ENAMETOOLONG) {
-		throw HttpException("Error: Not Found", StatusCode(NOT_FOUND));
-	} else {
-		throw HttpException("Error: Internal Server Error", StatusCode(INTERNAL_SERVER_ERROR));
-	}
-}
-
 std::string ReadErrorFile(const std::string &file_path) {
 	const std::string root_path = GetCwd() + "/../../../root";
 	std::ifstream     file((root_path + file_path).c_str());
 	if (!file) {
-		SystemExceptionHandler(errno);
+		if (errno == EACCES || errno == EPERM) {
+			return HttpResponse::CreateDefaultBodyMessage(StatusCode(FORBIDDEN));
+		} else if (errno == ENOENT || errno == ENOTDIR || errno == ELOOP || errno == ENAMETOOLONG) {
+			return HttpResponse::CreateDefaultBodyMessage(StatusCode(NOT_FOUND));
+		} else {
+			return HttpResponse::CreateDefaultBodyMessage(StatusCode(INTERNAL_SERVER_ERROR));
+		}
 	}
 	std::stringstream ss;
 	ss << file.rdbuf();
@@ -79,15 +74,11 @@ HttpResponseFormat HttpResponse::CreateHttpResponseFormat(
 	HeaderFields response_header_fields = InitResponseHeaderFields(request_info);
 	std::string  response_body_message;
 	utils::Result< std::pair<unsigned int, std::string> > error_page;
-	std::string                                           error_page_content;
 
 	try {
 		const CheckServerInfoResult &server_info_result =
 			HttpServerInfoCheck::Check(server_info, request_info.request);
 		error_page = server_info_result.error_page;
-		if (error_page.IsOk()) {
-			error_page_content = ReadErrorFile(error_page.GetValue().second);
-		}
 		if (server_info_result.redirect.IsOk()) {
 			return HandleRedirect(response_header_fields, server_info_result);
 		}
@@ -130,10 +121,9 @@ HttpResponseFormat HttpResponse::CreateHttpResponseFormat(
 				  << std::endl;
 
 		status_code = e.GetStatusCode();
-		if (error_page.IsOk() && status_code.GetEStatusCode() == error_page.GetValue().first &&
-			!error_page_content.empty()) {
+		if (error_page.IsOk() && status_code.GetEStatusCode() == error_page.GetValue().first) {
 			utils::Debug("ErrorPage", error_page.GetValue().second);
-			response_body_message = error_page_content;
+			response_body_message = ReadErrorFile(error_page.GetValue().second);
 		} else {
 			response_body_message = CreateDefaultBodyMessage(status_code);
 		}
