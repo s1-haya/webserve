@@ -27,14 +27,6 @@ std::string FileToString(const std::ifstream &file) {
 	return ss.str();
 }
 
-std::string ReadFile(const std::string &file_path) {
-	std::ifstream file(file_path.c_str());
-	if (!file.is_open()) {
-		throw http::HttpException("Error: Not Found", http::StatusCode(http::NOT_FOUND));
-	}
-	return FileToString(file);
-}
-
 bool EndWith(const std::string &str, const std::string &suffix) {
 	return str.size() >= suffix.size() &&
 		   str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0;
@@ -240,6 +232,14 @@ Stat Method::TryStat(const std::string &path) {
 	}
 	Stat info(stat_buf);
 	return info;
+}
+
+std::string Method::ReadFile(const std::string &file_path) {
+	std::ifstream file(file_path.c_str());
+	if (!file) {
+		SystemExceptionHandler(errno);
+	}
+	return FileToString(file);
 }
 
 bool Method::IsSupportedMethod(const std::string &method) {
