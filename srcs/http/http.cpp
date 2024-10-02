@@ -18,7 +18,7 @@ Http::Run(const ClientInfos &client_info, const server::VirtualServerAddrList &s
 	utils::Result<void> parsed_result =
 		ParseHttpRequestFormat(client_info.fd, client_info.request_buf);
 	if (!parsed_result.IsOk()) {
-		return CreateBadRequestResponse(client_info);
+		return CreateBadRequestResponse(client_info.fd);
 	}
 	if (IsHttpRequestFormatComplete(client_info.fd)) {
 		result = CreateHttpResponse(client_info, server_info);
@@ -90,14 +90,14 @@ HttpResult Http::GetErrorResponse(int client_fd, ErrorState state) {
 	return result;
 }
 
-HttpResult Http::CreateBadRequestResponse(const ClientInfos &client_info) {
+HttpResult Http::CreateBadRequestResponse(int client_fd) {
 	HttpResult            result;
-	HttpRequestParsedData data  = storage_.GetClientSaveData(client_info.fd);
+	HttpRequestParsedData data  = storage_.GetClientSaveData(client_fd);
 	result.is_response_complete = true;
 	result.is_connection_keep   = false;
 	result.request_buf          = data.current_buf;
 	result.response             = HttpResponse::CreateErrorResponse(StatusCode(BAD_REQUEST));
-	storage_.DeleteClientSaveData(client_info.fd);
+	storage_.DeleteClientSaveData(client_fd);
 	return result;
 }
 

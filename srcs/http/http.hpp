@@ -29,7 +29,7 @@ class Http : public IHttp {
 	HttpResult          CreateHttpResponse(
 				 const ClientInfos &client_info, const server::VirtualServerAddrList &server_info
 			 );
-	HttpResult            CreateBadRequestResponse(const ClientInfos &client_info);
+	HttpResult            CreateBadRequestResponse(int client_fd);
 	bool                  IsHttpRequestFormatComplete(int client_fd);
 	HttpRequestParsedData GetClientData(int client_fd);
 };
