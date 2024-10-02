@@ -33,9 +33,20 @@ class CustomConstIterator {
 	}
 
 	CustomConstIterator operator++(int) {
-		CustomConstIterator temp = *this;
+		CustomConstIterator tmp = *this;
 		++(*this);
-		return temp;
+		return tmp;
+	}
+
+	CustomConstIterator &operator--() {
+		--it_;
+		return *this;
+	}
+
+	CustomConstIterator operator--(int) {
+		CustomConstIterator tmp = *this;
+		--(*this);
+		return tmp;
 	}
 
 	const T &operator*() const {
