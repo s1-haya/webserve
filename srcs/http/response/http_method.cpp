@@ -15,6 +15,7 @@
 #include <sys/stat.h>
 #include <unistd.h> // access
 
+namespace http {
 namespace {
 
 bool IsExistPath(const std::string &path) {
@@ -25,16 +26,6 @@ std::string FileToString(const std::ifstream &file) {
 	std::stringstream ss;
 	ss << file.rdbuf();
 	return ss.str();
-}
-
-std::string ReadFile(const std::string &file_path) {
-	std::ifstream file(file_path.c_str());
-	if (!file) {
-		// todo: default error page?
-		std::ifstream error_file("root/html/404.html");
-		return FileToString(error_file);
-	}
-	return FileToString(file);
 }
 
 bool EndWith(const std::string &str, const std::string &suffix) {
@@ -55,12 +46,10 @@ std::string DetermineContentType(const std::string &path) {
 	} else if (EndWith(path, pdf_extension)) {
 		return "application/pdf";
 	}
-	return http::TEXT_PLAIN;
+	return TEXT_PLAIN;
 }
 
 } // namespace
-
-namespace http {
 
 StatusCode Method::Handler(
 	const std::string  &path,
@@ -242,6 +231,14 @@ Stat Method::TryStat(const std::string &path) {
 	}
 	Stat info(stat_buf);
 	return info;
+}
+
+std::string Method::ReadFile(const std::string &file_path) {
+	std::ifstream file(file_path.c_str());
+	if (!file) {
+		SystemExceptionHandler(errno);
+	}
+	return FileToString(file);
 }
 
 bool Method::IsSupportedMethod(const std::string &method) {

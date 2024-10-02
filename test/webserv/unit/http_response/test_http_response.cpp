@@ -109,7 +109,7 @@ server::VirtualServer *BuildVirtualServer2() {
 	server_names.push_back("host2");
 	server::VirtualServer::HostPortList host_ports;
 	host_ports.push_back(std::make_pair("localhost", 8080));
-	server::VirtualServer::ErrorPage error_page(404, "/404.html");
+	server::VirtualServer::ErrorPage error_page(404, "/html/error_pages/404-ja.html");
 
 	return new server::VirtualServer(server_names, locationlist, host_ports, 1024, error_page);
 }
@@ -237,6 +237,25 @@ int main(void) {
 	const std::string &expected4_response =
 		expected4_status_line + expected4_header_fields + http::CRLF + expected4_body_message;
 	ret_code |= HandleResult(response4, expected4_response);
+
+	// ErrorPageのテスト
+	request_info.request.request_line.method         = http::GET;
+	request_info.request.request_line.request_target = "/www/aaa";
+	request_info.request.request_line.version        = http::HTTP_VERSION;
+	request_info.request.header_fields[http::HOST]   = "host2";
+	std::string response5 =
+		http::HttpResponse::Run(client_infos, server_info, request_info, cgi_result);
+
+	std::string expected5_status_line =
+		LoadFileContent("../../expected_response/default_status_line/404_not_found.txt");
+	std::string expected5_body_message =
+		LoadFileContent("../../../../root/html/error_pages/404-ja.html");
+	std::string expected5_header_fields = SetDefaultHeaderFields(
+		http::KEEP_ALIVE, utils::ToString(expected5_body_message.length()), http::TEXT_HTML
+	);
+	const std::string &expected5_response =
+		expected5_status_line + expected5_header_fields + http::CRLF + expected5_body_message;
+	ret_code |= HandleResult(response5, expected5_response);
 
 	DeleteAddrList(server_info);
 	return ret_code;
