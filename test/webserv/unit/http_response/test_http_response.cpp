@@ -243,7 +243,8 @@ int main(void) {
 	request_info.request.request_line.request_target = "/www/aaa";
 	request_info.request.request_line.version        = http::HTTP_VERSION;
 	request_info.request.header_fields[http::HOST]   = "host2";
-	std::string response5 = http::HttpResponse::Run(server_info, request_info, cgi_result);
+	std::string response5 =
+		http::HttpResponse::Run(client_infos, server_info, request_info, cgi_result);
 
 	std::string expected5_status_line =
 		LoadFileContent("../../expected_response/default_status_line/404_not_found.txt");
