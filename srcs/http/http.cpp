@@ -70,9 +70,9 @@ HttpResult Http::CreateHttpResponse(
 	return result;
 }
 
-HttpResult Http::GetErrorResponse(const ClientInfos &client_info, ErrorState state) {
+HttpResult Http::GetErrorResponse(int client_fd, ErrorState state) {
 	HttpResult            result;
-	HttpRequestParsedData data  = storage_.GetClientSaveData(client_info.fd);
+	HttpRequestParsedData data  = storage_.GetClientSaveData(client_fd);
 	result.is_response_complete = true;
 	result.is_connection_keep   = false;
 	result.request_buf          = data.current_buf;
@@ -86,7 +86,7 @@ HttpResult Http::GetErrorResponse(const ClientInfos &client_info, ErrorState sta
 	default:
 		break;
 	}
-	storage_.DeleteClientSaveData(client_info.fd);
+	storage_.DeleteClientSaveData(client_fd);
 	return result;
 }
 

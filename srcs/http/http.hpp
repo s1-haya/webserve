@@ -18,7 +18,7 @@ class Http : public IHttp {
 	~Http();
 	HttpResult
 	Run(const ClientInfos &client_info, const server::VirtualServerAddrList &server_info);
-	HttpResult GetErrorResponse(const ClientInfos &client_info, ErrorState state);
+	HttpResult GetErrorResponse(int client_fd, ErrorState state);
 	HttpResult GetResponseFromCgi(int client_fd, const cgi::CgiResponse &cgi_response);
 
   private:
