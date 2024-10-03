@@ -269,8 +269,7 @@ int main(void) {
 	static const TestCase test_case_http_request_line_format[] = {
 		TestCase("GET / HTTP/1.1\r\n", test1_request_line),
 		TestCase("GET / HTTP/1.\r\n", test2_request_line),
-		TestCase("GET / HTTP/1.1", test3_request_line)
-	};
+		TestCase("GET / HTTP/1.1", test3_request_line)};
 
 	ret_code |= RunTestCases(
 		test_case_http_request_line_format,
@@ -287,11 +286,11 @@ int main(void) {
 	test1_header_fields.is_request_format.is_body_message  = true;
 
 	// 5.ヘッダフィールドの書式が正しくない場合
-	// http::HttpRequestParsedData test2_header_fields;
-	// test2_header_fields.request_result.status_code         = http::StatusCode(http::BAD_REQUEST);
-	// test2_header_fields.is_request_format.is_request_line  = true;
-	// test2_header_fields.is_request_format.is_header_fields = false;
-	// test2_header_fields.is_request_format.is_body_message  = false;
+	http::HttpRequestParsedData test2_header_fields;
+	test2_header_fields.request_result.status_code         = http::StatusCode(http::BAD_REQUEST);
+	test2_header_fields.is_request_format.is_request_line  = true;
+	test2_header_fields.is_request_format.is_header_fields = false;
+	test2_header_fields.is_request_format.is_body_message  = false;
 
 	// 6.ヘッダフィールドにContent-Lengthがあるがボディメッセージがない場合
 	http::HttpRequestParsedData test3_header_fields;
@@ -305,7 +304,7 @@ int main(void) {
 
 	static const TestCase test_case_http_request_header_fields_format[] = {
 		TestCase("GET / HTTP/1.1\r\nHost: a\r\n\r\n", test1_header_fields),
-		// TestCase("GET / HTTP/1.1\r\nHost :\r\n\r\n", test2_header_fields),
+		TestCase("GET / HTTP/1.1\r\nHost :\r\n\r\n", test2_header_fields),
 		TestCase("GET / HTTP/1.1\r\nHost: test\r\nContent-Length: 2\r\n\r\n", test3_header_fields),
 	};
 
