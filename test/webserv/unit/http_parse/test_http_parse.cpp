@@ -193,6 +193,19 @@ IsSameHttpRequest(const http::HttpRequestFormat &res, const http::HttpRequestFor
 	return http_request_result;
 }
 
+Result IsSameCurrentBuf(const std::string &current_buf, const std::string &expected_current_buf) {
+	Result             current_buf_result;
+	std::ostringstream error_log;
+	if (current_buf != expected_current_buf) {
+		error_log << "Error: current_buf\n";
+		error_log << "- Expected: [" << expected_current_buf << "]\n";
+		error_log << "- Result  : [" << current_buf << "]\n";
+		current_buf_result.is_success = false;
+	}
+	current_buf_result.error_log = error_log.str();
+	return current_buf_result;
+}
+
 Result IsSameHttpRequestParsedData(
 	const http::HttpRequestParsedData &result, const http::HttpRequestParsedData &expected
 ) {
@@ -213,8 +226,13 @@ Result IsSameHttpRequestParsedData(
 	if (is_response_complete) {
 		http_request_result =
 			IsSameHttpRequest(result.request_result.request, expected.request_result.request);
+		if (!http_request_result.is_success) {
+			return http_request_result;
+		}
 	}
-	return http_request_result;
+
+	Result current_buf_result = IsSameCurrentBuf(result.current_buf, expected.current_buf);
+	return current_buf_result;
 }
 
 http::HttpRequestParsedData ParseHttpRequestFormat(const std::string &read_buf) {
@@ -254,17 +272,20 @@ int main(void) {
 	http::HttpRequestParsedData test1_request_line;
 	test1_request_line.request_result.status_code        = http::StatusCode(http::OK);
 	test1_request_line.is_request_format.is_request_line = true;
+	test1_request_line.current_buf                       = "";
 
 	// 2.リクエストラインの書式が正しいくない場合
 	http::HttpRequestParsedData test2_request_line;
 	test2_request_line.request_result.status_code        = http::StatusCode(http::BAD_REQUEST);
 	test2_request_line.is_request_format.is_request_line = false;
+	test2_request_line.current_buf                       = "";
 
 	// 3.CRLFがない場合
 	http::HttpRequestParsedData test3_request_line;
 	// 本来のステータスコードはRequest Timeout
 	test3_request_line.request_result.status_code        = http::StatusCode(http::OK);
 	test3_request_line.is_request_format.is_request_line = false;
+	test3_request_line.current_buf                       = "GET / HTTP/1.1";
 
 	static const TestCase test_case_http_request_line_format[] = {
 		TestCase("GET / HTTP/1.1\r\n", test1_request_line),
@@ -285,6 +306,7 @@ int main(void) {
 	test1_header_fields.is_request_format.is_request_line  = true;
 	test1_header_fields.is_request_format.is_header_fields = true;
 	test1_header_fields.is_request_format.is_body_message  = true;
+	test1_header_fields.current_buf                        = "";
 
 	// 5.ヘッダフィールドの書式が正しくない場合
 	http::HttpRequestParsedData test2_header_fields;
@@ -292,6 +314,7 @@ int main(void) {
 	test2_header_fields.is_request_format.is_request_line  = true;
 	test2_header_fields.is_request_format.is_header_fields = false;
 	test2_header_fields.is_request_format.is_body_message  = false;
+	test2_header_fields.current_buf                        = "";
 
 	// 6.ヘッダフィールドにContent-Lengthがあるがボディメッセージがない場合
 	http::HttpRequestParsedData test3_header_fields;
@@ -302,6 +325,7 @@ int main(void) {
 	test3_header_fields.is_request_format.is_request_line  = true;
 	test3_header_fields.is_request_format.is_header_fields = true;
 	test3_header_fields.is_request_format.is_body_message  = false;
+	test3_header_fields.current_buf                        = "";
 
 	static const TestCase test_case_http_request_header_fields_format[] = {
 		TestCase("GET / HTTP/1.1\r\nHost: a\r\n\r\n", test1_header_fields),
@@ -323,6 +347,7 @@ int main(void) {
 	test1_body_message.is_request_format.is_request_line  = true;
 	test1_body_message.is_request_format.is_header_fields = true;
 	test1_body_message.is_request_format.is_body_message  = true;
+	test1_body_message.current_buf                        = "Content-Length:  3\r\n\r\nabc";
 
 	// 8.Content-Lengthの数値以上にボディメッセージがある場合
 	http::HttpRequestParsedData test2_body_message;
@@ -333,6 +358,7 @@ int main(void) {
 	test2_body_message.is_request_format.is_header_fields  = true;
 	test2_body_message.is_request_format.is_body_message   = true;
 	test2_body_message.request_result.request.body_message = "ab";
+	test2_body_message.current_buf                         = "ccccccccc";
 
 	// 9.Content-Lengthの値の書式が間違ってる場合
 	http::HttpRequestParsedData test3_body_message;
@@ -341,6 +367,7 @@ int main(void) {
 	test3_body_message.is_request_format.is_header_fields  = true;
 	test3_body_message.is_request_format.is_body_message   = false;
 	test3_body_message.request_result.request.body_message = "ab";
+	test3_body_message.current_buf                         = "abccccccccc";
 
 	// 10.Chunked Transfer-Encodingの場合
 	http::HttpRequestParsedData test4_body_message;
@@ -352,6 +379,7 @@ int main(void) {
 	test4_body_message.is_request_format.is_body_message  = true;
 	test4_body_message.request_result.request.body_message =
 		"Wikipedia is a free online encyclopedia that anyone can edit.";
+	test4_body_message.current_buf = "\r\n"; // todo: "" にしたい
 
 	// 11.Chunked Transfer-Encodingの場合で、chunk-sizeとchunk-dataの大きさが一致していない場合
 	http::HttpRequestParsedData test5_body_message;
@@ -362,6 +390,7 @@ int main(void) {
 	test5_body_message.is_request_format.is_header_fields  = true;
 	test5_body_message.is_request_format.is_body_message   = false;
 	test5_body_message.request_result.request.body_message = "Wikipedia";
+	test5_body_message.current_buf                         = "0\r\n\r\n";
 
 	// 12.Chunked Transfer-Encodingの場合で、Content-Lengthがある場合
 	http::HttpRequestParsedData test6_body_message;
@@ -372,6 +401,7 @@ int main(void) {
 	test6_body_message.is_request_format.is_header_fields  = true;
 	test6_body_message.is_request_format.is_body_message   = false;
 	test6_body_message.request_result.request.body_message = "Wikipedia";
+	test6_body_message.current_buf                         = "4\r\nWiki\r\n5\r\npedia\r\n0\r\n\r\n";
 
 	// 13.Chunked Transfer-Encodingの場合で、終端に0\r\n\r\nがない場合
 	http::HttpRequestParsedData test7_body_message;
@@ -382,6 +412,7 @@ int main(void) {
 	test7_body_message.is_request_format.is_header_fields  = true;
 	test7_body_message.is_request_format.is_body_message   = false;
 	test7_body_message.request_result.request.body_message = "Wikipedia";
+	test7_body_message.current_buf                         = "";
 
 	// 14.Chunked Transfer-Encodingの場合で、chunk-sizeが不正な場合(無効な文字)
 	http::HttpRequestParsedData test8_body_message;
@@ -392,6 +423,7 @@ int main(void) {
 	test8_body_message.is_request_format.is_header_fields  = true;
 	test8_body_message.is_request_format.is_body_message   = false;
 	test8_body_message.request_result.request.body_message = "Wikipedia";
+	test8_body_message.current_buf = "pedia\r\n"; // todo: "ss\r\npedia\r\n" にしたい
 
 	// 15.Chunked Transfer-Encodingの場合で、chunk-sizeが不正な場合(負の数)
 	http::HttpRequestParsedData test9_body_message;
@@ -402,6 +434,7 @@ int main(void) {
 	test9_body_message.is_request_format.is_header_fields  = true;
 	test9_body_message.is_request_format.is_body_message   = false;
 	test9_body_message.request_result.request.body_message = "Wikipedia";
+	test9_body_message.current_buf = "pedia\r\n"; // todo: "-122\r\npedia\r\n" にしたい
 
 	// 16.Chunked Transfer-Encodingの場合で、終端の0\r\n\r\nが中途半端な場合
 	http::HttpRequestParsedData test10_body_message;
@@ -412,6 +445,7 @@ int main(void) {
 	test10_body_message.is_request_format.is_header_fields  = true;
 	test10_body_message.is_request_format.is_body_message   = false;
 	test10_body_message.request_result.request.body_message = "Wikipedia";
+	test10_body_message.current_buf                         = "";
 
 	static const TestCase test_case_http_request_body_message_format[] = {
 		TestCase(
