@@ -19,12 +19,12 @@ CgiResponseParse::ParsedData CgiResponseParse::Parse(const std::string &response
 		return parsed_data;
 	}
 	std::string header = response.substr(0, pos + CRLF.size()); // CRLFも含めたいため
-	ParseHeaderFields(header, parsed_data);
+	ParseHeaderFields(header, parsed_data.header_fields);
 	ParseBody(response.substr(pos + HEADER_FIELDS_END.size()), parsed_data);
 	return parsed_data;
 }
 
-void CgiResponseParse::ParseHeaderFields(const std::string &header, ParsedData &parsed_data) {
+void CgiResponseParse::ParseHeaderFields(const std::string &header, HeaderFields &header_fields) {
 	std::string::size_type pos = 0;
 	// todo: err でthrow
 	while (pos < header.size()) {
@@ -42,7 +42,7 @@ void CgiResponseParse::ParseHeaderFields(const std::string &header, ParsedData &
 		std::string value = line.substr(colon_pos + 1);
 		value             = TrimOws(value);
 		// todo: validation(HttpParseの処理をそのまま使う)
-		parsed_data.header_fields[key] = value;
+		header_fields[key] = value;
 	}
 }
 
