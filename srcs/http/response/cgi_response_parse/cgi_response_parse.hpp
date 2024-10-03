@@ -4,7 +4,7 @@
 #include <map>
 #include <string>
 
-namespace http {
+namespace cgi {
 
 class CgiResponseParse {
   public:
@@ -29,6 +29,6 @@ class CgiResponseParse {
 	static const std::string OWS;
 };
 
-} // namespace http
+} // namespace cgi
 
 #endif

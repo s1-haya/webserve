@@ -5,7 +5,7 @@
 #include <map>
 #include <string>
 
-using namespace http;
+using namespace cgi;
 
 // ==================== Test汎用 ==================== //
 namespace {

@@ -1,7 +1,7 @@
 #include "cgi_response_parse.hpp"
 #include "utils.hpp"
 
-namespace http {
+namespace cgi {
 
 const std::string CgiResponseParse::CRLF              = "\r\n";
 const std::string CgiResponseParse::HEADER_FIELDS_END = CRLF + CRLF;
@@ -81,4 +81,4 @@ std::string &CgiResponseParse::TrimOws(std::string &s) {
 	return s;
 }
 
-} // namespace http
+} // namespace cgi
