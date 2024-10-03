@@ -32,8 +32,7 @@ HttpResult Http::GetResponseFromCgi(int client_fd, const cgi::CgiResponse &cgi_r
 	HttpResult                                               result;
 	CgiParseResult cgi_parse_result = cgi::CgiResponseParse::Parse(cgi_response.response);
 	if (!cgi_parse_result.IsOk()) {
-		result.response = GetErrorResponse(client_fd, INTERNAL_ERROR).response;
-		return result;
+		return GetErrorResponse(client_fd, INTERNAL_ERROR);
 	}
 	HttpRequestParsedData data = storage_.GetClientSaveData(client_fd);
 
