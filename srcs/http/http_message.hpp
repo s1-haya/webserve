@@ -31,6 +31,7 @@ extern const std::string CONNECTION;
 extern const std::string KEEP_ALIVE;
 extern const std::string CLOSE;
 extern const std::string CONTENT_TYPE;
+extern const std::string APPLICATION_OCTET_STREAM;
 extern const std::string CONTENT_LENGTH;
 extern const std::string TRANSFER_ENCODING;
 extern const std::string CHUNKED;

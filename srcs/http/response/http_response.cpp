@@ -217,8 +217,12 @@ std::string HttpResponse::GetResponseFromCgi(
 
 	HeaderFields response_header_fields;
 	response_header_fields[SERVER] = SERVER_VERSION;
-	response_header_fields[CONTENT_TYPE] =
-		cgi_parsed_data.header_fields.at(CONTENT_TYPE); // todo: at
+	// Content-Tyeがない場合はapplication/octet-streamを設定
+	if (cgi_parsed_data.header_fields.find(CONTENT_TYPE) == cgi_parsed_data.header_fields.end()) {
+		response_header_fields[CONTENT_TYPE] = APPLICATION_OCTET_STREAM;
+	} else {
+		response_header_fields[CONTENT_TYPE] = cgi_parsed_data.header_fields.at(CONTENT_TYPE);
+	}
 	// Content-Lengthがない場合はbodyの長さを設定
 	if (cgi_parsed_data.header_fields.find(CONTENT_LENGTH) == cgi_parsed_data.header_fields.end()) {
 		response_header_fields[CONTENT_LENGTH] = utils::ToString(response_body_message.length());
