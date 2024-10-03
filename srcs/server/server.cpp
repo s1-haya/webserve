@@ -156,8 +156,12 @@ void Server::HandleNewConnection(int server_fd) {
 }
 
 void Server::HandleExistingConnection(const event::Event &event) {
-	if (event.type & event::EVENT_ERROR || event.type & event::EVENT_HANGUP) {
+	if (event.type & event::EVENT_ERROR) {
 		HandleErrorEvent(event.fd);
+		return;
+	}
+	if (event.type & event::EVENT_HANGUP) {
+		HandleHangUpEvent(event.fd);
 		return;
 	}
 	if (event.type & event::EVENT_READ) {
@@ -189,6 +193,14 @@ void Server::HandleErrorEvent(int fd) {
 	if (!IsMessageExist(fd)) {
 		return;
 	}
+	const int client_fd = IsCgi(fd) ? cgi_manager_.GetClientFd(fd) : fd;
+	SetInternalServerError(client_fd);
+}
+
+void Server::HandleHangUpEvent(int fd) {
+	if (!IsMessageExist(fd)) {
+		return;
+	}
 	if (IsCgi(fd)) {
 		const int client_fd = cgi_manager_.GetClientFd(fd);
 		// todo: EPOLL errorだからといってread pipeが空とは限らないのかもしれない？
@@ -202,7 +214,7 @@ void Server::HandleErrorEvent(int fd) {
 		return;
 	}
 	// fd == client_fd
-	Disconnect(fd);
+	SetInternalServerError(fd);
 }
 
 void Server::HandleReadEvent(const event::Event &event) {
