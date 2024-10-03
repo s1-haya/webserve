@@ -133,13 +133,10 @@ void HttpParse::ParseBodyMessage(HttpRequestParsedData &data) {
 	}
 	// todo: HttpRequestParsedDataクラスでcontent_lengthを保持？
 	// why: ParseBodyMessageが呼ばれるたびにcontent_lengthを変換するのを避けるため
-	const utils::Result<std::size_t> convert_result =
-		utils::ConvertStrToSize(data.request_result.request.header_fields[CONTENT_LENGTH]);
-	if (!convert_result.IsOk()) {
-		throw HttpException("Error: wrong Content-Length number", StatusCode(BAD_REQUEST));
-	}
-	const size_t content_length = convert_result.GetValue();
-	size_t       readable_content_length =
+	const size_t content_length =
+		utils::ConvertStrToSize(data.request_result.request.header_fields[CONTENT_LENGTH])
+			.GetValue();
+	size_t readable_content_length =
 		content_length - data.request_result.request.body_message.size();
 	if (data.current_buf.size() >= readable_content_length) {
 		data.request_result.request.body_message +=
