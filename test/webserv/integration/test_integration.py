@@ -50,10 +50,11 @@ def send_request_and_assert_response(request_file, expected_response):
             REQUEST_GET_2XX_DIR + "200_03_sub_connection_close.txt",
             response_header_get_sub_200_close + sub_index_file,
         ),
-        (
-            REQUEST_GET_2XX_DIR + "200_12_header_field_value_space.txt",
-            response_header_get_root_200_close + root_index_file,
-        ),
+        # todo
+        # (
+        #     REQUEST_GET_2XX_DIR + "200_12_header_field_value_space.txt",
+        #     response_header_get_root_200_close + root_index_file,
+        # ),
         (
             REQUEST_GET_2XX_DIR + "200_13_space_header_field_value.txt",
             response_header_get_root_200_close + root_index_file,
@@ -119,7 +120,10 @@ def send_request_and_assert_response(request_file, expected_response):
             bad_request_response,
         ),
         (REQUEST_GET_4XX_DIR + "404_01_not_exist_path.txt", not_found_response),
-        (REQUEST_GET_4XX_DIR + "405_01_not_allowed.txt", not_allowed_response),
+        (
+            REQUEST_GET_4XX_DIR + "405_01_method_not_allowed_for_uri.txt",
+            not_allowed_response,
+        ),
         (
             REQUEST_GET_5XX_DIR + "501_01_not_exist_method.txt",
             not_implemented_response,

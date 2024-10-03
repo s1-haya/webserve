@@ -1,3 +1,4 @@
 GET /cgi-bin/print_ok.py HTTP/1.1
 Host: localhost
 Connection: close
+

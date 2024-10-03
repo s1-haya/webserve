@@ -39,7 +39,7 @@ std::string ReadFileStr(const std::string &file_path) {
 
 } // namespace
 
-// ./client PORT INFILE_PATH
+// ./client PORT REQUEST
 int main(int argc, char **argv) {
 	if (argc != 3) {
 		PrintError("Error: invalid arguments");
