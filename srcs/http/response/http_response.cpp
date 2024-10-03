@@ -173,7 +173,7 @@ HeaderFields HttpResponse::InitResponseHeaderFields(const HttpRequestResult &req
 
 bool HttpResponse::IsConnectionKeep(const HeaderFields &request_header_fields) {
 	HeaderFields::const_iterator it = request_header_fields.find(CONNECTION);
-	return it == request_header_fields.end() || it->second == KEEP_ALIVE;
+	return it == request_header_fields.end() || it->second != CLOSE;
 }
 
 bool HttpResponse::IsCgi(
