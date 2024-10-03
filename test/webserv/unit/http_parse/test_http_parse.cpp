@@ -370,6 +370,36 @@ int main(void) {
 	test3_body_message.request_result.request.body_message = "ab";
 	test3_body_message.current_buf                         = "abccccccccc";
 
+	// 17.前後にOWSがある場合
+	http::HttpRequestParsedData test11_body_message;
+	test11_body_message.request_result.status_code = http::StatusCode(http::OK);
+	test11_body_message.request_result.request.request_line =
+		CreateRequestLine("GET", "/", "HTTP/1.1");
+	test11_body_message.is_request_format.is_request_line                = true;
+	test11_body_message.is_request_format.is_header_fields               = true;
+	test11_body_message.is_request_format.is_body_message                = true;
+	test11_body_message.request_result.request.header_fields[http::HOST] = "host";
+	test11_body_message.current_buf                                      = "";
+
+	static const TestCase test_case_http_request_body_message_format[] = {
+		TestCase("GET / HTTP/1.1\r\nHost: a\r\nContent-Length:  3\r\n\r\nabc", test1_body_message),
+		TestCase(
+			"GET / HTTP/1.1\r\nHost: test\r\nContent-Length: 2\r\n\r\nabccccccccc",
+			test2_body_message
+		),
+		TestCase(
+			"GET / HTTP/1.1\r\nHost: test\r\nContent-Length: dddd\r\n\r\nabccccccccc",
+			test3_body_message
+		),
+		TestCase("GET / HTTP/1.1\r\nHost:    host    \r\n\r\n", test11_body_message),
+	};
+
+	ret_code |= RunTestCases(
+		test_case_http_request_body_message_format,
+		sizeof(test_case_http_request_body_message_format) /
+			sizeof(test_case_http_request_body_message_format[0])
+	);
+
 	// 10.Chunked Transfer-Encodingの場合
 	http::HttpRequestParsedData test4_body_message;
 	test4_body_message.request_result.status_code = http::StatusCode(http::OK);
@@ -448,27 +478,7 @@ int main(void) {
 	test10_body_message.request_result.request.body_message = "Wikipedia";
 	test10_body_message.current_buf                         = "";
 
-	// 17.前後にOWSがある場合
-	http::HttpRequestParsedData test11_body_message;
-	test11_body_message.request_result.status_code = http::StatusCode(http::OK);
-	test11_body_message.request_result.request.request_line =
-		CreateRequestLine("GET", "/", "HTTP/1.1");
-	test11_body_message.is_request_format.is_request_line                = true;
-	test11_body_message.is_request_format.is_header_fields               = true;
-	test11_body_message.is_request_format.is_body_message                = true;
-	test11_body_message.request_result.request.header_fields[http::HOST] = "host";
-	test11_body_message.current_buf                                      = "";
-
-	static const TestCase test_case_http_request_body_message_format[] = {
-		TestCase("GET / HTTP/1.1\r\nHost: a\r\nContent-Length:  3\r\n\r\nabc", test1_body_message),
-		TestCase(
-			"GET / HTTP/1.1\r\nHost: test\r\nContent-Length: 2\r\n\r\nabccccccccc",
-			test2_body_message
-		),
-		TestCase(
-			"GET / HTTP/1.1\r\nHost: test\r\nContent-Length: dddd\r\n\r\nabccccccccc",
-			test3_body_message
-		),
+	static const TestCase test_case_http_request_body_message_format_with_chunked[] = {
 		TestCase(
 			"POST / HTTP/1.1\r\nHost: host\r\nTransfer-Encoding: "
 			"chunked\r\n\r\n4\r\nWiki\r\n5\r\npedia\r\n0x34\r\n is a free online encyclopedia that "
@@ -505,13 +515,12 @@ int main(void) {
 			"chunked\r\n\r\n4\r\nWiki\r\n5\r\npedia\r\n0\r\n",
 			test10_body_message
 		),
-		TestCase("GET / HTTP/1.1\r\nHost:    host    \r\n\r\n", test11_body_message),
 	};
 
 	ret_code |= RunTestCases(
-		test_case_http_request_body_message_format,
-		sizeof(test_case_http_request_body_message_format) /
-			sizeof(test_case_http_request_body_message_format[0])
+		test_case_http_request_body_message_format_with_chunked,
+		sizeof(test_case_http_request_body_message_format_with_chunked) /
+			sizeof(test_case_http_request_body_message_format_with_chunked[0])
 	);
 
 	return ret_code;
