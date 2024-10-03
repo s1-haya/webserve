@@ -96,6 +96,10 @@ int HandleTestResult(const Result &result) {
 int TestParseValidResponse() {
 	std::string response = "Content-Length: 13\r\nContent-Type: text/plain\r\n\r\nHello, world!";
 	utils::Result<CgiResponseParse::ParsedData> result = CgiResponseParse::Parse(response);
+	if (!result.IsOk()) {
+		PrintNg();
+		return EXIT_FAILURE;
+	}
 
 	CgiResponseParse::ParsedData expected;
 	expected.header_fields["Content-Length"] = "13";
@@ -107,6 +111,10 @@ int TestParseValidResponse() {
 int TestParseHeaderOnlyResponse() {
 	std::string response = "Content-Length: 0\r\nContent-Type: text/plain\r\n\r\n";
 	utils::Result<CgiResponseParse::ParsedData> result = CgiResponseParse::Parse(response);
+	if (!result.IsOk()) {
+		PrintNg();
+		return EXIT_FAILURE;
+	}
 
 	CgiResponseParse::ParsedData expected;
 	expected.header_fields["Content-Length"] = "0";
@@ -118,6 +126,10 @@ int TestParseHeaderOnlyResponse() {
 int TestParseBodyLongerThanContentLength() {
 	std::string response = "Content-Length: 5\r\nContent-Type: text/plain\r\n\r\nHello, world!";
 	utils::Result<CgiResponseParse::ParsedData> result = CgiResponseParse::Parse(response);
+	if (!result.IsOk()) {
+		PrintNg();
+		return EXIT_FAILURE;
+	}
 
 	CgiResponseParse::ParsedData expected;
 	expected.header_fields["Content-Length"] = "5";
@@ -129,6 +141,10 @@ int TestParseBodyLongerThanContentLength() {
 int TestParseNoContentLength() {
 	std::string response = "Content-Type: text/plain\r\n\r\nHello, world!";
 	utils::Result<CgiResponseParse::ParsedData> result = CgiResponseParse::Parse(response);
+	if (!result.IsOk()) {
+		PrintNg();
+		return EXIT_FAILURE;
+	}
 
 	CgiResponseParse::ParsedData expected;
 	expected.header_fields["Content-Type"] = "text/plain";
