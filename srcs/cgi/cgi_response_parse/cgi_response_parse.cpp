@@ -67,14 +67,17 @@ utils::Result<void> CgiResponseParse::ParseBody(const std::string &body, ParsedD
 		std::size_t content_length = convert_result.GetValue();
 		if (content_length > body.size()) {
 			parsed_data.body = body;
-			return;
+			result.Set(true);
+			return result;
 		}
 		parsed_data.body = body.substr(0, content_length);
-		return;
+		result.Set(true);
+		return result;
 	}
 	// Content-Lengthがない場合は全てのbodyを格納
 	parsed_data.body = body;
-	return;
+	result.Set(true);
+	return result;
 }
 
 std::string &CgiResponseParse::TrimOws(std::string &s) {
