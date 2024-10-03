@@ -1,3 +1,4 @@
+#include "http_message.hpp"
 #include "http_parse.hpp"
 #include "utils.hpp"
 #include <cstdlib>
@@ -269,7 +270,8 @@ int main(void) {
 	static const TestCase test_case_http_request_line_format[] = {
 		TestCase("GET / HTTP/1.1\r\n", test1_request_line),
 		TestCase("GET / HTTP/1.\r\n", test2_request_line),
-		TestCase("GET / HTTP/1.1", test3_request_line)};
+		TestCase("GET / HTTP/1.1", test3_request_line)
+	};
 
 	ret_code |= RunTestCases(
 		test_case_http_request_line_format,
@@ -319,9 +321,10 @@ int main(void) {
 	test1_body_message.request_result.status_code = http::StatusCode(http::OK);
 	test1_body_message.request_result.request.request_line =
 		CreateRequestLine("GET", "/", "HTTP/1.1");
-	test1_body_message.is_request_format.is_request_line  = true;
-	test1_body_message.is_request_format.is_header_fields = true;
-	test1_body_message.is_request_format.is_body_message  = true;
+	test1_body_message.is_request_format.is_request_line   = true;
+	test1_body_message.is_request_format.is_header_fields  = true;
+	test1_body_message.is_request_format.is_body_message   = true;
+	test1_body_message.request_result.request.body_message = "abc";
 
 	// 8.Content-Lengthの数値以上にボディメッセージがある場合
 	http::HttpRequestParsedData test2_body_message;
@@ -337,7 +340,7 @@ int main(void) {
 	http::HttpRequestParsedData test3_body_message;
 	test3_body_message.request_result.status_code          = http::StatusCode(http::BAD_REQUEST);
 	test3_body_message.is_request_format.is_request_line   = true;
-	test3_body_message.is_request_format.is_header_fields  = true;
+	test3_body_message.is_request_format.is_header_fields  = false;
 	test3_body_message.is_request_format.is_body_message   = false;
 	test3_body_message.request_result.request.body_message = "ab";
 
@@ -412,10 +415,18 @@ int main(void) {
 	test10_body_message.is_request_format.is_body_message   = false;
 	test10_body_message.request_result.request.body_message = "Wikipedia";
 
+	// 17.前後にOWSがある場合
+	http::HttpRequestParsedData test11_body_message;
+	test11_body_message.request_result.status_code = http::StatusCode(http::OK);
+	test11_body_message.request_result.request.request_line =
+		CreateRequestLine("GET", "/", "HTTP/1.1");
+	test11_body_message.is_request_format.is_request_line                = true;
+	test11_body_message.is_request_format.is_header_fields               = true;
+	test11_body_message.is_request_format.is_body_message                = true;
+	test11_body_message.request_result.request.header_fields[http::HOST] = "host";
+
 	static const TestCase test_case_http_request_body_message_format[] = {
-		TestCase(
-			"GET / HTTP/1.1\r\nHost: a\r\n\r\nContent-Length:  3\r\n\r\nabc", test1_body_message
-		),
+		TestCase("GET / HTTP/1.1\r\nHost: a\r\nContent-Length:  3\r\n\r\nabc", test1_body_message),
 		TestCase(
 			"GET / HTTP/1.1\r\nHost: test\r\nContent-Length: 2\r\n\r\nabccccccccc",
 			test2_body_message
@@ -460,6 +471,7 @@ int main(void) {
 			"chunked\r\n\r\n4\r\nWiki\r\n5\r\npedia\r\n0\r\n",
 			test10_body_message
 		),
+		TestCase("GET / HTTP/1.1\r\nHost:    host    \r\n\r\n", test11_body_message),
 	};
 
 	ret_code |= RunTestCases(
