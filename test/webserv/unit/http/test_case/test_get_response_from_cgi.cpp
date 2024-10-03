@@ -70,4 +70,24 @@ int TestGetResponseFromCgi2() {
 	return HandleResult(result.response, expected_response, 2);
 }
 
+// Content-Typeが無い場合 > application/octet-streamを設定
+int TestGetResponseFromCgi3() {
+	const std::string &response = "Content-Length: 12\r\n\r\nHello, world";
+	cgi::CgiResponse   cgi_response(response, "text/plain", true);
+
+	const std::string &expected_body_message = "Hello, world";
+	HeaderFields       expected_header_fields;
+	expected_header_fields[http::CONNECTION]     = http::KEEP_ALIVE;
+	expected_header_fields[http::CONTENT_LENGTH] = utils::ToString(expected_body_message.length());
+	expected_header_fields[http::CONTENT_TYPE]   = http::APPLICATION_OCTET_STREAM;
+	expected_header_fields[http::SERVER]         = http::SERVER_VERSION;
+	const std::string &expected_response         = CreateHttpResponseFormat(
+        EXPECTED_STATUS_LINE_OK, expected_header_fields, expected_body_message
+    );
+
+	http::Http       http;
+	http::HttpResult result = http.GetResponseFromCgi(2, cgi_response);
+	return HandleResult(result.response, expected_response, 2);
+}
+
 } // namespace test
