@@ -78,6 +78,10 @@ bool IsVString(const std::string &str) {
 	return true;
 }
 
+bool StartWith(const std::string &str, const std::string &prefix) {
+	return str.size() >= prefix.size() && str.compare(0, prefix.size(), prefix) == 0;
+}
+
 } // namespace
 
 void HttpParse::ParseRequestLine(HttpRequestParsedData &data) {
@@ -188,14 +192,15 @@ void HttpParse::ParseChunkedRequest(HttpRequestParsedData &data) {
 		}
 	}
 	if (data.current_buf == "\0") {
-		return;                            // is_request_format.is_body_message = false;
-	} else if (data.current_buf != CRLF) { // 終端に0\r\n\r\nの\r\nがあるはず
+		return; // is_request_format.is_body_message = false;
+	}
+	if (!StartWith(data.current_buf, CRLF)) { // 終端(current_bufの先頭)に0\r\n\r\nの\r\nがあるはず
 		throw HttpException(
 			"Error: Missing or incorrect chunked transfer encoding terminator",
 			StatusCode(BAD_REQUEST)
 		);
 	}
-	// 終端に0\r\n\r\nの\r\nがあるので次のリクエストの為にparse済みとして削除
+	// 終端(current_bufの先頭)に0\r\n\r\nの\r\nがあるので次のリクエストの為にparse済みとして削除
 	data.current_buf.erase(0, CRLF.size());
 	data.is_request_format.is_body_message = true;
 }
