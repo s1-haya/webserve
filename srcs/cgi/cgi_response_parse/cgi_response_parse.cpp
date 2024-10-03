@@ -11,22 +11,30 @@ CgiResponseParse::CgiResponseParse() {}
 
 CgiResponseParse::~CgiResponseParse() {}
 
-CgiResponseParse::ParsedData CgiResponseParse::Parse(const std::string &response) {
-	ParsedData parsed_data;
-	size_t     pos = response.find(HEADER_FIELDS_END);
-	// todo: throw
+utils::Result<CgiResponseParse::ParsedData> CgiResponseParse::Parse(const std::string &response) {
+	ParsedData                parsed_data;
+	utils::Result<ParsedData> result(false, parsed_data);
+	size_t                    pos = response.find(HEADER_FIELDS_END);
 	if (pos == std::string::npos) {
-		return parsed_data;
+		return result;
 	}
-	std::string header = response.substr(0, pos + CRLF.size()); // CRLFも含めたいため
-	ParseHeaderFields(header, parsed_data.header_fields);
-	ParseBody(response.substr(pos + HEADER_FIELDS_END.size()), parsed_data);
-	return parsed_data;
+	std::string         header = response.substr(0, pos + CRLF.size()); // CRLFも含めたいため
+	utils::Result<void> parse_result = ParseHeaderFields(header, parsed_data.header_fields);
+	if (!parse_result.IsOk()) {
+		return result;
+	}
+	parse_result = ParseBody(response.substr(pos + HEADER_FIELDS_END.size()), parsed_data);
+	if (!parse_result.IsOk()) {
+		return result;
+	}
+	return utils::Result<ParsedData>(true, parsed_data);
 }
 
-void CgiResponseParse::ParseHeaderFields(const std::string &header, HeaderFields &header_fields) {
+utils::Result<void>
+CgiResponseParse::ParseHeaderFields(const std::string &header, HeaderFields &header_fields) {
+	utils::Result<void>    result(false);
 	std::string::size_type pos = 0;
-	// todo: err でthrow
+	// todo: err処理
 	while (pos < header.size()) {
 		std::string::size_type end_of_line = header.find(CRLF, pos);
 		if (end_of_line == std::string::npos) {
@@ -36,7 +44,7 @@ void CgiResponseParse::ParseHeaderFields(const std::string &header, HeaderFields
 		pos                              = end_of_line + CRLF.size();
 		std::string::size_type colon_pos = line.find(":");
 		if (colon_pos == std::string::npos) {
-			continue;
+			return result;
 		}
 		std::string key   = line.substr(0, colon_pos);
 		std::string value = line.substr(colon_pos + 1);
@@ -44,13 +52,19 @@ void CgiResponseParse::ParseHeaderFields(const std::string &header, HeaderFields
 		// todo: validation(HttpParseの処理をそのまま使う)
 		header_fields[key] = value;
 	}
+	result.Set(true);
+	return result;
 }
 
-void CgiResponseParse::ParseBody(const std::string &body, ParsedData &parsed_data) {
+utils::Result<void> CgiResponseParse::ParseBody(const std::string &body, ParsedData &parsed_data) {
+	utils::Result<void>    result(false);
 	HeaderFields::iterator it = parsed_data.header_fields.find("Content-Length");
 	if (it != parsed_data.header_fields.end()) {
-		std::string::size_type content_length = utils::ConvertStrToSize(it->second).GetValue();
-		// todo: ConvertStrToSize is Not Ok
+		utils::Result<std::size_t> convert_result = utils::ConvertStrToSize(it->second);
+		if (!convert_result.IsOk()) {
+			return result;
+		}
+		std::size_t content_length = convert_result.GetValue();
 		if (content_length > body.size()) {
 			parsed_data.body = body;
 			return;
