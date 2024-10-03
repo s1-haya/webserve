@@ -162,7 +162,7 @@ Result IsSameHeaderFields(const http::HeaderFields &res, http::HeaderFields expe
 	return header_fields_result;
 }
 
-Result IsSameBodyMessage(const std::string &res, const std::string expected) {
+Result IsSameBodyMessage(const std::string &res, const std::string &expected) {
 	Result             body_message_result;
 	std::ostringstream error_log;
 	if (res != expected) {
@@ -234,7 +234,7 @@ int Run(const std::string &read_buf, const http::HttpRequestParsedData &expected
 }
 
 int RunTestCases(const TestCase test_cases[], std::size_t num_test_cases) {
-	int ret_code = 0;
+	int ret_code = EXIT_SUCCESS;
 
 	for (std::size_t i = 0; i < num_test_cases; i++) {
 		const TestCase test_case = test_cases[i];
@@ -246,7 +246,7 @@ int RunTestCases(const TestCase test_cases[], std::size_t num_test_cases) {
 } // namespace
 
 int main(void) {
-	int ret_code = 0;
+	int ret_code = EXIT_SUCCESS;
 
 	// todo: http/http_response/test_http_request.cpp HttpRequestParsedData関数のテストケース
 
@@ -260,7 +260,7 @@ int main(void) {
 	test2_request_line.request_result.status_code        = http::StatusCode(http::BAD_REQUEST);
 	test2_request_line.is_request_format.is_request_line = false;
 
-	// 3.CRLNがない場合
+	// 3.CRLFがない場合
 	http::HttpRequestParsedData test3_request_line;
 	// 本来のステータスコードはRequest Timeout
 	test3_request_line.request_result.status_code        = http::StatusCode(http::OK);
