@@ -399,7 +399,7 @@ int main(void) {
 	test1_body_message_chunked.is_request_format.is_body_message  = true;
 	test1_body_message_chunked.request_result.request.body_message =
 		"Wikipedia is a free online encyclopedia that anyone can edit.";
-	test1_body_message_chunked.current_buf = "\r\n"; // todo: "" にしたい
+	test1_body_message_chunked.current_buf = "";
 
 	// 11.Chunked Transfer-Encodingの場合で、chunk-sizeとchunk-dataの大きさが一致していない場合
 	http::HttpRequestParsedData test2_body_message_chunked;

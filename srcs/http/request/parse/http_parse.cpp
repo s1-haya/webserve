@@ -198,7 +198,8 @@ void HttpParse::ParseChunkedRequest(HttpRequestParsedData &data) {
 			StatusCode(BAD_REQUEST)
 		);
 	}
-
+	// 終端に0\r\n\r\nの\r\nがあるので次のリクエストの為にparse済みとして削除
+	data.current_buf.erase(0, CRLF.size());
 	data.is_request_format.is_body_message = true;
 }
 
