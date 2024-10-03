@@ -219,8 +219,12 @@ std::string HttpResponse::GetResponseFromCgi(
 	response_header_fields[SERVER] = SERVER_VERSION;
 	response_header_fields[CONTENT_TYPE] =
 		cgi_parsed_data.header_fields.at(CONTENT_TYPE); // todo: at
-	response_header_fields[CONTENT_LENGTH] =
-		cgi_parsed_data.header_fields.at(CONTENT_LENGTH); // todo: at
+	// Content-Lengthがない場合はbodyの長さを設定
+	if (cgi_parsed_data.header_fields.find(CONTENT_LENGTH) == cgi_parsed_data.header_fields.end()) {
+		response_header_fields[CONTENT_LENGTH] = utils::ToString(response_body_message.length());
+	} else {
+		response_header_fields[CONTENT_LENGTH] = cgi_parsed_data.header_fields.at(CONTENT_LENGTH);
+	}
 	if (IsConnectionKeep(request_info.request.header_fields)) {
 		response_header_fields[CONNECTION] = KEEP_ALIVE;
 	} else {
