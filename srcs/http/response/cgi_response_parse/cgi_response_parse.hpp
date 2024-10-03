@@ -22,7 +22,7 @@ class CgiResponseParse {
 
 	static void         ParseHeaderFields(const std::string &header, ParsedData &parsed_data);
 	static void         ParseBody(const std::string &body, ParsedData &parsed_data);
-	static std::string &TrimOWS(std::string &s);
+	static std::string &TrimOws(std::string &s);
 
 	static const std::string CRLF;
 	static const std::string HEADER_FIELDS_END;

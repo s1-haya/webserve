@@ -40,7 +40,7 @@ void CgiResponseParse::ParseHeaderFields(const std::string &header, ParsedData &
 		}
 		std::string key   = line.substr(0, colon_pos);
 		std::string value = line.substr(colon_pos + 1);
-		value             = TrimOWS(value);
+		value             = TrimOws(value);
 		// todo: validation(HttpParseの処理をそのまま使う)
 		parsed_data.header_fields[key] = value;
 	}
@@ -63,7 +63,7 @@ void CgiResponseParse::ParseBody(const std::string &body, ParsedData &parsed_dat
 	return;
 }
 
-std::string &CgiResponseParse::TrimOWS(std::string &s) {
+std::string &CgiResponseParse::TrimOws(std::string &s) {
 	// 先頭のスペースとタブを削除
 	std::string::iterator it = s.begin();
 	while (it != s.end() && CgiResponseParse::OWS.find(*it) != std::string::npos) {
