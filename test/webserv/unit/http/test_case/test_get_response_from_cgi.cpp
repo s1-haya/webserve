@@ -86,8 +86,29 @@ int TestGetResponseFromCgi3() {
     );
 
 	http::Http       http;
-	http::HttpResult result = http.GetResponseFromCgi(2, cgi_response);
-	return HandleResult(result.response, expected_response, 2);
+	http::HttpResult result = http.GetResponseFromCgi(3, cgi_response);
+	return HandleResult(result.response, expected_response, 3);
+}
+
+// Content-Lengthが出力より短い場合 > Content-Lengthの長さで切り捨て
+int TestGetResponseFromCgi4() {
+	const std::string &response =
+		"Content-Length: 3\r\nContent-Type: text/plain\r\n\r\nHello, world";
+	cgi::CgiResponse cgi_response(response, "text/plain", true);
+
+	const std::string &expected_body_message = "Hel";
+	HeaderFields       expected_header_fields;
+	expected_header_fields[http::CONNECTION]     = http::KEEP_ALIVE;
+	expected_header_fields[http::CONTENT_LENGTH] = utils::ToString(expected_body_message.length());
+	expected_header_fields[http::CONTENT_TYPE]   = http::TEXT_PLAIN;
+	expected_header_fields[http::SERVER]         = http::SERVER_VERSION;
+	const std::string &expected_response         = CreateHttpResponseFormat(
+        EXPECTED_STATUS_LINE_OK, expected_header_fields, expected_body_message
+    );
+
+	http::Http       http;
+	http::HttpResult result = http.GetResponseFromCgi(4, cgi_response);
+	return HandleResult(result.response, expected_response, 4);
 }
 
 } // namespace test

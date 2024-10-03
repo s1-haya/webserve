@@ -110,5 +110,6 @@ int  main(void) {
     ret_code |= test::TestGetResponseFromCgi1();
     ret_code |= test::TestGetResponseFromCgi2();
     ret_code |= test::TestGetResponseFromCgi3();
+    ret_code |= test::TestGetResponseFromCgi4();
     return ret_code;
 }
