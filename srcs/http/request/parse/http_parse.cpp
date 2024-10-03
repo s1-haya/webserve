@@ -33,12 +33,12 @@ bool IsStringUpper(const std::string &str) {
 }
 
 std::string StrTrimLeadingOptionalWhitespace(const std::string &str) {
-	std::string::size_type pos = str.find_first_not_of(OPTIONAL_WHITESPACE);
-	if (pos != std::string::npos) {
-		return str.substr(pos);
-	} else {
+	std::string::size_type start = str.find_first_not_of(OPTIONAL_WHITESPACE);
+	if (start == std::string::npos) {
 		return "";
 	}
+	std::string::size_type end = str.find_last_not_of(OPTIONAL_WHITESPACE);
+	return str.substr(start, end - start + 1);
 }
 
 bool IsBodyMessageReadingRequired(const HeaderFields &header_fields) {
