@@ -186,7 +186,10 @@ not_implemented_response = response_header_501 + not_implemented_file_501.decode
             bad_request_response,
         ),
         (REQUEST_GET_4XX_DIR + "404_01_not_exist_path.txt", not_found_response),
-        (REQUEST_GET_4XX_DIR + "405_01_not_allowed.txt", not_allowed_response),
+        (
+            REQUEST_GET_4XX_DIR + "405_01_method_not_allowed_for_uri.txt",
+            not_allowed_response,
+        ),
         (
             REQUEST_GET_5XX_DIR + "501_01_not_exist_method.txt",
             not_implemented_response,

@@ -1,7 +1,7 @@
-POST /upload/upload_file HTTP/1.1
+GET /cgi-bin/print_env.pl HTTP/1.1
 Host: localhost
 Connection: close
-Content-Type: text/plain
 Content-Length: 5
+Content-Type: text/plain
 
 abcde

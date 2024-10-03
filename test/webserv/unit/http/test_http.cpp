@@ -49,6 +49,7 @@ void DeleteVirtualServerAddrList(const server::VirtualServerAddrList &virtual_se
 int  main(void) {
     int ret_code = EXIT_SUCCESS;
 
+    std::cout << "\033[44;37m[ Test Run ]\033[m" << std::endl;
     server::VirtualServerAddrList server_infos = BuildVirtualServerAddrList();
     ret_code |= test::TestGetOk1ConnectionClose(server_infos);
     ret_code |= test::TestGetOk2ConnectionKeep(server_infos);
@@ -62,12 +63,7 @@ int  main(void) {
     ret_code |= test::TestGetOk13SpaceHeaderFieldValue(server_infos);
     ret_code |= test::TestGetOk14ExtraRequest(server_infos);
     ret_code |= test::TestGetOk15BodyMessageDefault(server_infos);
-    // todo: cgi
-    // ret_code |= test::TestGetOk16BodyMessageCgi(server_infos);
     ret_code |= test::TestGetOk17NotExistHeaderField(server_infos);
-    // ret_code |= test::TestGetOk18CgiScriptInPerl(server_infos);
-    // ret_code |= test::TestGetOk19CgiScriptInPython(server_infos);
-    // ret_code |= test::TestGetOk20CgiScriptInShell(server_infos);
     ret_code |= test::TestGetOk21NoConnection(server_infos);
 
     ret_code |= test::TestGetBadRequest1OnlyCrlf(server_infos);
@@ -98,6 +94,13 @@ int  main(void) {
     // todo: HttpResponse::CreateTimeoutResponse
     // ret_code |= test::TestGetTimeout1NoCrlf(server_infos);
     ret_code |= test::TestGetNotImplemented1NotExistMethod(server_infos);
+
+    // test cgi
+    std::cout << std::endl;
+    // ret_code |= test::TestCgiGetOk1PrintOkBodyMessage(server_infos);
+    // ret_code |= test::TestCgiGetOk2PrintOkInPerl(server_infos);
+    // ret_code |= test::TestCgiGetOk3PrintOkInPython(server_infos);
+    // ret_code |= test::TestCgiGetOk4PrintOkInShell(server_infos);
     DeleteVirtualServerAddrList(server_infos);
 
     // test GetErrorResponse
