@@ -7,6 +7,52 @@ const std::string CgiResponseParse::CRLF              = "\r\n";
 const std::string CgiResponseParse::HEADER_FIELDS_END = CRLF + CRLF;
 const std::string CgiResponseParse::OWS               = " \t";
 
+namespace {
+
+bool IsVString(const std::string &str) {
+	for (std::string::const_iterator it = str.begin(); it != str.end(); ++it) {
+		if (!std::isprint(*it)) {
+			return false;
+		}
+	}
+	return true;
+}
+
+bool HasSpace(const std::string &str) {
+	for (std::string::const_iterator it = str.begin(); it != str.end(); ++it) {
+		if (std::isspace(*it)) {
+			return true;
+		}
+	}
+	return false;
+}
+
+utils::Result<void> CheckValidHeaderFieldNameAndValue(
+	const std::string &header_field_name, const std::string &header_field_value
+) {
+	utils::Result<void> result(false);
+
+	if (!header_field_name.size()) {
+		return result;
+	}
+	if (!IsVString(header_field_name) || !IsVString(header_field_value)) {
+		return result;
+	}
+	if (HasSpace(header_field_name)) {
+		return result;
+	}
+	if (header_field_name == "Host" && header_field_value.empty()) {
+		return result;
+	} else if (header_field_name == "Content-Length" &&
+			   !utils::ConvertStrToSize(header_field_value).IsOk()) {
+		return result;
+	}
+	result.Set(true);
+	return result;
+}
+
+} // namespace
+
 CgiResponseParse::CgiResponseParse() {}
 
 CgiResponseParse::~CgiResponseParse() {}
@@ -34,7 +80,6 @@ utils::Result<void>
 CgiResponseParse::ParseHeaderFields(const std::string &header, HeaderFields &header_fields) {
 	utils::Result<void>    result(false);
 	std::string::size_type pos = 0;
-	// todo: err処理
 	while (pos < header.size()) {
 		std::string::size_type end_of_line = header.find(CRLF, pos);
 		if (end_of_line == std::string::npos) {
@@ -46,10 +91,13 @@ CgiResponseParse::ParseHeaderFields(const std::string &header, HeaderFields &hea
 		if (colon_pos == std::string::npos) {
 			return result;
 		}
-		std::string key   = line.substr(0, colon_pos);
-		std::string value = line.substr(colon_pos + 1);
-		value             = TrimOws(value);
-		// todo: validation(HttpParseの処理をそのまま使う)
+		std::string key                         = line.substr(0, colon_pos);
+		std::string value                       = line.substr(colon_pos + 1);
+		value                                   = TrimOws(value);
+		utils::Result<void> check_header_result = CheckValidHeaderFieldNameAndValue(key, value);
+		if (!check_header_result.IsOk()) {
+			return result;
+		}
 		header_fields[key] = value;
 	}
 	result.Set(true);
