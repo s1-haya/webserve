@@ -308,6 +308,43 @@ Result ParseChunkedMultipleTimes1() {
 	return result2;
 }
 
+Result ParseChunkedMultipleTimes2() {
+	http::HttpRequestParsedData save_data;
+	// 1回目のread_bufをセット
+	save_data.current_buf = "POST / HTTP/1.1\r\nHost: host\r\nTransfer-Encoding: "
+							"chunked\r\n\r\n4\r\nWiki\r";
+
+	// 1回目のParseのexpected
+	http::HttpRequestParsedData expected;
+	expected.request_result.status_code          = http::StatusCode(http::OK);
+	expected.request_result.request.request_line = CreateRequestLine("POST", "/", "HTTP/1.1");
+	expected.is_request_format.is_request_line   = true;
+	expected.is_request_format.is_header_fields  = true;
+	expected.is_request_format.is_body_message   = false;
+	expected.request_result.request.body_message = "";
+	expected.current_buf                         = "4\r\nWiki\r";
+
+	// 1回目のParse
+	const Result result1 =
+		IsSameHttpRequestParsedData(ParseHttpRequestFormatForChunked(save_data), expected);
+	if (!result1.is_success) {
+		return result1;
+	}
+
+	// 次のread_bufが追加される
+	save_data.current_buf += "\n5\r\nxx\r\n0\r\n\r\nGET /";
+
+	// 2回目のParseのexpected
+	expected.request_result.status_code          = http::StatusCode(http::BAD_REQUEST); // 400
+	expected.request_result.request.body_message = "Wiki";
+	expected.current_buf                         = "5\r\nxx\r\n0\r\n\r\nGET /";
+
+	// 2回目のParse
+	const Result result2 =
+		IsSameHttpRequestParsedData(ParseHttpRequestFormatForChunked(save_data), expected);
+	return result2;
+}
+
 } // namespace
 
 int main(void) {
@@ -687,6 +724,9 @@ int main(void) {
 	// 25. Chunked Transfer-Encodingの場合で、1回目OKで未完成・2回目OK 200で完成
 	//     chunk_dataが途中ならchunk_sizeもcurrent_bufに残す
 	ret_code |= HandleResult(ParseChunkedMultipleTimes1());
+
+	// 26. Chunked Transfer-Encodingの場合で、1回目OKで未完成・2回目で400
+	ret_code |= HandleResult(ParseChunkedMultipleTimes2());
 
 	return ret_code;
 }
