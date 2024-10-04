@@ -257,6 +257,9 @@ std::string HttpResponse::GetResponseFromCgi(
 	} else {
 		response_header_fields[CONNECTION] = CLOSE;
 	}
+	if (cgi_parsed_data.header_fields.find(LOCATION) != cgi_parsed_data.header_fields.end()) {
+		response_header_fields[LOCATION] = cgi_parsed_data.header_fields.at(LOCATION);
+	}
 
 	HttpResponseFormat response_format(
 		StatusLine(HTTP_VERSION, status_code.GetStatusCode(), status_code.GetReasonPhrase()),
