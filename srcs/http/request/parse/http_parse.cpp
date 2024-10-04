@@ -244,6 +244,11 @@ HeaderFields HttpParse::SetHeaderFields(const std::vector<std::string> &header_f
 }
 
 void HttpParse::CheckValidRequestLine(const std::vector<std::string> &request_line_info) {
+	if (request_line_info.size() != 3) {
+		throw HttpException(
+			"Error: invalid number of status line elements", StatusCode(BAD_REQUEST)
+		);
+	}
 	CheckValidMethod(request_line_info[0]);
 	CheckValidRequestTarget(request_line_info[1]);
 	CheckValidVersion(request_line_info[2]);
