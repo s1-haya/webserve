@@ -46,11 +46,8 @@ utils::Result<void> CheckValidHeaderFieldNameAndValue(
 		utils::Debug("CgiResponseParse", "Header field name has space");
 		return result;
 	}
-	if (header_field_name == "Host" && header_field_value.empty()) {
-		utils::Debug("CgiResponseParse", "Host header field is empty");
-		return result;
-	} else if (header_field_name == "Content-Length" &&
-			   !utils::ConvertStrToSize(header_field_value).IsOk()) {
+	if (header_field_name == "Content-Length" &&
+		!utils::ConvertStrToSize(header_field_value).IsOk()) {
 		utils::Debug("CgiResponseParse", "Invalid Content-Length: " + header_field_value);
 		return result;
 	}
