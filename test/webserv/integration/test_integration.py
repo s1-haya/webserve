@@ -117,6 +117,14 @@ def send_request_and_assert_response(request_file, expected_response):
             REQUEST_GET_4XX_DIR + "400_19_non_vchr_header_field_value.txt",
             bad_request_response,
         ),
+        (
+            REQUEST_GET_4XX_DIR + "400_20_too_few_status_line_elements.txt",
+            bad_request_response,
+        ),
+        (
+            REQUEST_GET_4XX_DIR + "400_21_too_many_status_line_elements.txt",
+            bad_request_response,
+        ),
         (REQUEST_GET_4XX_DIR + "404_01_not_exist_path.txt", not_found_response),
         (
             REQUEST_GET_4XX_DIR + "405_01_method_not_allowed_for_uri.txt",
