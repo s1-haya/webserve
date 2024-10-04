@@ -38,7 +38,7 @@ def test_not_found() -> None:
         assert_status_line(response, HTTPStatus.NOT_FOUND)
         assert_header(response, "Connection", "keep-alive")
         # todo
-        # assert_body(response, "root/html/404.html")
+        # assert_body(response, "root/html/error_pages/404-ja.html")
         con.close()
     except HTTPException as e:
         print(f"Request failed: {e}")

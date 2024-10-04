@@ -85,7 +85,7 @@ server::VirtualServer *BuildVirtualServer1() {
 	server_names.push_back("host1");
 	server::VirtualServer::HostPortList host_ports;
 	host_ports.push_back(std::make_pair("localhost", 8080));
-	server::VirtualServer::ErrorPage error_page(404, "/404.html");
+	server::VirtualServer::ErrorPage error_page(404, "/error_pages/404-ja.html");
 
 	return new server::VirtualServer(server_names, locationlist, host_ports, 1024, error_page);
 }
