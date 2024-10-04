@@ -168,6 +168,20 @@ int TestHeaderFieldWithOws() {
 	return HandleTestResult(CompareParsedData(expected, result.GetValue()));
 }
 
+int TestHeaderFieldHasLocation() {
+	std::string response = "Location: http://www.example.com/\r\n\r\n";
+	utils::Result<CgiResponseParse::ParsedData> result = CgiResponseParse::Parse(response);
+	if (!result.IsOk()) {
+		PrintNg();
+		return EXIT_FAILURE;
+	}
+
+	CgiResponseParse::ParsedData expected;
+	expected.header_fields["Location"] = "http://www.example.com/";
+	expected.body                      = "";
+	return HandleTestResult(CompareParsedData(expected, result.GetValue()));
+}
+
 int TestErrorResponse(const std::string &response) {
 	utils::Result<CgiResponseParse::ParsedData> result = CgiResponseParse::Parse(response);
 	if (!result.IsOk()) {
@@ -186,6 +200,7 @@ int main() {
 	ret |= TestParseBodyLongerThanContentLength();
 	ret |= TestParseNoContentLength();
 	ret |= TestHeaderFieldWithOws();
+	ret |= TestHeaderFieldHasLocation();
 	// ヘッダーフィールドが存在しない
 	ret |= TestErrorResponse("Hello, world!");
 	ret |= TestErrorResponse("Content-Type: text/plain\r\nHello, world!");
