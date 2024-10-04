@@ -152,6 +152,22 @@ int TestParseNoContentLength() {
 	return HandleTestResult(CompareParsedData(expected, result.GetValue()));
 }
 
+int TestHeaderFieldWithOws() {
+	std::string response =
+		"Content-Length:    5   \r\nContent-Type: text/plain\r\n\r\nHello, world!";
+	utils::Result<CgiResponseParse::ParsedData> result = CgiResponseParse::Parse(response);
+	if (!result.IsOk()) {
+		PrintNg();
+		return EXIT_FAILURE;
+	}
+
+	CgiResponseParse::ParsedData expected;
+	expected.header_fields["Content-Length"] = "5";
+	expected.header_fields["Content-Type"]   = "text/plain";
+	expected.body                            = "Hello";
+	return HandleTestResult(CompareParsedData(expected, result.GetValue()));
+}
+
 int TestErrorResponse(const std::string &response) {
 	utils::Result<CgiResponseParse::ParsedData> result = CgiResponseParse::Parse(response);
 	if (!result.IsOk()) {
@@ -169,6 +185,7 @@ int main() {
 	ret |= TestParseHeaderOnlyResponse();
 	ret |= TestParseBodyLongerThanContentLength();
 	ret |= TestParseNoContentLength();
+	ret |= TestHeaderFieldWithOws();
 	// ヘッダーフィールドが存在しない
 	ret |= TestErrorResponse("Hello, world!");
 	ret |= TestErrorResponse("Content-Type: text/plain\r\nHello, world!");
