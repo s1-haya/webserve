@@ -143,8 +143,8 @@
        */
       function handleNewPost(event) {
         event.preventDefault();
-        const input = document.getElementById('new-post-input');
-        const output = document.getElementById('new-post-output');
+        const input = document.getElementById('echo-post-input');
+        const output = document.getElementById('echo-post-output');
         const userText = input.value;
         const contentType = 'text/plain'; // 固定されたContent-Type
         const url = '/echo'; // 実際のエンドポイントに置き換えてください
@@ -250,14 +250,14 @@
 
     <!-- 新しいPOSTリクエストのセクション（独立） -->
     <div class="method" style="margin-top: 40px;">
-      <h2>New POST with Response Body Display</h2>
+      <h2>Echo POST with Response Body Display</h2>
       <form onsubmit="handleNewPost(event)" method="POST">
-        <label for="new-post-input">Enter text to POST</label>
-        <input type="text" id="new-post-input" name="user_text" required />
+        <label for="echo-post-input">Enter text to POST</label>
+        <input type="text" id="echo-post-input" name="user_text" required />
         <button type="submit">Send POST</button>
       </form>
       <h3>Response Body:</h3>
-      <textarea id="new-post-output" rows="10" readonly></textarea>
+      <textarea id="echo-post-output" rows="10" readonly></textarea>
     </div>
   </body>
 </html>
