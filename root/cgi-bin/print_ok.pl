@@ -3,5 +3,5 @@
 use strict;
 use warnings;
 
-print "Content-type: text/plain\r\n\r\n";
+print "Content-Type: text/plain\r\n\r\n";
 print "OK"
