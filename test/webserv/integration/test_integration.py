@@ -117,11 +117,10 @@ not_implemented_response = response_header_501 + not_implemented_file_501.decode
             REQUEST_GET_2XX_DIR + "200_03_sub_connection_close.txt",
             response_header_get_sub_200_close + sub_index_file,
         ),
-        # todo
-        # (
-        #     REQUEST_GET_2XX_DIR + "200_12_header_field_value_space.txt",
-        #     response_header_get_root_200_close + root_index_file,
-        # ),
+        (
+            REQUEST_GET_2XX_DIR + "200_12_header_field_value_space.txt",
+            response_header_get_root_200_close + root_index_file,
+        ),
         (
             REQUEST_GET_2XX_DIR + "200_13_space_header_field_value.txt",
             response_header_get_root_200_close + root_index_file,
