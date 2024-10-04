@@ -15,6 +15,7 @@ COPY test/apache/cgi/leak.pl /usr/local/apache2/cgi-bin/leak.pl
 COPY test/apache/cgi/loop.pl /usr/local/apache2/cgi-bin/loop.pl
 COPY test/apache/cgi/fd.pl /usr/local/apache2/cgi-bin/fd.pl
 COPY test/apache/cgi/recursion.pl /usr/local/apache2/cgi-bin/recursion.pl
+COPY test/apache/cgi/client_redirect.pl /usr/local/apache2/cgi-bin/client_redirect.pl
 COPY test/apache/no_content.txt /usr/local/apache2/no_content.txt
 
 RUN chmod a+x /usr/local/apache2/cgi-bin/first.pl
