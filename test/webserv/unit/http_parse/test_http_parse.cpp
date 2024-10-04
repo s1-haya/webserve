@@ -421,7 +421,7 @@ int main(void) {
 	test2_body_message_chunked.is_request_format.is_header_fields  = true;
 	test2_body_message_chunked.is_request_format.is_body_message   = false;
 	test2_body_message_chunked.request_result.request.body_message = "Wikipedia";
-	test2_body_message_chunked.current_buf                         = "0\r\n\r\n";
+	test2_body_message_chunked.current_buf                         = "2\r\npedia\r\n0\r\n\r\n";
 
 	// 13.Chunked Transfer-Encodingの場合で、Content-Lengthがある場合
 	http::HttpRequestParsedData test3_body_message_chunked;
@@ -454,7 +454,7 @@ int main(void) {
 	test5_body_message_chunked.is_request_format.is_header_fields  = true;
 	test5_body_message_chunked.is_request_format.is_body_message   = false;
 	test5_body_message_chunked.request_result.request.body_message = "Wikipedia";
-	test5_body_message_chunked.current_buf = "pedia\r\n"; // todo: "ss\r\npedia\r\n" にしたい
+	test5_body_message_chunked.current_buf                         = "ss\r\npedia\r\n";
 
 	// 16.Chunked Transfer-Encodingの場合で、chunk-sizeが不正な場合(負の数)
 	http::HttpRequestParsedData test6_body_message_chunked;
@@ -465,7 +465,7 @@ int main(void) {
 	test6_body_message_chunked.is_request_format.is_header_fields  = true;
 	test6_body_message_chunked.is_request_format.is_body_message   = false;
 	test6_body_message_chunked.request_result.request.body_message = "Wikipedia";
-	test6_body_message_chunked.current_buf = "pedia\r\n"; // todo: "-122\r\npedia\r\n" にしたい
+	test6_body_message_chunked.current_buf                         = "-122\r\npedia\r\n";
 
 	// 17.Chunked Transfer-Encodingの場合で、終端の0\r\n\r\nが中途半端な場合
 	http::HttpRequestParsedData test7_body_message_chunked;
@@ -476,9 +476,10 @@ int main(void) {
 	test7_body_message_chunked.is_request_format.is_header_fields  = true;
 	test7_body_message_chunked.is_request_format.is_body_message   = false;
 	test7_body_message_chunked.request_result.request.body_message = "Wikipedia";
-	test7_body_message_chunked.current_buf                         = "";
+	test7_body_message_chunked.current_buf                         = "0\r\n";
 
-	// 18.Chunked Transfer-Encodingの場合で、current_bufに次のリクエストが入っている場合正しく残るか
+	// 18.Chunked Transfer-Encodingの場合で
+	//    正常にchunk処理が終了した後、current_bufに次のリクエストが入っている場合正しく残るか
 	http::HttpRequestParsedData test8_body_message_chunked;
 	test8_body_message_chunked.request_result.status_code = http::StatusCode(http::OK);
 	test8_body_message_chunked.request_result.request.request_line =
