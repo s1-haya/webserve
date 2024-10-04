@@ -1,4 +1,5 @@
 #include "http.hpp"
+#include "cgi_response_parse.hpp"
 #include "client_infos.hpp"
 #include "http_message.hpp"
 #include "http_result.hpp"
@@ -27,13 +28,20 @@ Http::Run(const ClientInfos &client_info, const server::VirtualServerAddrList &s
 }
 
 HttpResult Http::GetResponseFromCgi(int client_fd, const cgi::CgiResponse &cgi_response) {
-	HttpResult            result;
+	typedef utils::Result<cgi::CgiResponseParse::ParsedData> CgiParseResult;
+	HttpResult                                               result;
+	CgiParseResult cgi_parse_result = cgi::CgiResponseParse::Parse(cgi_response.response);
+	if (!cgi_parse_result.IsOk()) {
+		return GetErrorResponse(client_fd, INTERNAL_ERROR);
+	}
 	HttpRequestParsedData data = storage_.GetClientSaveData(client_fd);
+
 	result.is_connection_keep =
 		HttpResponse::IsConnectionKeep(data.request_result.request.header_fields);
 	result.is_response_complete = true;
 	result.request_buf          = data.current_buf;
-	result.response = HttpResponse::GetResponseFromCgi(cgi_response, data.request_result);
+	result.response =
+		HttpResponse::GetResponseFromCgi(cgi_parse_result.GetValue(), data.request_result);
 	storage_.DeleteClientSaveData(client_fd);
 	return result;
 }

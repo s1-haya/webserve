@@ -233,20 +233,30 @@ std::string HttpResponse::CreateErrorResponse(const StatusCode &status_code) {
 }
 
 std::string HttpResponse::GetResponseFromCgi(
-	const cgi::CgiResponse &cgi_response, const HttpRequestResult &request_info
+	const cgi::CgiResponseParse::ParsedData &cgi_parsed_data, const HttpRequestResult &request_info
 ) {
 	StatusCode  status_code(OK);
-	std::string response_body_message = cgi_response.response;
+	std::string response_body_message = cgi_parsed_data.body;
 
 	HeaderFields response_header_fields;
-	response_header_fields[SERVER]         = SERVER_VERSION;
-	response_header_fields[CONTENT_TYPE]   = cgi_response.content_type;
-	response_header_fields[CONTENT_LENGTH] = utils::ToString(response_body_message.length());
+	response_header_fields[SERVER] = SERVER_VERSION;
+	// Content-Tyeがない場合はapplication/octet-streamを設定
+	if (cgi_parsed_data.header_fields.find(CONTENT_TYPE) == cgi_parsed_data.header_fields.end()) {
+		response_header_fields[CONTENT_TYPE] = APPLICATION_OCTET_STREAM;
+	} else {
+		response_header_fields[CONTENT_TYPE] = cgi_parsed_data.header_fields.at(CONTENT_TYPE);
+	}
+	// Content-Lengthがない場合はbodyの長さを設定
+	if (cgi_parsed_data.header_fields.find(CONTENT_LENGTH) == cgi_parsed_data.header_fields.end()) {
+		response_header_fields[CONTENT_LENGTH] = utils::ToString(response_body_message.length());
+	} else {
+		response_header_fields[CONTENT_LENGTH] = cgi_parsed_data.header_fields.at(CONTENT_LENGTH);
+	}
 	if (IsConnectionKeep(request_info.request.header_fields)) {
 		response_header_fields[CONNECTION] = KEEP_ALIVE;
 	} else {
 		response_header_fields[CONNECTION] = CLOSE;
-	} // InitResponseHeaderFields が完成したらそれを使う
+	}
 
 	HttpResponseFormat response_format(
 		StatusLine(HTTP_VERSION, status_code.GetStatusCode(), status_code.GetReasonPhrase()),
