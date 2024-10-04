@@ -57,6 +57,11 @@ class Method {
 		 std::string       &response_body_message,
 		 HeaderFields      &response_header_fields
 	 );
+	static StatusCode EchoPostHandler(
+		const std::string &request_body_message,
+		std::string       &response_body_message,
+		HeaderFields      &response_header_fields
+	);
 	static utils::Result<std::string> AutoindexHandler(const std::string &path);
 };
 
