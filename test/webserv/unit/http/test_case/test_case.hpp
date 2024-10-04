@@ -20,10 +20,6 @@ int TestGetOk4ConnectionKeepAndOkConnectionKeep(const server::VirtualServerAddrL
 int TestGetOk5ConnectionCloseAndOkConnectionClose(const server::VirtualServerAddrList &server_infos
 );
 int TestGetOk6ConnectionKeepAndOkConnectionClose(const server::VirtualServerAddrList &server_infos);
-int TestGetOk7DuplicateConnectionKeep(const server::VirtualServerAddrList &server_infos);
-int TestGetOk8DuplicateConnectionClose(const server::VirtualServerAddrList &server_infos);
-int TestGetOk9ConnectionKeepAndClose(const server::VirtualServerAddrList &server_infos);
-int TestGetOk10ConnectionCloseAndKeep(const server::VirtualServerAddrList &server_infos);
 int TestGetOk11UpperAndLowerHeaderFields(const server::VirtualServerAddrList &server_infos);
 int TestGetOk12HeaderFieldValueSpace(const server::VirtualServerAddrList &server_infos);
 int TestGetOk13SpaceHeaderFieldValue(const server::VirtualServerAddrList &server_infos);
