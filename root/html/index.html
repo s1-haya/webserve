@@ -2,13 +2,75 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Web Server</title>
+    <title>Web Server Interface</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+      }
+      .method {
+        border: 1px solid #ccc;
+        padding: 15px;
+        border-radius: 5px;
+        box-sizing: border-box;
+      }
+      .method h2 {
+        margin-top: 0;
+        font-size: 1.2em;
+        border-bottom: 1px solid #ddd;
+        padding-bottom: 5px;
+      }
+      label {
+        display: block;
+        margin-top: 10px;
+      }
+      input,
+      textarea,
+      button {
+        width: 100%;
+        padding: 8px;
+        margin-top: 5px;
+        box-sizing: border-box;
+      }
+      pre {
+        background-color: #f9f9f9;
+        padding: 10px;
+        border: 1px solid #ddd;
+        overflow-x: auto;
+        max-height: 200px;
+        overflow-y: auto;
+      }
+      /* フレックスコンテナのスタイル */
+      .flex-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        margin-top: 20px;
+      }
+      .flex-container .method {
+        flex: 1 1 45%; /* 各セクションが均等にスペースを取る */
+        min-width: 300px;
+      }
+      @media (max-width: 800px) {
+        .flex-container .method {
+          flex: 1 1 100%; /* 画面が狭い場合は縦並び */
+        }
+      }
+    </style>
     <script>
-      function updateFormAction(event, basePath, method, hasFile = false) {
+      /**
+       * 更新されたフォームアクションを処理し、レスポンスを指定された要素に表示します。
+       * @param {Event} event - フォーム送信イベント
+       * @param {string} basePath - ベースのURLパス
+       * @param {string} method - HTTPメソッド（POSTまたはDELETE）
+       * @param {boolean} hasFile - ファイルアップロードがあるかどうか
+       * @param {string} responseElementId - レスポンスを表示する要素のID
+       */
+      function updateFormAction(event, basePath, method, hasFile = false, responseElementId = null) {
         event.preventDefault();
         const form = event.target;
         const filename = form.filename ? form.filename.value : '';
-        const url = `${basePath}${filename}`;
+        const url = `${basePath}${encodeURIComponent(filename)}`;
         
         let formData = new FormData();
 
@@ -19,32 +81,107 @@
           }
         }
 
-        // For text fields
+        // テキストフィールドの追加
         const userTextInput = form.user_text;
         if (userTextInput) {
           formData.append("user_text", userTextInput.value);
         }
 
-        fetch(url, {
+        // DELETEメソッドの場合、通常はボディを送信しない
+        const fetchOptions = {
           method: method,
-          body: hasFile ? formData : null,
+          headers: {},
+        };
+
+        if (method === 'POST') {
+          fetchOptions.body = formData;
+        } else if (method === 'DELETE') {
+          // DELETEではボディを送信しない場合が多いですが、必要に応じて追加できます
+        }
+
+        fetch(url, fetchOptions)
+          .then(async response => {
+            let responseText = `HTTP/1.1 ${response.status} ${response.statusText}\n`;
+            // レスポンスヘッダーの取得
+            response.headers.forEach((value, key) => {
+              responseText += `${key}: ${value}\n`;
+            });
+            responseText += `\n`;
+
+            // レスポンスボディの取得
+            const contentType = response.headers.get('Content-Type') || '';
+            if (contentType.includes('application/json')) {
+              const data = await response.json();
+              responseText += JSON.stringify(data, null, 2);
+            } else if (contentType.includes('text/')) {
+              const data = await response.text();
+              responseText += data;
+            } else {
+              const data = await response.blob();
+              responseText += `<binary data: ${data.type}>`;
+            }
+
+            if (responseElementId) {
+              document.getElementById(responseElementId).textContent = responseText;
+            } else {
+              alert(`${method} method ${response.ok ? 'succeeded' : 'failed'} for ${filename}\n\n${responseText}`);
+            }
+          })
+          .catch(error => {
+            const errorText = `HTTP Request failed: ${error}`;
+            if (responseElementId) {
+              document.getElementById(responseElementId).textContent = errorText;
+            } else {
+              alert(`${method} method failed due to an error: ${error}`);
+            }
+          });
+      }
+
+      /**
+       * 新しいPOSTリクエストを処理し、レスポンスボディを表示します。
+       * @param {Event} event - フォーム送信イベント
+       */
+      function handleNewPost(event) {
+        event.preventDefault();
+        const input = document.getElementById('new-post-input');
+        const output = document.getElementById('new-post-output');
+        const userText = input.value;
+        const url = '/upload/ss'; // 実際のエンドポイントに置き換えてください
+
+        const formData = new FormData();
+        formData.append('user_text', userText);
+
+        fetch(url, {
+          method: 'POST',
+          body: formData,
         })
-        .then(response => {
-          if (response.ok) {
-            alert(`${method} method succeeded for ${filename}`);
-          } else {
-            alert(`${method} method failed for ${filename}`);
-          }
-        })
-        .catch(error => {
-          alert(`${method} method failed due to an error: ${error}`);
-        });
+          .then(async response => {
+            // レスポンスボディのみを取得
+            const contentType = response.headers.get('Content-Type') || '';
+            let responseBody = '';
+
+            if (contentType.includes('application/json')) {
+              const data = await response.json();
+              responseBody = JSON.stringify(data, null, 2);
+            } else if (contentType.includes('text/')) {
+              responseBody = await response.text();
+            } else {
+              const data = await response.blob();
+              responseBody = `<binary data: ${data.type}>`;
+            }
+
+            output.value = responseBody;
+          })
+          .catch(error => {
+            output.value = `HTTP Request failed: ${error}`;
+          });
       }
     </script>
   </head>
   <body>
     <h1>Hello from webserv!</h1>
 
+    <!-- GETメソッドのセクション（独立） -->
     <div class="method">
       <h2>GET</h2>
       <ul>
@@ -56,41 +193,68 @@
       </ul>
     </div>
 
-    <div class="method">
-      <h2>POST (with file upload)</h2>
-      <form onsubmit="updateFormAction(event, 'upload/', 'POST', true)" method="POST" enctype="multipart/form-data">
-        <label for="text-input">Enter text</label>
-        <input type="text" name="user_text" />
-        <label for="filename">Enter filename</label>
-        <input type="text" name="filename" required />
-        <label for="file">Choose file</label>
-        <input type="file" name="file" />
-        <button type="submit">Submit</button>
-      </form>
+    <!-- 横並びに配置するセクション -->
+    <div class="flex-container">
+      
+      <!-- POSTメソッド（ファイルアップロード付き）のセクション -->
+      <div class="method">
+        <h2>POST (with file upload)</h2>
+        <form onsubmit="updateFormAction(event, 'upload/', 'POST', true, 'post-response')" method="POST" enctype="multipart/form-data">
+          <label for="text-input">Enter text</label>
+          <input type="text" name="user_text" id="text-input" />
+          
+          <label for="filename">Enter filename</label>
+          <input type="text" name="filename" id="filename" required />
+          
+          <label for="file">Choose file</label>
+          <input type="file" name="file" id="file" />
+          
+          <button type="submit">Submit</button>
+        </form>
+        <h3>Response:</h3>
+        <pre id="post-response"></pre>
+      </div>
+
+      <!-- DELETEメソッドのセクション -->
+      <div class="method">
+        <h2>DELETE</h2>
+        <form onsubmit="updateFormAction(event, 'upload/', 'DELETE', false, 'delete-response')" method="POST">
+          <label for="delete-filename">Enter filename to delete</label>
+          <input type="text" name="filename" id="delete-filename" required />
+          <button type="submit">Delete</button>
+        </form>
+        <h3>Response:</h3>
+        <pre id="delete-response"></pre>
+      </div>
+
+      <!-- GETメソッド（CGI）のセクション -->
+      <div class="method">
+        <h2>GET(CGI)</h2>
+        <p><a href="cgi-bin/print_env.pl">link to cgi-bin/print_env.pl</a></p>
+      </div>
+
+      <!-- POSTメソッド（CGI）のセクション -->
+      <div class="method">
+        <h2>POST(CGI)</h2>
+        <p>Post to <code>cgi-bin/print_stdin.pl</code></p>
+        <form action="cgi-bin/print_stdin.pl" method="POST">
+          <label for="cgi-text-input">Enter text</label>
+          <input type="text" name="user_text" id="cgi-text-input" />
+          <button type="submit">Submit</button>
+        </form>
+      </div>
     </div>
 
-    <div class="method">
-      <h2>DELETE</h2>
-      <form onsubmit="updateFormAction(event, 'upload/', 'DELETE')" method="POST">
-        <label for="filename">Enter filename to delete</label>
-        <input type="text" name="filename" required />
-        <button type="submit">Delete</button>
+    <!-- 新しいPOSTリクエストのセクション（独立） -->
+    <div class="method" style="margin-top: 40px;">
+      <h2>New POST with Response Body Display</h2>
+      <form onsubmit="handleNewPost(event)" method="POST">
+        <label for="new-post-input">Enter text to POST</label>
+        <input type="text" id="new-post-input" name="user_text" required />
+        <button type="submit">Send POST</button>
       </form>
-    </div>
-
-    <div class="method">
-      <h2>GET(CGI)</h2>
-      <p><a href="cgi-bin/print_env.pl">link to cgi-bin/print_env.pl</a></p>
-    </div>
-
-    <div class="method">
-      <h2>POST(CGI)</h2>
-      <p>post to cgi-bin/print_stdin.pl</p>
-      <form action="cgi-bin/print_stdin.pl" method="POST">
-        <label for="text-input">Enter text</label>
-        <input type="text" name="user_text" />
-        <button type="submit">Submit</button>
-      </form>
+      <h3>Response Body:</h3>
+      <textarea id="new-post-output" rows="10" readonly></textarea>
     </div>
   </body>
 </html>
