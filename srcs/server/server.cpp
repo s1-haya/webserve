@@ -336,7 +336,7 @@ void Server::HandleTimeoutMessages() {
 		}
 
 		const http::HttpResult http_result =
-			http_.GetErrorResponse(GetClientInfos(client_fd), http::TIMEOUT);
+			http_.GetErrorResponse(client_fd, http::TIMEOUT);
 		message_manager_.AddPrimaryResponse(client_fd, message::CLOSE, http_result.response);
 		ReplaceEvent(client_fd, event::EVENT_WRITE);
 		utils::Debug("server", "timeout client", client_fd);
@@ -351,7 +351,7 @@ void Server::SetInternalServerError(int client_fd) {
 	}
 
 	const http::HttpResult http_result =
-		http_.GetErrorResponse(GetClientInfos(client_fd), http::INTERNAL_ERROR);
+		http_.GetErrorResponse(client_fd, http::INTERNAL_ERROR);
 	message_manager_.AddPrimaryResponse(client_fd, message::CLOSE, http_result.response);
 	ReplaceEvent(client_fd, event::EVENT_WRITE);
 	utils::Debug("server", "internal server error to client", client_fd);
@@ -370,7 +370,7 @@ void Server::Disconnect(int client_fd) {
 	}
 	// todo: client_save_dataがない場合に呼ばれても大丈夫な作りになってるか確認
 	// HttpResult is not used.
-	http_.GetErrorResponse(GetClientInfos(client_fd), http::INTERNAL_ERROR);
+	http_.GetErrorResponse(client_fd, http::INTERNAL_ERROR);
 	event_monitor_.Delete(client_fd);
 	message_manager_.DeleteMessage(client_fd);
 	context_.DeleteClientInfo(client_fd);
