@@ -146,24 +146,27 @@
         const input = document.getElementById('new-post-input');
         const output = document.getElementById('new-post-output');
         const userText = input.value;
-        const url = '/upload/ss'; // 実際のエンドポイントに置き換えてください
+        const contentType = 'text/plain'; // 固定されたContent-Type
+        const url = '/echo'; // 実際のエンドポイントに置き換えてください
 
-        const formData = new FormData();
-        formData.append('user_text', userText);
-
-        fetch(url, {
+        const fetchOptions = {
           method: 'POST',
-          body: formData,
-        })
+          headers: {
+            'Content-Type': contentType,
+          },
+          body: userText, // text/plainの場合、ボディはプレーンテキスト
+        };
+
+        fetch(url, fetchOptions)
           .then(async response => {
             // レスポンスボディのみを取得
-            const contentType = response.headers.get('Content-Type') || '';
+            const responseContentType = response.headers.get('Content-Type') || '';
             let responseBody = '';
 
-            if (contentType.includes('application/json')) {
+            if (responseContentType.includes('application/json')) {
               const data = await response.json();
               responseBody = JSON.stringify(data, null, 2);
-            } else if (contentType.includes('text/')) {
+            } else if (responseContentType.includes('text/')) {
               responseBody = await response.text();
             } else {
               const data = await response.blob();
