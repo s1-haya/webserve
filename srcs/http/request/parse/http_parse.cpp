@@ -86,6 +86,9 @@ ChunkSizeResult GetChunkSizeStr(const std::string &current_buf) {
 
 	const std::string::size_type end_of_chunk_size_pos = current_buf.find(CRLF);
 	if (end_of_chunk_size_pos == std::string::npos) {
+		if (current_buf.size() > 8) { // INT_MAX: 7FFFFFFF(8digits)
+			throw HttpException("Error: incorrect chunk size", StatusCode(BAD_REQUEST));
+		}
 		result.Set(false);
 		return result;
 	}

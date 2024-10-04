@@ -546,6 +546,17 @@ int main(void) {
 	test13_body_message_chunked.request_result.request.body_message = "Wikipedia";
 	test13_body_message_chunked.current_buf                         = "80000000\r\naaa";
 
+	// 24.Chunked Transfer-Encodingの場合で、\r\nが含まれずchunk_sizeが8桁より多い場合は早期に400
+	http::HttpRequestParsedData test14_body_message_chunked;
+	test14_body_message_chunked.request_result.status_code = http::StatusCode(http::BAD_REQUEST);
+	test14_body_message_chunked.request_result.request.request_line =
+		CreateRequestLine("POST", "/", "HTTP/1.1");
+	test14_body_message_chunked.is_request_format.is_request_line   = true;
+	test14_body_message_chunked.is_request_format.is_header_fields  = true;
+	test14_body_message_chunked.is_request_format.is_body_message   = false;
+	test14_body_message_chunked.request_result.request.body_message = "Wikipedia";
+	test14_body_message_chunked.current_buf                         = "123456789";
+
 	static const TestCase test_case_http_request_body_message_format_with_chunked[] = {
 		TestCase(
 			"POST / HTTP/1.1\r\nHost: host\r\nTransfer-Encoding: "
@@ -612,6 +623,11 @@ int main(void) {
 			"POST / HTTP/1.1\r\nHost: host\r\nTransfer-Encoding: "
 			"chunked\r\n\r\n4\r\nWiki\r\n5\r\npedia\r\n80000000\r\naaa",
 			test13_body_message_chunked
+		),
+		TestCase(
+			"POST / HTTP/1.1\r\nHost: host\r\nTransfer-Encoding: "
+			"chunked\r\n\r\n4\r\nWiki\r\n5\r\npedia\r\n123456789",
+			test14_body_message_chunked
 		),
 	};
 
