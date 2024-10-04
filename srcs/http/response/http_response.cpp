@@ -258,6 +258,7 @@ std::string HttpResponse::GetResponseFromCgi(
 		response_header_fields[CONNECTION] = CLOSE;
 	}
 	if (cgi_parsed_data.header_fields.find(LOCATION) != cgi_parsed_data.header_fields.end()) {
+		status_code                      = StatusCode(FOUND);
 		response_header_fields[LOCATION] = cgi_parsed_data.header_fields.at(LOCATION);
 	}
 
