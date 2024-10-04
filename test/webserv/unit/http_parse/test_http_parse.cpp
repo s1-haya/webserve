@@ -261,6 +261,53 @@ int RunTestCases(const TestCase test_cases[], std::size_t num_test_cases) {
 	return ret_code;
 }
 
+http::HttpRequestParsedData ParseHttpRequestFormatForChunked(http::HttpRequestParsedData &save_data
+) {
+	try {
+		http::HttpParse::Run(save_data);
+	} catch (const http::HttpException &e) {
+		save_data.request_result.status_code = e.GetStatusCode();
+	}
+	return save_data;
+}
+
+Result ParseChunkedMultipleTimes1() {
+	http::HttpRequestParsedData save_data;
+	// 1回目のread_bufをセット
+	save_data.current_buf = "POST / HTTP/1.1\r\nHost: host\r\nTransfer-Encoding: "
+							"chunked\r\n\r\n4\r\nWi";
+
+	// 1回目のParseのexpected
+	http::HttpRequestParsedData expected;
+	expected.request_result.status_code          = http::StatusCode(http::OK);
+	expected.request_result.request.request_line = CreateRequestLine("POST", "/", "HTTP/1.1");
+	expected.is_request_format.is_request_line   = true;
+	expected.is_request_format.is_header_fields  = true;
+	expected.is_request_format.is_body_message   = false;
+	expected.request_result.request.body_message = "";
+	expected.current_buf                         = "4\r\nWi";
+
+	// 1回目のParse
+	const Result result1 =
+		IsSameHttpRequestParsedData(ParseHttpRequestFormatForChunked(save_data), expected);
+	if (!result1.is_success) {
+		return result1;
+	}
+
+	// 次のread_bufが追加される
+	save_data.current_buf += "ki\r\n5\r\npedia\r\n0\r\n\r\nGET /";
+
+	// 2回目のParseのexpected
+	expected.is_request_format.is_body_message   = true; // OK
+	expected.request_result.request.body_message = "Wikipedia";
+	expected.current_buf                         = "GET /";
+
+	// 2回目のParse
+	const Result result2 =
+		IsSameHttpRequestParsedData(ParseHttpRequestFormatForChunked(save_data), expected);
+	return result2;
+}
+
 } // namespace
 
 int main(void) {
@@ -636,6 +683,10 @@ int main(void) {
 		sizeof(test_case_http_request_body_message_format_with_chunked) /
 			sizeof(test_case_http_request_body_message_format_with_chunked[0])
 	);
+
+	// 25. Chunked Transfer-Encodingの場合で、1回目OKで未完成・2回目OK 200で完成
+	//     chunk_dataが途中ならchunk_sizeもcurrent_bufに残す
+	ret_code |= HandleResult(ParseChunkedMultipleTimes1());
 
 	return ret_code;
 }
