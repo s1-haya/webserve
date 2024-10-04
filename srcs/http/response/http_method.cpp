@@ -147,7 +147,7 @@ StatusCode Method::PostHandler(
 	// ex. srcs/http/response/http_serverinfo_check/../../../../root/save/test.txt
 	const std::string upload_path = root_path + upload_directory + "/" + file_name;
 
-	if (!IsExistPath(path)) {
+	if (!IsExistPath(upload_path)) {
 		return FileCreationHandler(
 			upload_path, request_body_message, response_body_message, response_header_fields
 		);
