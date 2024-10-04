@@ -190,6 +190,8 @@ int main() {
 	ret |= TestErrorResponse("Hello, world!");
 	ret |= TestErrorResponse("Content-Type: text/plain\r\nHello, world!");
 	ret |= TestErrorResponse("\r\n\r\nHello, world!");
+	// ヘッダーフィールドにコロンが含まれていない
+	ret |= TestErrorResponse("Content-Length 5\r\n\r\nHello, world!");
 	// Content-Lengthが無効
 	ret |= TestErrorResponse("Content-Length: -1\r\n\r\nHello, world!");
 	ret |= TestErrorResponse("Content-Length: aa\r\n\r\nHello, world!");
