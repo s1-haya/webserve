@@ -69,7 +69,8 @@ SRCS	+=	test_http.cpp \
 			$(TEST_CASE_DIR)/test_get_response_from_cgi.cpp \
 			$(TEST_CASE_DIR)/$(TEST_CASE_FOR_GET)/test_2xx.cpp \
 			$(TEST_CASE_DIR)/$(TEST_CASE_FOR_GET)/test_4xx.cpp \
-			$(TEST_CASE_DIR)/$(TEST_CASE_FOR_GET)/test_5xx.cpp
+			$(TEST_CASE_DIR)/$(TEST_CASE_FOR_GET)/test_5xx.cpp \
+			$(TEST_CASE_DIR)/test_cgi.cpp
 
 # 4. Add unit test directory for INCLUDE
 SRCS_DIR += $(TEST_CASE_DIR) \

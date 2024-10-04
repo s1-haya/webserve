@@ -29,11 +29,7 @@ int TestGetOk12HeaderFieldValueSpace(const server::VirtualServerAddrList &server
 int TestGetOk13SpaceHeaderFieldValue(const server::VirtualServerAddrList &server_infos);
 int TestGetOk14ExtraRequest(const server::VirtualServerAddrList &server_infos);
 int TestGetOk15BodyMessageDefault(const server::VirtualServerAddrList &server_infos);
-int TestGetOk16BodyMessageCgi(const server::VirtualServerAddrList &server_infos);
 int TestGetOk17NotExistHeaderField(const server::VirtualServerAddrList &server_infos);
-int TestGetOk18CgiScriptInPerl(const server::VirtualServerAddrList &server_infos);
-int TestGetOk19CgiScriptInPython(const server::VirtualServerAddrList &server_infos);
-int TestGetOk20CgiScriptInShell(const server::VirtualServerAddrList &server_infos);
 int TestGetOk21NoConnection(const server::VirtualServerAddrList &server_infos);
 
 // 4xx
@@ -62,6 +58,12 @@ int TestGetMethodNotAllowed(const server::VirtualServerAddrList &server_infos);
 int TestGetTimeout1NoCrlf(const server::VirtualServerAddrList &server_infos);
 // 5xx
 int TestGetNotImplemented1NotExistMethod(const server::VirtualServerAddrList &server_infos);
+
+// cgi
+int TestCgiGetOk1PrintOkBodyMessage(const server::VirtualServerAddrList &server_infos);
+int TestCgiGetOk2PrintOkInPerl(const server::VirtualServerAddrList &server_infos);
+int TestCgiGetOk3PrintOkInPython(const server::VirtualServerAddrList &server_infos);
+int TestCgiGetOk4PrintOkInShell(const server::VirtualServerAddrList &server_infos);
 
 // GetErrorResponse
 int TestRequestTimeoutResponse();
