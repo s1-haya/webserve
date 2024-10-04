@@ -48,6 +48,8 @@ int TestGetBadRequest16HeaderFieldNameSpaceColon(const server::VirtualServerAddr
 int TestGetBadRequest17SpaceHeaderFieldName(const server::VirtualServerAddrList &server_infos);
 int TestGetBadRequest18NonVchrHeaderFieldName(const server::VirtualServerAddrList &server_infos);
 int TestGetBadRequest19NonVchrHeaderFieldValue(const server::VirtualServerAddrList &server_infos);
+int TestGetBadRequest20TooFewStatusLineElements(const server::VirtualServerAddrList &server_infos);
+int TestGetBadRequest21TooManyStatusLineElements(const server::VirtualServerAddrList &server_infos);
 
 int TestGetNotFound1NotExistFile(const server::VirtualServerAddrList &server_infos);
 int TestGetMethodNotAllowed(const server::VirtualServerAddrList &server_infos);
