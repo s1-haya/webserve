@@ -113,6 +113,10 @@ REQUEST_GET_5XX_DIR = REQUEST_DIR + "get/5xx/"
             bad_request_response,
         ),
         (
+            REQUEST_GET_4XX_DIR + "400_14_transfer_encoding_and_content_length.txt",
+            bad_request_response,
+        ),
+        (
             REQUEST_GET_4XX_DIR + "400_15_space_in_header_field_name.txt",
             bad_request_response,
         ),
@@ -177,6 +181,7 @@ REQUEST_GET_5XX_DIR = REQUEST_DIR + "get/5xx/"
         "400_11_no_header_field_colon",
         "400_12_no_connection_name",
         "400_13_empty_host_header_value",
+        "400_14_transfer_encoding_and_content_length.txt",
         "400_15_space_in_header_field_name",
         "400_16_header_field_name_space_colon",
         "400_17_space_header_field_name",
