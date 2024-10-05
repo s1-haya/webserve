@@ -12,13 +12,13 @@
 namespace http {
 namespace {
 
-std::string GetExtension(const std::string &path) {
-	size_t pos = path.find_last_of('.');
-
-	if (pos == std::string::npos || pos == path.length() - 1) {
-		return "";
+std::string GetPathAfterRoot(const std::string &path) {
+	const std::string root = "/root";
+	size_t            pos  = path.find(root);
+	if (pos != std::string::npos) {
+		return path.substr(pos + root.length());
 	}
-	return path.substr(pos);
+	return path;
 }
 
 std::string GetCwd() {
@@ -183,9 +183,9 @@ bool HttpResponse::IsCgi(
 	if (cgi_extension.empty()) {
 		return false;
 	}
-	// pathがcgi_extensionで設定された拡張子かどうか
+	// pathにcgi_extensionで設定された拡張子が含まれているかどうか
 	// falseの場合はpathに普通のリクエストとして送られる
-	if (cgi_extension != GetExtension(path)) {
+	if (GetPathAfterRoot(path).find(cgi_extension) == std::string::npos) {
 		return false;
 	}
 	// methodがGETかPOSTかつallow_methodかどうか
