@@ -78,8 +78,57 @@ bool IsVString(const std::string &str) {
 	return true;
 }
 
-bool StartWith(const std::string &str, const std::string &prefix) {
-	return str.size() >= prefix.size() && str.compare(0, prefix.size(), prefix) == 0;
+typedef utils::Result<std::pair<std::string::size_type, std::string> > ChunkSizeResult;
+typedef utils::Result<std::string>                                     ChunkDataResult;
+
+ChunkSizeResult GetChunkSizeStr(const std::string &current_buf) {
+	ChunkSizeResult result;
+
+	const std::string::size_type end_of_chunk_size_pos = current_buf.find(CRLF);
+	if (end_of_chunk_size_pos == std::string::npos) {
+		if (current_buf.size() > 8) { // INT_MAX: 7FFFFFFF(8digits)
+			throw HttpException("Error: incorrect chunk size", StatusCode(BAD_REQUEST));
+		}
+		result.Set(false);
+		return result;
+	}
+	const std::string chunk_size_str = current_buf.substr(0, end_of_chunk_size_pos);
+	if (!HexToDec(chunk_size_str).IsOk()) {
+		throw HttpException(
+			"Error: chunk size is not a hexadecimal number", StatusCode(BAD_REQUEST)
+		);
+	}
+	result.SetValue(std::make_pair(end_of_chunk_size_pos, chunk_size_str));
+	return result;
+}
+
+ChunkDataResult GetChunkData(
+	const std::string     &current_buf,
+	std::string::size_type end_of_chunk_size_pos,
+	std::size_t            chunk_size
+) {
+	ChunkDataResult result;
+
+	// "chunk_size\r\n"の次の文字からfind
+	const std::string::size_type end_of_chunk_data_pos =
+		current_buf.find(CRLF, end_of_chunk_size_pos + CRLF.size());
+	if (end_of_chunk_data_pos == std::string::npos) {
+		// CRLFがないかつ"3\r\nXXX\rX"のようにchunk_date以降が(chunk_size+1)より多かったら早期に400
+		if (current_buf.size() > end_of_chunk_size_pos + CRLF.size() + chunk_size + 1) {
+			throw HttpException(
+				"Error: Missing or incorrect chunked transfer encoding terminator",
+				StatusCode(BAD_REQUEST)
+			);
+		}
+		result.Set(false);
+		return result;
+	}
+	const std::string chunk_data = current_buf.substr(
+		end_of_chunk_size_pos + CRLF.size(),
+		end_of_chunk_data_pos - end_of_chunk_size_pos - CRLF.size()
+	);
+	result.SetValue(chunk_data);
+	return result;
 }
 
 } // namespace
@@ -162,46 +211,44 @@ void HttpParse::ParseChunkedRequest(HttpRequestParsedData &data) {
 		);
 	}
 
-	std::string::size_type end_of_chunk_size_pos = data.current_buf.find(CRLF);
-	std::string            chunk_size_str = data.current_buf.substr(0, end_of_chunk_size_pos);
-	data.current_buf.erase(0, chunk_size_str.size() + CRLF.size());
-	unsigned int chunk_size = HexToDec(chunk_size_str).GetValue();
-	if (HexToDec(chunk_size_str).IsOk() == false) {
-		throw HttpException(
-			"Error: chunk size is not a hexadecimal number", StatusCode(BAD_REQUEST)
-		);
+	ChunkSizeResult result = GetChunkSizeStr(data.current_buf);
+	if (!result.IsOk()) {
+		return;
 	}
-	while (chunk_size > 0 && data.current_buf != "\0") {
-		std::string::size_type end_of_chunk_data_pos = data.current_buf.find(CRLF);
-		std::string            chunk_data = data.current_buf.substr(0, end_of_chunk_data_pos);
-		data.current_buf.erase(0, chunk_data.size() + CRLF.size());
+	std::string::size_type end_of_chunk_size_pos = result.GetValue().first;
+	std::string            chunk_size_str        = result.GetValue().second;
+	std::size_t            chunk_size            = HexToDec(chunk_size_str).GetValue();
+
+	while (true) {
+		const ChunkDataResult chunk_data_result =
+			GetChunkData(data.current_buf, end_of_chunk_size_pos, chunk_size);
+		if (!chunk_data_result.IsOk()) {
+			return;
+		}
+		const std::string chunk_data = chunk_data_result.GetValue();
 		if (chunk_data.size() != chunk_size) {
 			throw HttpException(
 				"Error: chunk size and chunk data size are different", StatusCode(BAD_REQUEST)
 			);
 		}
+		// sizeとdataが揃ったのでbody_messageに追加 & current_bufからまとめてerase
 		data.request_result.request.body_message += chunk_data;
-		end_of_chunk_size_pos = data.current_buf.find(CRLF);
-		chunk_size_str        = data.current_buf.substr(0, end_of_chunk_size_pos);
-		data.current_buf.erase(0, chunk_size_str.size() + CRLF.size());
-		chunk_size = HexToDec(chunk_size_str).GetValue();
-		if (HexToDec(chunk_size_str).IsOk() == false && data.current_buf != "\0") {
-			throw HttpException(
-				"Error: chunk size is not a hexadecimal number", StatusCode(BAD_REQUEST)
-			);
+		const std::size_t chunk_size_and_data_length =
+			chunk_size_str.size() + CRLF.size() + chunk_data.size() + CRLF.size();
+		data.current_buf.erase(0, chunk_size_and_data_length);
+		if (chunk_size == 0) {
+			break;
 		}
+
+		ChunkSizeResult result = GetChunkSizeStr(data.current_buf);
+		if (!result.IsOk()) {
+			return;
+		}
+		end_of_chunk_size_pos = result.GetValue().first;
+		chunk_size_str        = result.GetValue().second;
+		chunk_size            = HexToDec(chunk_size_str).GetValue();
 	}
-	if (data.current_buf == "\0") {
-		return; // is_request_format.is_body_message = false;
-	}
-	if (!StartWith(data.current_buf, CRLF)) { // 終端(current_bufの先頭)に0\r\n\r\nの\r\nがあるはず
-		throw HttpException(
-			"Error: Missing or incorrect chunked transfer encoding terminator",
-			StatusCode(BAD_REQUEST)
-		);
-	}
-	// 終端(current_bufの先頭)に0\r\n\r\nの\r\nがあるので次のリクエストの為にparse済みとして削除
-	data.current_buf.erase(0, CRLF.size());
+
 	data.is_request_format.is_body_message = true;
 }
 
