@@ -20,7 +20,7 @@ def assert_response(response, expected_response):
 def create_response_header(
     status_code, reason_phrase, connection, content_length, content_type="text/plain"
 ):
-    return f"HTTP/1.1 {status_code} {reason_phrase}\r\nConnection: {connection}\r\nContent-Length: {content_length}\r\nContent-Type: {content_type}\r\nServer: webserv/1.1\r\n\r\n"
+    return f"HTTP/1.1 {status_code} {reason_phrase}\r\nconnection: {connection}\r\ncontent-length: {content_length}\r\ncontent-type: {content_type}\r\nserver: webserv/1.1\r\n\r\n"
 
 
 root_index_file, root_index_file_length = read_file("root/html/index.html")
