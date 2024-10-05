@@ -7,7 +7,7 @@ from common import (assert_response, response_header_get_root_200_keep,
 
 # serverのtimeout+αを設定する
 TIMEOUT = 4.0
-BUFFER_SIZE = 4096
+BUFFER_SIZE = 10240
 
 
 def receive_with_timeout(sock) -> Optional[str]:
