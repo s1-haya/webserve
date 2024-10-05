@@ -30,7 +30,7 @@ int HandleResult(const T &result, const T &expected, int number) {
 int TestGetResponseFromCgi1() {
 	const std::string &response =
 		"Content-Length: 12\r\nContent-Type: text/plain\r\n\r\nHello, world";
-	cgi::CgiResponse cgi_response(response, "text/html", true);
+	cgi::CgiResponse cgi_response(response, http::TEXT_PLAIN, true);
 
 	const std::string &expected_body_message = "Hello, world";
 	HeaderFields       expected_header_fields;
@@ -52,7 +52,7 @@ int TestGetResponseFromCgi2() {
 	const std::string &response =
 		"Content-Type: text/html\r\n\r\n<!DOCTYPE "
 		"html><html><head><title>Test</title></head><body><h1>Test</h1></body></html>";
-	cgi::CgiResponse cgi_response(response, "text/plain", true);
+	cgi::CgiResponse cgi_response(response, http::TEXT_HTML, true);
 
 	const std::string &expected_body_message =
 		"<!DOCTYPE html><html><head><title>Test</title></head><body><h1>Test</h1></body></html>";
