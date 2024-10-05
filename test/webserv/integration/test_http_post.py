@@ -46,9 +46,16 @@ def assert_uploaded_file_content(upload_file_path, expected_upload_file_content)
             UPLOAD_FILE_PATH,
             "abcde",
         ),
+        (
+            REQUEST_POST_2XX_DIR + "201_02_chunked.txt",
+            created_response,
+            UPLOAD_DIR + "chunked_request_file",
+            "SAWAMURA HAYATO",
+        ),
     ],
     ids=[
         "201_01_upload_file",
+        "201_02_chunked",
     ],
 )
 def test_post_upload_responses(
