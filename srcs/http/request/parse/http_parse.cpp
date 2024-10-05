@@ -32,13 +32,13 @@ bool IsStringUpper(const std::string &str) {
 	return true;
 }
 
-std::string StrTrimLeadingOptionalWhitespace(const std::string &str) {
-	std::string::size_type pos = str.find_first_not_of(OPTIONAL_WHITESPACE);
-	if (pos != std::string::npos) {
-		return str.substr(pos);
-	} else {
+std::string StrTrimOptionalWhitespace(const std::string &str) {
+	std::string::size_type start = str.find_first_not_of(OPTIONAL_WHITESPACE);
+	if (start == std::string::npos) {
 		return "";
 	}
+	std::string::size_type end = str.find_last_not_of(OPTIONAL_WHITESPACE);
+	return str.substr(start, end - start + 1);
 }
 
 bool IsBodyMessageReadingRequired(const HeaderFields &header_fields) {
@@ -76,6 +76,10 @@ bool IsVString(const std::string &str) {
 		}
 	}
 	return true;
+}
+
+bool StartWith(const std::string &str, const std::string &prefix) {
+	return str.size() >= prefix.size() && str.compare(0, prefix.size(), prefix) == 0;
 }
 
 } // namespace
@@ -133,13 +137,10 @@ void HttpParse::ParseBodyMessage(HttpRequestParsedData &data) {
 	}
 	// todo: HttpRequestParsedDataクラスでcontent_lengthを保持？
 	// why: ParseBodyMessageが呼ばれるたびにcontent_lengthを変換するのを避けるため
-	const utils::Result<std::size_t> convert_result =
-		utils::ConvertStrToSize(data.request_result.request.header_fields[CONTENT_LENGTH]);
-	if (!convert_result.IsOk()) {
-		throw HttpException("Error: wrong Content-Length number", StatusCode(BAD_REQUEST));
-	}
-	const size_t content_length = convert_result.GetValue();
-	size_t       readable_content_length =
+	const size_t content_length =
+		utils::ConvertStrToSize(data.request_result.request.header_fields[CONTENT_LENGTH])
+			.GetValue();
+	size_t readable_content_length =
 		content_length - data.request_result.request.body_message.size();
 	if (data.current_buf.size() >= readable_content_length) {
 		data.request_result.request.body_message +=
@@ -191,14 +192,16 @@ void HttpParse::ParseChunkedRequest(HttpRequestParsedData &data) {
 		}
 	}
 	if (data.current_buf == "\0") {
-		return;                            // is_request_format.is_body_message = false;
-	} else if (data.current_buf != CRLF) { // 終端に0\r\n\r\nの\r\nがあるはず
+		return; // is_request_format.is_body_message = false;
+	}
+	if (!StartWith(data.current_buf, CRLF)) { // 終端(current_bufの先頭)に0\r\n\r\nの\r\nがあるはず
 		throw HttpException(
 			"Error: Missing or incorrect chunked transfer encoding terminator",
 			StatusCode(BAD_REQUEST)
 		);
 	}
-
+	// 終端(current_bufの先頭)に0\r\n\r\nの\r\nがあるので次のリクエストの為にparse済みとして削除
+	data.current_buf.erase(0, CRLF.size());
 	data.is_request_format.is_body_message = true;
 }
 
@@ -224,7 +227,7 @@ HeaderFields HttpParse::SetHeaderFields(const std::vector<std::string> &header_f
 		std::size_t colon_pos          = (*it).find_first_of(':');
 		std::string header_field_name  = (*it).substr(0, colon_pos);
 		std::string header_field_value = (*it).substr(colon_pos + 1);
-		header_field_value             = StrTrimLeadingOptionalWhitespace(header_field_value);
+		header_field_value             = StrTrimOptionalWhitespace(header_field_value);
 		CheckValidHeaderFieldNameAndValue(header_field_name, header_field_value);
 		// todo:
 		// マルチパートを対応する場合はutils::SplitStrを使用して、セミコロン区切りのstd::vector<std::string>になる。
@@ -298,6 +301,17 @@ void HttpParse::CheckValidHeaderFieldNameAndValue(
 	if (HasSpace(header_field_name)) {
 		throw HttpException(
 			"Error: the name of Header field has a space.", StatusCode(BAD_REQUEST)
+		);
+	}
+	if (header_field_name == "Host" && header_field_value.empty()) {
+		throw HttpException(
+			"Error: the value of Host header field is empty.", StatusCode(BAD_REQUEST)
+		);
+	} else if (header_field_name == "Content-Length" &&
+			   !utils::ConvertStrToSize(header_field_value).IsOk()) {
+		throw HttpException(
+			"Error: the value of Content-Length header field is not a number.",
+			StatusCode(BAD_REQUEST)
 		);
 	}
 }

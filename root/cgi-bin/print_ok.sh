@@ -1,4 +1,4 @@
 #!/bin/bash
 
-echo "Content-type: text/plain\n\n"
+echo "Content-Type: text/plain\r\n\r\n"
 echo "OK"

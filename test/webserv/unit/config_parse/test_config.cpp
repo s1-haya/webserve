@@ -432,7 +432,7 @@ ServerList MakeExpectedTest8() {
 	context::LocationCon                 expected_location_1_1 =
 		BuildLocationCon("/", "/data/", "index.html", true, allowed_methods_1, redirect_1);
 	expected_locationlist_1.push_back(expected_location_1_1);
-	std::pair<unsigned int, std::string> error_page_1(404, "/404.html");
+	std::pair<unsigned int, std::string> error_page_1(404, "/error_pages/404-ja.html");
 	context::ServerCon                   expected_server_1 = BuildServerCon(
         expected_ports_1, server_names_1, expected_locationlist_1, 2024, error_page_1
     );
@@ -459,7 +459,7 @@ ServerList MakeExpectedTest9() {
 	expected_location_1_1.cgi_extension    = ".php"; // tmp(Builderに追加したい)
 	expected_location_1_1.upload_directory = "/tmp"; // tmp(Builderに追加したい)
 	expected_locationlist_1.push_back(expected_location_1_1);
-	std::pair<unsigned int, std::string> error_page_1(404, "/404.html");
+	std::pair<unsigned int, std::string> error_page_1(404, "/error_pages/404-ja.html");
 	context::ServerCon                   expected_server_1 = BuildServerCon(
         expected_ports_1, server_names_1, expected_locationlist_1, 2024, error_page_1
     );

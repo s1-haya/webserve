@@ -150,7 +150,7 @@ StatusCode Method::PostHandler(
 	if (upload_directory.empty()) {
 		return EchoPostHandler(request_body_message, response_body_message, response_header_fields);
 	}
-	if (!IsExistPath(path)) {
+	if (!IsExistPath(upload_path)) {
 		return FileCreationHandler(
 			upload_path, request_body_message, response_body_message, response_header_fields
 		);

@@ -1,4 +1,5 @@
 #include "cgi_response_parse.hpp"
+#include "result.hpp"
 #include "utils.hpp"
 #include <cstdlib>
 #include <iostream>
@@ -94,45 +95,61 @@ int HandleTestResult(const Result &result) {
 
 int TestParseValidResponse() {
 	std::string response = "Content-Length: 13\r\nContent-Type: text/plain\r\n\r\nHello, world!";
-	CgiResponseParse::ParsedData result = CgiResponseParse::Parse(response);
+	utils::Result<CgiResponseParse::ParsedData> result = CgiResponseParse::Parse(response);
+	if (!result.IsOk()) {
+		PrintNg();
+		return EXIT_FAILURE;
+	}
 
 	CgiResponseParse::ParsedData expected;
 	expected.header_fields["Content-Length"] = "13";
 	expected.header_fields["Content-Type"]   = "text/plain";
 	expected.body                            = "Hello, world!";
-	return HandleTestResult(CompareParsedData(expected, result));
+	return HandleTestResult(CompareParsedData(expected, result.GetValue()));
 }
 
 int TestParseHeaderOnlyResponse() {
-	std::string                  response = "Content-Length: 0\r\nContent-Type: text/plain\r\n\r\n";
-	CgiResponseParse::ParsedData result   = CgiResponseParse::Parse(response);
+	std::string response = "Content-Length: 0\r\nContent-Type: text/plain\r\n\r\n";
+	utils::Result<CgiResponseParse::ParsedData> result = CgiResponseParse::Parse(response);
+	if (!result.IsOk()) {
+		PrintNg();
+		return EXIT_FAILURE;
+	}
 
 	CgiResponseParse::ParsedData expected;
 	expected.header_fields["Content-Length"] = "0";
 	expected.header_fields["Content-Type"]   = "text/plain";
 	expected.body                            = "";
-	return HandleTestResult(CompareParsedData(expected, result));
+	return HandleTestResult(CompareParsedData(expected, result.GetValue()));
 }
 
 int TestParseBodyLongerThanContentLength() {
 	std::string response = "Content-Length: 5\r\nContent-Type: text/plain\r\n\r\nHello, world!";
-	CgiResponseParse::ParsedData result = CgiResponseParse::Parse(response);
+	utils::Result<CgiResponseParse::ParsedData> result = CgiResponseParse::Parse(response);
+	if (!result.IsOk()) {
+		PrintNg();
+		return EXIT_FAILURE;
+	}
 
 	CgiResponseParse::ParsedData expected;
 	expected.header_fields["Content-Length"] = "5";
 	expected.header_fields["Content-Type"]   = "text/plain";
 	expected.body                            = "Hello";
-	return HandleTestResult(CompareParsedData(expected, result));
+	return HandleTestResult(CompareParsedData(expected, result.GetValue()));
 }
 
 int TestParseNoContentLength() {
-	std::string                  response = "Content-Type: text/plain\r\n\r\nHello, world!";
-	CgiResponseParse::ParsedData result   = CgiResponseParse::Parse(response);
+	std::string response = "Content-Type: text/plain\r\n\r\nHello, world!";
+	utils::Result<CgiResponseParse::ParsedData> result = CgiResponseParse::Parse(response);
+	if (!result.IsOk()) {
+		PrintNg();
+		return EXIT_FAILURE;
+	}
 
 	CgiResponseParse::ParsedData expected;
 	expected.header_fields["Content-Type"] = "text/plain";
 	expected.body                          = "Hello, world!";
-	return HandleTestResult(CompareParsedData(expected, result));
+	return HandleTestResult(CompareParsedData(expected, result.GetValue()));
 }
 
 // todo: Error
