@@ -1,7 +1,7 @@
 import os
 
 import pytest
-from common_functions import send_request_and_assert_response
+from common_functions import read_file, send_request_and_assert_response
 from common_response import *
 
 REQUEST_DIR = "test/common/request/"
@@ -25,25 +25,40 @@ def delete_file(file_path):
         assert False
 
 
-# テスト前に削除しておきたいupload_file_pathが特になければNoneを指定する
+def assert_uploaded_file_content(upload_file_path, expected_upload_file_content):
+    if upload_file_path is None:
+        return
+
+    result_body_message, result_content_length = read_file(upload_file_path)
+
+    assert result_body_message == expected_upload_file_content
+    assert result_content_length == len(expected_upload_file_content)
+
+
+# upload_file_path: テスト前に削除しておきたいupload_file_pathが特になければNoneを指定
+# expected_upload_file_content: ファイル作成された場合に期待するファイルの中身
 @pytest.mark.parametrize(
-    "request_file, expected_response, upload_file_path",
+    "request_file, expected_response, upload_file_path, expected_upload_file_content",
     [
         (
             REQUEST_POST_2XX_DIR + "201_01_upload_file.txt",
             created_response,
             UPLOAD_FILE_PATH,
+            "abcde",
         ),
     ],
     ids=[
         "201_01_upload_file",
     ],
 )
-def test_post_responses(request_file, expected_response, upload_file_path):
+def test_post_upload_responses(
+    request_file, expected_response, upload_file_path, expected_upload_file_content
+):
     # testで作成したいファイルがあるならtest前に念のため削除
     delete_file(upload_file_path)
 
     send_request_and_assert_response(request_file, expected_response)
+    assert_uploaded_file_content(upload_file_path, expected_upload_file_content)
 
     # testで作成したファイルがあれば次のtestのために削除
     delete_file(upload_file_path)
