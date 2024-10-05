@@ -1,6 +1,7 @@
 #include "cgi_parse.hpp"
 #include "cgi_request.hpp"
 #include "http_format.hpp"
+#include "http_message.hpp"
 #include "utils.hpp"
 
 namespace http {
@@ -63,7 +64,7 @@ cgi::MetaMap CgiParse::CreateRequestMetaVariables(
 		request_meta_variables[cgi::CONTENT_LENGTH] =
 			utils::ConvertUintToStr(request.body_message.length());
 		request_meta_variables[cgi::CONTENT_TYPE] =
-			FindValueFromMap(request.header_fields, "Content-Type");
+			FindValueFromMap(request.header_fields, CONTENT_TYPE);
 	} // bodyがない場合はunset
 	request_meta_variables[cgi::GATEWAY_INTERFACE] = "CGI/1.1";
 	request_meta_variables[cgi::PATH_INFO]         = CreatePathInfo(cgi_extension, cgi_script);
@@ -76,10 +77,10 @@ cgi::MetaMap CgiParse::CreateRequestMetaVariables(
 	request_meta_variables[cgi::REMOTE_USER]     = "";
 	request_meta_variables[cgi::REQUEST_METHOD]  = request.request_line.method;
 	request_meta_variables[cgi::SCRIPT_NAME]     = TranslateToScriptName(cgi_extension, cgi_script);
-	request_meta_variables[cgi::SERVER_NAME]     = FindValueFromMap(request.header_fields, "Host");
+	request_meta_variables[cgi::SERVER_NAME]     = FindValueFromMap(request.header_fields, HOST);
 	request_meta_variables[cgi::SERVER_PORT]     = server_port;
 	request_meta_variables[cgi::SERVER_PROTOCOL] = request.request_line.version;
-	request_meta_variables[cgi::SERVER_SOFTWARE] = "Webserv/1.1";
+	request_meta_variables[cgi::SERVER_SOFTWARE] = SERVER_VERSION;
 	return request_meta_variables;
 }
 
