@@ -225,8 +225,8 @@ HeaderFields HttpParse::SetHeaderFields(const std::vector<std::string> &header_f
 	typedef std::vector<std::string>::const_iterator It;
 	for (It it = header_fields_info.begin(); it != header_fields_info.end(); ++it) {
 		std::size_t colon_pos          = (*it).find_first_of(':');
-		std::string header_field_name  = (*it).substr(0, colon_pos);
-		std::string header_field_value = (*it).substr(colon_pos + 1);
+		std::string header_field_name  = utils::ToLowerString((*it).substr(0, colon_pos));
+		std::string header_field_value = utils::ToLowerString((*it).substr(colon_pos + 1));
 		header_field_value             = StrTrimOptionalWhitespace(header_field_value);
 		CheckValidHeaderFieldNameAndValue(header_field_name, header_field_value);
 		// todo:

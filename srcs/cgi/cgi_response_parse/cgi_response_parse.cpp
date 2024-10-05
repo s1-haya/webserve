@@ -45,8 +45,8 @@ CgiResponseParse::ParseHeaderFields(const std::string &header, HeaderFields &hea
 		if (colon_pos == std::string::npos) {
 			return result;
 		}
-		std::string key   = line.substr(0, colon_pos);
-		std::string value = line.substr(colon_pos + 1);
+		std::string key   = utils::ToLowerString(line.substr(0, colon_pos));
+		std::string value = utils::ToLowerString(line.substr(colon_pos + 1));
 		value             = TrimOws(value);
 		// todo: validation(HttpParseの処理をそのまま使う)
 		header_fields[key] = value;
