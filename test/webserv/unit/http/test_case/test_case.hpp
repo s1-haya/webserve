@@ -14,7 +14,20 @@ namespace test {
 
 // 2xx
 int TestGetOk1ConnectionClose(const server::VirtualServerAddrList &server_infos);
-int TestGetOk13ExtraRequest(const server::VirtualServerAddrList &server_infos);
+int TestGetOk2ConnectionKeep(const server::VirtualServerAddrList &server_infos);
+int TestGetOk3SubConnectionClose(const server::VirtualServerAddrList &server_infos);
+int TestGetOk4ConnectionKeepAndOkConnectionKeep(const server::VirtualServerAddrList &server_infos);
+int TestGetOk5ConnectionCloseAndOkConnectionClose(const server::VirtualServerAddrList &server_infos
+);
+int TestGetOk6ConnectionKeepAndOkConnectionClose(const server::VirtualServerAddrList &server_infos);
+int TestGetOk11UpperAndLowerHeaderFields(const server::VirtualServerAddrList &server_infos);
+int TestGetOk12HeaderFieldValueSpace(const server::VirtualServerAddrList &server_infos);
+int TestGetOk13SpaceHeaderFieldValue(const server::VirtualServerAddrList &server_infos);
+int TestGetOk14ExtraRequest(const server::VirtualServerAddrList &server_infos);
+int TestGetOk15BodyMessageDefault(const server::VirtualServerAddrList &server_infos);
+int TestGetOk17NotExistHeaderField(const server::VirtualServerAddrList &server_infos);
+int TestGetOk21NoConnection(const server::VirtualServerAddrList &server_infos);
+
 // 4xx
 int TestGetBadRequest1OnlyCrlf(const server::VirtualServerAddrList &server_infos);
 int TestGetBadRequest2LowerMethod(const server::VirtualServerAddrList &server_infos);
@@ -30,15 +43,35 @@ int TestGetBadRequest11NoHeaderFieldColon(const server::VirtualServerAddrList &s
 int TestGetBadRequest12NoConnectionName(const server::VirtualServerAddrList &server_infos);
 int TestGetBadRequest13NoConnectionValue(const server::VirtualServerAddrList &server_infos);
 int TestGetBadRequest14WrongConnectionValue(const server::VirtualServerAddrList &server_infos);
-int TestGetBadRequest15NotExistHeaderField(const server::VirtualServerAddrList &server_infos);
+int TestGetBadRequest15SpaceInHeaderFieldName(const server::VirtualServerAddrList &server_infos);
 int TestGetBadRequest16HeaderFieldNameSpaceColon(const server::VirtualServerAddrList &server_infos);
 int TestGetBadRequest17SpaceHeaderFieldName(const server::VirtualServerAddrList &server_infos);
+int TestGetBadRequest18NonVchrHeaderFieldName(const server::VirtualServerAddrList &server_infos);
+int TestGetBadRequest19NonVchrHeaderFieldValue(const server::VirtualServerAddrList &server_infos);
+int TestGetBadRequest20TooFewStatusLineElements(const server::VirtualServerAddrList &server_infos);
+int TestGetBadRequest21TooManyStatusLineElements(const server::VirtualServerAddrList &server_infos);
 
 int TestGetNotFound1NotExistFile(const server::VirtualServerAddrList &server_infos);
 int TestGetMethodNotAllowed(const server::VirtualServerAddrList &server_infos);
 int TestGetTimeout1NoCrlf(const server::VirtualServerAddrList &server_infos);
 // 5xx
 int TestGetNotImplemented1NotExistMethod(const server::VirtualServerAddrList &server_infos);
+
+// cgi
+int TestCgiGetOk1PrintOkBodyMessage(const server::VirtualServerAddrList &server_infos);
+int TestCgiGetOk2PrintOkInPerl(const server::VirtualServerAddrList &server_infos);
+int TestCgiGetOk3PrintOkInPython(const server::VirtualServerAddrList &server_infos);
+int TestCgiGetOk4PrintOkInShell(const server::VirtualServerAddrList &server_infos);
+
+// GetErrorResponse
+int TestRequestTimeoutResponse();
+int TestInternalServerErrorResponse();
+
+// GetResponseFromCgi
+int TestGetResponseFromCgi1();
+int TestGetResponseFromCgi2();
+int TestGetResponseFromCgi3();
+int TestGetResponseFromCgi4();
 
 } // namespace test
 

@@ -14,10 +14,35 @@ static const std::string &REQUEST     = COMMON + "/request";
 static const std::string &REQUEST_GET = REQUEST + "/get";
 
 static const std::string &ROOT_2XX = "/2xx";
-static const std::string &GET_200_1_NO_CONNECTION =
+static const std::string &GET_200_1_CONNECTION_CLOSE =
 	LoadFileContent(REQUEST_GET + ROOT_2XX + "/200_01_connection_close.txt");
-static const std::string &GET_200_13_EXTRA_REQUEST =
-	LoadFileContent(REQUEST_GET + ROOT_2XX + "/200_13_extra_request.txt");
+static const std::string &GET_200_2_CONNECTION_KEEP =
+	LoadFileContent(REQUEST_GET + ROOT_2XX + "/200_02_connection_keep.txt");
+static const std::string &GET_200_3_SUB_CONNECTION_CLOSE =
+	LoadFileContent(REQUEST_GET + ROOT_2XX + "/200_03_sub_connection_close.txt");
+static const std::string &GET_200_4_CONNECTION_KEEP_AND_200_CONNECTION_KEEP = LoadFileContent(
+	REQUEST_GET + ROOT_2XX + "/200_04_connection_keep_alive_and_200_connection_keep_alive.txt"
+);
+static const std::string &GET_200_5_CONNECTION_CLOSE_AND_200_CONNECTION_CLOSE = LoadFileContent(
+	REQUEST_GET + ROOT_2XX + "/200_05_connection_close_and_200_connection_close.txt"
+);
+static const std::string &GET_200_6_CONNECTION_KEEP_AND_200_CONNECTION_CLOSE = LoadFileContent(
+	REQUEST_GET + ROOT_2XX + "/200_06_connection_keep_alive_and_200_connection_close.txt"
+);
+static const std::string &GET_200_11_UPPER_AND_LOWER_HEADER_FIELDS =
+	LoadFileContent(REQUEST_GET + ROOT_2XX + "/200_11_upper_and_lower_header_fields.txt");
+static const std::string &GET_200_12_HEADER_FIELD_VALUE_SPACE =
+	LoadFileContent(REQUEST_GET + ROOT_2XX + "/200_12_header_field_value_space.txt");
+static const std::string &GET_200_13_SPACE_HEADER_FIELD_VALUE =
+	LoadFileContent(REQUEST_GET + ROOT_2XX + "/200_13_space_header_field_value.txt");
+static const std::string &GET_200_14_EXTRA_REQUEST =
+	LoadFileContent(REQUEST_GET + ROOT_2XX + "/200_14_extra_request.txt");
+static const std::string &GET_200_15_BODY_MESSAGE_DEFAULT =
+	LoadFileContent(REQUEST_GET + ROOT_2XX + "/200_15_body_message_default.txt");
+static const std::string &GET_200_17_NOT_EXIST_HEADER_FIELD =
+	LoadFileContent(REQUEST_GET + ROOT_2XX + "/200_17_not_exist_header_field.txt");
+static const std::string &GET_200_21_NO_CONNECTION =
+	LoadFileContent(REQUEST_GET + ROOT_2XX + "/200_21_no_connection.txt");
 
 static const std::string &ROOT_4XX = "/4xx";
 static const std::string &GET_400_1_ONLY_CRLF =
@@ -48,17 +73,25 @@ static const std::string &GET_400_13_NO_CONNECTION_VALUE =
 	LoadFileContent(REQUEST_GET + ROOT_4XX + "/400_13_no_connection_value.txt");
 static const std::string &GET_400_14_WRONG_CONNECTION_VALUE =
 	LoadFileContent(REQUEST_GET + ROOT_4XX + "/400_14_wrong_connection_value.txt");
-static const std::string &GET_400_15_NOT_EXIST_HEADER_FIELD =
-	LoadFileContent(REQUEST_GET + ROOT_4XX + "/400_15_not_exist_header_field.txt");
+static const std::string &GET_400_15_SPACE_IN_HEADER_FIELD_NAME =
+	LoadFileContent(REQUEST_GET + ROOT_4XX + "/400_15_space_in_header_field_name.txt");
 static const std::string &GET_400_16_HEADER_FIELD_NAME_SPACE_COLON =
 	LoadFileContent(REQUEST_GET + ROOT_4XX + "/400_16_header_field_name_space_colon.txt");
 static const std::string &GET_400_17_SPACE_HEADER_FIELD_NAME =
 	LoadFileContent(REQUEST_GET + ROOT_4XX + "/400_17_space_header_field_name.txt");
+static const std::string &GET_400_18_NON_VCHR_HEADER_FIELD_NAME =
+	LoadFileContent(REQUEST_GET + ROOT_4XX + "/400_18_non_vchr_header_field_name.txt");
+static const std::string &GET_400_19_NON_VCHR_HEADER_FIELD_VALUE =
+	LoadFileContent(REQUEST_GET + ROOT_4XX + "/400_19_non_vchr_header_field_value.txt");
+static const std::string &GET_400_20_TOO_FEW_STATUS_LINE_ELEMENTS =
+	LoadFileContent(REQUEST_GET + ROOT_4XX + "/400_20_too_few_status_line_elements.txt");
+static const std::string &GET_400_21_TOO_MANY_STATUS_LINE_ELEMENTS =
+	LoadFileContent(REQUEST_GET + ROOT_4XX + "/400_21_too_many_status_line_elements.txt");
 
 static const std::string &GET_404_1_NOT_EXIST_PATH_CONNECTION_CLOSE =
 	LoadFileContent(REQUEST_GET + ROOT_4XX + "/404_01_not_exist_path.txt");
 static const std::string &GET_405_1_NOT_ALLOWED =
-	LoadFileContent(REQUEST_GET + ROOT_4XX + "/405_01_not_allowed.txt");
+	LoadFileContent(REQUEST_GET + ROOT_4XX + "/405_01_method_not_allowed_for_uri.txt");
 static const std::string &GET_408_1_NO_CRLF =
 	LoadFileContent(REQUEST_GET + ROOT_4XX + "/408_01_no_crlf.txt");
 
@@ -66,8 +99,22 @@ static const std::string &ROOT_5XX = "/5xx";
 static const std::string &GET_501_1_NOT_EXIST_METHOD =
 	LoadFileContent(REQUEST_GET + ROOT_5XX + "/501_01_not_exist_method.txt");
 
-} // namespace request
+namespace cgi {
 
+static const std::string &REQUEST_CGI = REQUEST + "/cgi";
+static const std::string &CGI_GET     = REQUEST_CGI + "/get";
+
+static const std::string &GET_200_01_PRINT_OK_PL_BODY_MESSAGE =
+	LoadFileContent(CGI_GET + "/200_01_print_ok_pl_body_message.txt");
+static const std::string &GET_200_02_PRINT_OK_PERL =
+	LoadFileContent(CGI_GET + "/200_02_print_ok_pl.txt");
+static const std::string &GET_200_03_PRINT_OK_PYTHON =
+	LoadFileContent(CGI_GET + "/200_03_print_ok_py.txt");
+static const std::string &GET_200_04_PRINT_OK_SHELL =
+	LoadFileContent(CGI_GET + "/200_04_print_ok_sh.txt");
+
+} // namespace cgi
+} // namespace request
 } // namespace test
 
 #endif

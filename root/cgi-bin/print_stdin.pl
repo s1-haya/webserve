@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-print "Content-type: text/plain\n\n";
+print "Content-Type: text/plain\r\n\r\n";
 if ($ENV{'REQUEST_METHOD'} eq 'POST') {
     my $content_length = $ENV{'CONTENT_LENGTH'};
     if (defined $content_length) {

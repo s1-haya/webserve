@@ -15,6 +15,7 @@
 #include <sys/stat.h>
 #include <unistd.h> // access
 
+namespace http {
 namespace {
 
 bool IsExistPath(const std::string &path) {
@@ -27,19 +28,28 @@ std::string FileToString(const std::ifstream &file) {
 	return ss.str();
 }
 
-std::string ReadFile(const std::string &file_path) {
-	std::ifstream file(file_path.c_str());
-	if (!file) {
-		// todo: default error page?
-		std::ifstream error_file("root/html/404.html");
-		return FileToString(error_file);
+bool EndWith(const std::string &str, const std::string &suffix) {
+	return str.size() >= suffix.size() &&
+		   str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0;
+}
+
+// ファイルの拡張子に基づいてContent-Typeを決定する関数: デフォルトはtext/plain
+std::string DetermineContentType(const std::string &path) {
+	const std::string html_extension = ".html";
+	const std::string json_extension = ".json";
+	const std::string pdf_extension  = ".pdf";
+
+	if (EndWith(path, html_extension)) {
+		return http::TEXT_HTML;
+	} else if (EndWith(path, json_extension)) {
+		return "application/json";
+	} else if (EndWith(path, pdf_extension)) {
+		return "application/pdf";
 	}
-	return FileToString(file);
+	return TEXT_PLAIN;
 }
 
 } // namespace
-
-namespace http {
 
 StatusCode Method::Handler(
 	const std::string  &path,
@@ -49,7 +59,8 @@ StatusCode Method::Handler(
 	std::string        &response_body_message,
 	HeaderFields       &response_header_fields,
 	const std::string  &index_file_path,
-	bool                autoindex_on
+	bool                autoindex_on,
+	const std::string  &upload_directory
 ) {
 	StatusCode status_code(OK);
 	if (!IsSupportedMethod(method)) {
@@ -63,15 +74,19 @@ StatusCode Method::Handler(
 			path, response_body_message, response_header_fields, index_file_path, autoindex_on
 		);
 	} else if (method == POST) {
-		status_code =
-			PostHandler(path, request_body_message, response_body_message, response_header_fields);
+		status_code = PostHandler(
+			path,
+			request_body_message,
+			response_body_message,
+			response_header_fields,
+			upload_directory
+		);
 	} else if (method == DELETE) {
 		status_code = DeleteHandler(path, response_body_message, response_header_fields);
 	}
 	return status_code;
 }
 
-// todo: refactor
 StatusCode Method::GetHandler(
 	const std::string &path,
 	std::string       &response_body_message,
@@ -89,6 +104,7 @@ StatusCode Method::GetHandler(
 			response_body_message = ReadFile(path + index_file_path);
 			response_header_fields[CONTENT_LENGTH] =
 				utils::ToString(response_body_message.length());
+			response_header_fields[CONTENT_TYPE] = DetermineContentType(path + index_file_path);
 		} else if (autoindex_on) {
 			utils::Result<std::string> result = AutoindexHandler(path);
 			response_body_message             = result.GetValue();
@@ -109,6 +125,7 @@ StatusCode Method::GetHandler(
 			response_body_message = ReadFile(path);
 			response_header_fields[CONTENT_LENGTH] =
 				utils::ToString(response_body_message.length());
+			response_header_fields[CONTENT_TYPE] = DetermineContentType(path);
 		}
 	} else {
 		throw HttpException("Error: Not Found", StatusCode(NOT_FOUND));
@@ -120,26 +137,37 @@ StatusCode Method::PostHandler(
 	const std::string &path,
 	const std::string &request_body_message,
 	std::string       &response_body_message,
-	HeaderFields      &response_header_fields
+	HeaderFields      &response_header_fields,
+	const std::string &upload_directory
 ) {
-	if (!IsExistPath(path)) {
+	// ex. test.txt
+	const std::string file_name = path.substr(path.find_last_of('/') + 1);
+	// ex. srcs/http/response/http_serverinfo_check/../../../../root
+	const std::string root_path = path.substr(0, path.find("root/") + 4);
+	// ex. srcs/http/response/http_serverinfo_check/../../../../root/save/test.txt
+	const std::string upload_path = root_path + upload_directory + "/" + file_name;
+
+	if (upload_directory.empty()) {
+		return EchoPostHandler(request_body_message, response_body_message, response_header_fields);
+	}
+	if (!IsExistPath(upload_path)) {
 		return FileCreationHandler(
-			path, request_body_message, response_body_message, response_header_fields
+			upload_path, request_body_message, response_body_message, response_header_fields
 		);
 	}
-	const Stat &info = TryStat(path);
+	const Stat &info = TryStat(upload_path);
 	StatusCode  status_code(NO_CONTENT);
 	if (info.IsDirectory()) {
 		throw HttpException("Error: Forbidden", StatusCode(FORBIDDEN));
 	} else if (info.IsRegularFile()) {
-		response_body_message = HttpResponse::CreateDefaultBodyMessageFormat(status_code);
+		response_body_message = HttpResponse::CreateDefaultBodyMessage(status_code);
 		response_header_fields[CONTENT_LENGTH] = utils::ToString(response_body_message.length());
 	} else {
 		// Location header fields: URI-reference
 		// ex) POST /save/test.txt HTTP/1.1
 		// Location: /save/test.txt;
 		status_code = FileCreationHandler(
-			path, request_body_message, response_body_message, response_header_fields
+			upload_path, request_body_message, response_body_message, response_header_fields
 		);
 	}
 	return status_code;
@@ -158,7 +186,7 @@ StatusCode Method::DeleteHandler(
 	if (std::remove(path.c_str()) == SYSTEM_ERROR) {
 		SystemExceptionHandler(errno);
 	} else {
-		response_body_message = HttpResponse::CreateDefaultBodyMessageFormat(status_code);
+		response_body_message = HttpResponse::CreateDefaultBodyMessage(status_code);
 		response_header_fields[CONTENT_LENGTH] = utils::ToString(response_body_message.length());
 	}
 	return status_code;
@@ -194,7 +222,7 @@ StatusCode Method::FileCreationHandler(
 		}
 		throw HttpException("Error: Forbidden", StatusCode(FORBIDDEN));
 	}
-	response_body_message = HttpResponse::CreateDefaultBodyMessageFormat(status_code);
+	response_body_message                  = HttpResponse::CreateDefaultBodyMessage(status_code);
 	response_header_fields[CONTENT_LENGTH] = utils::ToString(response_body_message.length());
 	return status_code;
 }
@@ -206,6 +234,14 @@ Stat Method::TryStat(const std::string &path) {
 	}
 	Stat info(stat_buf);
 	return info;
+}
+
+std::string Method::ReadFile(const std::string &file_path) {
+	std::ifstream file(file_path.c_str());
+	if (!file) {
+		SystemExceptionHandler(errno);
+	}
+	return FileToString(file);
 }
 
 bool Method::IsSupportedMethod(const std::string &method) {
@@ -237,13 +273,20 @@ utils::Result<std::string> Method::AutoindexHandler(const std::string &path) {
 		return result;
 	}
 
+	std::string       display_path = path;
+	const std::string root_path    = "/root";
+	size_t            pos          = path.find(root_path);
+	if (pos != std::string::npos) {
+		display_path = path.substr(pos + root_path.length());
+	}
+
 	struct dirent *entry;
 	response_body_message += "<html>\n"
 							 "<head><title>Index of " +
-							 path +
+							 display_path +
 							 "</title></head>\n"
 							 "<body><h1>Index of " +
-							 path +
+							 display_path +
 							 "</h1><hr><pre>"
 							 "<a href=\"../\">../</a>\n";
 
@@ -258,7 +301,7 @@ utils::Result<std::string> Method::AutoindexHandler(const std::string &path) {
 			bool        is_dir     = S_ISDIR(file_stat.st_mode);
 			std::string entry_name = std::string(entry->d_name) + (is_dir ? "/" : "");
 			// エントリ名の幅を固定
-			response_body_message += "<a href=\"" + path + entry_name + "\">" + entry_name + "</a>";
+			response_body_message += "<a href=\"" + entry_name + "\">" + entry_name + "</a>";
 			size_t padding = (entry_name.length() < 50) ? 50 - entry_name.length() : 0;
 			response_body_message += std::string(padding, ' ') + " ";
 
@@ -286,6 +329,16 @@ utils::Result<std::string> Method::AutoindexHandler(const std::string &path) {
 
 	result.SetValue(response_body_message);
 	return result;
+}
+
+StatusCode Method::EchoPostHandler(
+	const std::string &request_body_message,
+	std::string       &response_body_message,
+	HeaderFields      &response_header_fields
+) {
+	response_body_message                  = request_body_message;
+	response_header_fields[CONTENT_LENGTH] = utils::ToString(response_body_message.length());
+	return StatusCode(OK);
 }
 
 } // namespace http

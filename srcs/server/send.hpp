@@ -3,24 +3,22 @@
 
 #include "utils.hpp"
 #include <string>
-#include <sys/types.h> // ssize_t
 
 namespace server {
 
 /**
- * @brief Sends an response to the client and returns the result.
+ * @brief Sends a string to the client and returns the result.
  *
- * Sends the given response to the client using the provided file descriptor.
+ * Sends the given string to the client using the provided file descriptor.
  * The result is `false` if an error occurs, otherwise `true`.
- * If any part of the response is not sent, it is stored in the result value.
+ * If any part of the string is not sent, it is stored in the result value.
  */
 class Send {
   public:
-	typedef std::string             Response;
-	typedef utils::Result<Response> SendResult;
+	typedef utils::Result<std::string> SendResult;
 
 	// function
-	static SendResult SendResponse(int client_fd, const Response &response);
+	static SendResult SendStr(int client_fd, const std::string &send_str);
 
   private:
 	Send();

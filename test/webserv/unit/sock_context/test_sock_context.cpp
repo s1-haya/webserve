@@ -50,12 +50,11 @@ int Test(Result result) {
 
 // -----------------------------------------------------------------------------
 bool IsSameClientInfo(const server::ClientInfo &a, const server::ClientInfo &b) {
-	return a.GetFd() == b.GetFd() && a.GetListenIp() == b.GetListenIp() &&
+	return a.GetFd() == b.GetFd() && a.GetIp() == b.GetIp() && a.GetListenIp() == b.GetListenIp() &&
 		   a.GetListenPort() == b.GetListenPort();
 }
 
 // ClientInfo同士のメンバが全て等しいことを期待するテスト
-// (todo: 呼び出し側でClientInfoのメンバがセットできてないので今必ずtrueが返る)
 Result RunGetClientInfo(
 	const server::SockContext                &context,
 	const server::SockContext::ClientInfoMap &expected_client_info,
@@ -71,6 +70,8 @@ Result RunGetClientInfo(
 		std::ostringstream oss;
 		oss << "client_fd  : result   [" << a.GetFd() << "]" << std::endl;
 		oss << "             expected [" << b.GetFd() << "]" << std::endl;
+		oss << "client_ip  : result   [" << a.GetIp() << "]" << std::endl;
+		oss << "             expected [" << b.GetIp() << "]" << std::endl;
 		oss << "listen_ip  : result   [" << a.GetListenPort() << "]" << std::endl;
 		oss << "             expected [" << b.GetListenPort() << "]" << std::endl;
 		oss << "listen_port: result   [" << a.GetListenPort() << "]" << std::endl;
@@ -151,8 +152,8 @@ fd | listen_server |  client
 --------------------------------
  4 |  ServerInfo1  |
  5 |  ServerInfo2  |
- 6 |  ServerInfo1  | ClientInfo1 (accept済み接続)
- 7 |  ServerInfo2  | ClientInfo2 (accept済み接続)
+ 6 |  ServerInfo1  | ClientInfo1 (accept済み接続 fd:8, ip:127.0.0.1)
+ 7 |  ServerInfo2  | ClientInfo2 (accept済み接続 fd:9, ip:127.0.0.2)
 
 SockContext内部の期待されるデータ保持
 - ServerInfoMap     = {{host_port1: ServerInfo1}, {host_port2: ServerInfo2}}
@@ -173,9 +174,8 @@ int RunTestSockContext() {
 	server_info2.SetSockFd(5);
 
 	// SockContextに渡す用のClientInfoを2個作成
-	// (todo:ClientInfoがsock_addrをコンストラクト時に渡さないといけないことによりfd,portがセットできてない)
-	server::ClientInfo client_info1;
-	server::ClientInfo client_info2;
+	server::ClientInfo client_info1(8, "127.0.0.1", host_port1.first, host_port1.second);
+	server::ClientInfo client_info2(9, "127.0.0.2", host_port2.first, host_port2.second);
 
 	// 期待するSockContextのメンバのmap(同時に自分で作成していく)
 	server::SockContext::ServerInfoMap expected_server_info;

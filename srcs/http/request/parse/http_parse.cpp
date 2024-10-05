@@ -32,13 +32,13 @@ bool IsStringUpper(const std::string &str) {
 	return true;
 }
 
-std::string StrTrimLeadingOptionalWhitespace(const std::string &str) {
-	std::string::size_type pos = str.find_first_not_of(OPTIONAL_WHITESPACE);
-	if (pos != std::string::npos) {
-		return str.substr(pos);
-	} else {
+std::string StrTrimOptionalWhitespace(const std::string &str) {
+	std::string::size_type start = str.find_first_not_of(OPTIONAL_WHITESPACE);
+	if (start == std::string::npos) {
 		return "";
 	}
+	std::string::size_type end = str.find_last_not_of(OPTIONAL_WHITESPACE);
+	return str.substr(start, end - start + 1);
 }
 
 bool IsBodyMessageReadingRequired(const HeaderFields &header_fields) {
@@ -57,6 +57,84 @@ utils::Result<int> HexToDec(const std::string &hex_str) {
 		return utils::Result<int>(false, -1);
 	}
 	return utils::Result<int>(decimal_value);
+}
+
+bool HasSpace(const std::string &str) {
+	for (std::string::const_iterator it = str.begin(); it != str.end(); ++it) {
+		if (std::isspace(*it)) {
+			return true;
+		}
+	}
+	return false;
+}
+
+// 各文字が印字可能文字(VCHR)かどうかをチェック
+bool IsVString(const std::string &str) {
+	for (std::string::const_iterator it = str.begin(); it != str.end(); ++it) {
+		if (!std::isprint(*it)) {
+			return false;
+		}
+	}
+	return true;
+}
+
+typedef utils::Result<std::pair<std::string::size_type, std::string> > ChunkSizeResult;
+typedef utils::Result<std::string>                                     ChunkDataResult;
+
+ChunkSizeResult GetChunkSizeStr(const std::string &current_buf) {
+	ChunkSizeResult result;
+
+	const std::string::size_type end_of_chunk_size_pos = current_buf.find(CRLF);
+	if (end_of_chunk_size_pos == std::string::npos) {
+		if (current_buf.size() > 8) { // INT_MAX: 7FFFFFFF(8digits)
+			throw HttpException("Error: incorrect chunk size", StatusCode(BAD_REQUEST));
+		}
+		result.Set(false);
+		return result;
+	}
+	const std::string chunk_size_str = current_buf.substr(0, end_of_chunk_size_pos);
+	if (!HexToDec(chunk_size_str).IsOk()) {
+		throw HttpException(
+			"Error: chunk size is not a hexadecimal number", StatusCode(BAD_REQUEST)
+		);
+	}
+	result.SetValue(std::make_pair(end_of_chunk_size_pos, chunk_size_str));
+	return result;
+}
+
+ChunkDataResult GetChunkData(
+	const std::string     &current_buf,
+	std::string::size_type end_of_chunk_size_pos,
+	std::size_t            chunk_size
+) {
+	ChunkDataResult result;
+
+	// "chunk_size\r\n"の次の文字からfind
+	const std::string::size_type end_of_chunk_data_pos =
+		current_buf.find(CRLF, end_of_chunk_size_pos + CRLF.size());
+	if (end_of_chunk_data_pos == std::string::npos) {
+		// CRLFがないかつ"3\r\nXXX\rX"のようにchunk_date以降が(chunk_size+1)より多かったら早期に400
+		if (current_buf.size() > end_of_chunk_size_pos + CRLF.size() + chunk_size + 1) {
+			throw HttpException(
+				"Error: Missing or incorrect chunked transfer encoding terminator",
+				StatusCode(BAD_REQUEST)
+			);
+		}
+		result.Set(false);
+		return result;
+	}
+	const std::string chunk_data = current_buf.substr(
+		end_of_chunk_size_pos + CRLF.size(),
+		end_of_chunk_data_pos - end_of_chunk_size_pos - CRLF.size()
+	);
+	result.SetValue(chunk_data);
+	return result;
+}
+
+void ThrowMissingHostHeaderField(const HeaderFields &header_fields) {
+	if (header_fields.count(HOST) == 0) {
+		throw HttpException("Error: missing Host header field.", StatusCode(BAD_REQUEST));
+	}
 }
 
 } // namespace
@@ -114,13 +192,10 @@ void HttpParse::ParseBodyMessage(HttpRequestParsedData &data) {
 	}
 	// todo: HttpRequestParsedDataクラスでcontent_lengthを保持？
 	// why: ParseBodyMessageが呼ばれるたびにcontent_lengthを変換するのを避けるため
-	const utils::Result<std::size_t> convert_result =
-		utils::ConvertStrToSize(data.request_result.request.header_fields[CONTENT_LENGTH]);
-	if (!convert_result.IsOk()) {
-		throw HttpException("Error: wrong Content-Length number", StatusCode(BAD_REQUEST));
-	}
-	const size_t content_length = convert_result.GetValue();
-	size_t       readable_content_length =
+	const size_t content_length =
+		utils::ConvertStrToSize(data.request_result.request.header_fields[CONTENT_LENGTH])
+			.GetValue();
+	size_t readable_content_length =
 		content_length - data.request_result.request.body_message.size();
 	if (data.current_buf.size() >= readable_content_length) {
 		data.request_result.request.body_message +=
@@ -142,77 +217,51 @@ void HttpParse::ParseChunkedRequest(HttpRequestParsedData &data) {
 		);
 	}
 
-	std::string::size_type end_of_chunk_size_pos = data.current_buf.find(CRLF);
-	std::string            chunk_size_str = data.current_buf.substr(0, end_of_chunk_size_pos);
-	data.current_buf.erase(0, chunk_size_str.size() + CRLF.size());
-	unsigned int chunk_size = HexToDec(chunk_size_str).GetValue();
-	if (HexToDec(chunk_size_str).IsOk() == false) {
-		throw HttpException(
-			"Error: chunk size is not a hexadecimal number", StatusCode(BAD_REQUEST)
-		);
+	ChunkSizeResult result = GetChunkSizeStr(data.current_buf);
+	if (!result.IsOk()) {
+		return;
 	}
-	while (chunk_size > 0) {
-		std::string::size_type end_of_chunk_data_pos = data.current_buf.find(CRLF);
-		std::string            chunk_data = data.current_buf.substr(0, end_of_chunk_data_pos);
-		data.current_buf.erase(0, chunk_data.size() + CRLF.size());
+	std::string::size_type end_of_chunk_size_pos = result.GetValue().first;
+	std::string            chunk_size_str        = result.GetValue().second;
+	std::size_t            chunk_size            = HexToDec(chunk_size_str).GetValue();
+
+	while (true) {
+		const ChunkDataResult chunk_data_result =
+			GetChunkData(data.current_buf, end_of_chunk_size_pos, chunk_size);
+		if (!chunk_data_result.IsOk()) {
+			return;
+		}
+		const std::string chunk_data = chunk_data_result.GetValue();
 		if (chunk_data.size() != chunk_size) {
 			throw HttpException(
 				"Error: chunk size and chunk data size are different", StatusCode(BAD_REQUEST)
 			);
 		}
+		// sizeとdataが揃ったのでbody_messageに追加 & current_bufからまとめてerase
 		data.request_result.request.body_message += chunk_data;
-		end_of_chunk_size_pos = data.current_buf.find(CRLF);
-		chunk_size_str        = data.current_buf.substr(0, end_of_chunk_size_pos);
-		data.current_buf.erase(0, chunk_size_str.size() + CRLF.size());
-		chunk_size = HexToDec(chunk_size_str).GetValue();
-		if (HexToDec(chunk_size_str).IsOk() == false) {
-			throw HttpException(
-				"Error: chunk size is not a hexadecimal number", StatusCode(BAD_REQUEST)
-			);
+		const std::size_t chunk_size_and_data_length =
+			chunk_size_str.size() + CRLF.size() + chunk_data.size() + CRLF.size();
+		data.current_buf.erase(0, chunk_size_and_data_length);
+		if (chunk_size == 0) {
+			break;
 		}
-	}
-	if (data.current_buf != CRLF) { // 終端に0\r\n\r\nの\r\nがあるはず
-		throw HttpException(
-			"Error: Missing or incorrect chunked transfer encoding terminator",
-			StatusCode(BAD_REQUEST)
-		);
+
+		ChunkSizeResult result = GetChunkSizeStr(data.current_buf);
+		if (!result.IsOk()) {
+			return;
+		}
+		end_of_chunk_size_pos = result.GetValue().first;
+		chunk_size_str        = result.GetValue().second;
+		chunk_size            = HexToDec(chunk_size_str).GetValue();
 	}
 
 	data.is_request_format.is_body_message = true;
 }
 
-void HttpParse::TmpRun(HttpRequestParsedData &data) {
-	// todo: 外側でHttpParse::TmpRunを呼ぶため try, catchを削除する
-	try {
-		ParseRequestLine(data);
-		ParseHeaderFields(data);
-		ParseBodyMessage(data);
-	} catch (const HttpException &e) {
-		data.request_result.status_code = e.GetStatusCode();
-	}
-}
-
-void HttpParse::TmpRunHttpResultVersion(HttpRequestParsedData &data) {
+void HttpParse::Run(HttpRequestParsedData &data) {
 	ParseRequestLine(data);
 	ParseHeaderFields(data);
 	ParseBodyMessage(data);
-}
-
-// todo: tmp request_
-HttpRequestResult HttpParse::Run(const std::string &read_buf) {
-	HttpRequestResult result;
-	// a: [request_line ＋ header_fields, message-body]
-	// b: [request_line, header_fields]
-	std::vector<std::string> a = utils::SplitStr(read_buf, HEADER_FIELDS_END);
-	std::vector<std::string> b = utils::SplitStr(a[0], CRLF);
-	try {
-		result.request.request_line = SetRequestLine(utils::SplitStr(b[0], SP));
-		const std::vector<std::string> header_fields_info(b.begin() + 1, b.end());
-		result.request.header_fields = SetHeaderFields(header_fields_info);
-	} catch (const HttpException &e) {
-		result.status_code = e.GetStatusCode();
-	}
-	return result;
 }
 
 RequestLine HttpParse::SetRequestLine(const std::vector<std::string> &request_line_info) {
@@ -228,22 +277,14 @@ HeaderFields HttpParse::SetHeaderFields(const std::vector<std::string> &header_f
 	HeaderFields                                     header_fields;
 	typedef std::vector<std::string>::const_iterator It;
 	for (It it = header_fields_info.begin(); it != header_fields_info.end(); ++it) {
-		std::vector<std::string> header_field_name_and_value = utils::SplitStr(*it, ":");
-		// if (header_field_name_and_value.size() != 2) {
-		// 	throw HttpException(
-		// 		"Error: Missing colon or multiple colons found in header filed",
-		// 		StatusCode(BAD_REQUEST)
-		// 	);
-		// }
-
-		// Todo: `Host: localhost:8080`のような場合どうするのか
-
-		// header_field_valueを初期化してるためheader_field_nameも初期化した
-		const std::string &header_field_name = header_field_name_and_value[0];
-		CheckValidHeaderFieldName(header_field_name);
-		const std::string &header_field_value =
-			StrTrimLeadingOptionalWhitespace(header_field_name_and_value[1]);
-		// to do: #189  ヘッダフィールドをパースする関数（value）-> CheckValidHeaderFieldValue
+		std::size_t colon_pos          = (*it).find_first_of(':');
+		std::string header_field_name  = (*it).substr(0, colon_pos);
+		std::string header_field_value = (*it).substr(colon_pos + 1);
+		header_field_value             = StrTrimOptionalWhitespace(header_field_value);
+		CheckValidHeaderFieldNameAndValue(header_field_name, header_field_value);
+		// todo:
+		// マルチパートを対応する場合はutils::SplitStrを使用して、セミコロン区切りのstd::vector<std::string>になる。
+		// ex) Content-Type: multipart/form-data; boundary=----WebKitFormBoundary64XhQJfFNRKx7oK7
 		typedef std::pair<HeaderFields::const_iterator, bool> Result;
 		Result result = header_fields.insert(std::make_pair(header_field_name, header_field_value));
 		if (result.second == false) {
@@ -252,17 +293,25 @@ HeaderFields HttpParse::SetHeaderFields(const std::vector<std::string> &header_f
 			);
 		}
 	}
+	ThrowMissingHostHeaderField(header_fields);
 	return header_fields;
 }
 
 void HttpParse::CheckValidRequestLine(const std::vector<std::string> &request_line_info) {
+	if (request_line_info.size() != 3) {
+		throw HttpException(
+			"Error: invalid number of status line elements", StatusCode(BAD_REQUEST)
+		);
+	}
 	CheckValidMethod(request_line_info[0]);
 	CheckValidRequestTarget(request_line_info[1]);
 	CheckValidVersion(request_line_info[2]);
 }
 
 void HttpParse::CheckValidMethod(const std::string &method) {
-	// US-ASCIIかまたは大文字かどうか -> 400
+	if (!method.size()) {
+		throw HttpException("Error: the method don't exist.", StatusCode(BAD_REQUEST));
+	}
 	if (IsStringUsAscii(method) == false || IsStringUpper(method) == false) {
 		throw HttpException(
 			"Error: This method contains lowercase or non-USASCII characters.",
@@ -272,7 +321,9 @@ void HttpParse::CheckValidMethod(const std::string &method) {
 }
 
 void HttpParse::CheckValidRequestTarget(const std::string &request_target) {
-	// /が先頭になかったら場合 -> 400
+	if (!request_target.size()) {
+		throw HttpException("Error: the request target don't exist.", StatusCode(BAD_REQUEST));
+	}
 	if (request_target.empty() || request_target[0] != '/') {
 		throw HttpException(
 			"Error: the request target is missing the '/' character at the beginning",
@@ -282,7 +333,9 @@ void HttpParse::CheckValidRequestTarget(const std::string &request_target) {
 }
 
 void HttpParse::CheckValidVersion(const std::string &version) {
-	// HTTP/1.1かどうか -> 400
+	if (!version.size()) {
+		throw HttpException("Error: the http version don't exist.", StatusCode(BAD_REQUEST));
+	}
 	if (version != HTTP_VERSION) {
 		throw HttpException(
 			"Error: The version is not supported by webserv", StatusCode(BAD_REQUEST)
@@ -290,21 +343,36 @@ void HttpParse::CheckValidVersion(const std::string &version) {
 	}
 }
 
-void HttpParse::CheckValidHeaderFieldName(const std::string &header_field_value) {
-	(void)header_field_value;
-	// todo: 複数指定ありの場合はthrowしないようにする。
-	// if (header_field_value != CONNECTION &&
-	// 	std::find(
-	// 		REQUEST_HEADER_FIELDS,
-	// 		REQUEST_HEADER_FIELDS + REQUEST_HEADER_FIELDS_SIZE,
-	// 		header_field_value
-	// 	) == REQUEST_HEADER_FIELDS + REQUEST_HEADER_FIELDS_SIZE) {
-	// 	throw HttpException(
-	// 		"Error: the value does not exist in format of header fields", StatusCode(BAD_REQUEST)
-	// 	);
-	// }
-
-	// Todo: ブラウザでデフォルト以外のヘッダーが送られてくることがある
+void HttpParse::CheckValidHeaderFieldNameAndValue(
+	const std::string &header_field_name, const std::string &header_field_value
+) {
+	if (!header_field_name.size()) {
+		throw HttpException(
+			"Error: the name of Header field don't exist.", StatusCode(BAD_REQUEST)
+		);
+	}
+	if (!IsVString(header_field_name) || !IsVString(header_field_value)) {
+		throw HttpException(
+			"Error: the name or value of Header field contains non-VCHR characters.",
+			StatusCode(BAD_REQUEST)
+		);
+	}
+	if (HasSpace(header_field_name)) {
+		throw HttpException(
+			"Error: the name of Header field has a space.", StatusCode(BAD_REQUEST)
+		);
+	}
+	if (header_field_name == "Host" && header_field_value.empty()) {
+		throw HttpException(
+			"Error: the value of Host header field is empty.", StatusCode(BAD_REQUEST)
+		);
+	} else if (header_field_name == "Content-Length" &&
+			   !utils::ConvertStrToSize(header_field_value).IsOk()) {
+		throw HttpException(
+			"Error: the value of Content-Length header field is not a number.",
+			StatusCode(BAD_REQUEST)
+		);
+	}
 }
 
 // status_line && header

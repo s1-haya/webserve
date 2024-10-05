@@ -1,6 +1,9 @@
 import os
 import subprocess
 
+import pytest
+from common import *
+
 
 def build_client_module():
     # client_module ディレクトリに移動
@@ -24,79 +27,141 @@ except ImportError as e:
     print(f"Import failed: {e}")
 
 
-def read_file(file):
-    with open(file, "r") as f:
-        data = f.read()
-        return data, len(data)
-
-
-# \r\nをそのまま読み込む用(ヘッダー部分)
-def read_file_binary(file):
-    with open(file, "rb") as f:
-        return f.read()
-
-
-def assert_response(response, expected_response):
-    assert (
-        response == expected_response
-    ), f"Expected response\n\n {repr(expected_response)}, but got\n\n {repr(response)}"
-
-
-root_index_file, root_index_file_length = read_file("root/html/index.html")
-sub_index_file, sub_index_file_length = read_file("root/html/sub/index.html")
-
-response_header_get_root_200_close = f"HTTP/1.1 200 OK\r\nConnection: close\r\nContent-Length: {root_index_file_length}\r\nContent-Type: test/html\r\nServer: webserv/1.1\r\n\r\n"
-response_header_get_root_200_keep = f"HTTP/1.1 200 OK\r\nConnection: keep-alive\r\nContent-Length: {root_index_file_length}\r\nContent-Type: test/html\r\nServer: webserv/1.1\r\n\r\n"
-response_header_get_sub_200_close = f"HTTP/1.1 200 OK\r\nConnection: close\r\nContent-Length: {sub_index_file_length}\r\nContent-Type: test/html\r\nServer: webserv/1.1\r\n\r\n"
-
-
-def test_get_root_close_200():
-    expected_response = response_header_get_root_200_close + root_index_file
+def send_request_and_assert_response(request_file, expected_response):
     client_instance = client.Client(8080)
-    request = read_file_binary(
-        "test/common/request/get/2xx/200_01_connection_close.txt"
-    )
+    request, _ = read_file_binary(request_file)
     response = client_instance.SendRequestAndReceiveResponse(request)
     assert_response(response, expected_response)
 
 
-def test_get_root_keep_200():
-    expected_response = response_header_get_root_200_keep + root_index_file
-    # responseヘッダーもkeepaliveになる？
-    client_instance = client.Client(8080)
-    request = read_file_binary("test/common/request/get/2xx/200_02_connection_keep.txt")
-    response = client_instance.SendRequestAndReceiveResponse(request)
-    assert_response(response, expected_response)
+@pytest.mark.parametrize(
+    "request_file, expected_response",
+    [
+        (
+            REQUEST_GET_2XX_DIR + "200_01_connection_close.txt",
+            response_header_get_root_200_close + root_index_file,
+        ),
+        (
+            REQUEST_GET_2XX_DIR + "200_02_connection_keep.txt",
+            response_header_get_root_200_keep + root_index_file,
+        ),
+        (
+            REQUEST_GET_2XX_DIR + "200_03_sub_connection_close.txt",
+            response_header_get_sub_200_close + sub_index_file,
+        ),
+        (
+            REQUEST_GET_2XX_DIR + "200_07_no_connection_value.txt",
+            response_header_get_root_200_keep + root_index_file,
+        ),
+        (
+            REQUEST_GET_2XX_DIR + "200_08_wrong_connection_value.txt",
+            response_header_get_root_200_keep + root_index_file,
+        ),
+        (
+            REQUEST_GET_2XX_DIR + "200_12_header_field_value_space.txt",
+            response_header_get_root_200_close + root_index_file,
+        ),
+        (
+            REQUEST_GET_2XX_DIR + "200_13_space_header_field_value.txt",
+            response_header_get_root_200_close + root_index_file,
+        ),
+        (
+            REQUEST_GET_2XX_DIR + "200_14_extra_request.txt",
+            response_header_get_root_200_close + root_index_file,
+        ),
+        (
+            REQUEST_GET_2XX_DIR + "200_15_body_message_default.txt",
+            response_header_get_root_200_close + root_index_file,
+        ),
+        (
+            REQUEST_GET_2XX_DIR + "200_17_not_exist_header_field.txt",
+            response_header_get_root_200_close + root_index_file,
+        ),
+        (REQUEST_GET_4XX_DIR + "400_02_lower_method.txt", bad_request_response),
+        (
+            REQUEST_GET_4XX_DIR + "400_03_no_ascii_method.txt",
+            bad_request_response,
+        ),
+        (REQUEST_GET_4XX_DIR + "400_04_no_root.txt", bad_request_response),
+        (REQUEST_GET_4XX_DIR + "400_05_relative_path.txt", bad_request_response),
+        (
+            REQUEST_GET_4XX_DIR + "400_06_lower_http_version.txt",
+            bad_request_response,
+        ),
+        (
+            REQUEST_GET_4XX_DIR + "400_07_wrong_http_name.txt",
+            bad_request_response,
+        ),
+        (
+            REQUEST_GET_4XX_DIR + "400_08_wrong_http_version.txt",
+            bad_request_response,
+        ),
+        (
+            REQUEST_GET_4XX_DIR + "400_09_no_host.txt",
+            bad_request_response,
+        ),
+        (REQUEST_GET_4XX_DIR + "400_10_duplicate_host.txt", bad_request_response),
+        (
+            REQUEST_GET_4XX_DIR + "400_11_no_header_field_colon.txt",
+            bad_request_response,
+        ),
+        (
+            REQUEST_GET_4XX_DIR + "400_12_no_connection_name.txt",
+            bad_request_response,
+        ),
+        (
+            REQUEST_GET_4XX_DIR + "400_15_space_in_header_field_name.txt",
+            bad_request_response,
+        ),
+        (
+            REQUEST_GET_4XX_DIR + "400_16_header_field_name_space_colon.txt",
+            bad_request_response,
+        ),
+        (
+            REQUEST_GET_4XX_DIR + "400_17_space_header_field_name.txt",
+            bad_request_response,
+        ),
+        (
+            REQUEST_GET_4XX_DIR + "400_18_non_vchr_header_field_name.txt",
+            bad_request_response,
+        ),
+        (
+            REQUEST_GET_4XX_DIR + "400_19_non_vchr_header_field_value.txt",
+            bad_request_response,
+        ),
+        (
+            REQUEST_GET_4XX_DIR + "400_20_too_few_status_line_elements.txt",
+            bad_request_response,
+        ),
+        (
+            REQUEST_GET_4XX_DIR + "400_21_too_many_status_line_elements.txt",
+            bad_request_response,
+        ),
+        (REQUEST_GET_4XX_DIR + "404_01_not_exist_path.txt", not_found_response),
+        (
+            REQUEST_GET_4XX_DIR + "405_01_method_not_allowed_for_uri.txt",
+            not_allowed_response,
+        ),
+        (
+            REQUEST_GET_5XX_DIR + "501_01_not_exist_method.txt",
+            not_implemented_response,
+        ),
+    ],
+)
+def test_get_responses(request_file, expected_response):
+    send_request_and_assert_response(request_file, expected_response)
 
 
-def test_get_sub_close_200():
-    expected_response = response_header_get_sub_200_close + sub_index_file
-    client_instance = client.Client(8080)
-    request = read_file_binary(
-        "test/common/request/get/2xx/200_03_sub_connection_close.txt"
-    )
-    response = client_instance.SendRequestAndReceiveResponse(request)
-    assert_response(response, expected_response)
-
-
-# def test_get_404():
-#     expected_response = response_header_get_404 + read_file("../../html/sub/index.html")
-#     client_instance = client.Client(8080)
-#     request = read_file_binary("../request_messages/webserv/get/404_not-exist-path_connection-close.txt")
-#     response = client_instance.SendRequestAndReceiveResponse(request)
-#     assert (
-#         response == expected_response
-#     ), f"Expected response\n\n {repr(expected_response)}, but got\n\n {repr(response)}"
-
-
-def test_webserv():
-    try:
-        test_get_root_close_200()
-        test_get_root_keep_200()
-        test_get_sub_close_200()
-        # test_get_404()
-    except Exception as e:
-        print(f"Test failed: {e}")
+# >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+# def test_webserv():
+#     try:
+#         test_get_root_close_200()
+#         test_get_root_keep_200()
+#         test_get_sub_close_200()
+#         test_get_404()
+#         test_get_405()
+#     except Exception as e:
+#         print(f"Test failed: {e}")
 
 
 # def test1():
@@ -139,5 +204,7 @@ def test_webserv():
 #     # assert
 
 
-if __name__ == "__main__":
-    test_webserv()
+# if __name__ == "__main__":
+#     test_webserv()
+
+# <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<

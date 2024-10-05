@@ -53,82 +53,104 @@ InputIt Next(InputIt it, typename std::iterator_traits<InputIt>::difference_type
 
 // ================================================= //
 
-// cgi_parseから見た相対パス
-const std::string html_dir_path    = "../../../../html";
-const std::string cgi_bin_dir_path = "../../../../cgi-bin";
+// ホームから見たディレクトリパス
+const std::string root_dir_path    = "root";
+const std::string cgi_bin_dir_path = root_dir_path + "/cgi-bin";
 
+// GETのテスト
 int Test1() {
 	// request
 	const RequestLine request_line = {"GET", "/", "HTTP/1.1"};
 	HttpRequestFormat request;
-	request.request_line                  = request_line;
-	request.header_fields[HOST]           = "host1";
-	request.header_fields[CONTENT_LENGTH] = "0";
-	request.header_fields[CONTENT_TYPE]   = "text/plain";
+	request.request_line        = request_line;
+	request.body_message        = "";
+	request.header_fields[HOST] = "host";
 
-	std::string cgi_script    = "/test.cgi";
+	std::string cgi_script    = "root/cgi-bin/test.cgi";
 	std::string cgi_path_info = "/aa/b";
 	std::string cgi_extension = ".cgi";
 	std::string server_port   = "8080";
+	std::string client_ip     = "127.0.0.2";
+	std::string server_name   = "host";
 
-	utils::Result<cgi::CgiRequest> parse_result =
-		CgiParse::Parse(request, cgi_script + cgi_path_info, cgi_extension, server_port);
-	cgi::MetaMap meta_variables = parse_result.GetValue().meta_variables;
-
+	cgi::CgiRequest cgi_request =
+		CgiParse::Parse(request, cgi_script + cgi_path_info, cgi_extension, server_port, client_ip);
+	cgi::MetaMap meta_variables = cgi_request.meta_variables;
 	try {
-		COMPARE(meta_variables.at(cgi::CONTENT_LENGTH), request.header_fields.at(CONTENT_LENGTH));
-		COMPARE(meta_variables.at(cgi::CONTENT_TYPE), request.header_fields.at(CONTENT_TYPE));
+		if (!request.body_message.empty()) {
+			COMPARE(
+				meta_variables.at(cgi::CONTENT_LENGTH), request.header_fields.at(CONTENT_LENGTH)
+			);
+			COMPARE(meta_variables.at(cgi::CONTENT_TYPE), request.header_fields.at(CONTENT_TYPE));
+		}
 		COMPARE(meta_variables.at(cgi::PATH_INFO), cgi_path_info);
-		COMPARE(meta_variables.at(cgi::PATH_TRANSLATED), html_dir_path + cgi_path_info);
+		COMPARE(meta_variables.at(cgi::PATH_TRANSLATED), root_dir_path + cgi_path_info);
+		COMPARE(meta_variables.at(cgi::REMOTE_ADDR), client_ip);
 		COMPARE(meta_variables.at(cgi::REQUEST_METHOD), request_line.method);
-		COMPARE(meta_variables.at(cgi::SCRIPT_NAME), cgi_bin_dir_path + cgi_script);
+		COMPARE(meta_variables.at(cgi::SCRIPT_NAME), cgi_script);
 		COMPARE(meta_variables.at(cgi::SERVER_NAME), request.header_fields.at(HOST));
 		COMPARE(meta_variables.at(cgi::SERVER_PORT), server_port);
 		COMPARE(meta_variables.at(cgi::SERVER_PROTOCOL), request_line.version);
+		COMPARE(cgi_request.body_message, request.body_message);
 	} catch (const std::exception &e) {
 		PrintNg();
-		std::cerr << e.what() << '\n';
+		utils::Debug("Test1", e.what());
 		return EXIT_FAILURE;
 	}
 	PrintOk();
+	utils::Debug("PATH_INFO", meta_variables.at(cgi::PATH_INFO));
+	utils::Debug("PATH_TRANSLATED", meta_variables.at(cgi::PATH_TRANSLATED));
+	utils::Debug("SCRIPT_NAME", meta_variables.at(cgi::SCRIPT_NAME));
 	return EXIT_SUCCESS;
 }
 
-/* 不足しているフィールドがある場合 */
+// POSTのテスト
 int Test2() {
 	// request
-	const RequestLine request_line = {"GET", "/", "HTTP/1.1"};
+	const RequestLine request_line = {"POST", "/", "HTTP/1.1"};
 	HttpRequestFormat request;
 	request.request_line                  = request_line;
-	request.header_fields[CONTENT_LENGTH] = "0";
+	request.body_message                  = "test";
+	request.header_fields[CONTENT_LENGTH] = "4";
 	request.header_fields[CONTENT_TYPE]   = "text/plain";
+	request.header_fields[HOST]           = "host";
 
-	std::string cgi_script    = "/test.cgi";
-	std::string cgi_path_info = "/aa/b";
+	std::string cgi_script    = "root/cgi-bin/test2.cgi";
+	std::string cgi_path_info = "";
 	std::string cgi_extension = ".cgi";
 	std::string server_port   = "8080";
+	std::string client_ip     = "127.0.0.1";
+	std::string server_name   = "host";
 
-	utils::Result<cgi::CgiRequest> parse_result =
-		CgiParse::Parse(request, cgi_script + cgi_path_info, cgi_extension, server_port);
-	cgi::MetaMap meta_variables = parse_result.GetValue().meta_variables;
-
+	cgi::CgiRequest cgi_request =
+		CgiParse::Parse(request, cgi_script + cgi_path_info, cgi_extension, server_port, client_ip);
+	cgi::MetaMap meta_variables = cgi_request.meta_variables;
 	try {
-		COMPARE(meta_variables.at(cgi::CONTENT_LENGTH), request.header_fields.at(CONTENT_LENGTH));
-		COMPARE(meta_variables.at(cgi::CONTENT_TYPE), request.header_fields.at(CONTENT_TYPE));
+		if (!request.body_message.empty()) {
+			COMPARE(
+				meta_variables.at(cgi::CONTENT_LENGTH), request.header_fields.at(CONTENT_LENGTH)
+			);
+			COMPARE(meta_variables.at(cgi::CONTENT_TYPE), request.header_fields.at(CONTENT_TYPE));
+		}
 		COMPARE(meta_variables.at(cgi::PATH_INFO), cgi_path_info);
-		COMPARE(meta_variables.at(cgi::PATH_TRANSLATED), html_dir_path + cgi_path_info);
+		COMPARE(meta_variables.at(cgi::PATH_TRANSLATED), cgi_path_info);
+		COMPARE(meta_variables.at(cgi::REMOTE_ADDR), client_ip);
 		COMPARE(meta_variables.at(cgi::REQUEST_METHOD), request_line.method);
-		COMPARE(meta_variables.at(cgi::SCRIPT_NAME), cgi_bin_dir_path + cgi_script);
+		COMPARE(meta_variables.at(cgi::SCRIPT_NAME), cgi_script);
 		COMPARE(meta_variables.at(cgi::SERVER_NAME), request.header_fields.at(HOST));
 		COMPARE(meta_variables.at(cgi::SERVER_PORT), server_port);
 		COMPARE(meta_variables.at(cgi::SERVER_PROTOCOL), request_line.version);
+		COMPARE(cgi_request.body_message, request.body_message);
 	} catch (const std::exception &e) {
-		PrintOk();
+		PrintNg();
 		utils::Debug("Test2", e.what());
-		return EXIT_SUCCESS;
+		return EXIT_FAILURE;
 	}
-	PrintNg();
-	return EXIT_FAILURE;
+	PrintOk();
+	utils::Debug("PATH_INFO", meta_variables.at(cgi::PATH_INFO));
+	utils::Debug("PATH_TRANSLATED", meta_variables.at(cgi::PATH_TRANSLATED));
+	utils::Debug("SCRIPT_NAME", meta_variables.at(cgi::SCRIPT_NAME));
+	return EXIT_SUCCESS;
 }
 
 } // namespace

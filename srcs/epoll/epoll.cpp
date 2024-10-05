@@ -111,7 +111,8 @@ void Epoll::Delete(int socket_fd) {
 }
 
 // replace old_type with new_type
-void Epoll::Replace(int socket_fd, const event::Type new_type) {
+// allows multiple event types, e.g., event::EVENT_READ | event::EVENT_WRITE.
+void Epoll::Replace(int socket_fd, uint32_t new_type) {
 	EpollEvent ev = {};
 	ev.events     = ConvertToEpollEventType(new_type);
 	ev.data.fd    = socket_fd;

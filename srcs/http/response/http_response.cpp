@@ -1,11 +1,15 @@
 #include "http_response.hpp"
+#include "cgi.hpp"
+#include "cgi_parse.hpp"
 #include "client_infos.hpp"
 #include "http_exception.hpp"
 #include "http_message.hpp"
 #include "http_parse.hpp"
+#include <fstream>
 #include <iostream>
 #include <sstream>
 
+namespace http {
 namespace {
 
 std::string GetExtension(const std::string &path) {
@@ -14,52 +18,86 @@ std::string GetExtension(const std::string &path) {
 	if (pos == std::string::npos || pos == path.length() - 1) {
 		return "";
 	}
-	return path.substr(pos + 1);
+	return path.substr(pos);
+}
+
+std::string GetCwd() {
+	const char            *file_path = __FILE__;
+	std::string            path(file_path);
+	std::string::size_type pos       = path.find_last_of("/\\");
+	std::string            directory = (pos != std::string::npos) ? path.substr(0, pos) : "";
+	return directory;
+}
+
+std::string ReadErrorFile(const std::string &file_path) {
+	const std::string root_path = GetCwd() + "/../../../root";
+	std::ifstream     file((root_path + file_path).c_str());
+	if (!file) {
+		if (errno == EACCES || errno == EPERM) {
+			return HttpResponse::CreateDefaultBodyMessage(StatusCode(FORBIDDEN));
+		} else if (errno == ENOENT || errno == ENOTDIR || errno == ELOOP || errno == ENAMETOOLONG) {
+			return HttpResponse::CreateDefaultBodyMessage(StatusCode(NOT_FOUND));
+		} else {
+			return HttpResponse::CreateDefaultBodyMessage(StatusCode(INTERNAL_SERVER_ERROR));
+		}
+	}
+	std::stringstream ss;
+	ss << file.rdbuf();
+	return ss.str();
 }
 
 } // namespace
 
-namespace http {
-
 std::string HttpResponse::Run(
-	const ClientInfos                   &client_info,
+	const http::ClientInfos             &client_info,
 	const server::VirtualServerAddrList &server_info,
-	const HttpRequestResult             &request_info
+	const HttpRequestResult             &request_info,
+	CgiResult                           &cgi_result
 ) {
-	HttpResponseFormat response = CreateHttpResponseFormat(client_info, server_info, request_info);
+	HttpResponseFormat response =
+		CreateHttpResponseFormat(client_info, server_info, request_info, cgi_result);
+	if (cgi_result.is_cgi) {
+		return "";
+	}
 	return CreateHttpResponse(response);
 }
 
 // todo: HttpResponseFormat HttpResponse::CreateHttpResponseFormat(const HttpRequestResult
 // &request_info) 作成
 HttpResponseFormat HttpResponse::CreateHttpResponseFormat(
-	const ClientInfos                   &client_info,
+	const http::ClientInfos             &client_info,
 	const server::VirtualServerAddrList &server_info,
-	const HttpRequestResult             &request_info
+	const HttpRequestResult             &request_info,
+	CgiResult                           &cgi_result
 ) {
 	StatusCode   status_code(OK);
 	HeaderFields response_header_fields = InitResponseHeaderFields(request_info);
 	std::string  response_body_message;
+	utils::Result< std::pair<unsigned int, std::string> > error_page;
+
 	try {
 		const CheckServerInfoResult &server_info_result =
 			HttpServerInfoCheck::Check(server_info, request_info.request);
-		// todo: if redirect
-		// if (server_info_result.redirect.IsOk()) {
-		// 	result = RedirectHandler();
+		error_page = server_info_result.error_page;
+		if (server_info_result.redirect.IsOk()) {
+			return HandleRedirect(response_header_fields, server_info_result);
+		}
 		if (IsCgi(
 				server_info_result.cgi_extension,
 				server_info_result.path,
 				request_info.request.request_line.method,
-				server_info_result.allowed_methods,
-				server_info_result.upload_directory
+				server_info_result.allowed_methods
 			)) {
-			// todo: cgi実行
-			// cgi::Run()
-			// -> Internal　Server Errorを投げる可能性あり
-			// status_code = CgiToServerHandler(header_fields, response_body_message);
-			(void)client_info;
-			(void)server_info_result;
-			(void)status_code;
+			// これはパースした結果
+			cgi::CgiRequest cgi_request = CgiParse::Parse(
+				request_info.request,
+				server_info_result.path,
+				server_info_result.cgi_extension,
+				utils::ToString(client_info.listen_server_port),
+				client_info.ip
+			);
+			cgi_result.is_cgi      = true;
+			cgi_result.cgi_request = cgi_request;
 		} else {
 			status_code = Method::Handler(
 				server_info_result.path,
@@ -69,24 +107,23 @@ HttpResponseFormat HttpResponse::CreateHttpResponseFormat(
 				response_body_message,
 				response_header_fields,
 				server_info_result.index,
-				server_info_result.autoindex
+				server_info_result.autoindex,
+				server_info_result.upload_directory
 			);
 		}
 	} catch (const HttpException &e) {
 		// ステータスコードが300番台以上の場合
-		// feature: header_fieldとerror_pageとの関連性がわかり次第変更あり
-		// 返り値: response 引数:error_page, status_code
-		// todo: error_page status_code classに対応
-		// if (server_info.error_page.IsOk() &&
-		// 	status_code.GetEStatusCode() == server_info.error_page.GetValue().first) {
-		// 	response_message = ReadFile(server_info.error_page.GetValue().second);
-		// 	// check the path of error_page
-		// }
 		// for debug
 		std::cerr << utils::color::GRAY << "Debug [" << e.what() << "]" << utils::color::RESET
 				  << std::endl;
-		status_code                            = e.GetStatusCode();
-		response_body_message                  = CreateDefaultBodyMessageFormat(status_code);
+
+		status_code = e.GetStatusCode();
+		if (error_page.IsOk() && status_code.GetEStatusCode() == error_page.GetValue().first) {
+			utils::Debug("ErrorPage", error_page.GetValue().second);
+			response_body_message = ReadErrorFile(error_page.GetValue().second);
+		} else {
+			response_body_message = CreateDefaultBodyMessage(status_code);
+		}
 		response_header_fields[CONTENT_LENGTH] = utils::ToString(response_body_message.length());
 	}
 	return HttpResponseFormat(
@@ -96,7 +133,7 @@ HttpResponseFormat HttpResponse::CreateHttpResponseFormat(
 	);
 }
 
-std::string HttpResponse::CreateDefaultBodyMessageFormat(const StatusCode &status_code) {
+std::string HttpResponse::CreateDefaultBodyMessage(const StatusCode &status_code) {
 	std::ostringstream body_message;
 	body_message << "<html>" << CRLF << "<head><title>" << status_code.GetStatusCode() << SP
 				 << status_code.GetReasonPhrase() << "</title></head>" << CRLF << "<body>" << CRLF
@@ -121,11 +158,7 @@ std::string HttpResponse::CreateHttpResponse(const HttpResponseFormat &response)
 
 HeaderFields HttpResponse::InitResponseHeaderFields(const HttpRequestResult &request_info) {
 	HeaderFields response_header_fields;
-	response_header_fields[SERVER] = SERVER_VERSION;
-	(void)request_info;
-	// todo: request_infoから情報取得
-	// GetContentType(request_info);
-	// GetConnection(request_info);
+	response_header_fields[SERVER]       = SERVER_VERSION;
 	response_header_fields[CONTENT_TYPE] = TEXT_HTML;
 	if (IsConnectionKeep(request_info.request.header_fields)) {
 		response_header_fields[CONNECTION] = KEEP_ALIVE;
@@ -137,25 +170,21 @@ HeaderFields HttpResponse::InitResponseHeaderFields(const HttpRequestResult &req
 
 bool HttpResponse::IsConnectionKeep(const HeaderFields &request_header_fields) {
 	HeaderFields::const_iterator it = request_header_fields.find(CONNECTION);
-	return it == request_header_fields.end() || it->second == KEEP_ALIVE;
+	return it == request_header_fields.end() || it->second != CLOSE;
 }
 
 bool HttpResponse::IsCgi(
 	const std::string          &cgi_extension,
 	const std::string          &path,
 	const std::string          &method,
-	const Method::AllowMethods &allowed_methods,
-	const std::string          &upload_directory
+	const Method::AllowMethods &allowed_methods
 ) {
-	// todo:
 	// cgi_extensionがあるかどうか
 	if (cgi_extension.empty()) {
 		return false;
 	}
-	// upload_directory内にpathが存在するかどうか
-	// -> pathがaliasで設定される場合どうなるんだろう。
-	(void)upload_directory;
 	// pathがcgi_extensionで設定された拡張子かどうか
+	// falseの場合はpathに普通のリクエストとして送られる
 	if (cgi_extension != GetExtension(path)) {
 		return false;
 	}
@@ -166,19 +195,76 @@ bool HttpResponse::IsCgi(
 	return true;
 }
 
-std::string HttpResponse::CreateBadRequestResponse(const HttpRequestResult &request_info) {
+HttpResponseFormat HttpResponse::HandleRedirect(
+	HeaderFields &response_header_fields, const CheckServerInfoResult &server_info_result
+) {
+	// httpがない場合は現在のサーバーに送り、httpがある場合はそのまま
+	const std::string prefix = "http://";
+	const std::string url    = server_info_result.redirect.GetValue().second;
+	if (url.compare(0, prefix.size(), prefix) == 0) {
+		response_header_fields[LOCATION] = server_info_result.redirect.GetValue().second;
+	} else {
+		response_header_fields[LOCATION] = prefix + server_info_result.host_name + url;
+	}
+	utils::Debug("Redirect", response_header_fields[LOCATION]);
+	// サーバーで用意しているステータス以外を指定した場合はbodyやphraseを返さない
+	if (server_info_result.redirect.GetValue().first == MOVED_PERMANENTLY) {
+		throw HttpException("Moved Permanently", StatusCode(MOVED_PERMANENTLY));
+	} else {
+		response_header_fields[CONTENT_LENGTH] = "0";
+		const std::string redirect_status_code =
+			utils::ToString(server_info_result.redirect.GetValue().first);
+		return HttpResponseFormat(
+			StatusLine(HTTP_VERSION, redirect_status_code, ""), response_header_fields, ""
+		);
+	}
+}
+
+std::string HttpResponse::CreateErrorResponse(const StatusCode &status_code) {
 	HttpResponseFormat response;
-	response.status_line = StatusLine(
-		HTTP_VERSION,
-		request_info.status_code.GetStatusCode(),
-		request_info.status_code.GetReasonPhrase()
-	);
-	response.header_fields[SERVER]       = SERVER_VERSION;
-	response.header_fields[CONTENT_TYPE] = TEXT_HTML;
-	response.header_fields[CONNECTION]   = CLOSE;
-	response.body_message                = CreateDefaultBodyMessageFormat(request_info.status_code);
+	response.status_line =
+		StatusLine(HTTP_VERSION, status_code.GetStatusCode(), status_code.GetReasonPhrase());
+	response.header_fields[SERVER]         = SERVER_VERSION;
+	response.header_fields[CONTENT_TYPE]   = TEXT_HTML;
+	response.header_fields[CONNECTION]     = CLOSE;
+	response.body_message                  = CreateDefaultBodyMessage(status_code);
 	response.header_fields[CONTENT_LENGTH] = utils::ToString(response.body_message.length());
 	return CreateHttpResponse(response);
+}
+
+std::string HttpResponse::GetResponseFromCgi(
+	const cgi::CgiResponseParse::ParsedData &cgi_parsed_data, const HttpRequestResult &request_info
+) {
+	StatusCode  status_code(OK);
+	std::string response_body_message = cgi_parsed_data.body;
+
+	HeaderFields response_header_fields;
+	response_header_fields[SERVER] = SERVER_VERSION;
+	// Content-Tyeがない場合はapplication/octet-streamを設定
+	if (cgi_parsed_data.header_fields.find(CONTENT_TYPE) == cgi_parsed_data.header_fields.end()) {
+		response_header_fields[CONTENT_TYPE] = APPLICATION_OCTET_STREAM;
+	} else {
+		response_header_fields[CONTENT_TYPE] = cgi_parsed_data.header_fields.at(CONTENT_TYPE);
+	}
+	// Content-Lengthがない場合はbodyの長さを設定
+	if (cgi_parsed_data.header_fields.find(CONTENT_LENGTH) == cgi_parsed_data.header_fields.end()) {
+		response_header_fields[CONTENT_LENGTH] = utils::ToString(response_body_message.length());
+	} else {
+		response_header_fields[CONTENT_LENGTH] = cgi_parsed_data.header_fields.at(CONTENT_LENGTH);
+	}
+	if (IsConnectionKeep(request_info.request.header_fields)) {
+		response_header_fields[CONNECTION] = KEEP_ALIVE;
+	} else {
+		response_header_fields[CONNECTION] = CLOSE;
+	}
+
+	HttpResponseFormat response_format(
+		StatusLine(HTTP_VERSION, status_code.GetStatusCode(), status_code.GetReasonPhrase()),
+		response_header_fields,
+		response_body_message
+	);
+
+	return CreateHttpResponse(response_format);
 }
 
 } // namespace http

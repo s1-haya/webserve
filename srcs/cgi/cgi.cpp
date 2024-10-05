@@ -1,7 +1,6 @@
 #include "cgi.hpp"
 #include "cgi_request.hpp"
 #include "http_message.hpp"
-#include "status_code.hpp"
 #include "system_exception.hpp"
 #include "utils.hpp"
 #include <cerrno>
@@ -156,7 +155,7 @@ char *const *Cgi::SetCgiArgv() {
 	char **argv = new (std::nothrow) char *[2];
 	char  *dest = new (std::nothrow) char[cgi_script_.size() + 1];
 	if (argv == NULL || dest == NULL) {
-		throw SystemException(std::strerror(errno));
+		throw SystemException("SetCgiArgv: Failed to allocate memory");
 	}
 	std::strcpy(dest, cgi_script_.c_str());
 	argv[0] = dest;
@@ -167,16 +166,16 @@ char *const *Cgi::SetCgiArgv() {
 char *const *Cgi::SetCgiEnv(const MetaMap &meta_variables) {
 	char **cgi_env = new (std::nothrow) char *[meta_variables.size() + 1];
 	if (cgi_env == NULL) {
-		throw SystemException(std::strerror(errno));
+		throw SystemException("SetCgiEnv: cgi_env: Failed to allocate memory");
 	}
 	std::size_t i = 0;
 
 	typedef MetaMap::const_iterator It;
-	for (It it = meta_variables.begin(); it != meta_variables.end(); it++) {
+	for (It it = meta_variables.begin(); it != meta_variables.end(); ++it) {
 		const std::string element = it->first + "=" + it->second;
 		char             *dest    = new (std::nothrow) char[element.size() + 1];
 		if (dest == NULL) {
-			throw SystemException(std::strerror(errno));
+			throw SystemException("SetCgiEnv: dest: Failed to allocate memory");
 		}
 		std::strcpy(dest, element.c_str());
 		cgi_env[i] = dest;
@@ -211,8 +210,7 @@ CgiResponse Cgi::AddAndGetResponse(const std::string &read_buf) {
 	if (read_buf.empty()) {
 		is_response_complete_ = true;
 	}
-	return CgiResponse(response_body_message_, "text/plain", is_response_complete_);
-	// text/plainのみ対応
+	return CgiResponse(response_body_message_, is_response_complete_);
 }
 
 void Cgi::ReplaceNewRequest(const std::string &new_request_str) {

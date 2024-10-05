@@ -21,7 +21,8 @@ class Method {
 					 std::string        &response_body_message,
 					 HeaderFields       &response_header_fields,
 					 const std::string  &index_file_path,
-					 bool                autoindex_on
+					 bool                autoindex_on,
+					 const std::string  &upload_directory
 				 );
 	static bool IsSupportedMethod(const std::string &method);
 	static bool
@@ -39,17 +40,24 @@ class Method {
 		const std::string &path,
 		const std::string &request_body_message,
 		std::string       &response_body_message,
-		HeaderFields      &response_header_fields
+		HeaderFields      &response_header_fields,
+		const std::string &upload_directory
 	);
 	static StatusCode DeleteHandler(
 		const std::string &path,
 		std::string       &response_body_message,
 		HeaderFields      &response_header_fields
 	);
-	static Stat       TryStat(const std::string &path);
-	static void       SystemExceptionHandler(int error_number);
-	static StatusCode FileCreationHandler(
-		const std::string &path,
+	static Stat        TryStat(const std::string &path);
+	static std::string ReadFile(const std::string &file_path);
+	static void        SystemExceptionHandler(int error_number);
+	static StatusCode  FileCreationHandler(
+		 const std::string &path,
+		 const std::string &request_body_message,
+		 std::string       &response_body_message,
+		 HeaderFields      &response_header_fields
+	 );
+	static StatusCode EchoPostHandler(
 		const std::string &request_body_message,
 		std::string       &response_body_message,
 		HeaderFields      &response_header_fields

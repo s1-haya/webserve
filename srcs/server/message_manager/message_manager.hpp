@@ -21,6 +21,7 @@ class MessageManager {
 	// functions
 	void       AddNewMessage(int client_fd);
 	void       DeleteMessage(int client_fd);
+	bool       IsMessageExist(int client_fd) const;
 	TimeoutFds GetNewTimeoutFds(double timeout);
 	void       UpdateTime(int client_fd);
 	// request_buf

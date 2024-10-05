@@ -1,9 +1,10 @@
 #include "http.hpp"
+#include "cgi_response_parse.hpp"
 #include "client_infos.hpp"
 #include "http_message.hpp"
 #include "http_result.hpp"
 #include "http_storage.hpp"
-#include "server_infos.hpp"
+#include "status_code.hpp"
 #include <iostream>
 
 namespace http {
@@ -26,10 +27,22 @@ Http::Run(const ClientInfos &client_info, const server::VirtualServerAddrList &s
 	return result;
 }
 
-HttpResult Http::GetErrorResponse(const ClientInfos &client_info, ErrState state) {
-	HttpResult result;
-	(void)client_info;
-	(void)state;
+HttpResult Http::GetResponseFromCgi(int client_fd, const cgi::CgiResponse &cgi_response) {
+	typedef utils::Result<cgi::CgiResponseParse::ParsedData> CgiParseResult;
+	HttpResult                                               result;
+	CgiParseResult cgi_parse_result = cgi::CgiResponseParse::Parse(cgi_response.response);
+	if (!cgi_parse_result.IsOk()) {
+		return GetErrorResponse(client_fd, INTERNAL_ERROR);
+	}
+	HttpRequestParsedData data = storage_.GetClientSaveData(client_fd);
+
+	result.is_connection_keep =
+		HttpResponse::IsConnectionKeep(data.request_result.request.header_fields);
+	result.is_response_complete = true;
+	result.request_buf          = data.current_buf;
+	result.response =
+		HttpResponse::GetResponseFromCgi(cgi_parse_result.GetValue(), data.request_result);
+	storage_.DeleteClientSaveData(client_fd);
 	return result;
 }
 
@@ -38,7 +51,7 @@ utils::Result<void> Http::ParseHttpRequestFormat(int client_fd, const std::strin
 	HttpRequestParsedData save_data = storage_.GetClientSaveData(client_fd);
 	save_data.current_buf += read_buf;
 	try {
-		HttpParse::TmpRunHttpResultVersion(save_data);
+		HttpParse::Run(save_data);
 	} catch (const HttpException &e) {
 		save_data.request_result.status_code = e.GetStatusCode();
 		result.Set(false);
@@ -47,52 +60,52 @@ utils::Result<void> Http::ParseHttpRequestFormat(int client_fd, const std::strin
 	return result;
 }
 
-// HttpResult CreateTimeoutRequest(client_fd) {
-// HttpResult result;
-// HttpRequestParsedData data = storage_.GetClientSaveData(client_fd);
-// result.is_response_complete = true;
-// result.response = HttpResponse::CreateTimeoutRequest(data.request_result);
-// result.request_buf = data.request_buf;
-// todo: HttpResponse::IsConnectionKeep
-// result.is_connection_keep = ;
-// storage_.DeleteClientSaveData(client_fd);
-// return result;
-// }
+HttpResult Http::CreateHttpResponse(
+	const ClientInfos &client_info, const server::VirtualServerAddrList &server_info
+) {
+	HttpResult            result;
+	HttpRequestParsedData data = storage_.GetClientSaveData(client_info.fd);
+	result.is_connection_keep =
+		HttpResponse::IsConnectionKeep(data.request_result.request.header_fields);
+	result.request_buf = data.current_buf;
+	result.response =
+		HttpResponse::Run(client_info, server_info, data.request_result, result.cgi_result);
+	// todo: 仮。CGI実行中はfalseにしたい
+	result.is_response_complete = !result.cgi_result.is_cgi;
+	if (!result.cgi_result.is_cgi) { // cgiの場合はcgiのhttp_responseを作るときにsave_dataが必要
+		storage_.DeleteClientSaveData(client_info.fd);
+	}
+	return result;
+}
 
-// HttpResult CreateInternalServerError(client_fd)
-// HttpResult result;
-// HttpRequestParsedData data = storage_.GetClientSaveData(client_fd);
-// result.is_response_complete = true;
-// result.response = HttpResponse::CreateInternalServerError(data.request_result);;
-// result.request_buf = data.request_buf;
-// todo: HttpResponse::IsConnectionKeep
-// result.is_connection_keep = ;
-// storage_.DeleteClientSaveData(client_fd);
-// return result;
-// }
+HttpResult Http::GetErrorResponse(int client_fd, ErrorState state) {
+	HttpResult            result;
+	HttpRequestParsedData data  = storage_.GetClientSaveData(client_fd);
+	result.is_response_complete = true;
+	result.is_connection_keep   = false;
+	result.request_buf          = data.current_buf;
+	switch (state) {
+	case TIMEOUT:
+		result.response = HttpResponse::CreateErrorResponse(StatusCode(REQUEST_TIMEOUT));
+		break;
+	case INTERNAL_ERROR:
+		result.response = HttpResponse::CreateErrorResponse(StatusCode(INTERNAL_SERVER_ERROR));
+		break;
+	default:
+		break;
+	}
+	storage_.DeleteClientSaveData(client_fd);
+	return result;
+}
 
 HttpResult Http::CreateBadRequestResponse(int client_fd) {
 	HttpResult            result;
 	HttpRequestParsedData data  = storage_.GetClientSaveData(client_fd);
 	result.is_response_complete = true;
-	// todo: BadRequestの場合はkeep-aliveにするかcloseにするか(現在はclose)
-	result.is_connection_keep = false;
-	result.request_buf        = data.current_buf;
-	result.response           = HttpResponse::CreateBadRequestResponse(data.request_result);
-	storage_.DeleteClientSaveData(client_fd);
-	return result;
-}
-
-HttpResult Http::CreateHttpResponse(
-	const ClientInfos &client_info, const server::VirtualServerAddrList &server_info
-) {
-	HttpResult            result;
-	HttpRequestParsedData data  = storage_.GetClientSaveData(client_info.fd);
-	result.is_connection_keep   = IsConnectionKeep(client_info.fd);
-	result.is_response_complete = true;
+	result.is_connection_keep   = false;
 	result.request_buf          = data.current_buf;
-	result.response             = HttpResponse::Run(client_info, server_info, data.request_result);
-	storage_.DeleteClientSaveData(client_info.fd);
+	result.response             = HttpResponse::CreateErrorResponse(StatusCode(BAD_REQUEST));
+	storage_.DeleteClientSaveData(client_fd);
 	return result;
 }
 
@@ -102,11 +115,6 @@ bool Http::IsHttpRequestFormatComplete(int client_fd) {
 	return save_data.is_request_format.is_request_line &&
 		   save_data.is_request_format.is_header_fields &&
 		   save_data.is_request_format.is_body_message;
-}
-
-bool Http::IsConnectionKeep(int client_fd) {
-	HttpRequestParsedData save_data = storage_.GetClientSaveData(client_fd);
-	return HttpResponse::IsConnectionKeep(save_data.request_result.request.header_fields);
 }
 
 // For test
