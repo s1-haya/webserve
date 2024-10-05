@@ -194,6 +194,8 @@ void Server::HandleErrorEvent(int fd) {
 		return;
 	}
 	const int client_fd = IsCgi(fd) ? cgi_manager_.GetClientFd(fd) : fd;
+	std::cout << "HandleErrorEvent" << std::endl;
+	std::cout << "client_fd: " << client_fd << std::endl;
 	SetInternalServerError(client_fd);
 }
 
@@ -550,6 +552,7 @@ void Server::HandleCgi(int client_fd, const http::CgiResult &cgi_result) {
 		return;
 	}
 	try {
+		// std::cout << client_fd << std::endl;
 		cgi_manager_.AddNewCgi(client_fd, cgi_result.cgi_request);
 		// RunCgi() is called only when a new Cgi is added via AddNewCgi().
 		cgi_manager_.RunCgi(client_fd);
@@ -626,10 +629,14 @@ Server::CgiResponseResult Server::AddAndGetCgiResponse(int client_fd, const std:
 }
 
 void Server::GetHttpResponseFromCgiResponse(int client_fd, const cgi::CgiResponse &cgi_response) {
-	const http::HttpResult http_result = http_.GetResponseFromCgi(client_fd, cgi_response);
+	http::HttpResult http_result = http_.GetResponseFromCgi(client_fd, cgi_response);
 
 	message_manager_.SetNewRequestBuf(client_fd, http_result.request_buf);
-	if (!http_result.is_response_complete) {
+	if (http_result.is_local_redirect) {
+		std::cout << http_result.response << std::endl;
+		message_manager_.AppendRequestBuf(client_fd, http_result.response);
+		std::cout << "request_buf: " << message_manager_.GetRequestBuf(client_fd) << std::endl;
+	} else if (!http_result.is_response_complete) {
 		throw std::logic_error("GetResponseFromCgi: incorrect HttpResult");
 	}
 	message_manager_.SetIsCompleteRequest(client_fd, true);
@@ -637,8 +644,8 @@ void Server::GetHttpResponseFromCgiResponse(int client_fd, const cgi::CgiRespons
 
 	const message::ConnectionState connection_state =
 		http_result.is_connection_keep ? message::KEEP : message::CLOSE;
-	message_manager_.AddNormalResponse(client_fd, connection_state, http_result.response);
 	UpdateEventInCgiResponseComplete(connection_state, client_fd);
+	message_manager_.AddNormalResponse(client_fd, connection_state, http_result.response);
 }
 
 void Server::UpdateEventInCgiResponseComplete(

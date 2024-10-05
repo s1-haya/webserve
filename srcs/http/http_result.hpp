@@ -14,10 +14,12 @@ struct CgiResult {
 };
 
 struct HttpResult {
-	HttpResult() : is_response_complete(false), is_connection_keep(true) {}
+	HttpResult()
+		: is_response_complete(false), is_connection_keep(true), is_local_redirect(false) {}
 
 	bool        is_response_complete;
 	bool        is_connection_keep;
+	bool        is_local_redirect;
 	std::string request_buf;
 	std::string response;
 	CgiResult   cgi_result;

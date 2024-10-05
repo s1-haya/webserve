@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 # リダイレクト先のURLを設定
-my $redirect_url = "http://localhost:8080/";
+my $redirect_url = "/cgi-bin/print_env.pl";
 
 # HTTPヘッダーを出力
 print "Status: 302 Found\r\n";

@@ -8,6 +8,22 @@
 #include <iostream>
 
 namespace http {
+namespace {
+
+bool StartWith(const std::string &str, const std::string &prefix) {
+	if (prefix.length() > str.length()) {
+		return false;
+	}
+	return str.compare(0, prefix.length(), prefix) == 0;
+}
+
+std::string CreateLocalRedirectRequest(const std::string &location) {
+	std::string response;
+	response += "GET " + location + " HTTP/1.1\r\nHost: localhost:8080\r\n\r\n";
+	return response;
+}
+
+} // namespace
 
 Http::Http() {}
 
@@ -34,12 +50,24 @@ HttpResult Http::GetResponseFromCgi(int client_fd, const cgi::CgiResponse &cgi_r
 	if (!cgi_parse_result.IsOk()) {
 		return GetErrorResponse(client_fd, INTERNAL_ERROR);
 	}
+	cgi::CgiResponseParse::HeaderFields header_fields = cgi_parse_result.GetValue().header_fields;
+	if (header_fields.find(LOCATION) != header_fields.end() &&
+		StartWith(header_fields[LOCATION], "/")) {
+		std::cout << header_fields.at(LOCATION) << std::endl;
+		result.is_local_redirect   = true;
+		HttpRequestParsedData data = storage_.GetClientSaveData(client_fd);
+		result.response            = CreateLocalRedirectRequest(header_fields[LOCATION]);
+		result.is_connection_keep =
+			HttpResponse::IsConnectionKeep(data.request_result.request.header_fields);
+		result.is_response_complete = true;
+		result.request_buf          = data.current_buf;
+		storage_.DeleteClientSaveData(client_fd);
+		return result;
+	}
 	HttpRequestParsedData data = storage_.GetClientSaveData(client_fd);
-
 	result.is_connection_keep =
 		HttpResponse::IsConnectionKeep(data.request_result.request.header_fields);
 	result.is_response_complete = true;
-	result.request_buf          = data.current_buf;
 	result.response =
 		HttpResponse::GetResponseFromCgi(cgi_parse_result.GetValue(), data.request_result);
 	storage_.DeleteClientSaveData(client_fd);

@@ -72,6 +72,15 @@ void MessageManager::AddRequestBuf(int client_fd, const std::string &request_buf
 	}
 }
 
+void MessageManager::AppendRequestBuf(int client_fd, const std::string &request_buf) {
+	try {
+		message::Message &message = messages_.at(client_fd);
+		message.AppendRequestBuf(request_buf);
+	} catch (const std::exception &e) {
+		throw std::logic_error("AppendRequestBuf: " + std::string(e.what()));
+	}
+}
+
 void MessageManager::SetNewRequestBuf(int client_fd, const std::string &request_buf) {
 	try {
 		message::Message &message = messages_.at(client_fd);
