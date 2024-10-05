@@ -163,9 +163,9 @@ int TestHeaderFieldWithOws() {
 	}
 
 	CgiResponseParse::ParsedData expected;
-	expected.header_fields["Content-Length"] = "5";
-	expected.header_fields["Content-Type"]   = "text/plain";
-	expected.body                            = "Hello";
+	expected.header_fields[http::CONTENT_LENGTH] = "5";
+	expected.header_fields[http::CONTENT_TYPE]   = http::TEXT_PLAIN;
+	expected.body                                = "Hello";
 	return HandleTestResult(CompareParsedData(expected, result.GetValue()));
 }
 

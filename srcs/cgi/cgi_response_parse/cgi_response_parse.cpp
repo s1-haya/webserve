@@ -45,7 +45,7 @@ utils::Result<void> CheckValidHeaderFieldNameAndValue(
 		utils::Debug("CgiResponseParse", "Header field name has space");
 		return result;
 	}
-	if (header_field_name == "Content-Length" &&
+	if (header_field_name == http::CONTENT_LENGTH &&
 		!utils::ConvertStrToSize(header_field_value).IsOk()) {
 		utils::Debug("CgiResponseParse", "Invalid Content-Length: " + header_field_value);
 		return result;
@@ -96,17 +96,13 @@ CgiResponseParse::ParseHeaderFields(const std::string &header, HeaderFields &hea
 			utils::Debug("CgiResponseParse", "Invalid header field format: " + line);
 			return result;
 		}
-		std::string key                         = line.substr(0, colon_pos);
-		std::string value                       = line.substr(colon_pos + 1);
+		std::string key                         = utils::ToLowerString(line.substr(0, colon_pos));
+		std::string value                       = utils::ToLowerString(line.substr(colon_pos + 1));
 		value                                   = TrimOws(value);
 		utils::Result<void> check_header_result = CheckValidHeaderFieldNameAndValue(key, value);
 		if (!check_header_result.IsOk()) {
 			return result;
 		}
-		std::string key   = line.substr(0, colon_pos);
-		std::string value = line.substr(colon_pos + 1);
-		value             = TrimOws(value);
-		// todo: validation(HttpParseの処理をそのまま使う)
 		header_fields[key] = value;
 	}
 	result.Set(true);
