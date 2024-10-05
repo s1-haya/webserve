@@ -28,8 +28,6 @@ TranslateToScriptName(const std::string &cgi_extension, const std::string &reque
 		if (!EndWith(script_name, cgi_extension)) {
 			const std::string::size_type extension_pos = script_name.find(cgi_extension);
 			// /aa.cgi/bb の場合、/aa.cgi のみを返す
-			std::cout << "script_name: " << script_name << std::endl;
-			std::cout << script_name.substr(0, extension_pos + cgi_extension.length()) << std::endl;
 			return script_name.substr(0, extension_pos + cgi_extension.length());
 		}
 		return script_name;
