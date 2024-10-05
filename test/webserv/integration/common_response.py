@@ -66,8 +66,11 @@ response_header_get_root_200_keep = create_response_header(
 response_header_get_sub_200_close = create_response_header(
     200, CLOSE, sub_index_file_length, TEXT_HTML
 )
-response_header_201 = create_response_header(
+response_header_201_close = create_response_header(
     201, CLOSE, created_file_201_length, TEXT_HTML
+)
+response_header_201_keep = create_response_header(
+    201, KEEP_ALIVE, created_file_201_length, TEXT_HTML
 )
 response_header_204 = create_response_header(
     204, CLOSE, no_content_file_204_length, TEXT_HTML
@@ -88,7 +91,8 @@ response_header_501 = create_response_header(
     501, CLOSE, not_implemented_file_501_length, TEXT_HTML
 )
 
-created_response = response_header_201 + created_file_201.decode("utf-8")
+created_response_close = response_header_201_close + created_file_201.decode("utf-8")
+created_response_keep = response_header_201_keep + created_file_201.decode("utf-8")
 no_content_response = response_header_204 + no_content_file_204.decode("utf-8")
 bad_request_response = response_header_400 + bad_request_file_400.decode("utf-8")
 not_found_response = response_header_404 + not_found_file_404.decode("utf-8")

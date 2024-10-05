@@ -42,20 +42,27 @@ def assert_uploaded_file_content(upload_file_path, expected_upload_file_content)
     [
         (
             REQUEST_POST_2XX_DIR + "201_01_upload_file.txt",
-            created_response,
+            created_response_close,
             UPLOAD_FILE_PATH,
             "abcde",
         ),
         (
             REQUEST_POST_2XX_DIR + "201_02_chunked.txt",
-            created_response,
+            created_response_close,
             UPLOAD_DIR + "chunked_request_file",
             "SAWAMURA HAYATO",
+        ),
+        (
+            REQUEST_POST_2XX_DIR + "201_03_upload_file_204_same_upload_file.txt",
+            created_response_keep + no_content_response,
+            UPLOAD_FILE_PATH,
+            "first",
         ),
     ],
     ids=[
         "201_01_upload_file",
         "201_02_chunked",
+        "201_03_upload_file_204_same_upload_file",
     ],
 )
 def test_post_upload_responses(
