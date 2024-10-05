@@ -303,11 +303,11 @@ void HttpParse::CheckValidHeaderFieldNameAndValue(
 			"Error: the name of Header field has a space.", StatusCode(BAD_REQUEST)
 		);
 	}
-	if (header_field_name == "Host" && header_field_value.empty()) {
+	if (header_field_name == HOST && header_field_value.empty()) {
 		throw HttpException(
 			"Error: the value of Host header field is empty.", StatusCode(BAD_REQUEST)
 		);
-	} else if (header_field_name == "Content-Length" &&
+	} else if (header_field_name == CONTENT_LENGTH &&
 			   !utils::ConvertStrToSize(header_field_value).IsOk()) {
 		throw HttpException(
 			"Error: the value of Content-Length header field is not a number.",

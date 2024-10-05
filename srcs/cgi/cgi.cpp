@@ -210,7 +210,7 @@ CgiResponse Cgi::AddAndGetResponse(const std::string &read_buf) {
 	if (read_buf.empty()) {
 		is_response_complete_ = true;
 	}
-	return CgiResponse(response_body_message_, "text/plain", is_response_complete_);
+	return CgiResponse(response_body_message_, http::TEXT_PLAIN, is_response_complete_);
 	// text/plainのみ対応
 }
 
