@@ -3,7 +3,7 @@
 import os
 
 def print_ok():
-	print("Content-Type: text/plain\r\n\r\n")
+	print("Content-type: text/plain\n\n")
 	print("OK")
 
 
