@@ -2,8 +2,9 @@ import socket
 from http.client import HTTPConnection, HTTPException
 from typing import Optional
 
-from common import (assert_response, response_header_get_root_200_keep,
-                    root_index_file, timeout_response)
+from common_functions import assert_response
+from common_response import (response_header_get_root_200_keep,
+                             root_index_file, timeout_response)
 
 # serverのtimeout+αを設定する
 TIMEOUT = 4.0

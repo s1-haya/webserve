@@ -1,20 +1,8 @@
-def read_file(file):
-    with open(file, "r") as f:
-        data = f.read()
-        return data, len(data)
+from common_functions import read_file, read_file_binary
 
-
-# \r\nをそのまま読み込む用(ヘッダー部分)
-def read_file_binary(file):
-    with open(file, "rb") as f:
-        data = f.read()
-    return data, len(data)
-
-
-def assert_response(response, expected_response):
-    assert (
-        response == expected_response
-    ), f"Expected response\n\n {repr(expected_response)}, but got\n\n {repr(response)}"
+KEEP_ALIVE = "keep-alive"
+CLOSE = "close"
+TEXT_HTML = "text/html"
 
 
 def create_response_header(
@@ -49,15 +37,6 @@ for filename, data_var, length_var in error_files:
     globals()[data_var] = data
     globals()[length_var] = length
 
-
-REQUEST_DIR = "test/common/request/"
-REQUEST_GET_2XX_DIR = REQUEST_DIR + "get/2xx/"
-REQUEST_GET_4XX_DIR = REQUEST_DIR + "get/4xx/"
-REQUEST_GET_5XX_DIR = REQUEST_DIR + "get/5xx/"
-
-KEEP_ALIVE = "keep-alive"
-CLOSE = "close"
-TEXT_HTML = "text/html"
 
 response_header_get_root_200_close = create_response_header(
     200, "OK", CLOSE, root_index_file_length, TEXT_HTML
