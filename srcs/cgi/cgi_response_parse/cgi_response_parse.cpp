@@ -1,11 +1,10 @@
 #include "cgi_response_parse.hpp"
+#include "http_message.hpp"
 #include "utils.hpp"
 
 namespace cgi {
 
-const std::string CgiResponseParse::CRLF              = "\r\n";
-const std::string CgiResponseParse::HEADER_FIELDS_END = CRLF + CRLF;
-const std::string CgiResponseParse::OWS               = " \t";
+const std::string CgiResponseParse::OWS = " \t";
 
 CgiResponseParse::CgiResponseParse() {}
 
@@ -14,16 +13,16 @@ CgiResponseParse::~CgiResponseParse() {}
 utils::Result<CgiResponseParse::ParsedData> CgiResponseParse::Parse(const std::string &response) {
 	ParsedData                parsed_data;
 	utils::Result<ParsedData> result(false, parsed_data);
-	size_t                    pos = response.find(HEADER_FIELDS_END);
+	size_t                    pos = response.find(http::HEADER_FIELDS_END);
 	if (pos == std::string::npos) {
 		return result;
 	}
-	std::string         header = response.substr(0, pos + CRLF.size()); // CRLFも含めたいため
+	std::string header = response.substr(0, pos + http::CRLF.size()); // CRLFも含めたいため
 	utils::Result<void> parse_result = ParseHeaderFields(header, parsed_data.header_fields);
 	if (!parse_result.IsOk()) {
 		return result;
 	}
-	parse_result = ParseBody(response.substr(pos + HEADER_FIELDS_END.size()), parsed_data);
+	parse_result = ParseBody(response.substr(pos + http::HEADER_FIELDS_END.size()), parsed_data);
 	if (!parse_result.IsOk()) {
 		return result;
 	}
@@ -36,12 +35,12 @@ CgiResponseParse::ParseHeaderFields(const std::string &header, HeaderFields &hea
 	std::string::size_type pos = 0;
 	// todo: err処理
 	while (pos < header.size()) {
-		std::string::size_type end_of_line = header.find(CRLF, pos);
+		std::string::size_type end_of_line = header.find(http::CRLF, pos);
 		if (end_of_line == std::string::npos) {
 			break;
 		}
 		std::string line                 = header.substr(pos, end_of_line - pos);
-		pos                              = end_of_line + CRLF.size();
+		pos                              = end_of_line + http::CRLF.size();
 		std::string::size_type colon_pos = line.find(":");
 		if (colon_pos == std::string::npos) {
 			return result;
@@ -58,7 +57,7 @@ CgiResponseParse::ParseHeaderFields(const std::string &header, HeaderFields &hea
 
 utils::Result<void> CgiResponseParse::ParseBody(const std::string &body, ParsedData &parsed_data) {
 	utils::Result<void>    result(false);
-	HeaderFields::iterator it = parsed_data.header_fields.find("Content-Length");
+	HeaderFields::iterator it = parsed_data.header_fields.find(http::CONTENT_LENGTH);
 	if (it != parsed_data.header_fields.end()) {
 		utils::Result<std::size_t> convert_result = utils::ConvertStrToSize(it->second);
 		if (!convert_result.IsOk()) {
