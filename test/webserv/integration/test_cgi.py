@@ -1,7 +1,10 @@
 import unittest
-from http_module.assert_http_response import assert_body, assert_header, assert_status_line
-from http.client import HTTPConnection, HTTPException
 from http import HTTPStatus
+from http.client import HTTPConnection, HTTPException
+
+from http_module.assert_http_response import (assert_body, assert_header,
+                                              assert_status_line)
+
 
 class TestCGI(unittest.TestCase):
     def setUp(self):
@@ -48,7 +51,7 @@ class TestCGI(unittest.TestCase):
             self.assertIn("SERVER_SOFTWARE:", body)
         except HTTPException as e:
             self.fail(f"Request failed: {e}")
-    
+
     def test_print_ok_py(self):
         try:
             self.con.request("GET", "/cgi-bin/print_ok.py")
@@ -58,7 +61,7 @@ class TestCGI(unittest.TestCase):
             assert_body(response, "root/cgi-bin/print_ok.py")
         except HTTPException as e:
             self.fail(f"Request failed: {e}")
-    
+
     def test_print_stdin_pl(self):
         try:
             headers = {"Content-Type": "application/x-www-form-urlencoded"}
@@ -81,9 +84,6 @@ class TestCGI(unittest.TestCase):
             self.assertIn(b"No POST data received.", response.read())
         except HTTPException as e:
             self.fail(f"Request failed: {e}")
-        
-    
 
     # todo: PathInfo(マージ後追加)
     # todo: error (マージ後追加)
-            
