@@ -28,6 +28,24 @@ class TestCGI(unittest.TestCase):
             response = self.con.getresponse()
             assert_status_line(response, HTTPStatus.OK)
             assert_header(response, "Connection", "keep-alive")
+            body = response.read().decode()
+            self.assertIn("AUTH_TYPE:", body)
+            self.assertIn("CONTENT_LENGTH:", body)
+            self.assertIn("CONTENT_TYPE:", body)
+            self.assertIn("GATEWAY_INTERFACE:", body)
+            self.assertIn("PATH_INFO:", body)
+            self.assertIn("PATH_TRANSLATED:", body)
+            self.assertIn("QUERY_STRING:", body)
+            self.assertIn("REMOTE_ADDR:", body)
+            self.assertIn("REMOTE_HOST:", body)
+            self.assertIn("REMOTE_IDENT:", body)
+            self.assertIn("REMOTE_USER:", body)
+            self.assertIn("REQUEST_METHOD:", body)
+            self.assertIn("SCRIPT_NAME:", body)
+            self.assertIn("SERVER_NAME:", body)
+            self.assertIn("SERVER_PORT:", body)
+            self.assertIn("SERVER_PROTOCOL:", body)
+            self.assertIn("SERVER_SOFTWARE:", body)
         except HTTPException as e:
             self.fail(f"Request failed: {e}")
     
@@ -63,6 +81,8 @@ class TestCGI(unittest.TestCase):
             self.assertIn(b"No POST data received.", response.read())
         except HTTPException as e:
             self.fail(f"Request failed: {e}")
+        
+    
 
     # todo: PathInfo(マージ後追加)
     # todo: error (マージ後追加)
