@@ -96,6 +96,10 @@ def send_request_and_assert_response(request_file, expected_response):
             REQUEST_GET_4XX_DIR + "400_08_wrong_http_version.txt",
             bad_request_response,
         ),
+        (
+            REQUEST_GET_4XX_DIR + "400_09_no_host.txt",
+            bad_request_response,
+        ),
         (REQUEST_GET_4XX_DIR + "400_10_duplicate_host.txt", bad_request_response),
         (
             REQUEST_GET_4XX_DIR + "400_11_no_header_field_colon.txt",

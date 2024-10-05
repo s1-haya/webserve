@@ -131,6 +131,12 @@ ChunkDataResult GetChunkData(
 	return result;
 }
 
+void ThrowMissingHostHeaderField(const HeaderFields &header_fields) {
+	if (header_fields.count(HOST) == 0) {
+		throw HttpException("Error: missing Host header field.", StatusCode(BAD_REQUEST));
+	}
+}
+
 } // namespace
 
 void HttpParse::ParseRequestLine(HttpRequestParsedData &data) {
@@ -287,6 +293,7 @@ HeaderFields HttpParse::SetHeaderFields(const std::vector<std::string> &header_f
 			);
 		}
 	}
+	ThrowMissingHostHeaderField(header_fields);
 	return header_fields;
 }
 
