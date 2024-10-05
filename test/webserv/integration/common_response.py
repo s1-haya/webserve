@@ -24,7 +24,7 @@ def create_response_header(
 root_index_file, root_index_file_length = read_file("root/html/index.html")
 sub_index_file, sub_index_file_length = read_file("root/html/sub/index.html")
 
-error_files = [
+ERROR_FILES = (
     ("400_bad_request.txt", "bad_request_file_400", "bad_request_file_400_length"),
     ("404_not_found.txt", "not_found_file_404", "not_found_file_404_length"),
     (
@@ -38,9 +38,10 @@ error_files = [
         "not_implemented_file_501",
         "not_implemented_file_501_length",
     ),
-]
+)
 
-for filename, data_var, length_var in error_files:
+
+for filename, data_var, length_var in ERROR_FILES:
     data, length = read_file_binary(
         f"test/webserv/expected_response/default_body_message/{filename}"
     )
