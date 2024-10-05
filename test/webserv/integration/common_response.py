@@ -7,12 +7,15 @@ TEXT_HTML = "text/html"
 
 STATUS = {
     200: "OK",
+    201: "Created",
     400: "Bad Request",
     404: "Not Found",
     405: "Method Not Allowed",
     408: "Request Timeout",
     501: "Not Implemented",
 }
+
+SUCCESS_FILES = (("201_created.txt", "created_file_201", "created_file_201_length"),)
 
 ERROR_FILES = (
     ("400_bad_request.txt", "bad_request_file_400", "bad_request_file_400_length"),
@@ -31,12 +34,13 @@ ERROR_FILES = (
 )
 
 
-for filename, data_var, length_var in ERROR_FILES:
-    data, length = read_file_binary(
-        f"test/webserv/expected_response/default_body_message/{filename}"
-    )
-    globals()[data_var] = data
-    globals()[length_var] = length
+for files in (SUCCESS_FILES, ERROR_FILES):
+    for filename, data_var, length_var in files:
+        data, length = read_file_binary(
+            f"test/webserv/expected_response/default_body_message/{filename}"
+        )
+        globals()[data_var] = data
+        globals()[length_var] = length
 
 
 def create_response_header(
@@ -58,6 +62,9 @@ response_header_get_root_200_keep = create_response_header(
 response_header_get_sub_200_close = create_response_header(
     200, CLOSE, sub_index_file_length, TEXT_HTML
 )
+response_header_201 = create_response_header(
+    201, CLOSE, created_file_201_length, TEXT_HTML
+)
 response_header_400 = create_response_header(
     400, CLOSE, bad_request_file_400_length, TEXT_HTML
 )
@@ -74,6 +81,7 @@ response_header_501 = create_response_header(
     501, CLOSE, not_implemented_file_501_length, TEXT_HTML
 )
 
+created_response = response_header_201 + created_file_201.decode("utf-8")
 bad_request_response = response_header_400 + bad_request_file_400.decode("utf-8")
 not_found_response = response_header_404 + not_found_file_404.decode("utf-8")
 not_allowed_response = response_header_405 + not_allowed_file_405.decode("utf-8")
