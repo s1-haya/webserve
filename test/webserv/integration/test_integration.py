@@ -50,6 +50,14 @@ def send_request_and_assert_response(request_file, expected_response):
             response_header_get_sub_200_close + sub_index_file,
         ),
         (
+            REQUEST_GET_2XX_DIR + "200_07_no_connection_value.txt",
+            response_header_get_root_200_keep + root_index_file,
+        ),
+        (
+            REQUEST_GET_2XX_DIR + "200_08_wrong_connection_value.txt",
+            response_header_get_root_200_keep + root_index_file,
+        ),
+        (
             REQUEST_GET_2XX_DIR + "200_12_header_field_value_space.txt",
             response_header_get_root_200_close + root_index_file,
         ),
@@ -88,6 +96,10 @@ def send_request_and_assert_response(request_file, expected_response):
             REQUEST_GET_4XX_DIR + "400_08_wrong_http_version.txt",
             bad_request_response,
         ),
+        (
+            REQUEST_GET_4XX_DIR + "400_09_no_host.txt",
+            bad_request_response,
+        ),
         (REQUEST_GET_4XX_DIR + "400_10_duplicate_host.txt", bad_request_response),
         (
             REQUEST_GET_4XX_DIR + "400_11_no_header_field_colon.txt",
@@ -115,6 +127,14 @@ def send_request_and_assert_response(request_file, expected_response):
         ),
         (
             REQUEST_GET_4XX_DIR + "400_19_non_vchr_header_field_value.txt",
+            bad_request_response,
+        ),
+        (
+            REQUEST_GET_4XX_DIR + "400_20_too_few_status_line_elements.txt",
+            bad_request_response,
+        ),
+        (
+            REQUEST_GET_4XX_DIR + "400_21_too_many_status_line_elements.txt",
             bad_request_response,
         ),
         (REQUEST_GET_4XX_DIR + "404_01_not_exist_path.txt", not_found_response),

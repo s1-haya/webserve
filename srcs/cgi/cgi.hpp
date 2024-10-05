@@ -9,16 +9,9 @@ namespace cgi {
 struct CgiResponse {
 	// parse等の他の処理で決まるのでstatus_codeはここにはいらない
 	std::string response;
-	std::string content_type;
 	bool        is_response_complete;
-	CgiResponse(
-		const std::string &response             = "",
-		const std::string &content_type         = "",
-		bool               is_response_complete = false
-	)
-		: response(response),
-		  content_type(content_type),
-		  is_response_complete(is_response_complete) {}
+	CgiResponse(const std::string &response = "", bool is_response_complete = false)
+		: response(response), is_response_complete(is_response_complete) {}
 };
 
 class Cgi {
