@@ -14,15 +14,22 @@ std::string CreatePathInfo(const std::string &cgi_extension, const std::string &
 	return "";
 }
 
+bool EndWith(const std::string &str, const std::string &suffix) {
+	return str.size() >= suffix.size() &&
+		   str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0;
+}
+
 std::string
 TranslateToScriptName(const std::string &cgi_extension, const std::string &request_target) {
 	// from root path
-	const std::string::size_type extension_pos = request_target.find(cgi_extension);
-	const std::string::size_type root_pos      = request_target.find("root/cgi-bin/");
+	const std::string::size_type root_pos = request_target.find("root/cgi-bin/");
 	if (root_pos != std::string::npos) {
 		const std::string script_name = request_target.substr(root_pos);
-		if (extension_pos != std::string::npos) {
+		if (!EndWith(script_name, cgi_extension)) {
+			const std::string::size_type extension_pos = script_name.find(cgi_extension);
 			// /aa.cgi/bb の場合、/aa.cgi のみを返す
+			std::cout << "script_name: " << script_name << std::endl;
+			std::cout << script_name.substr(0, extension_pos + cgi_extension.length()) << std::endl;
 			return script_name.substr(0, extension_pos + cgi_extension.length());
 		}
 		return script_name;
