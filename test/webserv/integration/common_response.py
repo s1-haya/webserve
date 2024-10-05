@@ -14,16 +14,6 @@ STATUS = {
     501: "Not Implemented",
 }
 
-
-def create_response_header(
-    status_code, connection, content_length, content_type=TEXT_PLAIN
-):
-    return f"HTTP/1.1 {status_code} {STATUS[status_code]}\r\nConnection: {connection}\r\nContent-Length: {content_length}\r\nContent-Type: {content_type}\r\nServer: webserv/1.1\r\n\r\n"
-
-
-root_index_file, root_index_file_length = read_file("root/html/index.html")
-sub_index_file, sub_index_file_length = read_file("root/html/sub/index.html")
-
 ERROR_FILES = (
     ("400_bad_request.txt", "bad_request_file_400", "bad_request_file_400_length"),
     ("404_not_found.txt", "not_found_file_404", "not_found_file_404_length"),
@@ -47,6 +37,16 @@ for filename, data_var, length_var in ERROR_FILES:
     )
     globals()[data_var] = data
     globals()[length_var] = length
+
+
+def create_response_header(
+    status_code, connection, content_length, content_type=TEXT_PLAIN
+):
+    return f"HTTP/1.1 {status_code} {STATUS[status_code]}\r\nConnection: {connection}\r\nContent-Length: {content_length}\r\nContent-Type: {content_type}\r\nServer: webserv/1.1\r\n\r\n"
+
+
+root_index_file, root_index_file_length = read_file("root/html/index.html")
+sub_index_file, sub_index_file_length = read_file("root/html/sub/index.html")
 
 
 response_header_get_root_200_close = create_response_header(
