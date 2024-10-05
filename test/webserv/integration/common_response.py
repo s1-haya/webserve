@@ -2,6 +2,7 @@ from common_functions import read_file, read_file_binary
 
 KEEP_ALIVE = "keep-alive"
 CLOSE = "close"
+TEXT_PLAIN = "text/plain"
 TEXT_HTML = "text/html"
 
 STATUS = {
@@ -15,7 +16,7 @@ STATUS = {
 
 
 def create_response_header(
-    status_code, connection, content_length, content_type="text/plain"
+    status_code, connection, content_length, content_type=TEXT_PLAIN
 ):
     return f"HTTP/1.1 {status_code} {STATUS[status_code]}\r\nConnection: {connection}\r\nContent-Length: {content_length}\r\nContent-Type: {content_type}\r\nServer: webserv/1.1\r\n\r\n"
 
