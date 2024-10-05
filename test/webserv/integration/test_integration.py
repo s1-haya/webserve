@@ -50,6 +50,27 @@ def send_request_and_assert_response(request_file, expected_response):
             response_header_get_sub_200_close + sub_index_file,
         ),
         (
+            REQUEST_GET_2XX_DIR
+            + "200_04_connection_keep_alive_and_200_connection_keep_alive.txt",
+            response_header_get_root_200_keep
+            + root_index_file
+            + response_header_get_root_200_keep
+            + root_index_file,
+        ),
+        (
+            REQUEST_GET_2XX_DIR
+            + "200_05_connection_close_and_200_connection_close.txt",
+            response_header_get_root_200_close + root_index_file,
+        ),
+        (
+            REQUEST_GET_2XX_DIR
+            + "200_06_connection_keep_alive_and_200_connection_close.txt",
+            response_header_get_root_200_keep
+            + root_index_file
+            + response_header_get_root_200_close
+            + root_index_file,
+        ),
+        (
             REQUEST_GET_2XX_DIR + "200_07_no_connection_value.txt",
             response_header_get_root_200_keep + root_index_file,
         ),
@@ -76,6 +97,10 @@ def send_request_and_assert_response(request_file, expected_response):
         (
             REQUEST_GET_2XX_DIR + "200_17_not_exist_header_field.txt",
             response_header_get_root_200_close + root_index_file,
+        ),
+        (
+            REQUEST_GET_2XX_DIR + "200_21_no_connection.txt",
+            response_header_get_root_200_keep + root_index_file,
         ),
         (REQUEST_GET_4XX_DIR + "400_02_lower_method.txt", bad_request_response),
         (
@@ -151,6 +176,9 @@ def send_request_and_assert_response(request_file, expected_response):
         "200_01_connection_close",
         "200_02_connection_keep",
         "200_03_sub_connection_close",
+        "200_04_connection_keep_alive_and_200_connection_keep_alive",
+        "200_05_connection_close_and_200_connection_close",
+        "200_06_connection_keep_alive_and_200_connection_close",
         "200_07_no_connection_value",
         "200_08_wrong_connection_value",
         "200_12_header_field_value_space",
@@ -158,6 +186,7 @@ def send_request_and_assert_response(request_file, expected_response):
         "200_14_extra_request",
         "200_15_body_message_default",
         "200_17_not_exist_header_field",
+        "200_21_no_connection",
         "400_02_lower_method",
         "400_03_no_ascii_method",
         "400_04_no_root",
