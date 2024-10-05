@@ -8,6 +8,7 @@ TEXT_HTML = "text/html"
 STATUS = {
     200: "OK",
     201: "Created",
+    204: "No Content",
     400: "Bad Request",
     404: "Not Found",
     405: "Method Not Allowed",
@@ -15,7 +16,10 @@ STATUS = {
     501: "Not Implemented",
 }
 
-SUCCESS_FILES = (("201_created.txt", "created_file_201", "created_file_201_length"),)
+SUCCESS_FILES = (
+    ("201_created.txt", "created_file_201", "created_file_201_length"),
+    ("204_no_content.txt", "no_content_file_204", "no_content_file_204_length"),
+)
 
 ERROR_FILES = (
     ("400_bad_request.txt", "bad_request_file_400", "bad_request_file_400_length"),
@@ -65,6 +69,9 @@ response_header_get_sub_200_close = create_response_header(
 response_header_201 = create_response_header(
     201, CLOSE, created_file_201_length, TEXT_HTML
 )
+response_header_204 = create_response_header(
+    204, CLOSE, no_content_file_204_length, TEXT_HTML
+)
 response_header_400 = create_response_header(
     400, CLOSE, bad_request_file_400_length, TEXT_HTML
 )
@@ -82,6 +89,7 @@ response_header_501 = create_response_header(
 )
 
 created_response = response_header_201 + created_file_201.decode("utf-8")
+no_content_response = response_header_204 + no_content_file_204.decode("utf-8")
 bad_request_response = response_header_400 + bad_request_file_400.decode("utf-8")
 not_found_response = response_header_404 + not_found_file_404.decode("utf-8")
 not_allowed_response = response_header_405 + not_allowed_file_405.decode("utf-8")
