@@ -112,7 +112,7 @@ int Test2() {
 	request.request_line                  = request_line;
 	request.body_message                  = "test";
 	request.header_fields[CONTENT_LENGTH] = "4";
-	request.header_fields[CONTENT_TYPE]   = "text/plain";
+	request.header_fields[CONTENT_TYPE]   = http::TEXT_PLAIN;
 	request.header_fields[HOST]           = "host";
 
 	std::string cgi_script    = "root/cgi-bin/test2.cgi";

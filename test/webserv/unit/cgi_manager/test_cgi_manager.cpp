@@ -229,7 +229,7 @@ int RunTest3() {
 	// "abc"をread()できたとしてresponseに追加
 	std::string buffer = "abc";
 	// addしてgetterを使ってresponseの保持確認
-	cgi::CgiResponse expected_cgi_response("abc", "text/plain", false);
+	cgi::CgiResponse expected_cgi_response("abc", http::TEXT_PLAIN, false);
 	ret_code |=
 		Test(RunAddAndGetResponse(cgi_manager, client_fd, buffer, expected_cgi_response)); // Test4
 
@@ -237,12 +237,12 @@ int RunTest3() {
 	const std::string appended_buffer = "defgh";
 	buffer += appended_buffer;
 	ret_code |= Test(RunAddAndGetResponse(
-		cgi_manager, client_fd, appended_buffer, cgi::CgiResponse(buffer, "text/plain", false)
+		cgi_manager, client_fd, appended_buffer, cgi::CgiResponse(buffer, http::TEXT_PLAIN, false)
 	)); // Test5
 
 	// 最後に""をread()したとして、responseが完成になっているか確認
 	ret_code |= Test(RunAddAndGetResponse(
-		cgi_manager, client_fd, "", cgi::CgiResponse(buffer, "text/plain", true)
+		cgi_manager, client_fd, "", cgi::CgiResponse(buffer, http::TEXT_PLAIN, true)
 	)); // Test6
 
 	return ret_code;
