@@ -31,6 +31,7 @@ const std::string CLOSE                    = "close";
 const std::string CONTENT_TYPE             = "Content-Type";
 const std::string APPLICATION_OCTET_STREAM = "application/octet-stream";
 const std::string MULTIPART_FORM_DATA      = "multipart/form-data";
+const std::string BOUNDARY                 = "boundary";
 const std::string CONTENT_LENGTH           = "Content-Length";
 const std::string TRANSFER_ENCODING        = "Transfer-Encoding";
 const std::string CHUNKED                  = "chunked";
@@ -53,5 +54,9 @@ const std::size_t REQUEST_HEADER_FIELDS_SIZE =
 
 // response header fields
 const std::string SERVER = "Server";
+
+// For multipart/form-data header fields
+const std::string CONTENT_DISPOSITION = "Content-Disposition";
+const std::string FILENAME            = "filename";
 
 } // namespace http

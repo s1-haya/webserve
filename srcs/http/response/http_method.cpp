@@ -281,11 +281,11 @@ StatusCode Method::FileCreationHandlerForMultiPart(
 		std::vector<Method::Part> parts =
 			DecodeMultipartFormData(request_header_fields.at(CONTENT_TYPE), request_body_message);
 		for (std::vector<Method::Part>::iterator it = parts.begin(); it != parts.end(); ++it) {
-			if ((*it).headers.find("Content-Disposition") != (*it).headers.end()) {
+			if ((*it).headers.find(CONTENT_DISPOSITION) != (*it).headers.end()) {
 				std::map<std::string, std::string> content_disposition =
-					ParseContentDisposition((*it).headers["Content-Disposition"]);
-				if (content_disposition.find("filename") != content_disposition.end()) {
-					std::string   file_name = content_disposition["filename"];
+					ParseContentDisposition((*it).headers[CONTENT_DISPOSITION]);
+				if (content_disposition.find(FILENAME) != content_disposition.end()) {
+					std::string   file_name = content_disposition[FILENAME];
 					std::string   file_path = path + "/" + file_name;
 					std::ofstream file(file_path.c_str(), std::ios::binary);
 					if (file.fail()) {
@@ -450,8 +450,8 @@ StatusCode Method::EchoPostHandler(
 // multipart/form-dataをデコードする関数
 // Boundaryを抽出する関数
 std::string Method::ExtractBoundary(const std::string &content_type) {
-	std::string boundary_prefix = "boundary=";
-	std::size_t pos             = content_type.find(boundary_prefix);
+	const std::string boundary_prefix = BOUNDARY + "=";
+	std::size_t       pos             = content_type.find(boundary_prefix);
 	if (pos != std::string::npos) {
 		return "--" + content_type.substr(pos + boundary_prefix.length());
 	}
