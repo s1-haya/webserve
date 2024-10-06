@@ -83,26 +83,6 @@ std::string RemoveQuotes(const std::string &str) {
 	return str;
 }
 
-// Content-Disposition ヘッダーをパースする関数
-std::map<std::string, std::string> ParseContentDisposition(const std::string &header) {
-	std::map<std::string, std::string> result;
-	std::istringstream                 stream(header);
-	std::string                        part;
-
-	// セミコロンで分割
-	while (std::getline(stream, part, ';')) {
-		part            = Trim(part);
-		std::size_t pos = part.find('=');
-		if (pos != std::string::npos) {
-			std::string key   = Trim(part.substr(0, pos));
-			std::string value = Trim(part.substr(pos + 1));
-			value             = RemoveQuotes(value);
-			result[key]       = value;
-		}
-	}
-	return result;
-}
-
 } // namespace
 
 StatusCode Method::Handler(
@@ -522,6 +502,26 @@ Method::DecodeMultipartFormData(const std::string &content_type, const std::stri
 		}
 	}
 	return parts;
+}
+
+// Content-Disposition ヘッダーをパースする関数
+std::map<std::string, std::string> Method::ParseContentDisposition(const std::string &header) {
+	std::map<std::string, std::string> result;
+	std::istringstream                 stream(header);
+	std::string                        part;
+
+	// セミコロンで分割
+	while (std::getline(stream, part, ';')) {
+		part            = Trim(part);
+		std::size_t pos = part.find('=');
+		if (pos != std::string::npos) {
+			std::string key   = Trim(part.substr(0, pos));
+			std::string value = Trim(part.substr(pos + 1));
+			value             = RemoveQuotes(value);
+			result[key]       = value;
+		}
+	}
+	return result;
 }
 
 } // namespace http

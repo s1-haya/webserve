@@ -85,6 +85,8 @@ class Method {
 	static Part ParsePart(const std::string &part);
 	static std::vector<Part>
 	DecodeMultipartFormData(const std::string &content_type, const std::string &body);
+	static std::map<std::string, std::string>
+	ParseContentDisposition(const std::string &content_disposition);
 };
 
 } // namespace http
