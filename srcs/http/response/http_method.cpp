@@ -475,13 +475,13 @@ std::vector<std::string> Method::SplitParts(const std::string &body, const std::
 // ヘッダーとボディを分割する関数
 Method::Part Method::ParsePart(const std::string &part) {
 	Part        result;
-	std::size_t header_end = part.find("\r\n\r\n");
+	std::size_t header_end = part.find(CRLF + CRLF);
 	if (header_end != std::string::npos) {
 		std::string headers = part.substr(0, header_end);
 		result.body         = part.substr(header_end + 4);
 
 		std::size_t pos = 0;
-		std::size_t end = headers.find("\r\n", pos);
+		std::size_t end = headers.find(CRLF, pos);
 		while (end != std::string::npos) {
 			std::string header = headers.substr(pos, end - pos);
 			std::size_t colon  = header.find(": ");
@@ -491,7 +491,7 @@ Method::Part Method::ParsePart(const std::string &part) {
 				result.headers[name] = value;
 			}
 			pos = end + 2;
-			end = headers.find("\r\n", pos);
+			end = headers.find(CRLF, pos);
 		}
 		// 最後のヘッダー行を処理
 		std::string last_header = headers.substr(pos);
