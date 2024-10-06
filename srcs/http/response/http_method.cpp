@@ -56,6 +56,7 @@ StatusCode Method::Handler(
 	const std::string  &method,
 	const AllowMethods &allow_methods,
 	const std::string  &request_body_message,
+	const HeaderFields &request_header_fields,
 	std::string        &response_body_message,
 	HeaderFields       &response_header_fields,
 	const std::string  &index_file_path,
@@ -209,7 +210,6 @@ StatusCode Method::FileCreationHandler(
 	std::string       &response_body_message,
 	HeaderFields      &response_header_fields
 ) {
-	StatusCode    status_code(CREATED);
 	std::ofstream file(path.c_str(), std::ios::binary);
 	if (file.fail()) {
 		throw HttpException("Error: Forbidden", StatusCode(FORBIDDEN));
@@ -222,6 +222,7 @@ StatusCode Method::FileCreationHandler(
 		}
 		throw HttpException("Error: Forbidden", StatusCode(FORBIDDEN));
 	}
+	StatusCode status_code(CREATED);
 	response_body_message                  = HttpResponse::CreateDefaultBodyMessage(status_code);
 	response_header_fields[CONTENT_LENGTH] = utils::ToString(response_body_message.length());
 	return status_code;

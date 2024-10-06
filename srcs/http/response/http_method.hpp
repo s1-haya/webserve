@@ -18,6 +18,7 @@ class Method {
 					 const std::string  &method,
 					 const AllowMethods &allow_methods,
 					 const std::string  &request_body_message,
+					 const HeaderFields &request_header_fields,
 					 std::string        &response_body_message,
 					 HeaderFields       &response_header_fields,
 					 const std::string  &index_file_path,
