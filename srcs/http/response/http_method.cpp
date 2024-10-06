@@ -78,6 +78,7 @@ StatusCode Method::Handler(
 		status_code = PostHandler(
 			path,
 			request_body_message,
+			request_header_fields,
 			response_body_message,
 			response_header_fields,
 			upload_directory
@@ -135,11 +136,12 @@ StatusCode Method::GetHandler(
 }
 
 StatusCode Method::PostHandler(
-	const std::string &path,
-	const std::string &request_body_message,
-	std::string       &response_body_message,
-	HeaderFields      &response_header_fields,
-	const std::string &upload_directory
+	const std::string  &path,
+	const std::string  &request_body_message,
+	const HeaderFields &request_header_fields,
+	std::string        &response_body_message,
+	HeaderFields       &response_header_fields,
+	const std::string  &upload_directory
 ) {
 	// ex. test.txt
 	const std::string file_name = path.substr(path.find_last_of('/') + 1);
