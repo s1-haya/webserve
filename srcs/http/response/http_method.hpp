@@ -79,12 +79,10 @@ class Method {
 		std::string                        body;
 	};
 	// multipart/form-dataをデコードする関数
-	static std::string ExtractBoundary(const std::string &content_type);
-	static std::vector<std::string>
-				SplitParts(const std::string &body, const std::string &boundary);
-	static Part ParsePart(const std::string &part);
 	static std::vector<Part>
 	DecodeMultipartFormData(const std::string &content_type, const std::string &body);
+	static std::string ExtractBoundary(const std::string &content_type);
+	static Part        ParsePart(const std::string &part);
 	static std::map<std::string, std::string>
 	ParseContentDisposition(const std::string &content_disposition);
 };

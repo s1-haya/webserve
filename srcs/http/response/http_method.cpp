@@ -243,8 +243,7 @@ StatusCode Method::DeleteHandler(
 void Method::SystemExceptionHandler(int error_number) {
 	if (error_number == EACCES || error_number == EPERM) {
 		throw HttpException("Error: Forbidden", StatusCode(FORBIDDEN));
-	} else if (error_number == ENOENT || error_number == ENOTDIR || error_number == ELOOP ||
-			   error_number == ENAMETOOLONG) {
+	} else if (error_number == ENOENT || error_number == ENOTDIR || error_number == ELOOP || error_number == ENAMETOOLONG) {
 		throw HttpException("Error: Not Found", StatusCode(NOT_FOUND));
 	} else {
 		throw HttpException("Error: Internal Server Error", StatusCode(INTERNAL_SERVER_ERROR));
@@ -353,7 +352,7 @@ bool Method::IsAllowedMethod(
 
 utils::Result<std::string> Method::AutoindexHandler(const std::string &path) {
 	utils::Result<std::string> result;
-	DIR                       *dir = opendir(path.c_str());
+	DIR					   *dir = opendir(path.c_str());
 	std::string                response_body_message;
 
 	if (dir == NULL) {
@@ -430,6 +429,24 @@ StatusCode Method::EchoPostHandler(
 }
 
 // multipart/form-dataをデコードする関数
+std::vector<Method::Part>
+Method::DecodeMultipartFormData(const std::string &content_type, const std::string &body) {
+	std::vector<Method::Part> parts;
+	std::string               boundary = ExtractBoundary(content_type);
+	if (!boundary.empty()) {
+		std::vector<std::string> raw_parts = utils::SplitStr(body, boundary);
+		for (std::vector<std::string>::const_iterator raw_part = raw_parts.begin();
+			 raw_part != raw_parts.end();
+			 ++raw_part) {
+			Part part = ParsePart(*raw_part);
+			if (!part.headers.empty()) {
+				parts.push_back(part);
+			}
+		}
+	}
+	return parts;
+}
+
 // Boundaryを抽出する関数
 std::string Method::ExtractBoundary(const std::string &content_type) {
 	const std::string boundary_prefix = BOUNDARY + "=";
@@ -438,20 +455,6 @@ std::string Method::ExtractBoundary(const std::string &content_type) {
 		return "--" + content_type.substr(pos + boundary_prefix.length());
 	}
 	return "";
-}
-
-// パートを分割する関数
-std::vector<std::string> Method::SplitParts(const std::string &body, const std::string &boundary) {
-	std::vector<std::string> parts;
-	std::size_t start = body.find(boundary) + boundary.length() + 2; // +2は\r\nをスキップするため
-	std::size_t end = body.find(boundary, start);
-	while (end != std::string::npos) {
-		// -2は\r\nを除外するため
-		parts.push_back(body.substr(start, end - start - 2));
-		start = end + boundary.length() + 2;
-		end   = body.find(boundary, start);
-	}
-	return parts;
 }
 
 // ヘッダーとボディを分割する関数
@@ -485,25 +488,6 @@ Method::Part Method::ParsePart(const std::string &part) {
 		}
 	}
 	return result;
-}
-
-// multipart/form-dataをデコードする関数
-std::vector<Method::Part>
-Method::DecodeMultipartFormData(const std::string &content_type, const std::string &body) {
-	std::vector<Method::Part> parts;
-	std::string               boundary = ExtractBoundary(content_type);
-	if (!boundary.empty()) {
-		std::vector<std::string> raw_parts = SplitParts(body, boundary);
-		for (std::vector<std::string>::const_iterator raw_part = raw_parts.begin();
-			 raw_part != raw_parts.end();
-			 ++raw_part) {
-			Part part = ParsePart(*raw_part);
-			if (!part.headers.empty()) {
-				parts.push_back(part);
-			}
-		}
-	}
-	return parts;
 }
 
 // Content-Disposition ヘッダーをパースする関数
