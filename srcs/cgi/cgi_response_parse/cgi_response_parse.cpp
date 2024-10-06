@@ -63,7 +63,11 @@ CgiResponseParse::~CgiResponseParse() {}
 utils::Result<CgiResponseParse::ParsedData> CgiResponseParse::Parse(const std::string &response) {
 	ParsedData                parsed_data;
 	utils::Result<ParsedData> result(false, parsed_data);
-	size_t                    pos = response.find(http::HEADER_FIELDS_END);
+	if (response.empty()) {
+		utils::Debug("CgiResponseParse", "Empty response");
+		return result;
+	}
+	size_t pos = response.find(http::HEADER_FIELDS_END);
 	if (pos == std::string::npos) {
 		utils::Debug("CgiResponseParse", "Missing header fields");
 		return result;

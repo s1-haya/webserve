@@ -151,64 +151,40 @@ def send_request_and_assert_response(request_file, expected_response):
             not_implemented_response,
         ),
     ],
+    ids=[
+        "200_01_connection_close",
+        "200_02_connection_keep",
+        "200_03_sub_connection_close",
+        "200_07_no_connection_value",
+        "200_08_wrong_connection_value",
+        "200_11_upper_and_lower_header_fields",
+        "200_12_header_field_value_space",
+        "200_13_space_header_field_value",
+        "200_14_extra_request",
+        "200_15_body_message_default",
+        "200_17_not_exist_header_field",
+        "400_02_lower_method",
+        "400_03_no_ascii_method",
+        "400_04_no_root",
+        "400_05_relative_path",
+        "400_06_lower_http_version",
+        "400_07_wrong_http_name",
+        "400_08_wrong_http_version",
+        "400_09_no_host",
+        "400_10_duplicate_host",
+        "400_11_no_header_field_colon",
+        "400_12_no_connection_name",
+        "400_15_space_in_header_field_name",
+        "400_16_header_field_name_space_colon",
+        "400_17_space_header_field_name",
+        "400_18_non_vchr_header_field_name",
+        "400_19_non_vchr_header_field_value",
+        "400_20_too_few_status_line_elements",
+        "400_21_too_many_status_line_elements",
+        "404_01_not_exist_path",
+        "405_01_method_not_allowed_for_uri",
+        "501_01_not_exist_method",
+    ],
 )
 def test_get_responses(request_file, expected_response):
     send_request_and_assert_response(request_file, expected_response)
-
-
-# >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-# def test_webserv():
-#     try:
-#         test_get_root_close_200()
-#         test_get_root_keep_200()
-#         test_get_sub_close_200()
-#         test_get_404()
-#         test_get_405()
-#     except Exception as e:
-#         print(f"Test failed: {e}")
-
-
-# def test1():
-#     client_instance = client.Client(8080)
-#     response = client_instance.SendRequestAndReceiveResponse("")
-#     print(response)
-#     # assert
-
-
-# def test2():
-#     client_instance = client.Client(8080)
-#     response = client_instance.SendRequestAndReceiveResponse("GET / HTTP/1.1\n")
-#     print(response)
-#     # assert
-
-
-# def test3():
-#     client_instance = client.Client(8080)
-#     response = client_instance.SendRequestAndReceiveResponse("aaa" * 10000)
-#     print(response)
-#     # assert
-
-
-# def test4():
-#     client_instance = client.Client(8080)
-#     while True:
-#         response = client_instance.SendRequestAndReceiveResponse(
-#             "GET / HTTP/1.1\nHost: localhost\r\n\r\n"
-#         )
-#     print(response)
-#     # assert
-
-
-# def test5():
-#     client_instance = client.Client(8080)
-#     response = client_instance.SendRequestAndReceiveResponse(
-#         "GET \n   Test: aaa  \r\n\r\n"
-#     )
-#     print(response)
-#     # assert
-
-
-# if __name__ == "__main__":
-#     test_webserv()
-
-# <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
