@@ -243,7 +243,8 @@ StatusCode Method::DeleteHandler(
 void Method::SystemExceptionHandler(int error_number) {
 	if (error_number == EACCES || error_number == EPERM) {
 		throw HttpException("Error: Forbidden", StatusCode(FORBIDDEN));
-	} else if (error_number == ENOENT || error_number == ENOTDIR || error_number == ELOOP || error_number == ENAMETOOLONG) {
+	} else if (error_number == ENOENT || error_number == ENOTDIR || error_number == ELOOP ||
+			   error_number == ENAMETOOLONG) {
 		throw HttpException("Error: Not Found", StatusCode(NOT_FOUND));
 	} else {
 		throw HttpException("Error: Internal Server Error", StatusCode(INTERNAL_SERVER_ERROR));
@@ -352,7 +353,7 @@ bool Method::IsAllowedMethod(
 
 utils::Result<std::string> Method::AutoindexHandler(const std::string &path) {
 	utils::Result<std::string> result;
-	DIR					   *dir = opendir(path.c_str());
+	DIR                       *dir = opendir(path.c_str());
 	std::string                response_body_message;
 
 	if (dir == NULL) {
@@ -433,16 +434,22 @@ std::vector<Method::Part>
 Method::DecodeMultipartFormData(const std::string &content_type, const std::string &body) {
 	std::vector<Method::Part> parts;
 	std::string               boundary = ExtractBoundary(content_type);
-	if (!boundary.empty()) {
-		std::vector<std::string> raw_parts = utils::SplitStr(body, boundary);
-		for (std::vector<std::string>::const_iterator raw_part = raw_parts.begin();
-			 raw_part != raw_parts.end();
-			 ++raw_part) {
-			Part part = ParsePart(*raw_part);
-			if (!part.headers.empty()) {
-				parts.push_back(part);
-			}
-		}
+	if (boundary.empty()) {
+		throw HttpException(
+			"Error: Boundary not found in Content-Type header", StatusCode(BAD_REQUEST)
+		);
+	}
+	std::vector<std::string> raw_parts = utils::SplitStr(body, boundary);
+	for (std::vector<std::string>::const_iterator raw_part =
+			 raw_parts.begin() + 1; // 最初のパートは空文字列
+		 raw_part != raw_parts.end() - 1;
+		 ++raw_part) {
+		parts.push_back(ParsePart(*raw_part));
+	}
+	if (parts.empty()) {
+		throw HttpException(
+			"Error: No parts found in multipart/form-data", StatusCode(BAD_REQUEST)
+		);
 	}
 	return parts;
 }
@@ -454,38 +461,38 @@ std::string Method::ExtractBoundary(const std::string &content_type) {
 	if (pos != std::string::npos) {
 		return "--" + content_type.substr(pos + boundary_prefix.length());
 	}
-	return "";
+	throw HttpException(
+		"Error: Boundary not found in Content-Type header", StatusCode(BAD_REQUEST)
+	);
 }
 
 // ヘッダーとボディを分割する関数
 Method::Part Method::ParsePart(const std::string &part) {
-	Part        result;
+	Part result;
+	std::cout << "part: " << part << std::endl;
 	std::size_t header_end = part.find(CRLF + CRLF);
-	if (header_end != std::string::npos) {
-		std::string headers = part.substr(0, header_end);
-		result.body         = part.substr(header_end + 4);
+	if (header_end == std::string::npos) {
+		throw HttpException(
+			"Error: Invalid part format, headers and body not properly separated",
+			StatusCode(BAD_REQUEST)
+		);
+	}
+	std::string headers = part.substr(CRLF.length(), header_end);
+	result.body         = part.substr(header_end + CRLF.length() * 2);
 
-		std::size_t pos = 0;
-		std::size_t end = headers.find(CRLF, pos);
-		while (end != std::string::npos) {
-			std::string header = headers.substr(pos, end - pos);
-			std::size_t colon  = header.find(": ");
-			if (colon != std::string::npos) {
-				std::string name     = header.substr(0, colon);
-				std::string value    = header.substr(colon + 2);
-				result.headers[name] = value;
-			}
-			pos = end + 2;
-			end = headers.find(CRLF, pos);
+	std::size_t pos = 0;
+	std::size_t end = headers.find(CRLF, pos);
+	while (end != std::string::npos) {
+		std::string header = headers.substr(pos, end - pos);
+		std::size_t colon  = header.find(": ");
+		if (colon == std::string::npos) {
+			throw HttpException("Error: Invalid header format", StatusCode(BAD_REQUEST));
 		}
-		// 最後のヘッダー行を処理
-		std::string last_header = headers.substr(pos);
-		std::size_t colon       = last_header.find(": ");
-		if (colon != std::string::npos) {
-			std::string name     = last_header.substr(0, colon);
-			std::string value    = last_header.substr(colon + 2);
-			result.headers[name] = value;
-		}
+		std::string name     = header.substr(0, colon);
+		std::string value    = header.substr(colon + 2);
+		result.headers[name] = value;
+		pos                  = end + CRLF.length();
+		end                  = headers.find(CRLF, pos);
 	}
 	return result;
 }
