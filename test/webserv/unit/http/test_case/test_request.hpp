@@ -86,6 +86,11 @@ static const std::string &GET_400_18_NON_VCHR_HEADER_FIELD_NAME =
 	LoadFileContent(REQUEST_GET + ROOT_4XX + "/400_18_non_vchr_header_field_name.txt");
 static const std::string &GET_400_19_NON_VCHR_HEADER_FIELD_VALUE =
 	LoadFileContent(REQUEST_GET + ROOT_4XX + "/400_19_non_vchr_header_field_value.txt");
+static const std::string &GET_400_20_TOO_FEW_STATUS_LINE_ELEMENTS =
+	LoadFileContent(REQUEST_GET + ROOT_4XX + "/400_20_too_few_status_line_elements.txt");
+static const std::string &GET_400_21_TOO_MANY_STATUS_LINE_ELEMENTS =
+	LoadFileContent(REQUEST_GET + ROOT_4XX + "/400_21_too_many_status_line_elements.txt");
+
 static const std::string &GET_404_1_NOT_EXIST_PATH_CONNECTION_CLOSE =
 	LoadFileContent(REQUEST_GET + ROOT_4XX + "/404_01_not_exist_path.txt");
 static const std::string &GET_405_1_NOT_ALLOWED =

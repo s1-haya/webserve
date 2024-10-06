@@ -1,4 +1,5 @@
 #include "http.hpp"
+#include "cgi_response_parse.hpp"
 #include "client_infos.hpp"
 #include "http_message.hpp"
 #include "http_result.hpp"
@@ -18,7 +19,7 @@ Http::Run(const ClientInfos &client_info, const server::VirtualServerAddrList &s
 	utils::Result<void> parsed_result =
 		ParseHttpRequestFormat(client_info.fd, client_info.request_buf);
 	if (!parsed_result.IsOk()) {
-		return CreateBadRequestResponse(client_info);
+		return CreateBadRequestResponse(client_info.fd);
 	}
 	if (IsHttpRequestFormatComplete(client_info.fd)) {
 		result = CreateHttpResponse(client_info, server_info);
@@ -27,13 +28,20 @@ Http::Run(const ClientInfos &client_info, const server::VirtualServerAddrList &s
 }
 
 HttpResult Http::GetResponseFromCgi(int client_fd, const cgi::CgiResponse &cgi_response) {
-	HttpResult            result;
+	typedef utils::Result<cgi::CgiResponseParse::ParsedData> CgiParseResult;
+	HttpResult                                               result;
+	CgiParseResult cgi_parse_result = cgi::CgiResponseParse::Parse(cgi_response.response);
+	if (!cgi_parse_result.IsOk()) {
+		return GetErrorResponse(client_fd, INTERNAL_ERROR);
+	}
 	HttpRequestParsedData data = storage_.GetClientSaveData(client_fd);
+
 	result.is_connection_keep =
 		HttpResponse::IsConnectionKeep(data.request_result.request.header_fields);
 	result.is_response_complete = true;
 	result.request_buf          = data.current_buf;
-	result.response = HttpResponse::GetResponseFromCgi(cgi_response, data.request_result);
+	result.response =
+		HttpResponse::GetResponseFromCgi(cgi_parse_result.GetValue(), data.request_result);
 	storage_.DeleteClientSaveData(client_fd);
 	return result;
 }
@@ -70,9 +78,9 @@ HttpResult Http::CreateHttpResponse(
 	return result;
 }
 
-HttpResult Http::GetErrorResponse(const ClientInfos &client_info, ErrorState state) {
+HttpResult Http::GetErrorResponse(int client_fd, ErrorState state) {
 	HttpResult            result;
-	HttpRequestParsedData data  = storage_.GetClientSaveData(client_info.fd);
+	HttpRequestParsedData data  = storage_.GetClientSaveData(client_fd);
 	result.is_response_complete = true;
 	result.is_connection_keep   = false;
 	result.request_buf          = data.current_buf;
@@ -86,18 +94,18 @@ HttpResult Http::GetErrorResponse(const ClientInfos &client_info, ErrorState sta
 	default:
 		break;
 	}
-	storage_.DeleteClientSaveData(client_info.fd);
+	storage_.DeleteClientSaveData(client_fd);
 	return result;
 }
 
-HttpResult Http::CreateBadRequestResponse(const ClientInfos &client_info) {
+HttpResult Http::CreateBadRequestResponse(int client_fd) {
 	HttpResult            result;
-	HttpRequestParsedData data  = storage_.GetClientSaveData(client_info.fd);
+	HttpRequestParsedData data  = storage_.GetClientSaveData(client_fd);
 	result.is_response_complete = true;
 	result.is_connection_keep   = false;
 	result.request_buf          = data.current_buf;
 	result.response             = HttpResponse::CreateErrorResponse(StatusCode(BAD_REQUEST));
-	storage_.DeleteClientSaveData(client_info.fd);
+	storage_.DeleteClientSaveData(client_fd);
 	return result;
 }
 

@@ -48,10 +48,16 @@ class Method {
 		std::string       &response_body_message,
 		HeaderFields      &response_header_fields
 	);
-	static Stat       TryStat(const std::string &path);
-	static void       SystemExceptionHandler(int error_number);
-	static StatusCode FileCreationHandler(
-		const std::string &path,
+	static Stat        TryStat(const std::string &path);
+	static std::string ReadFile(const std::string &file_path);
+	static void        SystemExceptionHandler(int error_number);
+	static StatusCode  FileCreationHandler(
+		 const std::string &path,
+		 const std::string &request_body_message,
+		 std::string       &response_body_message,
+		 HeaderFields      &response_header_fields
+	 );
+	static StatusCode EchoPostHandler(
 		const std::string &request_body_message,
 		std::string       &response_body_message,
 		HeaderFields      &response_header_fields

@@ -37,7 +37,7 @@ int TestRequestTimeoutResponse() {
     );
 
 	http::Http       http;
-	http::HttpResult result = http.GetErrorResponse(client_infos, http::TIMEOUT);
+	http::HttpResult result = http.GetErrorResponse(client_infos.fd, http::TIMEOUT);
 	return HandleGetErrorResponseError(result.response, expected_response, 1);
 }
 
@@ -55,7 +55,7 @@ int TestInternalServerErrorResponse() {
     );
 
 	http::Http       http;
-	http::HttpResult result = http.GetErrorResponse(client_infos, http::INTERNAL_ERROR);
+	http::HttpResult result = http.GetErrorResponse(client_infos.fd, http::INTERNAL_ERROR);
 	return HandleGetErrorResponseError(result.response, expected_response, 2);
 }
 

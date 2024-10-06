@@ -15,6 +15,7 @@
 #include <sys/stat.h>
 #include <unistd.h> // access
 
+namespace http {
 namespace {
 
 bool IsExistPath(const std::string &path) {
@@ -25,16 +26,6 @@ std::string FileToString(const std::ifstream &file) {
 	std::stringstream ss;
 	ss << file.rdbuf();
 	return ss.str();
-}
-
-std::string ReadFile(const std::string &file_path) {
-	std::ifstream file(file_path.c_str());
-	if (!file) {
-		// todo: default error page?
-		std::ifstream error_file("root/html/404.html");
-		return FileToString(error_file);
-	}
-	return FileToString(file);
 }
 
 bool EndWith(const std::string &str, const std::string &suffix) {
@@ -55,12 +46,10 @@ std::string DetermineContentType(const std::string &path) {
 	} else if (EndWith(path, pdf_extension)) {
 		return "application/pdf";
 	}
-	return http::TEXT_PLAIN;
+	return TEXT_PLAIN;
 }
 
 } // namespace
-
-namespace http {
 
 StatusCode Method::Handler(
 	const std::string  &path,
@@ -158,7 +147,10 @@ StatusCode Method::PostHandler(
 	// ex. srcs/http/response/http_serverinfo_check/../../../../root/save/test.txt
 	const std::string upload_path = root_path + upload_directory + "/" + file_name;
 
-	if (!IsExistPath(path)) {
+	if (upload_directory.empty()) {
+		return EchoPostHandler(request_body_message, response_body_message, response_header_fields);
+	}
+	if (!IsExistPath(upload_path)) {
 		return FileCreationHandler(
 			upload_path, request_body_message, response_body_message, response_header_fields
 		);
@@ -242,6 +234,14 @@ Stat Method::TryStat(const std::string &path) {
 	}
 	Stat info(stat_buf);
 	return info;
+}
+
+std::string Method::ReadFile(const std::string &file_path) {
+	std::ifstream file(file_path.c_str());
+	if (!file) {
+		SystemExceptionHandler(errno);
+	}
+	return FileToString(file);
 }
 
 bool Method::IsSupportedMethod(const std::string &method) {
@@ -329,6 +329,16 @@ utils::Result<std::string> Method::AutoindexHandler(const std::string &path) {
 
 	result.SetValue(response_body_message);
 	return result;
+}
+
+StatusCode Method::EchoPostHandler(
+	const std::string &request_body_message,
+	std::string       &response_body_message,
+	HeaderFields      &response_header_fields
+) {
+	response_body_message                  = request_body_message;
+	response_header_fields[CONTENT_LENGTH] = utils::ToString(response_body_message.length());
+	return StatusCode(OK);
 }
 
 } // namespace http

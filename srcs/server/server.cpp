@@ -156,8 +156,12 @@ void Server::HandleNewConnection(int server_fd) {
 }
 
 void Server::HandleExistingConnection(const event::Event &event) {
-	if (event.type & event::EVENT_ERROR || event.type & event::EVENT_HANGUP) {
+	if (event.type & event::EVENT_ERROR) {
 		HandleErrorEvent(event.fd);
+		return;
+	}
+	if (event.type & event::EVENT_HANGUP) {
+		HandleHangUpEvent(event);
 		return;
 	}
 	if (event.type & event::EVENT_READ) {
@@ -189,20 +193,29 @@ void Server::HandleErrorEvent(int fd) {
 	if (!IsMessageExist(fd)) {
 		return;
 	}
+	const int client_fd = IsCgi(fd) ? cgi_manager_.GetClientFd(fd) : fd;
+	SetInternalServerError(client_fd);
+}
+
+void Server::HandleHangUpEvent(const event::Event &event) {
+	const int fd = event.fd;
+	if (!IsMessageExist(fd)) {
+		return;
+	}
 	if (IsCgi(fd)) {
-		const int client_fd = cgi_manager_.GetClientFd(fd);
-		// todo: EPOLL errorだからといってread pipeが空とは限らないのかもしれない？
-		const CgiResponseResult cgi_response_result = AddAndGetCgiResponse(client_fd, "");
-		if (!cgi_response_result.IsOk()) {
-			throw std::logic_error("HandleErrorEvent: Invalid result from cgi response");
+		const int                     client_fd      = cgi_manager_.GetClientFd(fd);
+		const CgiManager::GetFdResult read_fd_result = cgi_manager_.GetReadFd(client_fd);
+		// except on read_fd
+		if (!read_fd_result.IsOk() || read_fd_result.GetValue() != fd) {
+			SetInternalServerError(client_fd);
+			return;
 		}
-		// Explicitly delete from cgi_manager
-		cgi_manager_.DeleteCgi(client_fd);
-		GetHttpResponseFromCgiResponse(client_fd, cgi_response_result.GetValue());
+		// If it's read_fd, keep reading until read returns 0
+		HandleReadEvent(event);
 		return;
 	}
 	// fd == client_fd
-	Disconnect(fd);
+	SetInternalServerError(fd);
 }
 
 void Server::HandleReadEvent(const event::Event &event) {
@@ -336,7 +349,7 @@ void Server::HandleTimeoutMessages() {
 		}
 
 		const http::HttpResult http_result =
-			http_.GetErrorResponse(GetClientInfos(client_fd), http::TIMEOUT);
+			http_.GetErrorResponse(client_fd, http::TIMEOUT);
 		message_manager_.AddPrimaryResponse(client_fd, message::CLOSE, http_result.response);
 		ReplaceEvent(client_fd, event::EVENT_WRITE);
 		utils::Debug("server", "timeout client", client_fd);
@@ -351,7 +364,7 @@ void Server::SetInternalServerError(int client_fd) {
 	}
 
 	const http::HttpResult http_result =
-		http_.GetErrorResponse(GetClientInfos(client_fd), http::INTERNAL_ERROR);
+		http_.GetErrorResponse(client_fd, http::INTERNAL_ERROR);
 	message_manager_.AddPrimaryResponse(client_fd, message::CLOSE, http_result.response);
 	ReplaceEvent(client_fd, event::EVENT_WRITE);
 	utils::Debug("server", "internal server error to client", client_fd);
@@ -370,7 +383,7 @@ void Server::Disconnect(int client_fd) {
 	}
 	// todo: client_save_dataがない場合に呼ばれても大丈夫な作りになってるか確認
 	// HttpResult is not used.
-	http_.GetErrorResponse(GetClientInfos(client_fd), http::INTERNAL_ERROR);
+	http_.GetErrorResponse(client_fd, http::INTERNAL_ERROR);
 	event_monitor_.Delete(client_fd);
 	message_manager_.DeleteMessage(client_fd);
 	context_.DeleteClientInfo(client_fd);

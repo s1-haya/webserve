@@ -25,7 +25,7 @@ my $server_software  = $ENV{'SERVER_SOFTWARE'};
 # my $protocol_var_name  = $ENV{'protocol-var-name'};
 
 # HTTPレスポンスヘッダーを出力
-print "Content-type: text/plain\n\n";
+print "Content-Type: text/plain\r\n\r\n";
 
 # 環境変数の値を出力
 print "AUTH_TYPE: $auth_type\n";

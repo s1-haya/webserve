@@ -331,6 +331,45 @@ int TestGetBadRequest19NonVchrHeaderFieldValue(const server::VirtualServerAddrLi
 	return HandleHttpResult(client_infos, server_infos, expected, "400-19");
 }
 
+int TestGetBadRequest20TooFewStatusLineElements(const server::VirtualServerAddrList &server_infos) {
+	http::ClientInfos client_infos =
+		CreateClientInfos(request::GET_400_20_TOO_FEW_STATUS_LINE_ELEMENTS);
+	std::string  expected_status_line  = EXPECTED_STATUS_LINE_BAD_REQUEST;
+	std::string  expected_body_message = EXPECTED_BODY_MESSAGE_BAD_REQUEST;
+	HeaderFields expected_header_fields;
+	expected_header_fields[http::CONNECTION]     = http::CLOSE;
+	expected_header_fields[http::CONTENT_LENGTH] = utils::ToString(expected_body_message.length());
+	expected_header_fields[http::CONTENT_TYPE]   = http::TEXT_HTML;
+	expected_header_fields[http::SERVER]         = http::SERVER_VERSION;
+	const std::string &expected_response         = CreateHttpResponseFormat(
+        expected_status_line, expected_header_fields, expected_body_message
+    );
+	const std::string &expected_request_buffer = "Host: localhost\r\nConnection: close\r\n\r\n";
+	http::HttpResult   expected =
+		CreateHttpResult(true, false, expected_request_buffer, expected_response);
+	return HandleHttpResult(client_infos, server_infos, expected, "400-20");
+}
+
+int TestGetBadRequest21TooManyStatusLineElements(const server::VirtualServerAddrList &server_infos
+) {
+	http::ClientInfos client_infos =
+		CreateClientInfos(request::GET_400_21_TOO_MANY_STATUS_LINE_ELEMENTS);
+	std::string  expected_status_line  = EXPECTED_STATUS_LINE_BAD_REQUEST;
+	std::string  expected_body_message = EXPECTED_BODY_MESSAGE_BAD_REQUEST;
+	HeaderFields expected_header_fields;
+	expected_header_fields[http::CONNECTION]     = http::CLOSE;
+	expected_header_fields[http::CONTENT_LENGTH] = utils::ToString(expected_body_message.length());
+	expected_header_fields[http::CONTENT_TYPE]   = http::TEXT_HTML;
+	expected_header_fields[http::SERVER]         = http::SERVER_VERSION;
+	const std::string &expected_response         = CreateHttpResponseFormat(
+        expected_status_line, expected_header_fields, expected_body_message
+    );
+	const std::string &expected_request_buffer = "Host: localhost\r\nConnection: close\r\n\r\n";
+	http::HttpResult   expected =
+		CreateHttpResult(true, false, expected_request_buffer, expected_response);
+	return HandleHttpResult(client_infos, server_infos, expected, "400-21");
+}
+
 int TestGetNotFound1NotExistFile(const server::VirtualServerAddrList &server_infos) {
 	http::ClientInfos client_infos =
 		CreateClientInfos(request::GET_404_1_NOT_EXIST_PATH_CONNECTION_CLOSE);

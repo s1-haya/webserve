@@ -12,7 +12,7 @@ struct HttpRequestFormat;
 
 class CgiParse {
   public:
-	static utils::Result<cgi::CgiRequest> Parse(
+	static cgi::CgiRequest Parse(
 		const http::HttpRequestFormat &request,
 		const std::string             &cgi_script,
 		const std::string             &cgi_extension,

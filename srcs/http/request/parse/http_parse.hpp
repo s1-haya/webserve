@@ -55,7 +55,6 @@ class HttpParse {
 	static void CheckValidHeaderFieldNameAndValue(
 		const std::string &header_field_name, const std::string &header_field_value
 	);
-	static bool HasConnectionKeepInHeaderFields(const HeaderFields &header_fields);
 };
 
 } // namespace http

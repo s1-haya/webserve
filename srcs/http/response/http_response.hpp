@@ -1,6 +1,7 @@
 #ifndef HTTP_RESPONSE_HPP_
 #define HTTP_RESPONSE_HPP_
 
+#include "cgi_response_parse.hpp"
 #include "http_format.hpp"
 #include "http_method.hpp"
 #include "http_result.hpp"
@@ -49,8 +50,10 @@ class HttpResponse {
 	static std::string CreateErrorResponse(const StatusCode &status_code);
 	static bool        IsConnectionKeep(const HeaderFields &request_header_fields);
 	static std::string CreateDefaultBodyMessage(const StatusCode &status_code);
-	static std::string
-	GetResponseFromCgi(const cgi::CgiResponse &cgi_response, const HttpRequestResult &request_info);
+	static std::string GetResponseFromCgi(
+		const cgi::CgiResponseParse::ParsedData &cgi_parsed_data,
+		const HttpRequestResult                 &request_info
+	);
 
   private:
 	HttpResponse();

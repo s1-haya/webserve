@@ -21,10 +21,6 @@ int TestGetOk4ConnectionKeepAndOkConnectionKeep(const server::VirtualServerAddrL
 int TestGetOk5ConnectionCloseAndOkConnectionClose(const server::VirtualServerAddrList &server_infos
 );
 int TestGetOk6ConnectionKeepAndOkConnectionClose(const server::VirtualServerAddrList &server_infos);
-int TestGetOk7DuplicateConnectionKeep(const server::VirtualServerAddrList &server_infos);
-int TestGetOk8DuplicateConnectionClose(const server::VirtualServerAddrList &server_infos);
-int TestGetOk9ConnectionKeepAndClose(const server::VirtualServerAddrList &server_infos);
-int TestGetOk10ConnectionCloseAndKeep(const server::VirtualServerAddrList &server_infos);
 int TestGetOk11UpperAndLowerHeaderFields(const server::VirtualServerAddrList &server_infos);
 int TestGetOk12HeaderFieldValueSpace(const server::VirtualServerAddrList &server_infos);
 int TestGetOk13SpaceHeaderFieldValue(const server::VirtualServerAddrList &server_infos);
@@ -52,6 +48,9 @@ int TestGetBadRequest16HeaderFieldNameSpaceColon(const server::VirtualServerAddr
 int TestGetBadRequest17SpaceHeaderFieldName(const server::VirtualServerAddrList &server_infos);
 int TestGetBadRequest18NonVchrHeaderFieldName(const server::VirtualServerAddrList &server_infos);
 int TestGetBadRequest19NonVchrHeaderFieldValue(const server::VirtualServerAddrList &server_infos);
+int TestGetBadRequest20TooFewStatusLineElements(const server::VirtualServerAddrList &server_infos);
+int TestGetBadRequest21TooManyStatusLineElements(const server::VirtualServerAddrList &server_infos);
+
 int TestGetNotFound1NotExistFile(const server::VirtualServerAddrList &server_infos);
 int TestGetMethodNotAllowed(const server::VirtualServerAddrList &server_infos);
 int TestGetTimeout1NoCrlf(const server::VirtualServerAddrList &server_infos);
@@ -85,6 +84,8 @@ int TestInternalServerErrorResponse();
 // GetResponseFromCgi
 int TestGetResponseFromCgi1();
 int TestGetResponseFromCgi2();
+int TestGetResponseFromCgi3();
+int TestGetResponseFromCgi4();
 
 } // namespace test
 
