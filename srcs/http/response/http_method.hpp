@@ -63,6 +63,18 @@ class Method {
 		HeaderFields      &response_header_fields
 	);
 	static utils::Result<std::string> AutoindexHandler(const std::string &path);
+
+	// マルチパート用のパートを表す構造体
+	struct Part {
+		std::map<std::string, std::string> headers;
+		std::string                        body;
+	};
+	// multipart/form-dataをデコードする関数
+	std::string              ExtractBoundary(const std::string &content_type);
+	std::vector<std::string> SplitParts(const std::string &body, const std::string &boundary);
+	Part                     ParsePart(const std::string &part);
+	std::vector<Part>
+	DecodeMultipartFormData(const std::string &content_type, const std::string &body);
 };
 
 } // namespace http

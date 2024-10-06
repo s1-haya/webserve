@@ -341,4 +341,81 @@ StatusCode Method::EchoPostHandler(
 	return StatusCode(OK);
 }
 
+// multipart/form-dataをデコードする関数
+// Boundaryを抽出する関数
+std::string Method::ExtractBoundary(const std::string &content_type) {
+	std::string boundary_prefix = "boundary=";
+	size_t      pos             = content_type.find(boundary_prefix);
+	if (pos != std::string::npos) {
+		return "--" + content_type.substr(pos + boundary_prefix.length());
+	}
+	return "";
+}
+
+// パートを分割する関数
+std::vector<std::string> Method::SplitParts(const std::string &body, const std::string &boundary) {
+	std::vector<std::string> parts;
+	size_t start = body.find(boundary) + boundary.length() + 2; // +2は\r\nをスキップするため
+	size_t end = body.find(boundary, start);
+	while (end != std::string::npos) {
+		// -2は\r\nを除外するため
+		parts.push_back(body.substr(start, end - start - 2));
+		start = end + boundary.length() + 2;
+		end   = body.find(boundary, start);
+	}
+	return parts;
+}
+
+// ヘッダーとボディを分割する関数
+Method::Part Method::ParsePart(const std::string &part) {
+	Part   result;
+	size_t header_end = part.find("\r\n\r\n");
+	if (header_end != std::string::npos) {
+		std::string headers = part.substr(0, header_end);
+		result.body         = part.substr(header_end + 4);
+
+		size_t pos = 0;
+		size_t end = headers.find("\r\n", pos);
+		while (end != std::string::npos) {
+			std::string header = headers.substr(pos, end - pos);
+			size_t      colon  = header.find(": ");
+			if (colon != std::string::npos) {
+				std::string name     = header.substr(0, colon);
+				std::string value    = header.substr(colon + 2);
+				result.headers[name] = value;
+			}
+			pos = end + 2;
+			end = headers.find("\r\n", pos);
+		}
+		// 最後のヘッダー行を処理
+		std::string last_header = headers.substr(pos);
+		size_t      colon       = last_header.find(": ");
+		if (colon != std::string::npos) {
+			std::string name     = last_header.substr(0, colon);
+			std::string value    = last_header.substr(colon + 2);
+			result.headers[name] = value;
+		}
+	}
+	return result;
+}
+
+// multipart/form-dataをデコードする関数
+std::vector<Method::Part>
+Method::DecodeMultipartFormData(const std::string &content_type, const std::string &body) {
+	std::vector<Method::Part> parts;
+	std::string               boundary = ExtractBoundary(content_type);
+	if (!boundary.empty()) {
+		std::vector<std::string> raw_parts = SplitParts(body, boundary);
+		for (std::vector<std::string>::const_iterator raw_part = raw_parts.begin();
+			 raw_part != raw_parts.end();
+			 ++raw_part) {
+			Part part = ParsePart(*raw_part);
+			if (!part.headers.empty()) {
+				parts.push_back(part);
+			}
+		}
+	}
+	return parts;
+}
+
 } // namespace http
