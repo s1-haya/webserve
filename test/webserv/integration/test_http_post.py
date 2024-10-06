@@ -104,9 +104,15 @@ def test_post_upload_responses(
             bad_request_response,
             UPLOAD_DIR + "duplicate_content_length",
         ),
+        (
+            REQUEST_POST_4XX_DIR + "400_02_transfer_encoding_and_content_length.txt",
+            bad_request_response,
+            UPLOAD_FILE_PATH,
+        ),
     ],
     ids=[
         "400_01_duplicate_content_length",
+        "400_02_transfer_encoding_and_content_length",
     ],
 )
 def test_post_4xx_responses(request_file, expected_response, upload_file_path):
