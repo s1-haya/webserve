@@ -169,6 +169,14 @@ void HttpParse::ParseHeaderFields(HttpRequestParsedData &data) {
 	data.request_result.request.header_fields =
 		SetHeaderFields(utils::SplitStr(header_fields, CRLF));
 	data.is_request_format.is_header_fields = true;
+	if (data.request_result.request.request_line.method == POST &&
+		!data.request_result.request.header_fields.count(CONTENT_TYPE)) {
+		throw HttpException("Error: missing Content-Type header field.", StatusCode(BAD_REQUEST));
+	}
+	if (data.request_result.request.request_line.method == POST &&
+		!data.request_result.request.header_fields.count(CONTENT_LENGTH)) {
+		throw HttpException("Error: missing Content-Length header field.", StatusCode(BAD_REQUEST));
+	}
 	if (!IsBodyMessageReadingRequired(data.request_result.request.header_fields)) {
 		data.is_request_format.is_body_message = true;
 	}
