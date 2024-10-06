@@ -49,6 +49,60 @@ std::string DetermineContentType(const std::string &path) {
 	return TEXT_PLAIN;
 }
 
+// todo: utilsへ移動
+
+bool StartWith(const std::string &str, const std::string &prefix) {
+	return str.size() >= prefix.size() && str.compare(0, prefix.size(), prefix) == 0;
+}
+
+// ヘルパー関数: 文字列のトリム
+std::string Trim(const std::string &str) {
+	size_t first = str.find_first_not_of(' ');
+	if (std::string::npos == first) {
+		return str;
+	}
+	size_t last = str.find_last_not_of(' ');
+	return str.substr(first, last - first + 1);
+}
+
+// std::string::front()
+char FrontChar(const std::string &str) {
+	return str.empty() ? '\0' : str[0];
+}
+
+// std::string::back()
+char BackChar(const std::string &str) {
+	return str.empty() ? '\0' : str[str.size() - 1];
+}
+
+// ヘルパー関数: 文字列のクオートを削除
+std::string RemoveQuotes(const std::string &str) {
+	if (FrontChar(str) == '"' && BackChar(str) == '"') {
+		return str.substr(1, str.size() - 2);
+	}
+	return str;
+}
+
+// Content-Disposition ヘッダーをパースする関数
+std::map<std::string, std::string> ParseContentDisposition(const std::string &header) {
+	std::map<std::string, std::string> result;
+	std::istringstream                 stream(header);
+	std::string                        part;
+
+	// セミコロンで分割
+	while (std::getline(stream, part, ';')) {
+		part       = Trim(part);
+		size_t pos = part.find('=');
+		if (pos != std::string::npos) {
+			std::string key   = Trim(part.substr(0, pos));
+			std::string value = Trim(part.substr(pos + 1));
+			value             = RemoveQuotes(value);
+			result[key]       = value;
+		}
+	}
+	return result;
+}
+
 } // namespace
 
 StatusCode Method::Handler(
@@ -148,17 +202,26 @@ StatusCode Method::PostHandler(
 	// ex. srcs/http/response/http_serverinfo_check/../../../../root
 	const std::string root_path = path.substr(0, path.find("root/") + 4);
 	// ex. srcs/http/response/http_serverinfo_check/../../../../root/save/test.txt
-	const std::string upload_path = root_path + upload_directory + "/" + file_name;
+	const std::string upload_dir_path  = root_path + upload_directory;
+	const std::string upload_file_path = upload_dir_path + "/" + file_name;
 
 	if (upload_directory.empty()) {
 		return EchoPostHandler(request_body_message, response_body_message, response_header_fields);
-	}
-	if (!IsExistPath(upload_path)) {
+	} else if (request_header_fields.find(CONTENT_TYPE) != request_header_fields.end() &&
+			   StartWith(request_header_fields.at(CONTENT_TYPE), MULTIPART_FORM_DATA)) {
+		return FileCreationHandlerForMultiPart(
+			upload_dir_path,
+			request_body_message,
+			request_header_fields,
+			response_body_message,
+			response_header_fields
+		);
+	} else if (!IsExistPath(upload_file_path)) {
 		return FileCreationHandler(
-			upload_path, request_body_message, response_body_message, response_header_fields
+			upload_file_path, request_body_message, response_body_message, response_header_fields
 		);
 	}
-	const Stat &info = TryStat(upload_path);
+	const Stat &info = TryStat(upload_file_path);
 	StatusCode  status_code(NO_CONTENT);
 	if (info.IsDirectory()) {
 		throw HttpException("Error: Forbidden", StatusCode(FORBIDDEN));
@@ -170,8 +233,8 @@ StatusCode Method::PostHandler(
 		// ex) POST /save/test.txt HTTP/1.1
 		// Location: /save/test.txt;
 		status_code = FileCreationHandler(
-			upload_path, request_body_message, response_body_message, response_header_fields
-		);
+			upload_file_path, request_body_message, response_body_message, response_header_fields
+		); // todo: forbiddenに
 	}
 	return status_code;
 }
@@ -204,6 +267,46 @@ void Method::SystemExceptionHandler(int error_number) {
 	} else {
 		throw HttpException("Error: Internal Server Error", StatusCode(INTERNAL_SERVER_ERROR));
 	}
+}
+
+StatusCode Method::FileCreationHandlerForMultiPart(
+	const std::string  &path,
+	const std::string  &request_body_message,
+	const HeaderFields &request_header_fields,
+	std::string        &response_body_message,
+	HeaderFields       &response_header_fields
+) {
+	if (request_header_fields.find(CONTENT_TYPE) != request_header_fields.end() &&
+		StartWith(request_header_fields.at(CONTENT_TYPE), MULTIPART_FORM_DATA)) {
+		std::vector<Method::Part> parts =
+			DecodeMultipartFormData(request_header_fields.at(CONTENT_TYPE), request_body_message);
+		for (std::vector<Method::Part>::iterator it = parts.begin(); it != parts.end(); ++it) {
+			if ((*it).headers.find("Content-Disposition") != (*it).headers.end()) {
+				std::map<std::string, std::string> content_disposition =
+					ParseContentDisposition((*it).headers["Content-Disposition"]);
+				if (content_disposition.find("filename") != content_disposition.end()) {
+					std::string   file_name = content_disposition["filename"];
+					std::string   file_path = path + "/" + file_name;
+					std::ofstream file(file_path.c_str(), std::ios::binary);
+					if (file.fail()) {
+						throw HttpException("Error: Forbidden", StatusCode(FORBIDDEN));
+					}
+					file.write((*it).body.c_str(), (*it).body.length());
+					if (file.fail()) {
+						file.close();
+						if (std::remove(file_path.c_str()) == SYSTEM_ERROR) {
+							SystemExceptionHandler(errno);
+						}
+						throw HttpException("Error: Forbidden", StatusCode(FORBIDDEN));
+					}
+				}
+			}
+		}
+	}
+	StatusCode status_code(CREATED);
+	response_body_message                  = HttpResponse::CreateDefaultBodyMessage(status_code);
+	response_header_fields[CONTENT_LENGTH] = utils::ToString(response_body_message.length());
+	return status_code;
 }
 
 StatusCode Method::FileCreationHandler(

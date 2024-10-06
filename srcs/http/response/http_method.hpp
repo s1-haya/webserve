@@ -59,6 +59,13 @@ class Method {
 		 std::string       &response_body_message,
 		 HeaderFields      &response_header_fields
 	 );
+	static StatusCode FileCreationHandlerForMultiPart(
+		const std::string  &path,
+		const std::string  &request_body_message,
+		const HeaderFields &request_header_fields,
+		std::string        &response_body_message,
+		HeaderFields       &response_header_fields
+	);
 	static StatusCode EchoPostHandler(
 		const std::string &request_body_message,
 		std::string       &response_body_message,
@@ -72,10 +79,11 @@ class Method {
 		std::string                        body;
 	};
 	// multipart/form-dataをデコードする関数
-	std::string              ExtractBoundary(const std::string &content_type);
-	std::vector<std::string> SplitParts(const std::string &body, const std::string &boundary);
-	Part                     ParsePart(const std::string &part);
-	std::vector<Part>
+	static std::string ExtractBoundary(const std::string &content_type);
+	static std::vector<std::string>
+				SplitParts(const std::string &body, const std::string &boundary);
+	static Part ParsePart(const std::string &part);
+	static std::vector<Part>
 	DecodeMultipartFormData(const std::string &content_type, const std::string &body);
 };
 
