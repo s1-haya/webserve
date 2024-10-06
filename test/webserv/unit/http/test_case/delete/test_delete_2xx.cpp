@@ -27,7 +27,7 @@ void DeleteTestFile(const std::string &file_name) {
 
 } // namespace
 
-bool HandleWhetherFileDelete(const std::string &file) {
+int HandleWhetherFileDelete(const std::string &file) {
 	if (access(file.c_str(), F_OK) == 0) {
 		std::cerr << utils::color::RED << "Error: couldn't delete the file in delete test case."
 				  << utils::color::RESET << std::endl;
