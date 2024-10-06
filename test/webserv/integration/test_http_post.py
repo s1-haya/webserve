@@ -114,11 +114,17 @@ def test_post_upload_responses(
             timeout_response,
             UPLOAD_DIR + "shortened_body_message",
         ),
+        (
+            REQUEST_POST_4XX_DIR + "408_02_no_body_message.txt",
+            timeout_response,
+            UPLOAD_DIR + "no_body_message",
+        ),
     ],
     ids=[
         "400_01_duplicate_content_length",
         "400_02_transfer_encoding_and_content_length",
         "408_01_shortened_body_message",
+        "408_02_no_body_message",
     ],
 )
 def test_post_4xx_responses(request_file, expected_response, upload_file_path):
