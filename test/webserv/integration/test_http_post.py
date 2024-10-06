@@ -58,11 +58,20 @@ def assert_uploaded_file_content(upload_file_path, expected_upload_file_content)
             UPLOAD_FILE_PATH,
             "first",
         ),
+        (
+            REQUEST_POST_2XX_DIR + "201_04_chunked_200_get_close.txt",
+            created_response_keep
+            + response_header_get_root_200_close
+            + root_index_file,
+            UPLOAD_DIR + "chunked_request_file",
+            "Wikipedia",
+        ),
     ],
     ids=[
         "201_01_upload_file",
         "201_02_chunked",
         "201_03_upload_file_204_same_upload_file",
+        "201_04_chunked_200_get_close",
     ],
 )
 def test_post_upload_responses(
