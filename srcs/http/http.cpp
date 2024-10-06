@@ -54,6 +54,8 @@ HttpResult Http::GetResponseFromCgi(int client_fd, const cgi::CgiResponse &cgi_r
 	if (header_fields.find(LOCATION) != header_fields.end() &&
 		StartWith(header_fields[LOCATION], "/")) {
 		std::cout << header_fields.at(LOCATION) << std::endl;
+		// is_local_redirectフラグと条件分岐なしでresult.request_bufの先頭にCreateLocalRedirectRequest()の結果をつけて
+		// 返す方法でもできそうではある(serverがlocal_redirectの存在を知らなくても良いようにできそう)
 		result.is_local_redirect   = true;
 		HttpRequestParsedData data = storage_.GetClientSaveData(client_fd);
 		result.response            = CreateLocalRedirectRequest(header_fields[LOCATION]);
@@ -68,6 +70,7 @@ HttpResult Http::GetResponseFromCgi(int client_fd, const cgi::CgiResponse &cgi_r
 	result.is_connection_keep =
 		HttpResponse::IsConnectionKeep(data.request_result.request.header_fields);
 	result.is_response_complete = true;
+	result.request_buf          = data.current_buf;
 	result.response =
 		HttpResponse::GetResponseFromCgi(cgi_parse_result.GetValue(), data.request_result);
 	storage_.DeleteClientSaveData(client_fd);

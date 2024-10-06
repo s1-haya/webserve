@@ -172,6 +172,8 @@ void Server::HandleExistingConnection(const event::Event &event) {
 	}
 	// Call RunHttpAndCgi() if request_buf contains data, even without a read event.
 	if (IsHttpRequestBufExist(event.fd)) {
+		// 何かしらeventが発生しないとここ(http_.Run()が呼ばれない作りになってる
+		// -> event監視と別で、request_bufがあるclientは全部http_.Run()を呼ぶなどした方が良いのかも
 		RunHttpAndCgi(event);
 	}
 }
@@ -310,6 +312,11 @@ void Server::HandleWriteEvent(int fd) {
 }
 
 void Server::SendHttpResponse(int client_fd) {
+	// local_redirect後にEVENT_WRITEセットしたらresponseがなくても入ってくるようになってしまう
+	if (!message_manager_.IsResponseExist(client_fd)) {
+		return;
+	}
+
 	message::Response              response         = message_manager_.PopHeadResponse(client_fd);
 	const message::ConnectionState connection_state = response.connection_state;
 	const std::string             &response_str     = response.response_str;
@@ -636,7 +643,12 @@ void Server::GetHttpResponseFromCgiResponse(int client_fd, const cgi::CgiRespons
 		std::cout << http_result.response << std::endl;
 		message_manager_.AppendRequestBuf(client_fd, http_result.response);
 		std::cout << "request_buf: " << message_manager_.GetRequestBuf(client_fd) << std::endl;
-	} else if (!http_result.is_response_complete) {
+		// 今だと何かしらeventが起きないとhttp_.Run()が呼ばれない流れになってるので仮にEVENT_WRITEを登録する(良くはない)
+		ReplaceEvent(client_fd, event::EVENT_WRITE);
+		utils::Debug("server", "received local redirect request from client", client_fd);
+		return;
+	}
+	if (!http_result.is_response_complete) {
 		throw std::logic_error("GetResponseFromCgi: incorrect HttpResult");
 	}
 	message_manager_.SetIsCompleteRequest(client_fd, true);
@@ -644,8 +656,8 @@ void Server::GetHttpResponseFromCgiResponse(int client_fd, const cgi::CgiRespons
 
 	const message::ConnectionState connection_state =
 		http_result.is_connection_keep ? message::KEEP : message::CLOSE;
-	UpdateEventInCgiResponseComplete(connection_state, client_fd);
 	message_manager_.AddNormalResponse(client_fd, connection_state, http_result.response);
+	UpdateEventInCgiResponseComplete(connection_state, client_fd);
 }
 
 void Server::UpdateEventInCgiResponseComplete(
