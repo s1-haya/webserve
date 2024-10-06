@@ -50,18 +50,18 @@ std::string DetermineContentType(const std::string &path) {
 }
 
 // todo: utilsへ移動
-
+// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 bool StartWith(const std::string &str, const std::string &prefix) {
 	return str.size() >= prefix.size() && str.compare(0, prefix.size(), prefix) == 0;
 }
 
-// ヘルパー関数: 文字列のトリム
-std::string Trim(const std::string &str) {
-	std::size_t first = str.find_first_not_of(' ');
+// ヘルパー関数: 文字列のトリム: TrimOWSにも使える
+std::string Trim(const std::string &str, const std::string &to_trim) {
+	std::size_t first = str.find_first_not_of(to_trim);
 	if (std::string::npos == first) {
 		return str;
 	}
-	std::size_t last = str.find_last_not_of(' ');
+	std::size_t last = str.find_last_not_of(to_trim);
 	return str.substr(first, last - first + 1);
 }
 
@@ -74,6 +74,8 @@ char FrontChar(const std::string &str) {
 char BackChar(const std::string &str) {
 	return str.empty() ? '\0' : str[str.size() - 1];
 }
+
+// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 // ヘルパー関数: 文字列のクオートを削除
 std::string RemoveQuotes(const std::string &str) {
@@ -512,11 +514,13 @@ std::map<std::string, std::string> Method::ParseContentDisposition(const std::st
 
 	// セミコロンで分割
 	while (std::getline(stream, part, ';')) {
-		part            = Trim(part);
+		// form-data; name="file"; filename="a.txt"
+		part            = Trim(part, OPTIONAL_WHITESPACE);
 		std::size_t pos = part.find('=');
 		if (pos != std::string::npos) {
-			std::string key   = Trim(part.substr(0, pos));
-			std::string value = Trim(part.substr(pos + 1));
+			// filename="a.txt"のような形で来る
+			std::string key   = Trim(part.substr(0, pos), OPTIONAL_WHITESPACE);
+			std::string value = Trim(part.substr(pos + 1), OPTIONAL_WHITESPACE);
 			value             = RemoveQuotes(value);
 			result[key]       = value;
 		}
