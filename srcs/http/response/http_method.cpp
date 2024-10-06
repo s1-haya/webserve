@@ -433,22 +433,25 @@ StatusCode Method::EchoPostHandler(
 std::vector<Method::Part>
 Method::DecodeMultipartFormData(const std::string &content_type, const std::string &body) {
 	std::vector<Method::Part> parts;
-	std::string               boundary = ExtractBoundary(content_type);
-	if (boundary.empty()) {
-		throw HttpException(
-			"Error: Boundary not found in Content-Type header", StatusCode(BAD_REQUEST)
-		);
+	std::string               boundary  = ExtractBoundary(content_type);
+	std::vector<std::string>  raw_parts = utils::SplitStr(body, boundary);
+	if (raw_parts.size() < 3) { // boundary + パート + boundary が最低でも必要
+		throw HttpException("Error: Invalid multipart/form-data format", StatusCode(BAD_REQUEST));
 	}
-	std::vector<std::string> raw_parts = utils::SplitStr(body, boundary);
 	for (std::vector<std::string>::const_iterator raw_part =
-			 raw_parts.begin() + 1; // 最初のパートは空文字列
-		 raw_part != raw_parts.end() - 1;
+			 raw_parts.begin() + 1;       // 最初のパートは空文字列
+		 raw_part != raw_parts.end() - 1; // 最後のパートはboundary + "--"
 		 ++raw_part) {
 		parts.push_back(ParsePart(*raw_part));
 	}
 	if (parts.empty()) {
 		throw HttpException(
 			"Error: No parts found in multipart/form-data", StatusCode(BAD_REQUEST)
+		);
+	} else if (raw_parts.back() != "--\r\n") {
+		throw HttpException(
+			"Error: Invalid multipart/form-data format, final boundary not found",
+			StatusCode(BAD_REQUEST)
 		);
 	}
 	return parts;
@@ -468,8 +471,7 @@ std::string Method::ExtractBoundary(const std::string &content_type) {
 
 // ヘッダーとボディを分割する関数
 Method::Part Method::ParsePart(const std::string &part) {
-	Part result;
-	std::cout << "part: " << part << std::endl;
+	Part        result;
 	std::size_t header_end = part.find(CRLF + CRLF);
 	if (header_end == std::string::npos) {
 		throw HttpException(
@@ -489,7 +491,7 @@ Method::Part Method::ParsePart(const std::string &part) {
 			throw HttpException("Error: Invalid header format", StatusCode(BAD_REQUEST));
 		}
 		std::string name     = header.substr(0, colon);
-		std::string value    = header.substr(colon + 2);
+		std::string value    = header.substr(colon + CRLF.length());
 		result.headers[name] = value;
 		pos                  = end + CRLF.length();
 		end                  = headers.find(CRLF, pos);
@@ -503,18 +505,22 @@ std::map<std::string, std::string> Method::ParseContentDisposition(const std::st
 	std::istringstream                 stream(header);
 	std::string                        part;
 
+	// form-data; name="file"; filename="a.txt"
+	std::getline(stream, part, ';'); // form-data
 	// セミコロンで分割
 	while (std::getline(stream, part, ';')) {
-		// form-data; name="file"; filename="a.txt"
 		part            = Trim(part, OPTIONAL_WHITESPACE);
 		std::size_t pos = part.find('=');
-		if (pos != std::string::npos) {
-			// filename="a.txt"のような形で来る
-			std::string key   = Trim(part.substr(0, pos), OPTIONAL_WHITESPACE);
-			std::string value = Trim(part.substr(pos + 1), OPTIONAL_WHITESPACE);
-			value             = RemoveQuotes(value);
-			result[key]       = value;
+		if (pos == std::string::npos) {
+			throw HttpException(
+				"Error: Invalid Content-Disposition header format", StatusCode(BAD_REQUEST)
+			);
 		}
+		// filename="a.txt"のような形で来る
+		std::string key   = Trim(part.substr(0, pos), OPTIONAL_WHITESPACE);
+		std::string value = Trim(part.substr(pos + 1), OPTIONAL_WHITESPACE);
+		value             = RemoveQuotes(value);
+		result[key]       = value;
 	}
 	return result;
 }
