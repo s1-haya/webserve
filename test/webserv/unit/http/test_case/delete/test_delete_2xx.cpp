@@ -10,6 +10,18 @@
 #include <unistd.h>
 
 namespace test {
+namespace {
+
+bool CreateTestFile(const std::string &file_name) {
+	std::ofstream file(file_name.c_str(), std::ios::binary);
+	if (file.fail()) {
+		utils::Debug("Error: fail to create file in delete test case.");
+		return false;
+	}
+	return true;
+}
+
+} // namespace
 
 bool HandleWhetherFileDelete(const std::string &file) {
 	if (access(file.c_str(), F_OK) == 0) {
@@ -24,9 +36,7 @@ bool HandleWhetherFileDelete(const std::string &file) {
 int TestDeleteNoContent1ExistingFile(const server::VirtualServerAddrList &server_infos) {
 	int                ret_code  = EXIT_SUCCESS;
 	const std::string &file_name = "../../../../root/upload/delete_file";
-	std::ofstream      file(file_name.c_str(), std::ios::binary);
-	if (file.fail()) {
-		utils::Debug("Error: fail to create file in delete test case.");
+	if (!CreateTestFile(file_name)) {
 		return EXIT_FAILURE;
 	}
 	http::ClientInfos client_infos         = CreateClientInfos(request::DELETE_204_1_EXISTING_FILE);
@@ -51,9 +61,7 @@ int TestDeleteNoContent2ExistingFileWithBodyMessage(
 ) {
 	int                ret_code  = EXIT_SUCCESS;
 	const std::string &file_name = "../../../../root/upload/delete_file";
-	std::ofstream      file(file_name.c_str(), std::ios::binary);
-	if (file.fail()) {
-		utils::Debug("Error: fail to create file in delete test case.");
+	if (!CreateTestFile(file_name)) {
 		return EXIT_FAILURE;
 	}
 	http::ClientInfos client_infos =
@@ -79,9 +87,7 @@ int TestDeleteNoContent3ExistingFileThenNotFoundOnSecondAttempt(
 ) {
 	int                ret_code  = EXIT_SUCCESS;
 	const std::string &file_name = "../../../../root/upload/delete_file";
-	std::ofstream      file(file_name.c_str(), std::ios::binary);
-	if (file.fail()) {
-		utils::Debug("Error: fail to create file in delete test case.");
+	if (!CreateTestFile(file_name)) {
 		return EXIT_FAILURE;
 	}
 	http::ClientInfos client_infos =
