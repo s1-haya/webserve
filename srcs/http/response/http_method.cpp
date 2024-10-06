@@ -57,11 +57,11 @@ bool StartWith(const std::string &str, const std::string &prefix) {
 
 // ヘルパー関数: 文字列のトリム
 std::string Trim(const std::string &str) {
-	size_t first = str.find_first_not_of(' ');
+	std::size_t first = str.find_first_not_of(' ');
 	if (std::string::npos == first) {
 		return str;
 	}
-	size_t last = str.find_last_not_of(' ');
+	std::size_t last = str.find_last_not_of(' ');
 	return str.substr(first, last - first + 1);
 }
 
@@ -91,8 +91,8 @@ std::map<std::string, std::string> ParseContentDisposition(const std::string &he
 
 	// セミコロンで分割
 	while (std::getline(stream, part, ';')) {
-		part       = Trim(part);
-		size_t pos = part.find('=');
+		part            = Trim(part);
+		std::size_t pos = part.find('=');
 		if (pos != std::string::npos) {
 			std::string key   = Trim(part.substr(0, pos));
 			std::string value = Trim(part.substr(pos + 1));
@@ -381,7 +381,7 @@ utils::Result<std::string> Method::AutoindexHandler(const std::string &path) {
 
 	std::string       display_path = path;
 	const std::string root_path    = "/root";
-	size_t            pos          = path.find(root_path);
+	std::size_t       pos          = path.find(root_path);
 	if (pos != std::string::npos) {
 		display_path = path.substr(pos + root_path.length());
 	}
@@ -408,7 +408,7 @@ utils::Result<std::string> Method::AutoindexHandler(const std::string &path) {
 			std::string entry_name = std::string(entry->d_name) + (is_dir ? "/" : "");
 			// エントリ名の幅を固定
 			response_body_message += "<a href=\"" + entry_name + "\">" + entry_name + "</a>";
-			size_t padding = (entry_name.length() < 50) ? 50 - entry_name.length() : 0;
+			std::size_t padding = (entry_name.length() < 50) ? 50 - entry_name.length() : 0;
 			response_body_message += std::string(padding, ' ') + " ";
 
 			// ctimeの部分を固定幅にする
@@ -451,7 +451,7 @@ StatusCode Method::EchoPostHandler(
 // Boundaryを抽出する関数
 std::string Method::ExtractBoundary(const std::string &content_type) {
 	std::string boundary_prefix = "boundary=";
-	size_t      pos             = content_type.find(boundary_prefix);
+	std::size_t pos             = content_type.find(boundary_prefix);
 	if (pos != std::string::npos) {
 		return "--" + content_type.substr(pos + boundary_prefix.length());
 	}
@@ -461,8 +461,8 @@ std::string Method::ExtractBoundary(const std::string &content_type) {
 // パートを分割する関数
 std::vector<std::string> Method::SplitParts(const std::string &body, const std::string &boundary) {
 	std::vector<std::string> parts;
-	size_t start = body.find(boundary) + boundary.length() + 2; // +2は\r\nをスキップするため
-	size_t end = body.find(boundary, start);
+	std::size_t start = body.find(boundary) + boundary.length() + 2; // +2は\r\nをスキップするため
+	std::size_t end = body.find(boundary, start);
 	while (end != std::string::npos) {
 		// -2は\r\nを除外するため
 		parts.push_back(body.substr(start, end - start - 2));
@@ -474,17 +474,17 @@ std::vector<std::string> Method::SplitParts(const std::string &body, const std::
 
 // ヘッダーとボディを分割する関数
 Method::Part Method::ParsePart(const std::string &part) {
-	Part   result;
-	size_t header_end = part.find("\r\n\r\n");
+	Part        result;
+	std::size_t header_end = part.find("\r\n\r\n");
 	if (header_end != std::string::npos) {
 		std::string headers = part.substr(0, header_end);
 		result.body         = part.substr(header_end + 4);
 
-		size_t pos = 0;
-		size_t end = headers.find("\r\n", pos);
+		std::size_t pos = 0;
+		std::size_t end = headers.find("\r\n", pos);
 		while (end != std::string::npos) {
 			std::string header = headers.substr(pos, end - pos);
-			size_t      colon  = header.find(": ");
+			std::size_t colon  = header.find(": ");
 			if (colon != std::string::npos) {
 				std::string name     = header.substr(0, colon);
 				std::string value    = header.substr(colon + 2);
@@ -495,7 +495,7 @@ Method::Part Method::ParsePart(const std::string &part) {
 		}
 		// 最後のヘッダー行を処理
 		std::string last_header = headers.substr(pos);
-		size_t      colon       = last_header.find(": ");
+		std::size_t colon       = last_header.find(": ");
 		if (colon != std::string::npos) {
 			std::string name     = last_header.substr(0, colon);
 			std::string value    = last_header.substr(colon + 2);
