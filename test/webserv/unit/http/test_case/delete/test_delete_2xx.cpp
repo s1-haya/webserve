@@ -21,6 +21,10 @@ bool CreateTestFile(const std::string &file_name) {
 	return true;
 }
 
+void DeleteTestFile(const std::string &file_name) {
+	std::remove(file_name.c_str());
+}
+
 } // namespace
 
 bool HandleWhetherFileDelete(const std::string &file) {
@@ -53,6 +57,7 @@ int TestDeleteNoContent1ExistingFile(const server::VirtualServerAddrList &server
 	http::HttpResult expected = CreateHttpResult(true, false, "", expected_response);
 	ret_code |= HandleHttpResult(client_infos, server_infos, expected, "204-01");
 	ret_code |= HandleWhetherFileDelete(file_name);
+	DeleteTestFile(file_name);
 	return ret_code;
 }
 
@@ -79,6 +84,7 @@ int TestDeleteNoContent2ExistingFileWithBodyMessage(
 	http::HttpResult expected = CreateHttpResult(true, false, "", expected_response);
 	ret_code |= HandleHttpResult(client_infos, server_infos, expected, "204-02");
 	ret_code |= HandleWhetherFileDelete(file_name);
+	DeleteTestFile(file_name);
 	return ret_code;
 }
 
@@ -122,6 +128,7 @@ int TestDeleteNoContent3ExistingFileThenNotFoundOnSecondAttempt(
 	http::HttpResult expected_not_found =
 		CreateHttpResult(true, false, "", expected_response_not_found);
 	ret_code |= HandleHttpResult(client_infos, server_infos, expected_not_found, "404-03-2");
+	DeleteTestFile(file_name);
 	return ret_code;
 }
 
