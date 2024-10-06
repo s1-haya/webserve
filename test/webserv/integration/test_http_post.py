@@ -10,6 +10,7 @@ REQUEST_POST_4XX_DIR = REQUEST_DIR + "post/4xx/"
 
 UPLOAD_DIR = "root/upload/"
 UPLOAD_FILE_PATH = UPLOAD_DIR + "test_upload_file"
+CHUNKED_FILE_PATH = UPLOAD_DIR + "chunked_request_file"
 
 
 def delete_file(file_path):
@@ -49,7 +50,7 @@ def assert_uploaded_file_content(upload_file_path, expected_upload_file_content)
         (
             REQUEST_POST_2XX_DIR + "201_02_chunked.txt",
             created_response_close,
-            UPLOAD_DIR + "chunked_request_file",
+            CHUNKED_FILE_PATH,
             "SAWAMURA HAYATO",
         ),
         (
@@ -63,8 +64,14 @@ def assert_uploaded_file_content(upload_file_path, expected_upload_file_content)
             created_response_keep
             + response_header_get_root_200_close
             + root_index_file,
-            UPLOAD_DIR + "chunked_request_file",
+            CHUNKED_FILE_PATH,
             "Wikipedia",
+        ),
+        (
+            REQUEST_POST_2XX_DIR + "201_05_chunked_hex_size.txt",
+            created_response_close,
+            CHUNKED_FILE_PATH,
+            "Wikipedia is a free online encyclopedia that anyone can edit.",
         ),
     ],
     ids=[
@@ -72,6 +79,7 @@ def assert_uploaded_file_content(upload_file_path, expected_upload_file_content)
         "201_02_chunked",
         "201_03_upload_file_204_same_upload_file",
         "201_04_chunked_200_get_close",
+        "201_05_chunked_hex_size",
     ],
 )
 def test_post_upload_responses(
