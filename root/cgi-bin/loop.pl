@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
-use strict;
-use warnings;
-
 print "Content-Type: text/plain\r\n\r\n";
-print "OK\n"
+
+while (1) {
+    print "This is an infinite loop.\n";
+}
