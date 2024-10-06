@@ -93,3 +93,27 @@ def test_post_upload_responses(
 
     # testで作成したファイルがあれば次のtestのために削除
     delete_file(upload_file_path)
+
+
+# upload_file_path: ファイルを作らない想定でもテスト失敗時用にupload_file_pathを指定。ない場合はNoneを指定
+@pytest.mark.parametrize(
+    "request_file, expected_response, upload_file_path",
+    [
+        (
+            REQUEST_POST_4XX_DIR + "400_01_duplicate_content_length.txt",
+            bad_request_response,
+            UPLOAD_DIR + "duplicate_content_length",
+        ),
+    ],
+    ids=[
+        "400_01_duplicate_content_length",
+    ],
+)
+def test_post_4xx_responses(request_file, expected_response, upload_file_path):
+    # test結果に影響を与えるかもしれないので念のため削除
+    delete_file(upload_file_path)
+
+    send_request_and_assert_response(request_file, expected_response)
+
+    # testに失敗して作られてしまった場合、次のために削除
+    delete_file(upload_file_path)
