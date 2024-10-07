@@ -94,5 +94,27 @@ class TestCGI(unittest.TestCase):
             self.assertIn(b"PathInfo string: /path_info\n", response.read())
         except HTTPException as e:
             self.fail(f"Request failed: {e}")
+    
+    def test_no_header_pl(self):
+        try:
+            self.con.request("GET", "/cgi-bin/no_header.pl")
+            response = self.con.getresponse()
+            self.assertEqual(response.status, HTTPStatus.INTERNAL_SERVER_ERROR)
+        except HTTPException as e:
+            self.fail(f"Request failed: {e}")
 
-    # todo: error (マージ後追加)
+    def test_not_executable_pl(self):
+        try:
+            self.con.request("GET", "/cgi-bin/not_executable.pl")
+            response = self.con.getresponse()
+            self.assertEqual(response.status, HTTPStatus.INTERNAL_SERVER_ERROR)
+        except HTTPException as e:
+            self.fail(f"Request failed: {e}")
+
+    def test_invalid_header_pl(self):
+        try:
+            self.con.request("GET", "/cgi-bin/invalid_header.pl")
+            response = self.con.getresponse()
+            self.assertEqual(response.status, HTTPStatus.INTERNAL_SERVER_ERROR)
+        except HTTPException as e:
+            self.fail(f"Request failed: {e}")
