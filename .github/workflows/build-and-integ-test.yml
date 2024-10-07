@@ -36,7 +36,7 @@ jobs:
 
       - name: Run webserv
         run:
-          make run-webserv
+          make run-webserv-for-test
 
       - name: Wait for webserv to start
         run:
