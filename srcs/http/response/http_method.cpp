@@ -262,18 +262,18 @@ StatusCode Method::FileCreationHandlerForMultiPart(
 	for (std::vector<Method::Part>::iterator it = parts.begin(); it != parts.end(); ++it) {
 		// Content-Disposition: form-data; name="file"; filename="test.txt"
 		// のようにfilenameが含まれる場合 そのパスにファイルを作成する
-		if ((*it).headers.find(CONTENT_DISPOSITION) != (*it).headers.end()) {
-			std::map<std::string, std::string> content_disposition =
-				ParseContentDisposition((*it).headers[CONTENT_DISPOSITION]);
-			if (content_disposition.find(FILENAME) != content_disposition.end()) {
-				std::string file_name = content_disposition[FILENAME];
-				std::string file_path = path + "/" + file_name;
-				// upload_dir + "/" + file_name にファイルを作成
-				FileCreationHandler(
-					file_path, (*it).body, response_body_message, response_header_fields
-				);
-			}
+		if ((*it).headers.find(CONTENT_DISPOSITION) == (*it).headers.end()) {
+			continue;
 		}
+		std::map<std::string, std::string> content_disposition =
+			ParseContentDisposition((*it).headers[CONTENT_DISPOSITION]);
+		if (content_disposition.find(FILENAME) == content_disposition.end()) {
+			continue;
+		}
+		std::string file_name = content_disposition[FILENAME];
+		std::string file_path = path + "/" + file_name;
+		// upload_dir + "/" + file_name にファイルを作成
+		FileCreationHandler(file_path, (*it).body, response_body_message, response_header_fields);
 	}
 	StatusCode status_code(CREATED);
 	response_body_message                  = HttpResponse::CreateDefaultBodyMessage(status_code);
