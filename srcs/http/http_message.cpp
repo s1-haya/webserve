@@ -36,17 +36,16 @@ const std::string CHUNKED                  = "chunked";
 const std::string LOCATION                 = "location";
 const std::string AUTHORIZATION            = "authorization";
 const std::string REQUEST_HEADER_FIELDS[]  = {
-    HOST,
-    USER_AGENT,
-    ACCEPT,
-    ACCEPT_ENCODING,
-    CONNECTION,
-    CONTENT_TYPE,
-    CONTENT_LENGTH,
-    TRANSFER_ENCODING,
-    LOCATION,
-    AUTHORIZATION
-};
+	 HOST,
+	 USER_AGENT,
+	 ACCEPT,
+	 ACCEPT_ENCODING,
+	 CONNECTION,
+	 CONTENT_TYPE,
+	 CONTENT_LENGTH,
+	 TRANSFER_ENCODING,
+	 LOCATION,
+	 AUTHORIZATION};
 const std::size_t REQUEST_HEADER_FIELDS_SIZE =
 	sizeof(REQUEST_HEADER_FIELDS) / sizeof(REQUEST_HEADER_FIELDS[0]);
 

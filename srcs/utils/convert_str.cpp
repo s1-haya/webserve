@@ -22,7 +22,7 @@ Result<unsigned int> ConvertStrToUint(const std::string &str) {
 		return convert_result;
 	}
 
-	char            *end;
+	char			*end;
 	static const int BASE   = 10;
 	errno                   = 0;
 	const unsigned long num = std::strtoul(str.c_str(), &end, BASE);
@@ -45,7 +45,7 @@ Result<std::size_t> ConvertStrToSize(const std::string &str) {
 		return convert_result;
 	}
 
-	char            *end;
+	char			*end;
 	static const int BASE   = 10;
 	errno                   = 0;
 	const unsigned long num = std::strtoul(str.c_str(), &end, BASE);

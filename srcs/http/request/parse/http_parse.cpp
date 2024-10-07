@@ -366,8 +366,7 @@ void HttpParse::CheckValidHeaderFieldNameAndValue(
 		throw HttpException(
 			"Error: the value of Host header field is empty.", StatusCode(BAD_REQUEST)
 		);
-	} else if (header_field_name == CONTENT_LENGTH &&
-			   !utils::ConvertStrToSize(header_field_value).IsOk()) {
+	} else if (header_field_name == CONTENT_LENGTH && !utils::ConvertStrToSize(header_field_value).IsOk()) {
 		throw HttpException(
 			"Error: the value of Content-Length header field is not a number.",
 			StatusCode(BAD_REQUEST)
