@@ -434,11 +434,7 @@ Method::DecodeMultipartFormData(const std::string &content_type, const std::stri
 		 ++raw_part) {
 		parts.push_back(ParsePart(*raw_part));
 	}
-	if (parts.empty()) {
-		throw HttpException(
-			"Error: No parts found in multipart/form-data", StatusCode(BAD_REQUEST)
-		);
-	} else if (raw_parts.back() != "--\r\n") {
+	if (raw_parts.back() != "--\r\n") {
 		// 最後はboundary + "--"(----WebKitFormBoundary7MA4YWxkTrZu0gW--)
 		throw HttpException(
 			"Error: Invalid multipart/form-data format, final boundary not found",
