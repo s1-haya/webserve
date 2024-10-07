@@ -1,4 +1,5 @@
 import os
+import time
 
 import pytest
 from common_functions import read_file, send_request_and_assert_response
@@ -20,6 +21,7 @@ def delete_file(file_path):
     try:
         if os.path.exists(file_path):
             os.remove(file_path)
+            time.sleep(1)
             print(f"Deleted file: {file_path}")
     except Exception as e:
         print(f"Error deleting file: {file_path}, {e}")
@@ -34,6 +36,20 @@ def assert_uploaded_file_content(upload_file_path, expected_upload_file_content)
 
     assert result_body_message == expected_upload_file_content
     assert result_content_length == len(expected_upload_file_content)
+
+
+@pytest.fixture
+def cleanup_file_context():
+    # コンテキストマネージャとして使用可能なフィクスチャ
+    from contextlib import contextmanager
+
+    @contextmanager
+    def _cleanup(file_path):
+        delete_file(file_path)
+        yield
+        delete_file(file_path)
+
+    return _cleanup
 
 
 # upload_file_path: テスト前に削除しておきたいupload_file_pathが特になければNoneを指定
@@ -83,16 +99,17 @@ def assert_uploaded_file_content(upload_file_path, expected_upload_file_content)
     ],
 )
 def test_post_upload_responses(
-    request_file, expected_response, upload_file_path, expected_upload_file_content
+    request_file,
+    expected_response,
+    upload_file_path,
+    expected_upload_file_content,
+    cleanup_file_context,
 ):
-    # testで作成したいファイルがあるならtest前に念のため削除
-    delete_file(upload_file_path)
-
-    send_request_and_assert_response(request_file, expected_response)
-    assert_uploaded_file_content(upload_file_path, expected_upload_file_content)
-
-    # testで作成したファイルがあれば次のtestのために削除
-    delete_file(upload_file_path)
+    # cleanup_file_contextフィクスチャを使用してファイル削除を実行
+    if upload_file_path:
+        with cleanup_file_context(upload_file_path):
+            send_request_and_assert_response(request_file, expected_response)
+            assert_uploaded_file_content(upload_file_path, expected_upload_file_content)
 
 
 # upload_file_path: ファイルを作らない想定でもテスト失敗時用にupload_file_pathを指定。ない場合はNoneを指定
@@ -127,11 +144,12 @@ def test_post_upload_responses(
         "408_02_no_body_message",
     ],
 )
-def test_post_4xx_responses(request_file, expected_response, upload_file_path):
-    # test結果に影響を与えるかもしれないので念のため削除
-    delete_file(upload_file_path)
-
-    send_request_and_assert_response(request_file, expected_response)
-
-    # testに失敗して作られてしまった場合、次のために削除
-    delete_file(upload_file_path)
+def test_post_4xx_responses(
+    request_file,
+    expected_response,
+    upload_file_path,
+    cleanup_file_context,
+):
+    if upload_file_path:
+        with cleanup_file_context(upload_file_path):
+            send_request_and_assert_response(request_file, expected_response)
