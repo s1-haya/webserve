@@ -39,8 +39,10 @@ try:
     import client_module.client as client
 except subprocess.CalledProcessError as e:
     print(f"Build failed: {e}")
+    raise
 except ImportError as e:
     print(f"Import failed: {e}")
+    raise
 
 
 def send_request_and_assert_response(request_file, expected_response):

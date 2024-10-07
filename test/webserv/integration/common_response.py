@@ -37,20 +37,27 @@ ERROR_FILES = (
     ),
 )
 
+success_files_data = {}
+for filename, data_var, length_var in SUCCESS_FILES:
+    data, length = read_file_binary(
+        f"test/webserv/expected_response/default_body_message/{filename}"
+    )
+    success_files_data[data_var] = data
+    success_files_data[length_var] = length
 
-for files in (SUCCESS_FILES, ERROR_FILES):
-    for filename, data_var, length_var in files:
-        data, length = read_file_binary(
-            f"test/webserv/expected_response/default_body_message/{filename}"
-        )
-        globals()[data_var] = data
-        globals()[length_var] = length
+error_files_data = {}
+for filename, data_var, length_var in ERROR_FILES:
+    data, length = read_file_binary(
+        f"test/webserv/expected_response/default_body_message/{filename}"
+    )
+    error_files_data[data_var] = data
+    error_files_data[length_var] = length
 
 
 def create_response_header(
     status_code, connection, content_length, content_type=TEXT_PLAIN
 ):
-    return f"HTTP/1.1 {status_code} {STATUS[status_code]}\r\nConnection: {connection}\r\nContent-Length: {content_length}\r\nContent-Type: {content_type}\r\nServer: webserv/1.1\r\n\r\n"
+    return f"HTTP/1.1 {status_code} {STATUS[status_code]}\r\nconnection: {connection}\r\ncontent-length: {content_length}\r\ncontent-type: {content_type}\r\nserver: webserv/1.1\r\n\r\n"
 
 
 root_index_file, root_index_file_length = read_file("root/html/index.html")
@@ -67,37 +74,51 @@ response_header_get_sub_200_close = create_response_header(
     200, CLOSE, sub_index_file_length, TEXT_HTML
 )
 response_header_201_close = create_response_header(
-    201, CLOSE, created_file_201_length, TEXT_HTML
+    201, CLOSE, success_files_data["created_file_201_length"], TEXT_HTML
 )
 response_header_201_keep = create_response_header(
-    201, KEEP_ALIVE, created_file_201_length, TEXT_HTML
+    201, KEEP_ALIVE, success_files_data["created_file_201_length"], TEXT_HTML
 )
 response_header_204 = create_response_header(
-    204, CLOSE, no_content_file_204_length, TEXT_HTML
+    204, CLOSE, success_files_data["no_content_file_204_length"], TEXT_HTML
 )
 response_header_400 = create_response_header(
-    400, CLOSE, bad_request_file_400_length, TEXT_HTML
+    400, CLOSE, error_files_data["bad_request_file_400_length"], TEXT_HTML
 )
 response_header_404 = create_response_header(
-    404, CLOSE, not_found_file_404_length, TEXT_HTML
+    404, CLOSE, error_files_data["not_found_file_404_length"], TEXT_HTML
 )
 response_header_405 = create_response_header(
-    405, CLOSE, not_allowed_file_405_length, TEXT_HTML
+    405, CLOSE, error_files_data["not_allowed_file_405_length"], TEXT_HTML
 )
 response_header_408 = create_response_header(
-    408, CLOSE, timeout_file_408_length, TEXT_HTML
+    408, CLOSE, error_files_data["timeout_file_408_length"], TEXT_HTML
 )
 response_header_501 = create_response_header(
-    501, CLOSE, not_implemented_file_501_length, TEXT_HTML
+    501, CLOSE, error_files_data["not_implemented_file_501_length"], TEXT_HTML
 )
 
-created_response_close = response_header_201_close + created_file_201.decode("utf-8")
-created_response_keep = response_header_201_keep + created_file_201.decode("utf-8")
-no_content_response = response_header_204 + no_content_file_204.decode("utf-8")
-bad_request_response = response_header_400 + bad_request_file_400.decode("utf-8")
-not_found_response = response_header_404 + not_found_file_404.decode("utf-8")
-not_allowed_response = response_header_405 + not_allowed_file_405.decode("utf-8")
-timeout_response = response_header_408 + timeout_file_408.decode("utf-8")
-not_implemented_response = response_header_501 + not_implemented_file_501.decode(
+created_response_close = response_header_201_close + success_files_data[
+    "created_file_201"
+].decode("utf-8")
+created_response_keep = response_header_201_keep + success_files_data[
+    "created_file_201"
+].decode("utf-8")
+no_content_response = response_header_204 + success_files_data[
+    "no_content_file_204"
+].decode("utf-8")
+bad_request_response = response_header_400 + error_files_data[
+    "bad_request_file_400"
+].decode("utf-8")
+not_found_response = response_header_404 + error_files_data[
+    "not_found_file_404"
+].decode("utf-8")
+not_allowed_response = response_header_405 + error_files_data[
+    "not_allowed_file_405"
+].decode("utf-8")
+timeout_response = response_header_408 + error_files_data["timeout_file_408"].decode(
     "utf-8"
 )
+not_implemented_response = response_header_501 + error_files_data[
+    "not_implemented_file_501"
+].decode("utf-8")
