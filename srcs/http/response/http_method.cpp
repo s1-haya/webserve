@@ -465,7 +465,7 @@ std::string Method::ExtractBoundary(const std::string &content_type) {
 // ヘッダーとボディを分割する関数
 Method::Part Method::ParsePart(const std::string &part) {
 	Part        result;
-	std::size_t header_end = part.find(CRLF + CRLF);
+	std::size_t header_end = part.find(HEADER_FIELDS_END);
 	if (header_end == std::string::npos) {
 		throw HttpException(
 			"Error: Invalid part format, headers and body not properly separated",
