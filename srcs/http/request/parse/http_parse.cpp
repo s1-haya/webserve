@@ -138,6 +138,7 @@ void ThrowMissingHostHeaderField(const HeaderFields &header_fields) {
 }
 
 void ValidateInvalidHeaderFields(const HeaderFields &header_fields, const std::string &method) {
+	ThrowMissingHostHeaderField(header_fields);
 	if (method == POST && !header_fields.count(CONTENT_TYPE)) {
 		throw HttpException("Error: missing Content-Type header field.", StatusCode(BAD_REQUEST));
 	}
@@ -305,7 +306,6 @@ HeaderFields HttpParse::SetHeaderFields(const std::vector<std::string> &header_f
 			);
 		}
 	}
-	ThrowMissingHostHeaderField(header_fields);
 	return header_fields;
 }
 
