@@ -442,6 +442,7 @@ Method::DecodeMultipartFormData(const std::string &content_type, const std::stri
 			"Error: No parts found in multipart/form-data", StatusCode(BAD_REQUEST)
 		);
 	} else if (raw_parts.back() != "--\r\n") {
+		// 最後はboundary + "--"(----WebKitFormBoundary7MA4YWxkTrZu0gW--)
 		throw HttpException(
 			"Error: Invalid multipart/form-data format, final boundary not found",
 			StatusCode(BAD_REQUEST)
@@ -454,7 +455,9 @@ Method::DecodeMultipartFormData(const std::string &content_type, const std::stri
 std::string Method::ExtractBoundary(const std::string &content_type) {
 	const std::string boundary_prefix = BOUNDARY + "=";
 	std::size_t       pos             = content_type.find(boundary_prefix);
+	// Content-Type: multipart/form-data; boundary=--WebKitFormBoundary7MA4YWxkTrZu0gW
 	if (pos != std::string::npos) {
+		// ----WebKitFormBoundary7MA4YWxkTrZu0gW\r\n のような形式になっている
 		return "--" + content_type.substr(pos + boundary_prefix.length());
 	}
 	throw HttpException(
@@ -472,6 +475,8 @@ Method::Part Method::ParsePart(const std::string &part) {
 			StatusCode(BAD_REQUEST)
 		);
 	}
+	// ----WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name="file";
+	// のboundary=----WebKitFormBoundary7MA4YWxkTrZu0gW以降の\r\nから始まる
 	std::string headers = part.substr(CRLF.length(), header_end);
 	result.body         = part.substr(header_end + CRLF.length() * 2);
 
