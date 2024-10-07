@@ -5,7 +5,6 @@
 #include <vector>
 
 namespace http {
-
 namespace {
 
 bool IsUsAscii(int c) {
@@ -145,7 +144,10 @@ void ThrowMissingContentTypeHeaderField(const HeaderFields &header_fields) {
 
 void ThrowMissingBodyRequiredHeaderField(const HeaderFields &header_fields) {
 	if (!IsBodyMessageReadingRequired(header_fields)) {
-		throw HttpException("Error: missing Content-Length header field.", StatusCode(BAD_REQUEST));
+		throw HttpException(
+			"Error: missing either Content-Length or Transfer-Encoding header field.",
+			StatusCode(BAD_REQUEST)
+		);
 	}
 	// Transfer-Encodingのみ存在する場合、そのheader-field-valueがchunked以外はエラー
 	if (header_fields.count(TRANSFER_ENCODING) && header_fields.at(TRANSFER_ENCODING) != CHUNKED) {
@@ -395,7 +397,8 @@ void HttpParse::CheckValidHeaderFieldNameAndValue(
 		throw HttpException(
 			"Error: the value of Host header field is empty.", StatusCode(BAD_REQUEST)
 		);
-	} else if (header_field_name == CONTENT_LENGTH && !utils::ConvertStrToSize(header_field_value).IsOk()) {
+	} else if (header_field_name == CONTENT_LENGTH &&
+			   !utils::ConvertStrToSize(header_field_value).IsOk()) {
 		throw HttpException(
 			"Error: the value of Content-Length header field is not a number.",
 			StatusCode(BAD_REQUEST)
