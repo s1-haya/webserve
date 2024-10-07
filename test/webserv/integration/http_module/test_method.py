@@ -1,7 +1,8 @@
 from http import HTTPStatus
 from http.client import HTTPConnection, HTTPException
 
-from assert_http_response import assert_body, assert_header, assert_status_line
+from http_module.assert_http_response import (assert_body, assert_header,
+                                              assert_status_line)
 
 
 def test_ok() -> None:

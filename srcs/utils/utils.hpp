@@ -49,6 +49,7 @@ Result<unsigned int>     ConvertStrToUint(const std::string &str);
 Result<std::size_t>      ConvertStrToSize(const std::string &str);
 std::string              ConvertUintToStr(unsigned int num);
 std::vector<std::string> SplitStr(const std::string &src, const std::string &substring);
+std::string              ToLowerString(const std::string &str);
 
 bool IsDigit(char c);
 

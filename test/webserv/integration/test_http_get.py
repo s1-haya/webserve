@@ -1,37 +1,11 @@
-import os
-import subprocess
-
 import pytest
-from common import *
+from common_functions import send_request_and_assert_response
+from common_response import *
 
-
-def build_client_module():
-    # client_module ディレクトリに移動
-    client_module_dir = os.path.join(os.path.dirname(__file__), "client_module")
-    # コマンドを実行
-    subprocess.run(
-        ["python3", "setup.py", "build_ext", "--inplace"],
-        cwd=client_module_dir,
-        check=True,
-    )
-
-
-try:
-    # client_module をビルド
-    build_client_module()
-    # client_module.client をインポート
-    import client_module.client as client
-except subprocess.CalledProcessError as e:
-    print(f"Build failed: {e}")
-except ImportError as e:
-    print(f"Import failed: {e}")
-
-
-def send_request_and_assert_response(request_file, expected_response):
-    client_instance = client.Client(8080)
-    request, _ = read_file_binary(request_file)
-    response = client_instance.SendRequestAndReceiveResponse(request)
-    assert_response(response, expected_response)
+REQUEST_DIR = "test/common/request/"
+REQUEST_GET_2XX_DIR = REQUEST_DIR + "get/2xx/"
+REQUEST_GET_4XX_DIR = REQUEST_DIR + "get/4xx/"
+REQUEST_GET_5XX_DIR = REQUEST_DIR + "get/5xx/"
 
 
 @pytest.mark.parametrize(
@@ -50,12 +24,37 @@ def send_request_and_assert_response(request_file, expected_response):
             response_header_get_sub_200_close + sub_index_file,
         ),
         (
+            REQUEST_GET_2XX_DIR
+            + "200_04_connection_keep_alive_and_200_connection_keep_alive.txt",
+            response_header_get_root_200_keep
+            + root_index_file
+            + response_header_get_root_200_keep
+            + root_index_file,
+        ),
+        (
+            REQUEST_GET_2XX_DIR
+            + "200_05_connection_close_and_200_connection_close.txt",
+            response_header_get_root_200_close + root_index_file,
+        ),
+        (
+            REQUEST_GET_2XX_DIR
+            + "200_06_connection_keep_alive_and_200_connection_close.txt",
+            response_header_get_root_200_keep
+            + root_index_file
+            + response_header_get_root_200_close
+            + root_index_file,
+        ),
+        (
             REQUEST_GET_2XX_DIR + "200_07_no_connection_value.txt",
             response_header_get_root_200_keep + root_index_file,
         ),
         (
             REQUEST_GET_2XX_DIR + "200_08_wrong_connection_value.txt",
             response_header_get_root_200_keep + root_index_file,
+        ),
+        (
+            REQUEST_GET_2XX_DIR + "200_11_upper_and_lower_header_fields.txt",
+            response_header_get_root_200_close + root_index_file,
         ),
         (
             REQUEST_GET_2XX_DIR + "200_12_header_field_value_space.txt",
@@ -76,6 +75,10 @@ def send_request_and_assert_response(request_file, expected_response):
         (
             REQUEST_GET_2XX_DIR + "200_17_not_exist_header_field.txt",
             response_header_get_root_200_close + root_index_file,
+        ),
+        (
+            REQUEST_GET_2XX_DIR + "200_21_no_connection.txt",
+            response_header_get_root_200_keep + root_index_file,
         ),
         (REQUEST_GET_4XX_DIR + "400_02_lower_method.txt", bad_request_response),
         (
@@ -107,6 +110,14 @@ def send_request_and_assert_response(request_file, expected_response):
         ),
         (
             REQUEST_GET_4XX_DIR + "400_12_no_connection_name.txt",
+            bad_request_response,
+        ),
+        (
+            REQUEST_GET_4XX_DIR + "400_13_empty_host_header_value.txt",
+            bad_request_response,
+        ),
+        (
+            REQUEST_GET_4XX_DIR + "400_14_transfer_encoding_and_content_length.txt",
             bad_request_response,
         ),
         (
@@ -151,13 +162,18 @@ def send_request_and_assert_response(request_file, expected_response):
         "200_01_connection_close",
         "200_02_connection_keep",
         "200_03_sub_connection_close",
+        "200_04_connection_keep_alive_and_200_connection_keep_alive",
+        "200_05_connection_close_and_200_connection_close",
+        "200_06_connection_keep_alive_and_200_connection_close",
         "200_07_no_connection_value",
         "200_08_wrong_connection_value",
+        "200_11_upper_and_lower_header_fields",
         "200_12_header_field_value_space",
         "200_13_space_header_field_value",
         "200_14_extra_request",
         "200_15_body_message_default",
         "200_17_not_exist_header_field",
+        "200_21_no_connection",
         "400_02_lower_method",
         "400_03_no_ascii_method",
         "400_04_no_root",
@@ -169,6 +185,8 @@ def send_request_and_assert_response(request_file, expected_response):
         "400_10_duplicate_host",
         "400_11_no_header_field_colon",
         "400_12_no_connection_name",
+        "400_13_empty_host_header_value",
+        "400_14_transfer_encoding_and_content_length.txt",
         "400_15_space_in_header_field_name",
         "400_16_header_field_name_space_colon",
         "400_17_space_header_field_name",
