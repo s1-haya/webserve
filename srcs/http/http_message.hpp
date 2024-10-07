@@ -44,7 +44,6 @@ extern const std::size_t REQUEST_HEADER_FIELDS_SIZE;
 
 extern const std::string SERVER;
 
-extern const std::string BOUNDARY;
 extern const std::string CONTENT_DISPOSITION;
 extern const std::string FILENAME;
 
