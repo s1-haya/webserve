@@ -37,21 +37,20 @@ ERROR_FILES = (
     ),
 )
 
-success_files_data = {}
-for filename, data_var, length_var in SUCCESS_FILES:
-    data, length = read_file_binary(
-        f"test/webserv/expected_response/default_body_message/{filename}"
-    )
-    success_files_data[data_var] = data
-    success_files_data[length_var] = length
 
-error_files_data = {}
-for filename, data_var, length_var in ERROR_FILES:
-    data, length = read_file_binary(
-        f"test/webserv/expected_response/default_body_message/{filename}"
-    )
-    error_files_data[data_var] = data
-    error_files_data[length_var] = length
+def read_files_data(file_list):
+    files_data = {}
+    for filename, data_var, length_var in file_list:
+        data, length = read_file_binary(
+            f"test/webserv/expected_response/default_body_message/{filename}"
+        )
+        files_data[data_var] = data
+        files_data[length_var] = length
+    return files_data
+
+
+success_files_data = read_files_data(SUCCESS_FILES)
+error_files_data = read_files_data(ERROR_FILES)
 
 
 def create_response_header(
