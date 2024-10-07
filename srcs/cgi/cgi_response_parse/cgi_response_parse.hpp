@@ -25,10 +25,6 @@ class CgiResponseParse {
 	ParseHeaderFields(const std::string &header, HeaderFields &header_fields);
 	static utils::Result<void> ParseBody(const std::string &body, ParsedData &parsed_data);
 	static std::string        &TrimOws(std::string &s);
-
-	static const std::string CRLF;
-	static const std::string HEADER_FIELDS_END;
-	static const std::string OWS;
 };
 
 } // namespace cgi

@@ -1,0 +1,16 @@
+POST /upload/chunked_request_file HTTP/1.1
+Host: www.example.com
+Transfer-Encoding: chunked
+Content-Type: text/plain
+Connection: keep-alive
+
+4
+Wiki
+5
+pedia
+0
+
+GET / HTTP/1.1
+Host: www.example.com
+Connection: close
+

@@ -1,8 +1,7 @@
-POST /upload/duplicate_content_length HTTP/1.1
+DELETE /upload/delete_file HTTP/1.1
 Host: localhost
 Connection: close
 Content-Type: text/plain
 Content-Length: 5
-Content-Length: 3
 
-abcde
+HELLO

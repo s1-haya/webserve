@@ -1,4 +1,6 @@
 #include "utils.hpp"
+#include <algorithm> // transform
+#include <cctype>    // tolower
 #include <cerrno>
 #include <cstddef> // size_t
 #include <cstdlib> // strtoul
@@ -6,6 +8,13 @@
 #include <sstream>
 
 namespace utils {
+namespace {
+
+char ToLowerChar(char c) {
+	return static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
+}
+
+} // namespace
 
 Result<unsigned int> ConvertStrToUint(const std::string &str) {
 	Result<unsigned int> convert_result(false, 0);
@@ -13,7 +22,7 @@ Result<unsigned int> ConvertStrToUint(const std::string &str) {
 		return convert_result;
 	}
 
-	char            *end;
+	char			*end;
 	static const int BASE   = 10;
 	errno                   = 0;
 	const unsigned long num = std::strtoul(str.c_str(), &end, BASE);
@@ -36,7 +45,7 @@ Result<std::size_t> ConvertStrToSize(const std::string &str) {
 		return convert_result;
 	}
 
-	char            *end;
+	char			*end;
 	static const int BASE   = 10;
 	errno                   = 0;
 	const unsigned long num = std::strtoul(str.c_str(), &end, BASE);
@@ -45,6 +54,12 @@ Result<std::size_t> ConvertStrToSize(const std::string &str) {
 	}
 	convert_result.Set(true, static_cast<std::size_t>(num));
 	return convert_result;
+}
+
+std::string ToLowerString(const std::string &str) {
+	std::string lower_str = str;
+	std::transform(lower_str.begin(), lower_str.end(), lower_str.begin(), ToLowerChar);
+	return lower_str;
 }
 
 } // namespace utils

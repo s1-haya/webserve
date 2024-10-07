@@ -1,8 +1,8 @@
-POST /upload/duplicate_content_length HTTP/1.1
+POST /upload/test_upload_file HTTP/1.1
 Host: localhost
+Transfer-Encoding: chunked
 Connection: close
 Content-Type: text/plain
 Content-Length: 5
-Content-Length: 3
 
 abcde

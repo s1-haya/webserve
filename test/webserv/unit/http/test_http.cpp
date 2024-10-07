@@ -57,10 +57,8 @@ int  main(void) {
     ret_code |= test::TestGetOk4ConnectionKeepAndOkConnectionKeep(server_infos);
     ret_code |= test::TestGetOk5ConnectionCloseAndOkConnectionClose(server_infos);
     ret_code |= test::TestGetOk6ConnectionKeepAndOkConnectionClose(server_infos);
-    // todo: ヘッダーフィールド大文字、小文字対応する？(優先度は低い)
-    // ret_code |= test::TestGetOk11UpperAndLowerHeaderFields(server_infos);
-    // todo: ヘッダーフィールドのvalueの右のOWSをtrimする
-    // ret_code |= test::TestGetOk12HeaderFieldValueSpace(server_infos);
+    ret_code |= test::TestGetOk11UpperAndLowerHeaderFields(server_infos);
+    ret_code |= test::TestGetOk12HeaderFieldValueSpace(server_infos);
     ret_code |= test::TestGetOk13SpaceHeaderFieldValue(server_infos);
     ret_code |= test::TestGetOk14ExtraRequest(server_infos);
     ret_code |= test::TestGetOk15BodyMessageDefault(server_infos);
@@ -79,10 +77,6 @@ int  main(void) {
     ret_code |= test::TestGetBadRequest10DuplicateHost(server_infos);
     ret_code |= test::TestGetBadRequest11NoHeaderFieldColon(server_infos);
     ret_code |= test::TestGetBadRequest12NoConnectionName(server_infos);
-    // todo: CheckHeaderFieldValue() / Connectionがkeep-aliveとclose以外の場合
-    // ret_code |= test::TestGetBadRequest13NoConnectionValue(server_infos);
-    // ret_code |= test::TestGetBadRequest14WrongConnectionValue(server_infos);
-    // todo: 対応していないヘッダーフィールドは無視する場合はこのテストを削除する
     ret_code |= test::TestGetBadRequest15SpaceInHeaderFieldName(server_infos);
     ret_code |= test::TestGetBadRequest16HeaderFieldNameSpaceColon(server_infos);
     ret_code |= test::TestGetBadRequest17SpaceHeaderFieldName(server_infos);
@@ -93,17 +87,16 @@ int  main(void) {
 
     ret_code |= test::TestGetNotFound1NotExistFile(server_infos);
     ret_code |= test::TestGetMethodNotAllowed(server_infos);
-    // todo: HttpResponse::CreateTimeoutResponse
-    // ret_code |= test::TestGetTimeout1NoCrlf(server_infos);
     ret_code |= test::TestGetNotImplemented1NotExistMethod(server_infos);
 
-    // test cgi
-    std::cout << std::endl;
-    // ret_code |= test::TestCgiGetOk1PrintOkBodyMessage(server_infos);
-    // ret_code |= test::TestCgiGetOk2PrintOkInPerl(server_infos);
-    // ret_code |= test::TestCgiGetOk3PrintOkInPython(server_infos);
-    // ret_code |= test::TestCgiGetOk4PrintOkInShell(server_infos);
-    DeleteVirtualServerAddrList(server_infos);
+    std::cout << "\n\033[44;37m[ Test DELETE ]\033[m" << std::endl;
+    ret_code |= test::TestDeleteNoContent1ExistingFile(server_infos);
+    ret_code |= test::TestDeleteNoContent2ExistingFileWithBodyMessage(server_infos);
+    ret_code |= test::TestDeleteNoContent3ExistingFileThenNotFoundOnSecondAttempt(server_infos);
+
+    ret_code |= test::TestDelete1ForbiddenDirectory(server_infos);
+    ret_code |= test::TestDelete1NotFoundNonexistentFile(server_infos);
+    ret_code |= test::TestDeleteMethodNotAllowed(server_infos);
 
     // test GetErrorResponse
     std::cout << "\n\033[44;37m[ Test GetErrorResponse ]\033[m" << std::endl;
