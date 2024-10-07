@@ -275,7 +275,7 @@ Result ParseChunkedMultipleTimes1() {
 	http::HttpRequestParsedData save_data;
 	// 1回目のread_bufをセット
 	save_data.current_buf = "POST / HTTP/1.1\r\nHost: host\r\nTransfer-Encoding: "
-							"chunked\r\n\r\n4\r\nWi";
+							"chunked\r\nContent-Type: text/plain\r\n\r\n4\r\nWi";
 
 	// 1回目のParseのexpected
 	http::HttpRequestParsedData expected;
@@ -312,7 +312,7 @@ Result ParseChunkedMultipleTimes2() {
 	http::HttpRequestParsedData save_data;
 	// 1回目のread_bufをセット
 	save_data.current_buf = "POST / HTTP/1.1\r\nHost: host\r\nTransfer-Encoding: "
-							"chunked\r\n\r\n4\r\nWiki\r";
+							"chunked\r\nContent-Type: text/plain\r\n\r\n4\r\nWiki\r";
 
 	// 1回目のParseのexpected
 	http::HttpRequestParsedData expected;
@@ -643,74 +643,74 @@ int main(void) {
 
 	static const TestCase test_case_http_request_body_message_format_with_chunked[] = {
 		TestCase(
-			"POST / HTTP/1.1\r\nHost: host\r\nTransfer-Encoding: "
-			"chunked\r\n\r\n4\r\nWiki\r\n5\r\npedia\r\n0x34\r\n is a free online encyclopedia that "
-			"anyone can edit.\r\n0\r\n\r\n",
+			"POST / HTTP/1.1\r\nHost: host\r\nTransfer-Encoding: chunked\r\nContent-Type: "
+			"text/plain\r\n\r\n4\r\nWiki\r\n5\r\npedia\r\n0x34\r\n is a free online encyclopedia "
+			"that anyone can edit.\r\n0\r\n\r\n",
 			test1_body_message_chunked
 		),
 		TestCase(
-			"POST / HTTP/1.1\r\nHost: host\r\nTransfer-Encoding: "
-			"chunked\r\n\r\n4\r\nWiki\r\n2\r\npedia\r\n0\r\n\r\n",
+			"POST / HTTP/1.1\r\nHost: host\r\nTransfer-Encoding: chunked\r\nContent-Type: "
+			"text/plain\r\n\r\n4\r\nWiki\r\n2\r\npedia\r\n0\r\n\r\n",
 			test2_body_message_chunked
 		),
 		TestCase(
-			"POST / HTTP/1.1\r\nHost: host\r\nTransfer-Encoding: "
-			"chunked\r\nContent-Length: 10\r\n\r\n4\r\nWiki\r\n5\r\npedia\r\n0\r\n\r\n",
+			"POST / HTTP/1.1\r\nHost: host\r\nTransfer-Encoding: chunked\r\nContent-Length: "
+			"10\r\nContent-Type: text/plain\r\n\r\n4\r\nWiki\r\n5\r\npedia\r\n0\r\n\r\n",
 			test3_body_message_chunked
 		),
 		TestCase(
-			"POST / HTTP/1.1\r\nHost: host\r\nTransfer-Encoding: "
-			"chunked\r\n\r\n4\r\nWiki\r\n5\r\npedia\r\n",
+			"POST / HTTP/1.1\r\nHost: host\r\nTransfer-Encoding: chunked\r\nContent-Type: "
+			"text/plain\r\n\r\n4\r\nWiki\r\n5\r\npedia\r\n",
 			test4_body_message_chunked
 		),
 		TestCase(
-			"POST / HTTP/1.1\r\nHost: host\r\nTransfer-Encoding: "
-			"chunked\r\n\r\n4\r\nWiki\r\nss\r\npedia\r\n",
+			"POST / HTTP/1.1\r\nHost: host\r\nTransfer-Encoding: chunked\r\nContent-Type: "
+			"text/plain\r\n\r\n4\r\nWiki\r\nss\r\npedia\r\n",
 			test5_body_message_chunked
 		),
 		TestCase(
-			"POST / HTTP/1.1\r\nHost: host\r\nTransfer-Encoding: "
-			"chunked\r\n\r\n4\r\nWiki\r\n-122\r\npedia\r\n",
+			"POST / HTTP/1.1\r\nHost: host\r\nTransfer-Encoding: chunked\r\nContent-Type: "
+			"text/plain\r\n\r\n4\r\nWiki\r\n-122\r\npedia\r\n",
 			test6_body_message_chunked
 		),
 		TestCase(
-			"POST / HTTP/1.1\r\nHost: host\r\nTransfer-Encoding: "
-			"chunked\r\n\r\n4\r\nWiki\r\n5\r\npedia\r\n0\r\n",
+			"POST / HTTP/1.1\r\nHost: host\r\nTransfer-Encoding: chunked\r\nContent-Type: "
+			"text/plain\r\n\r\n4\r\nWiki\r\n5\r\npedia\r\n0\r\n",
 			test7_body_message_chunked
 		),
 		TestCase(
-			"POST / HTTP/1.1\r\nHost: host\r\nTransfer-Encoding: "
-			"chunked\r\n\r\n4\r\nWiki\r\n5\r\npedia\r\n0\r\n\r\nGET /",
+			"POST / HTTP/1.1\r\nHost: host\r\nTransfer-Encoding: chunked\r\nContent-Type: "
+			"text/plain\r\n\r\n4\r\nWiki\r\n5\r\npedia\r\n0\r\n\r\nGET /",
 			test8_body_message_chunked
 		),
 		TestCase(
-			"POST / HTTP/1.1\r\nHost: host\r\nTransfer-Encoding: "
-			"chunked\r\n\r\n4\r\nWiki\r\n5\r\npedia\r\n0",
+			"POST / HTTP/1.1\r\nHost: host\r\nTransfer-Encoding: chunked\r\nContent-Type: "
+			"text/plain\r\n\r\n4\r\nWiki\r\n5\r\npedia\r\n0",
 			test9_body_message_chunked
 		),
 		TestCase(
-			"POST / HTTP/1.1\r\nHost: host\r\nTransfer-Encoding: "
-			"chunked\r\n\r\n4\r\nWiki\r\n5\r\npedia\r\n0\r",
+			"POST / HTTP/1.1\r\nHost: host\r\nTransfer-Encoding: chunked\r\nContent-Type: "
+			"text/plain\r\n\r\n4\r\nWiki\r\n5\r\npedia\r\n0\r",
 			test10_body_message_chunked
 		),
 		TestCase(
-			"POST / HTTP/1.1\r\nHost: host\r\nTransfer-Encoding: "
-			"chunked\r\n\r\n4\r\nWiki\r\n5\r\npedia\r\n0\rGET /",
+			"POST / HTTP/1.1\r\nHost: host\r\nTransfer-Encoding: chunked\r\nContent-Type: "
+			"text/plain\r\n\r\n4\r\nWiki\r\n5\r\npedia\r\n0\rGET /",
 			test11_body_message_chunked
 		),
 		TestCase(
-			"POST / HTTP/1.1\r\nHost: host\r\nTransfer-Encoding: "
-			"chunked\r\n\r\n4\r\nWiki\r\n5\r\npedia\r\n0\r\nGET /",
+			"POST / HTTP/1.1\r\nHost: host\r\nTransfer-Encoding: chunked\r\nContent-Type: "
+			"text/plain\r\n\r\n4\r\nWiki\r\n5\r\npedia\r\n0\r\nGET /",
 			test12_body_message_chunked
 		),
 		TestCase(
-			"POST / HTTP/1.1\r\nHost: host\r\nTransfer-Encoding: "
-			"chunked\r\n\r\n4\r\nWiki\r\n5\r\npedia\r\n80000000\r\naaa",
+			"POST / HTTP/1.1\r\nHost: host\r\nTransfer-Encoding: chunked\r\nContent-Type: "
+			"text/plain\r\n\r\n4\r\nWiki\r\n5\r\npedia\r\n80000000\r\naaa",
 			test13_body_message_chunked
 		),
 		TestCase(
-			"POST / HTTP/1.1\r\nHost: host\r\nTransfer-Encoding: "
-			"chunked\r\n\r\n4\r\nWiki\r\n5\r\npedia\r\n123456789",
+			"POST / HTTP/1.1\r\nHost: host\r\nTransfer-Encoding: chunked\r\nContent-Type: "
+			"text/plain\r\n\r\n4\r\nWiki\r\n5\r\npedia\r\n123456789",
 			test14_body_message_chunked
 		),
 	};
