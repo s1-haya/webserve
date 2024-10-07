@@ -4,8 +4,6 @@
 
 namespace cgi {
 
-const std::string CgiResponseParse::OWS = " \t";
-
 namespace {
 
 bool IsVString(const std::string &str) {
@@ -137,14 +135,14 @@ utils::Result<void> CgiResponseParse::ParseBody(const std::string &body, ParsedD
 std::string &CgiResponseParse::TrimOws(std::string &s) {
 	// 先頭のスペースとタブを削除
 	std::string::iterator it = s.begin();
-	while (it != s.end() && CgiResponseParse::OWS.find(*it) != std::string::npos) {
+	while (it != s.end() && http::OPTIONAL_WHITESPACE.find(*it) != std::string::npos) {
 		++it;
 	}
 	s.erase(s.begin(), it);
 
 	// 末尾のスペースとタブを削除
 	std::string::reverse_iterator rit = s.rbegin();
-	while (rit != s.rend() && CgiResponseParse::OWS.find(*rit) != std::string::npos) {
+	while (rit != s.rend() && http::OPTIONAL_WHITESPACE.find(*rit) != std::string::npos) {
 		++rit;
 	}
 	s.erase(rit.base(), s.end());
