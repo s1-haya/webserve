@@ -472,6 +472,12 @@ Method::Part Method::ParsePart(const std::string &part) {
 	// のboundary=----WebKitFormBoundary7MA4YWxkTrZu0gW以降の\r\nから始まる
 	std::string headers = part.substr(CRLF.length(), header_end);
 	result.body         = part.substr(header_end + CRLF.length() * 2);
+	if (!EndWith(result.body, CRLF)) { // bodyの終端はCRLFで終わっているとする
+		throw HttpException(
+			"Error: Invalid part format, body not properly terminated", StatusCode(BAD_REQUEST)
+		);
+	}
+	result.body = result.body.substr(0, result.body.length() - CRLF.length());
 
 	std::size_t pos = 0;
 	std::size_t end = headers.find(CRLF, pos);
