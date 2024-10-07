@@ -9,7 +9,7 @@ LOG_FILE_PATH	:=	$(LOG_DIR)/$(LOG_FILE_NAME)
 
 # 2. Add target webserv files
 WS_SRCS_DIR			:=	../../../../srcs
-WS_UTILS_DIR		:= $(WS_SRCS_DIR)/utils
+WS_UTILS_DIR		:=	$(WS_SRCS_DIR)/utils
 WS_HTTP_DIR			:=	$(WS_SRCS_DIR)/http
 WS_HTTP_REQUEST_DIR			:=	$(WS_HTTP_DIR)/request
 WS_HTTP_PARSE_DIR	:=	$(WS_HTTP_REQUEST_DIR)/parse
@@ -18,6 +18,7 @@ SRCS				+=	$(WS_UTILS_DIR)/color.cpp \
 						$(WS_UTILS_DIR)/split_str.cpp \
 						$(WS_UTILS_DIR)/isdigit.cpp \
 						$(WS_UTILS_DIR)/convert_str.cpp \
+						$(WS_UTILS_DIR)/is_vstring.cpp \
 						$(WS_HTTP_DIR)/http_message.cpp \
 						$(WS_HTTP_DIR)/http_exception.cpp \
 						$(WS_HTTP_DIR)/status_code.cpp \

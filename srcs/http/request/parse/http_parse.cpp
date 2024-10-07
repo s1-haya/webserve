@@ -68,16 +68,6 @@ bool HasSpace(const std::string &str) {
 	return false;
 }
 
-// 各文字が印字可能文字(VCHR)かどうかをチェック
-bool IsVString(const std::string &str) {
-	for (std::string::const_iterator it = str.begin(); it != str.end(); ++it) {
-		if (!std::isprint(*it)) {
-			return false;
-		}
-	}
-	return true;
-}
-
 typedef utils::Result<std::pair<std::string::size_type, std::string> > ChunkSizeResult;
 typedef utils::Result<std::string>                                     ChunkDataResult;
 
@@ -351,7 +341,7 @@ void HttpParse::CheckValidHeaderFieldNameAndValue(
 			"Error: the name of Header field don't exist.", StatusCode(BAD_REQUEST)
 		);
 	}
-	if (!IsVString(header_field_name) || !IsVString(header_field_value)) {
+	if (!utils::IsVString(header_field_name) || !utils::IsVString(header_field_value)) {
 		throw HttpException(
 			"Error: the name or value of Header field contains non-VCHR characters.",
 			StatusCode(BAD_REQUEST)
