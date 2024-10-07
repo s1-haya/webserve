@@ -137,6 +137,15 @@ void ThrowMissingHostHeaderField(const HeaderFields &header_fields) {
 	}
 }
 
+void ValidateInvalidHeaderFields(const HeaderFields &header_fields, const std::string &method) {
+	if (method == POST && !header_fields.count(CONTENT_TYPE)) {
+		throw HttpException("Error: missing Content-Type header field.", StatusCode(BAD_REQUEST));
+	}
+	if (method == POST && !IsBodyMessageReadingRequired(header_fields)) {
+		throw HttpException("Error: missing Content-Length header field.", StatusCode(BAD_REQUEST));
+	}
+}
+
 } // namespace
 
 void HttpParse::ParseRequestLine(HttpRequestParsedData &data) {
@@ -168,15 +177,10 @@ void HttpParse::ParseHeaderFields(HttpRequestParsedData &data) {
 	data.current_buf.erase(0, pos + HEADER_FIELDS_END.size());
 	data.request_result.request.header_fields =
 		SetHeaderFields(utils::SplitStr(header_fields, CRLF));
+	ValidateInvalidHeaderFields(
+		data.request_result.request.header_fields, data.request_result.request.request_line.method
+	);
 	data.is_request_format.is_header_fields = true;
-	if (data.request_result.request.request_line.method == POST &&
-		!data.request_result.request.header_fields.count(CONTENT_TYPE)) {
-		throw HttpException("Error: missing Content-Type header field.", StatusCode(BAD_REQUEST));
-	}
-	if (data.request_result.request.request_line.method == POST &&
-		!IsBodyMessageReadingRequired(data.request_result.request.header_fields)) {
-		throw HttpException("Error: missing Content-Length header field.", StatusCode(BAD_REQUEST));
-	}
 	if (!IsBodyMessageReadingRequired(data.request_result.request.header_fields)) {
 		data.is_request_format.is_body_message = true;
 	}
