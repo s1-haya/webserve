@@ -66,12 +66,12 @@ std::string Trim(const std::string &str, const std::string &to_trim) {
 }
 
 // std::string::front()
-char FrontChar(const std::string &str) {
+char GetFrontChar(const std::string &str) {
 	return str.empty() ? '\0' : str[0];
 }
 
 // std::string::back()
-char BackChar(const std::string &str) {
+char GetBackChar(const std::string &str) {
 	return str.empty() ? '\0' : str[str.size() - 1];
 }
 
@@ -79,7 +79,7 @@ char BackChar(const std::string &str) {
 
 // ヘルパー関数: 文字列のクオートを削除
 std::string RemoveQuotes(const std::string &str) {
-	if (FrontChar(str) == '"' && BackChar(str) == '"') {
+	if (GetFrontChar(str) == '"' && GetBackChar(str) == '"') {
 		return str.substr(1, str.size() - 2);
 	}
 	return str;
