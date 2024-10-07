@@ -3,7 +3,6 @@
 #include "utils.hpp"
 
 namespace cgi {
-
 namespace {
 
 bool IsVString(const std::string &str) {
