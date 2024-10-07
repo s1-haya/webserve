@@ -153,6 +153,18 @@ REQUEST_GET_5XX_DIR = REQUEST_DIR + "get/5xx/"
             REQUEST_GET_4XX_DIR + "400_21_too_many_status_line_elements.txt",
             bad_request_response,
         ),
+        (
+            REQUEST_GET_4XX_DIR + "400_22_non_vchr_method.txt",
+            bad_request_response,
+        ),
+        (
+            REQUEST_GET_4XX_DIR + "400_23_non_vchr_request_target.txt",
+            bad_request_response,
+        ),
+        (
+            REQUEST_GET_4XX_DIR + "400_24_non_vchr_http_version.txt",
+            bad_request_response,
+        ),
         (REQUEST_GET_4XX_DIR + "404_01_not_exist_path.txt", not_found_response),
         (
             REQUEST_GET_4XX_DIR + "405_01_method_not_allowed_for_uri.txt",
@@ -199,6 +211,9 @@ REQUEST_GET_5XX_DIR = REQUEST_DIR + "get/5xx/"
         "400_19_non_vchr_header_field_value",
         "400_20_too_few_status_line_elements",
         "400_21_too_many_status_line_elements",
+        "400_22_non_vchr_method",
+        "400_23_non_vchr_request_target",
+        "400_24_non_vchr_http_version",
         "404_01_not_exist_path",
         "405_01_method_not_allowed_for_uri",
         "501_01_not_exist_method",
