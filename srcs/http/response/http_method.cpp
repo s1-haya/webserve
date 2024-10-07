@@ -58,7 +58,7 @@ bool StartWith(const std::string &str, const std::string &prefix) {
 // ヘルパー関数: 文字列のトリム: TrimOWSにも使える
 std::string Trim(const std::string &str, const std::string &to_trim) {
 	std::size_t first = str.find_first_not_of(to_trim);
-	if (std::string::npos == first) {
+	if (first == std::string::npos) {
 		return "";
 	}
 	std::size_t last = str.find_last_not_of(to_trim);
