@@ -42,7 +42,7 @@ for filename, data_var, length_var in ERROR_FILES:
 def create_response_header(
     status_code, connection, content_length, content_type=TEXT_PLAIN
 ):
-    return f"HTTP/1.1 {status_code} {STATUS[status_code]}\r\nConnection: {connection}\r\nContent-Length: {content_length}\r\nContent-Type: {content_type}\r\nServer: webserv/1.1\r\n\r\n"
+    return f"HTTP/1.1 {status_code} {STATUS[status_code]}\r\nconnection: {connection}\r\ncontent-length: {content_length}\r\ncontent-type: {content_type}\r\nserver: webserv/1.1\r\n\r\n"
 
 
 root_index_file, root_index_file_length = read_file("root/html/index.html")
