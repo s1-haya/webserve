@@ -211,12 +211,9 @@ StatusCode Method::PostHandler(
 		response_body_message = HttpResponse::CreateDefaultBodyMessage(status_code);
 		response_header_fields[CONTENT_LENGTH] = utils::ToString(response_body_message.length());
 	} else {
-		// Location header fields: URI-reference
-		// ex) POST /save/test.txt HTTP/1.1
-		// Location: /save/test.txt;
-		status_code = FileCreationHandler(
-			upload_file_path, request_body_message, response_body_message, response_header_fields
-		); // todo: forbiddenに
+		// - upload_file_pathがシンボリックリンク
+		// - upload_file_pathが特殊ファイル（デバイスファイル、ソケットファイルなど）
+		throw HttpException("Error: Forbidden", StatusCode(FORBIDDEN));
 	}
 	return status_code;
 }
