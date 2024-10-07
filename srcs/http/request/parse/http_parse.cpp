@@ -147,6 +147,13 @@ void ThrowMissingBodyRequiredHeaderField(const HeaderFields &header_fields) {
 	if (!IsBodyMessageReadingRequired(header_fields)) {
 		throw HttpException("Error: missing Content-Length header field.", StatusCode(BAD_REQUEST));
 	}
+	// Transfer-Encodingのみ存在する場合、そのheader-field-valueがchunked以外はエラー
+	if (header_fields.count(TRANSFER_ENCODING) && header_fields.at(TRANSFER_ENCODING) != CHUNKED) {
+		throw HttpException(
+			"Error: invalid value for the Transfer-Encoding header; only chunked is allowed.",
+			StatusCode(BAD_REQUEST)
+		);
+	}
 }
 
 void ValidateInvalidHeaderFields(const HeaderFields &header_fields, const std::string &method) {
