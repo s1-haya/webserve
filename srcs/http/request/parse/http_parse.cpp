@@ -302,6 +302,11 @@ void HttpParse::CheckValidMethod(const std::string &method) {
 	if (!method.size()) {
 		throw HttpException("Error: the method don't exist.", StatusCode(BAD_REQUEST));
 	}
+	if (!utils::IsVString(method)) {
+		throw HttpException(
+			"Error: the method contains non-VCHR characters.", StatusCode(BAD_REQUEST)
+		);
+	}
 	if (IsStringUsAscii(method) == false || IsStringUpper(method) == false) {
 		throw HttpException(
 			"Error: This method contains lowercase or non-USASCII characters.",
@@ -314,6 +319,11 @@ void HttpParse::CheckValidRequestTarget(const std::string &request_target) {
 	if (!request_target.size()) {
 		throw HttpException("Error: the request target don't exist.", StatusCode(BAD_REQUEST));
 	}
+	if (!utils::IsVString(request_target)) {
+		throw HttpException(
+			"Error: the request target contains non-VCHR characters.", StatusCode(BAD_REQUEST)
+		);
+	}
 	if (request_target.empty() || request_target[0] != '/') {
 		throw HttpException(
 			"Error: the request target is missing the '/' character at the beginning",
@@ -325,6 +335,11 @@ void HttpParse::CheckValidRequestTarget(const std::string &request_target) {
 void HttpParse::CheckValidVersion(const std::string &version) {
 	if (!version.size()) {
 		throw HttpException("Error: the http version don't exist.", StatusCode(BAD_REQUEST));
+	}
+	if (!utils::IsVString(version)) {
+		throw HttpException(
+			"Error: the http version contains non-VCHR characters.", StatusCode(BAD_REQUEST)
+		);
 	}
 	if (version != HTTP_VERSION) {
 		throw HttpException(
