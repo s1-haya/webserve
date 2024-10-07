@@ -3,8 +3,8 @@ import time
 
 import pytest
 from common_functions import read_file, send_request_and_assert_response
-from common_response import (bad_request_response, no_content_response_close,
-                                no_content_response_keep, not_found_response)
+from common_response import (no_content_response_close,
+                                no_content_response_keep, not_found_response, forbidden_response)
 
 REQUEST_DIR = "test/common/request/"
 REQUEST_DELETE_2XX_DIR = REQUEST_DIR + "delete/2xx/"
@@ -12,7 +12,7 @@ REQUEST_DELETE_4XX_DIR = REQUEST_DIR + "delete/4xx/"
 
 UPLOAD_DIR = "root/upload/"
 DELETE_FILE_PATH = UPLOAD_DIR + "delete_file"
-NOT_EXISTING_FILE_PATH = UPLOAD_DIR + "non_existing_file"
+NOT_EXISTING_FILE_PATH = UPLOAD_DIR + "not_found"
 
 def create_file(file_path, content=""):
     if file_path is None:
@@ -28,6 +28,7 @@ def create_file(file_path, content=""):
         raise AssertionError
 
 
+# ファイルがない場合に作成する関数
 @pytest.fixture
 def setup_file_context():
     # コンテキストマネージャとして使用可能なフィクスチャ
@@ -94,50 +95,59 @@ def test_delete_responses(
             send_request_and_assert_response(request_file, expected_response)
 
 
+def delete_file(file_path):
+    if file_path is None:
+        return
 
-# @pytest.mark.parametrize(
-#     "request_file, expected_response, upload_file_path",
-#     [
-#         (
-#             REQUEST_POST_4XX_DIR + "400_01_duplicate_content_length.txt",
-#             bad_request_response,
-#             UPLOAD_DIR + "duplicate_content_length",
-#         ),
-        # (
-        #     REQUEST_DELETE_4XX_DIR + "400_01_delete_non_existing_file.txt",
-        #     bad_request_response,
-        #     NOT_EXISTING_FILE_PATH,
-        #     "",
-        # ),
-#         (
-#             REQUEST_POST_4XX_DIR + "400_02_transfer_encoding_and_content_length.txt",
-#             bad_request_response,
-#             UPLOAD_FILE_PATH,
-#         ),
-#         (
-#             REQUEST_POST_4XX_DIR + "408_01_shortened_body_message.txt",
-#             timeout_response,
-#             UPLOAD_DIR + "shortened_body_message",
-#         ),
-#         (
-#             REQUEST_POST_4XX_DIR + "408_02_no_body_message.txt",
-#             timeout_response,
-#             UPLOAD_DIR + "no_body_message",
-#         ),
-#     ],
-#     ids=[
-#         "400_01_duplicate_content_length",
-#         "400_02_transfer_encoding_and_content_length",
-#         "408_01_shortened_body_message",
-#         "408_02_no_body_message",
-#     ],
-# )
-# def test_post_4xx_responses(
-#     request_file,
-#     expected_response,
-#     upload_file_path,
-#     cleanup_file_context,
-# ):
-#     if upload_file_path:
-#         with cleanup_file_context(upload_file_path):
-#             send_request_and_assert_response(request_file, expected_response)
+    try:
+        if os.path.exists(file_path):
+            os.remove(file_path)
+            time.sleep(1)
+            print(f"Deleted file: {file_path}")
+    except Exception as e:
+        print(f"Error deleting file: {file_path}, {e}")
+        raise AssertionError
+
+# ファイルがある場合に削除する関数
+@pytest.fixture
+def cleanup_file_context():
+    # コンテキストマネージャとして使用可能なフィクスチャ
+    from contextlib import contextmanager
+
+    @contextmanager
+    def _cleanup(file_path):
+        delete_file(file_path)
+        yield
+        delete_file(file_path)
+
+    return _cleanup
+
+
+@pytest.mark.parametrize(
+    "request_file, expected_response, upload_file_path",
+    [
+        (
+            REQUEST_DELETE_4XX_DIR + "403_01_delete_directory.txt",
+            forbidden_response,
+            "",
+        ),
+        (
+            REQUEST_DELETE_4XX_DIR + "404_01_delete_nonexistent_file.txt",
+            not_found_response,
+            NOT_EXISTING_FILE_PATH,
+        ),
+    ],
+    ids=[
+        "403_01_delete_directory",
+        "404_01_delete_nonexistent_file",
+    ],
+)
+def test_post_4xx_responses(
+    request_file,
+    expected_response,
+    upload_file_path,
+    cleanup_file_context,
+):
+    if upload_file_path:
+        with cleanup_file_context(upload_file_path):
+            send_request_and_assert_response(request_file, expected_response)
