@@ -84,6 +84,15 @@ class TestCGI(unittest.TestCase):
             self.assertIn(b"No POST data received.", response.read())
         except HTTPException as e:
             self.fail(f"Request failed: {e}")
+    
+    def test_path_info_pl(self):
+        try:
+            self.con.request("GET", "/cgi-bin/path_info.pl/path_info")
+            response = self.con.getresponse()
+            assert_status_line(response, HTTPStatus.OK)
+            assert_header(response, "Connection", "keep-alive")
+            self.assertIn(b"PathInfo string: /path_info\n", response.read())
+        except HTTPException as e:
+            self.fail(f"Request failed: {e}")
 
-    # todo: PathInfo(マージ後追加)
     # todo: error (マージ後追加)
