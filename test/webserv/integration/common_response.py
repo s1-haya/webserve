@@ -7,12 +7,19 @@ TEXT_HTML = "text/html"
 
 STATUS = {
     200: "OK",
+    201: "Created",
+    204: "No Content",
     400: "Bad Request",
     404: "Not Found",
     405: "Method Not Allowed",
     408: "Request Timeout",
     501: "Not Implemented",
 }
+
+SUCCESS_FILES = (
+    ("201_created.txt", "created_file_201", "created_file_201_length"),
+    ("204_no_content.txt", "no_content_file_204", "no_content_file_204_length"),
+)
 
 ERROR_FILES = (
     ("400_bad_request.txt", "bad_request_file_400", "bad_request_file_400_length"),
@@ -30,13 +37,20 @@ ERROR_FILES = (
     ),
 )
 
-error_files_data = {}
-for filename, data_var, length_var in ERROR_FILES:
-    data, length = read_file_binary(
-        f"test/webserv/expected_response/default_body_message/{filename}"
-    )
-    error_files_data[data_var] = data
-    error_files_data[length_var] = length
+
+def read_files_data(file_list):
+    files_data = {}
+    for filename, data_var, length_var in file_list:
+        data, length = read_file_binary(
+            f"test/webserv/expected_response/default_body_message/{filename}"
+        )
+        files_data[data_var] = data
+        files_data[length_var] = length
+    return files_data
+
+
+success_files_data = read_files_data(SUCCESS_FILES)
+error_files_data = read_files_data(ERROR_FILES)
 
 
 def create_response_header(
@@ -58,6 +72,15 @@ response_header_get_root_200_keep = create_response_header(
 response_header_get_sub_200_close = create_response_header(
     200, CLOSE, sub_index_file_length, TEXT_HTML
 )
+response_header_201_close = create_response_header(
+    201, CLOSE, success_files_data["created_file_201_length"], TEXT_HTML
+)
+response_header_201_keep = create_response_header(
+    201, KEEP_ALIVE, success_files_data["created_file_201_length"], TEXT_HTML
+)
+response_header_204 = create_response_header(
+    204, CLOSE, success_files_data["no_content_file_204_length"], TEXT_HTML
+)
 response_header_400 = create_response_header(
     400, CLOSE, error_files_data["bad_request_file_400_length"], TEXT_HTML
 )
@@ -74,6 +97,15 @@ response_header_501 = create_response_header(
     501, CLOSE, error_files_data["not_implemented_file_501_length"], TEXT_HTML
 )
 
+created_response_close = response_header_201_close + success_files_data[
+    "created_file_201"
+].decode("utf-8")
+created_response_keep = response_header_201_keep + success_files_data[
+    "created_file_201"
+].decode("utf-8")
+no_content_response = response_header_204 + success_files_data[
+    "no_content_file_204"
+].decode("utf-8")
 bad_request_response = response_header_400 + error_files_data[
     "bad_request_file_400"
 ].decode("utf-8")

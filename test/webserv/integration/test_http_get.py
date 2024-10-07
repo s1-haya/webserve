@@ -1,6 +1,11 @@
 import pytest
 from common_functions import send_request_and_assert_response
-from common_response import *
+from common_response import (bad_request_response, not_allowed_response,
+                             not_found_response, not_implemented_response,
+                             response_header_get_root_200_close,
+                             response_header_get_root_200_keep,
+                             response_header_get_sub_200_close,
+                             root_index_file, sub_index_file)
 
 REQUEST_DIR = "test/common/request/"
 REQUEST_GET_2XX_DIR = REQUEST_DIR + "get/2xx/"

@@ -24,3 +24,5 @@
 
 !root/**
 !*.conf
+
+venv

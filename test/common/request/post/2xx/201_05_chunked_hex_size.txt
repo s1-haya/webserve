@@ -1,0 +1,14 @@
+POST /upload/chunked_request_file HTTP/1.1
+Host: www.example.com
+Transfer-Encoding: chunked
+Content-Type: text/plain
+Connection: close
+
+4
+Wiki
+5
+pedia
+0x34
+ is a free online encyclopedia that anyone can edit.
+0
+
