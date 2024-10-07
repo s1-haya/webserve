@@ -47,53 +47,47 @@
 server::VirtualServerAddrList BuildVirtualServerAddrList();
 void DeleteVirtualServerAddrList(const server::VirtualServerAddrList &virtual_servers);
 int  main(void) {
-	 int ret_code = EXIT_SUCCESS;
+    int ret_code = EXIT_SUCCESS;
 
-	 std::cout << "\033[44;37m[ Test Run ]\033[m" << std::endl;
-	 server::VirtualServerAddrList server_infos = BuildVirtualServerAddrList();
-	 ret_code |= test::TestGetOk1ConnectionClose(server_infos);
-	 ret_code |= test::TestGetOk2ConnectionKeep(server_infos);
-	 ret_code |= test::TestGetOk3SubConnectionClose(server_infos);
-	 ret_code |= test::TestGetOk4ConnectionKeepAndOkConnectionKeep(server_infos);
-	 ret_code |= test::TestGetOk5ConnectionCloseAndOkConnectionClose(server_infos);
-	 ret_code |= test::TestGetOk6ConnectionKeepAndOkConnectionClose(server_infos);
-	 ret_code |= test::TestGetOk11UpperAndLowerHeaderFields(server_infos);
-	 ret_code |= test::TestGetOk12HeaderFieldValueSpace(server_infos);
-	 ret_code |= test::TestGetOk13SpaceHeaderFieldValue(server_infos);
-	 ret_code |= test::TestGetOk14ExtraRequest(server_infos);
-	 ret_code |= test::TestGetOk15BodyMessageDefault(server_infos);
-	 ret_code |= test::TestGetOk17NotExistHeaderField(server_infos);
-	 ret_code |= test::TestGetOk21NoConnection(server_infos);
+    std::cout << "\033[44;37m[ Test Run ]\033[m" << std::endl;
+    server::VirtualServerAddrList server_infos = BuildVirtualServerAddrList();
+    ret_code |= test::TestGetOk1ConnectionClose(server_infos);
+    ret_code |= test::TestGetOk2ConnectionKeep(server_infos);
+    ret_code |= test::TestGetOk3SubConnectionClose(server_infos);
+    ret_code |= test::TestGetOk4ConnectionKeepAndOkConnectionKeep(server_infos);
+    ret_code |= test::TestGetOk5ConnectionCloseAndOkConnectionClose(server_infos);
+    ret_code |= test::TestGetOk6ConnectionKeepAndOkConnectionClose(server_infos);
+    ret_code |= test::TestGetOk11UpperAndLowerHeaderFields(server_infos);
+    ret_code |= test::TestGetOk12HeaderFieldValueSpace(server_infos);
+    ret_code |= test::TestGetOk13SpaceHeaderFieldValue(server_infos);
+    ret_code |= test::TestGetOk14ExtraRequest(server_infos);
+    ret_code |= test::TestGetOk15BodyMessageDefault(server_infos);
+    ret_code |= test::TestGetOk17NotExistHeaderField(server_infos);
+    ret_code |= test::TestGetOk21NoConnection(server_infos);
 
-	 ret_code |= test::TestGetBadRequest1OnlyCrlf(server_infos);
-	 ret_code |= test::TestGetBadRequest2LowerMethod(server_infos);
-	 ret_code |= test::TestGetBadRequest3NoAsciiMethod(server_infos);
-	 ret_code |= test::TestGetBadRequest4NoRoot(server_infos);
-	 ret_code |= test::TestGetBadRequest5RelativePath(server_infos);
-	 ret_code |= test::TestGetBadRequest6LowerHttpVersion(server_infos);
-	 ret_code |= test::TestGetBadRequest7WrongHttpName(server_infos);
-	 ret_code |= test::TestGetBadRequest8WrongHttpVersion(server_infos);
-	 ret_code |= test::TestGetBadRequest9NoHost(server_infos);
-	 ret_code |= test::TestGetBadRequest10DuplicateHost(server_infos);
-	 ret_code |= test::TestGetBadRequest11NoHeaderFieldColon(server_infos);
-	 ret_code |= test::TestGetBadRequest12NoConnectionName(server_infos);
-	 // todo: CheckHeaderFieldValue() / Connectionがkeep-aliveとclose以外の場合
-	 // ret_code |= test::TestGetBadRequest13NoConnectionValue(server_infos);
-	 // ret_code |= test::TestGetBadRequest14WrongConnectionValue(server_infos);
-	 // todo: 対応していないヘッダーフィールドは無視する場合はこのテストを削除する
-	 ret_code |= test::TestGetBadRequest15SpaceInHeaderFieldName(server_infos);
-	 ret_code |= test::TestGetBadRequest16HeaderFieldNameSpaceColon(server_infos);
-	 ret_code |= test::TestGetBadRequest17SpaceHeaderFieldName(server_infos);
-	 ret_code |= test::TestGetBadRequest18NonVchrHeaderFieldName(server_infos);
-	 ret_code |= test::TestGetBadRequest19NonVchrHeaderFieldValue(server_infos);
-	 ret_code |= test::TestGetBadRequest20TooFewStatusLineElements(server_infos);
-	 ret_code |= test::TestGetBadRequest21TooManyStatusLineElements(server_infos);
+    ret_code |= test::TestGetBadRequest1OnlyCrlf(server_infos);
+    ret_code |= test::TestGetBadRequest2LowerMethod(server_infos);
+    ret_code |= test::TestGetBadRequest3NoAsciiMethod(server_infos);
+    ret_code |= test::TestGetBadRequest4NoRoot(server_infos);
+    ret_code |= test::TestGetBadRequest5RelativePath(server_infos);
+    ret_code |= test::TestGetBadRequest6LowerHttpVersion(server_infos);
+    ret_code |= test::TestGetBadRequest7WrongHttpName(server_infos);
+    ret_code |= test::TestGetBadRequest8WrongHttpVersion(server_infos);
+    ret_code |= test::TestGetBadRequest9NoHost(server_infos);
+    ret_code |= test::TestGetBadRequest10DuplicateHost(server_infos);
+    ret_code |= test::TestGetBadRequest11NoHeaderFieldColon(server_infos);
+    ret_code |= test::TestGetBadRequest12NoConnectionName(server_infos);
+    ret_code |= test::TestGetBadRequest15SpaceInHeaderFieldName(server_infos);
+    ret_code |= test::TestGetBadRequest16HeaderFieldNameSpaceColon(server_infos);
+    ret_code |= test::TestGetBadRequest17SpaceHeaderFieldName(server_infos);
+    ret_code |= test::TestGetBadRequest18NonVchrHeaderFieldName(server_infos);
+    ret_code |= test::TestGetBadRequest19NonVchrHeaderFieldValue(server_infos);
+    ret_code |= test::TestGetBadRequest20TooFewStatusLineElements(server_infos);
+    ret_code |= test::TestGetBadRequest21TooManyStatusLineElements(server_infos);
 
-	 ret_code |= test::TestGetNotFound1NotExistFile(server_infos);
-	 ret_code |= test::TestGetMethodNotAllowed(server_infos);
-	 // todo: HttpResponse::CreateTimeoutResponse
-	 // ret_code |= test::TestGetTimeout1NoCrlf(server_infos);
-	 ret_code |= test::TestGetNotImplemented1NotExistMethod(server_infos);
+    ret_code |= test::TestGetNotFound1NotExistFile(server_infos);
+    ret_code |= test::TestGetMethodNotAllowed(server_infos);
+    ret_code |= test::TestGetNotImplemented1NotExistMethod(server_infos);
 
     std::cout << "\n\033[44;37m[ Test DELETE ]\033[m" << std::endl;
     ret_code |= test::TestDeleteNoContent1ExistingFile(server_infos);
@@ -104,16 +98,16 @@ int  main(void) {
     ret_code |= test::TestDelete1NotFoundNonexistentFile(server_infos);
     ret_code |= test::TestDeleteMethodNotAllowed(server_infos);
 
-	 // test GetErrorResponse
-	 std::cout << "\n\033[44;37m[ Test GetErrorResponse ]\033[m" << std::endl;
-	 ret_code |= test::TestRequestTimeoutResponse();
-	 ret_code |= test::TestInternalServerErrorResponse();
+    // test GetErrorResponse
+    std::cout << "\n\033[44;37m[ Test GetErrorResponse ]\033[m" << std::endl;
+    ret_code |= test::TestRequestTimeoutResponse();
+    ret_code |= test::TestInternalServerErrorResponse();
 
-	 // test GetResponseFromCgi
-	 std::cout << "\n\033[44;37m[ Test GetResponseFromCgi ]\033[m" << std::endl;
-	 ret_code |= test::TestGetResponseFromCgi1();
-	 ret_code |= test::TestGetResponseFromCgi2();
-	 ret_code |= test::TestGetResponseFromCgi3();
-	 ret_code |= test::TestGetResponseFromCgi4();
-	 return ret_code;
+    // test GetResponseFromCgi
+    std::cout << "\n\033[44;37m[ Test GetResponseFromCgi ]\033[m" << std::endl;
+    ret_code |= test::TestGetResponseFromCgi1();
+    ret_code |= test::TestGetResponseFromCgi2();
+    ret_code |= test::TestGetResponseFromCgi3();
+    ret_code |= test::TestGetResponseFromCgi4();
+    return ret_code;
 }

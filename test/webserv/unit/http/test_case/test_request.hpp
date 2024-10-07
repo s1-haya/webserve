@@ -72,10 +72,6 @@ static const std::string &GET_400_11_NO_HEADER_FIELD_COLON =
 	LoadFileContent(REQUEST_GET + ROOT_4XX + "/400_11_no_header_field_colon.txt");
 static const std::string &GET_400_12_NO_CONNECTION_NAME =
 	LoadFileContent(REQUEST_GET + ROOT_4XX + "/400_12_no_connection_name.txt");
-static const std::string &GET_400_13_NO_CONNECTION_VALUE =
-	LoadFileContent(REQUEST_GET + ROOT_4XX + "/400_13_no_connection_value.txt");
-static const std::string &GET_400_14_WRONG_CONNECTION_VALUE =
-	LoadFileContent(REQUEST_GET + ROOT_4XX + "/400_14_wrong_connection_value.txt");
 static const std::string &GET_400_15_SPACE_IN_HEADER_FIELD_NAME =
 	LoadFileContent(REQUEST_GET + ROOT_4XX + "/400_15_space_in_header_field_name.txt");
 static const std::string &GET_400_16_HEADER_FIELD_NAME_SPACE_COLON =

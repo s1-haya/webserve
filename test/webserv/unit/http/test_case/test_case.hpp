@@ -53,7 +53,6 @@ int TestGetBadRequest21TooManyStatusLineElements(const server::VirtualServerAddr
 
 int TestGetNotFound1NotExistFile(const server::VirtualServerAddrList &server_infos);
 int TestGetMethodNotAllowed(const server::VirtualServerAddrList &server_infos);
-int TestGetTimeout1NoCrlf(const server::VirtualServerAddrList &server_infos);
 // 5xx
 int TestGetNotImplemented1NotExistMethod(const server::VirtualServerAddrList &server_infos);
 

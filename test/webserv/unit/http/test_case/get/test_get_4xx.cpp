@@ -214,38 +214,6 @@ int TestGetBadRequest12NoConnectionName(const server::VirtualServerAddrList &ser
 	return HandleHttpResult(client_infos, server_infos, expected, "400-12");
 }
 
-int TestGetBadRequest13NoConnectionValue(const server::VirtualServerAddrList &server_infos) {
-	http::ClientInfos client_infos = CreateClientInfos(request::GET_400_13_NO_CONNECTION_VALUE);
-	std::string       expected_status_line  = EXPECTED_STATUS_LINE_BAD_REQUEST;
-	std::string       expected_body_message = EXPECTED_BODY_MESSAGE_BAD_REQUEST;
-	HeaderFields      expected_header_fields;
-	expected_header_fields[http::CONNECTION]     = http::CLOSE;
-	expected_header_fields[http::CONTENT_LENGTH] = utils::ToString(expected_body_message.length());
-	expected_header_fields[http::CONTENT_TYPE]   = http::TEXT_HTML;
-	expected_header_fields[http::SERVER]         = http::SERVER_VERSION;
-	const std::string &expected_response         = CreateHttpResponseFormat(
-        expected_status_line, expected_header_fields, expected_body_message
-    );
-	http::HttpResult expected = CreateHttpResult(true, false, "", expected_response);
-	return HandleHttpResult(client_infos, server_infos, expected, "400-13");
-}
-
-int TestGetBadRequest14WrongConnectionValue(const server::VirtualServerAddrList &server_infos) {
-	http::ClientInfos client_infos = CreateClientInfos(request::GET_400_14_WRONG_CONNECTION_VALUE);
-	std::string       expected_status_line  = EXPECTED_STATUS_LINE_BAD_REQUEST;
-	std::string       expected_body_message = EXPECTED_BODY_MESSAGE_BAD_REQUEST;
-	HeaderFields      expected_header_fields;
-	expected_header_fields[http::CONNECTION]     = http::CLOSE;
-	expected_header_fields[http::CONTENT_LENGTH] = utils::ToString(expected_body_message.length());
-	expected_header_fields[http::CONTENT_TYPE]   = http::TEXT_HTML;
-	expected_header_fields[http::SERVER]         = http::SERVER_VERSION;
-	const std::string &expected_response         = CreateHttpResponseFormat(
-        expected_status_line, expected_header_fields, expected_body_message
-    );
-	http::HttpResult expected = CreateHttpResult(true, false, "", expected_response);
-	return HandleHttpResult(client_infos, server_infos, expected, "400-14");
-}
-
 int TestGetBadRequest15SpaceInHeaderFieldName(const server::VirtualServerAddrList &server_infos) {
 	http::ClientInfos client_infos =
 		CreateClientInfos(request::GET_400_15_SPACE_IN_HEADER_FIELD_NAME);
@@ -401,22 +369,6 @@ int TestGetMethodNotAllowed(const server::VirtualServerAddrList &server_infos) {
     );
 	http::HttpResult expected = CreateHttpResult(true, false, "", expected_response);
 	return HandleHttpResult(client_infos, server_infos, expected, "405-01");
-}
-
-int TestGetTimeout1NoCrlf(const server::VirtualServerAddrList &server_infos) {
-	http::ClientInfos client_infos          = CreateClientInfos(request::GET_408_1_NO_CRLF);
-	std::string       expected_status_line  = EXPECTED_STATUS_LINE_TIMEOUT;
-	std::string       expected_body_message = EXPECTED_BODY_MESSAGE_TIMEOUT;
-	HeaderFields      expected_header_fields;
-	expected_header_fields[http::CONNECTION]     = http::CLOSE;
-	expected_header_fields[http::CONTENT_LENGTH] = utils::ToString(expected_body_message.length());
-	expected_header_fields[http::CONTENT_TYPE]   = http::TEXT_HTML;
-	expected_header_fields[http::SERVER]         = http::SERVER_VERSION;
-	const std::string &expected_response         = CreateHttpResponseFormat(
-        expected_status_line, expected_header_fields, expected_body_message
-    );
-	http::HttpResult expected = CreateHttpResult(true, true, "", expected_response);
-	return HandleHttpResult(client_infos, server_infos, expected, "408-01");
 }
 
 } // namespace test
