@@ -152,31 +152,45 @@ int TestParseNoContentLength() {
 	return HandleTestResult(CompareParsedData(expected, result.GetValue()));
 }
 
-// todo: Error
+int TestHeaderFieldWithOws() {
+	std::string response =
+		"Content-Length:    5   \r\nContent-Type: text/plain\r\n\r\nHello, world!";
+	utils::Result<CgiResponseParse::ParsedData> result = CgiResponseParse::Parse(response);
+	if (!result.IsOk()) {
+		PrintNg();
+		return EXIT_FAILURE;
+	}
 
-// void TestParseBodyOnlyResponse() {
-// 	CgiResponseParse             parser;
-// 	std::string                        response = "\r\n\r\nHello, world!";
-// 	CgiResponseParse::ParsedData result   = parser.Parse(response);
+	CgiResponseParse::ParsedData expected;
+	expected.header_fields["Content-Length"] = "5";
+	expected.header_fields["Content-Type"]   = "text/plain";
+	expected.body                            = "Hello";
+	return HandleTestResult(CompareParsedData(expected, result.GetValue()));
+}
 
-// 	if (result.header_fields.size() == 0 && result.body == "Hello, world!") {
-// 		std::cout << "testParseBodyOnlyResponse passed\n";
-// 	} else {
-// 		std::cout << "testParseBodyOnlyResponse failed\n";
-// 	}
-// }
+int TestHeaderFieldHasLocation() {
+	std::string response = "Location: http://www.example.com/\r\n\r\n";
+	utils::Result<CgiResponseParse::ParsedData> result = CgiResponseParse::Parse(response);
+	if (!result.IsOk()) {
+		PrintNg();
+		return EXIT_FAILURE;
+	}
 
-// void TestParseInvalidResponse() {
-// 	http::CgiResponseParse             parser;
-// 	std::string                        response = "Invalid Response";
-// 	http::CgiResponseParse::ParsedData result   = parser.Parse(response);
+	CgiResponseParse::ParsedData expected;
+	expected.header_fields["Location"] = "http://www.example.com/";
+	expected.body                      = "";
+	return HandleTestResult(CompareParsedData(expected, result.GetValue()));
+}
 
-// 	if (result.header_fields.size() == 0 && result.body == "") {
-// 		std::cout << "testParseInvalidResponse passed\n";
-// 	} else {
-// 		std::cout << "testParseInvalidResponse failed\n";
-// 	}
-// }
+int TestErrorResponse(const std::string &response) {
+	utils::Result<CgiResponseParse::ParsedData> result = CgiResponseParse::Parse(response);
+	if (!result.IsOk()) {
+		PrintOk();
+		return EXIT_SUCCESS;
+	}
+	PrintNg();
+	return EXIT_FAILURE;
+}
 
 int main() {
 	int ret = EXIT_SUCCESS;
@@ -185,8 +199,26 @@ int main() {
 	ret |= TestParseHeaderOnlyResponse();
 	ret |= TestParseBodyLongerThanContentLength();
 	ret |= TestParseNoContentLength();
-	// testParseBodyOnlyResponse();
-	// testParseInvalidResponse();
+	ret |= TestHeaderFieldWithOws();
+	ret |= TestHeaderFieldHasLocation();
+	// ヘッダーフィールドが存在しない
+	ret |= TestErrorResponse("Hello, world!");
+	ret |= TestErrorResponse("Content-Type: text/plain\r\nHello, world!");
+	ret |= TestErrorResponse("\r\n\r\nHello, world!");
+	// ヘッダーフィールドにコロンが含まれていない
+	ret |= TestErrorResponse("Content-Length 5\r\n\r\nHello, world!");
+	// Content-Lengthが無効
+	ret |= TestErrorResponse("Content-Length: -1\r\n\r\nHello, world!");
+	ret |= TestErrorResponse("Content-Length: aa\r\n\r\nHello, world!");
+	// ヘッダーフィールドのヘッダー名にスペースが含まれている
+	ret |= TestErrorResponse("Content-Type   : text/plain\r\n\r\nHello, world!");
+	ret |= TestErrorResponse("  Content-Type: text/plain\r\n\r\nHello, world!");
+	// ヘッダーフィールドに可視文字でないものが含まれている
+	ret |= TestErrorResponse("Content-T\bype: text/plain\r\n\r\nHello, world!");
+	// ヘッダーフィールドのヘッダー名が空
+	ret |= TestErrorResponse(": 5\r\n\r\nHello, world!");
+	// ヘッダーフィールドのヘッダー値が空
+	ret |= TestErrorResponse("Content-Length: \r\n\r\nHello, world!");
 
 	return ret;
 }

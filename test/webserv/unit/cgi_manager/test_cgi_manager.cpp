@@ -101,14 +101,11 @@ Result RunAddAndGetResponse(
 
 	const cgi::CgiResponse cgi_response = cgi_manager.AddAndGetResponse(client_fd, read_buf);
 	if (!IsSame(cgi_response.response, expected_response.response) ||
-		!IsSame(cgi_response.content_type, expected_response.content_type) ||
 		!IsSame(cgi_response.is_response_complete, expected_response.is_response_complete)) {
 		result.is_success = false;
 		oss << "response" << std::endl;
 		oss << "- result(response)      : " << cgi_response.response << std::endl;
 		oss << "- expected(response)    : " << expected_response.response << std::endl;
-		oss << "- result(content_type)  : " << cgi_response.content_type << std::endl;
-		oss << "- expected(content_type): " << expected_response.content_type << std::endl;
 		oss << "- result(is_response_complete)  : " << cgi_response.is_response_complete
 			<< std::endl;
 		oss << "- expected(is_response_complete): " << expected_response.is_response_complete
@@ -229,7 +226,7 @@ int RunTest3() {
 	// "abc"をread()できたとしてresponseに追加
 	std::string buffer = "abc";
 	// addしてgetterを使ってresponseの保持確認
-	cgi::CgiResponse expected_cgi_response("abc", "text/plain", false);
+	cgi::CgiResponse expected_cgi_response("abc", false);
 	ret_code |=
 		Test(RunAddAndGetResponse(cgi_manager, client_fd, buffer, expected_cgi_response)); // Test4
 
@@ -237,13 +234,13 @@ int RunTest3() {
 	const std::string appended_buffer = "defgh";
 	buffer += appended_buffer;
 	ret_code |= Test(RunAddAndGetResponse(
-		cgi_manager, client_fd, appended_buffer, cgi::CgiResponse(buffer, "text/plain", false)
+		cgi_manager, client_fd, appended_buffer, cgi::CgiResponse(buffer, false)
 	)); // Test5
 
 	// 最後に""をread()したとして、responseが完成になっているか確認
-	ret_code |= Test(RunAddAndGetResponse(
-		cgi_manager, client_fd, "", cgi::CgiResponse(buffer, "text/plain", true)
-	)); // Test6
+	ret_code |=
+		Test(RunAddAndGetResponse(cgi_manager, client_fd, "", cgi::CgiResponse(buffer, true))
+		); // Test6
 
 	return ret_code;
 }

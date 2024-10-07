@@ -75,8 +75,7 @@ int  main(void) {
     ret_code |= test::TestGetBadRequest6LowerHttpVersion(server_infos);
     ret_code |= test::TestGetBadRequest7WrongHttpName(server_infos);
     ret_code |= test::TestGetBadRequest8WrongHttpVersion(server_infos);
-    // todo: Fix: std::out_of_range: map::at:  key not found
-    // ret_code |= test::TestGetBadRequest9NoHost(server_infos);
+    ret_code |= test::TestGetBadRequest9NoHost(server_infos);
     ret_code |= test::TestGetBadRequest10DuplicateHost(server_infos);
     ret_code |= test::TestGetBadRequest11NoHeaderFieldColon(server_infos);
     ret_code |= test::TestGetBadRequest12NoConnectionName(server_infos);
@@ -89,6 +88,8 @@ int  main(void) {
     ret_code |= test::TestGetBadRequest17SpaceHeaderFieldName(server_infos);
     ret_code |= test::TestGetBadRequest18NonVchrHeaderFieldName(server_infos);
     ret_code |= test::TestGetBadRequest19NonVchrHeaderFieldValue(server_infos);
+    ret_code |= test::TestGetBadRequest20TooFewStatusLineElements(server_infos);
+    ret_code |= test::TestGetBadRequest21TooManyStatusLineElements(server_infos);
 
     ret_code |= test::TestGetNotFound1NotExistFile(server_infos);
     ret_code |= test::TestGetMethodNotAllowed(server_infos);

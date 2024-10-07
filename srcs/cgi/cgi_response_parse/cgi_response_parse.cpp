@@ -7,6 +7,56 @@ const std::string CgiResponseParse::CRLF              = "\r\n";
 const std::string CgiResponseParse::HEADER_FIELDS_END = CRLF + CRLF;
 const std::string CgiResponseParse::OWS               = " \t";
 
+namespace {
+
+bool IsVString(const std::string &str) {
+	for (std::string::const_iterator it = str.begin(); it != str.end(); ++it) {
+		if (!std::isprint(*it)) {
+			return false;
+		}
+	}
+	return true;
+}
+
+bool HasSpace(const std::string &str) {
+	for (std::string::const_iterator it = str.begin(); it != str.end(); ++it) {
+		if (std::isspace(*it)) {
+			return true;
+		}
+	}
+	return false;
+}
+
+utils::Result<void> CheckValidHeaderFieldNameAndValue(
+	const std::string &header_field_name, const std::string &header_field_value
+) {
+	utils::Result<void> result(false);
+
+	if (!header_field_name.size()) {
+		utils::Debug("CgiResponseParse", "Header field name is empty");
+		return result;
+	}
+	if (!IsVString(header_field_name) || !IsVString(header_field_value)) {
+		utils::Debug(
+			"CgiResponseParse", "Header field name or value have non-printable characters"
+		);
+		return result;
+	}
+	if (HasSpace(header_field_name)) {
+		utils::Debug("CgiResponseParse", "Header field name has space");
+		return result;
+	}
+	if (header_field_name == "Content-Length" &&
+		!utils::ConvertStrToSize(header_field_value).IsOk()) {
+		utils::Debug("CgiResponseParse", "Invalid Content-Length: " + header_field_value);
+		return result;
+	}
+	result.Set(true);
+	return result;
+}
+
+} // namespace
+
 CgiResponseParse::CgiResponseParse() {}
 
 CgiResponseParse::~CgiResponseParse() {}
@@ -20,6 +70,7 @@ utils::Result<CgiResponseParse::ParsedData> CgiResponseParse::Parse(const std::s
 	}
 	size_t pos = response.find(HEADER_FIELDS_END);
 	if (pos == std::string::npos) {
+		utils::Debug("CgiResponseParse", "Missing header fields");
 		return result;
 	}
 	std::string         header = response.substr(0, pos + CRLF.size()); // CRLFも含めたいため
@@ -38,7 +89,6 @@ utils::Result<void>
 CgiResponseParse::ParseHeaderFields(const std::string &header, HeaderFields &header_fields) {
 	utils::Result<void>    result(false);
 	std::string::size_type pos = 0;
-	// todo: err処理
 	while (pos < header.size()) {
 		std::string::size_type end_of_line = header.find(CRLF, pos);
 		if (end_of_line == std::string::npos) {
@@ -48,12 +98,16 @@ CgiResponseParse::ParseHeaderFields(const std::string &header, HeaderFields &hea
 		pos                              = end_of_line + CRLF.size();
 		std::string::size_type colon_pos = line.find(":");
 		if (colon_pos == std::string::npos) {
+			utils::Debug("CgiResponseParse", "Invalid header field format: " + line);
 			return result;
 		}
-		std::string key   = line.substr(0, colon_pos);
-		std::string value = line.substr(colon_pos + 1);
-		value             = TrimOws(value);
-		// todo: validation(HttpParseの処理をそのまま使う)
+		std::string key                         = line.substr(0, colon_pos);
+		std::string value                       = line.substr(colon_pos + 1);
+		value                                   = TrimOws(value);
+		utils::Result<void> check_header_result = CheckValidHeaderFieldNameAndValue(key, value);
+		if (!check_header_result.IsOk()) {
+			return result;
+		}
 		header_fields[key] = value;
 	}
 	result.Set(true);
@@ -64,11 +118,8 @@ utils::Result<void> CgiResponseParse::ParseBody(const std::string &body, ParsedD
 	utils::Result<void>    result(false);
 	HeaderFields::iterator it = parsed_data.header_fields.find("Content-Length");
 	if (it != parsed_data.header_fields.end()) {
-		utils::Result<std::size_t> convert_result = utils::ConvertStrToSize(it->second);
-		if (!convert_result.IsOk()) {
-			return result;
-		}
-		std::size_t content_length = convert_result.GetValue();
+		// ヘッダーパースで値はチェック済み
+		std::size_t content_length = utils::ConvertStrToSize(it->second).GetValue();
 		if (content_length > body.size()) {
 			parsed_data.body = body;
 			result.Set(true);

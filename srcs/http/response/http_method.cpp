@@ -147,6 +147,9 @@ StatusCode Method::PostHandler(
 	// ex. srcs/http/response/http_serverinfo_check/../../../../root/save/test.txt
 	const std::string upload_path = root_path + upload_directory + "/" + file_name;
 
+	if (upload_directory.empty()) {
+		return EchoPostHandler(request_body_message, response_body_message, response_header_fields);
+	}
 	if (!IsExistPath(upload_path)) {
 		return FileCreationHandler(
 			upload_path, request_body_message, response_body_message, response_header_fields
@@ -326,6 +329,16 @@ utils::Result<std::string> Method::AutoindexHandler(const std::string &path) {
 
 	result.SetValue(response_body_message);
 	return result;
+}
+
+StatusCode Method::EchoPostHandler(
+	const std::string &request_body_message,
+	std::string       &response_body_message,
+	HeaderFields      &response_header_fields
+) {
+	response_body_message                  = request_body_message;
+	response_header_fields[CONTENT_LENGTH] = utils::ToString(response_body_message.length());
+	return StatusCode(OK);
 }
 
 } // namespace http

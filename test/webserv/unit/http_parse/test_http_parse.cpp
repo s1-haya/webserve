@@ -261,6 +261,90 @@ int RunTestCases(const TestCase test_cases[], std::size_t num_test_cases) {
 	return ret_code;
 }
 
+http::HttpRequestParsedData ParseHttpRequestFormatForChunked(http::HttpRequestParsedData &save_data
+) {
+	try {
+		http::HttpParse::Run(save_data);
+	} catch (const http::HttpException &e) {
+		save_data.request_result.status_code = e.GetStatusCode();
+	}
+	return save_data;
+}
+
+Result ParseChunkedMultipleTimes1() {
+	http::HttpRequestParsedData save_data;
+	// 1回目のread_bufをセット
+	save_data.current_buf = "POST / HTTP/1.1\r\nHost: host\r\nTransfer-Encoding: "
+							"chunked\r\n\r\n4\r\nWi";
+
+	// 1回目のParseのexpected
+	http::HttpRequestParsedData expected;
+	expected.request_result.status_code          = http::StatusCode(http::OK);
+	expected.request_result.request.request_line = CreateRequestLine("POST", "/", "HTTP/1.1");
+	expected.is_request_format.is_request_line   = true;
+	expected.is_request_format.is_header_fields  = true;
+	expected.is_request_format.is_body_message   = false;
+	expected.request_result.request.body_message = "";
+	expected.current_buf                         = "4\r\nWi";
+
+	// 1回目のParse
+	const Result result1 =
+		IsSameHttpRequestParsedData(ParseHttpRequestFormatForChunked(save_data), expected);
+	if (!result1.is_success) {
+		return result1;
+	}
+
+	// 次のread_bufが追加される
+	save_data.current_buf += "ki\r\n5\r\npedia\r\n0\r\n\r\nGET /";
+
+	// 2回目のParseのexpected
+	expected.is_request_format.is_body_message   = true; // OK
+	expected.request_result.request.body_message = "Wikipedia";
+	expected.current_buf                         = "GET /";
+
+	// 2回目のParse
+	const Result result2 =
+		IsSameHttpRequestParsedData(ParseHttpRequestFormatForChunked(save_data), expected);
+	return result2;
+}
+
+Result ParseChunkedMultipleTimes2() {
+	http::HttpRequestParsedData save_data;
+	// 1回目のread_bufをセット
+	save_data.current_buf = "POST / HTTP/1.1\r\nHost: host\r\nTransfer-Encoding: "
+							"chunked\r\n\r\n4\r\nWiki\r";
+
+	// 1回目のParseのexpected
+	http::HttpRequestParsedData expected;
+	expected.request_result.status_code          = http::StatusCode(http::OK);
+	expected.request_result.request.request_line = CreateRequestLine("POST", "/", "HTTP/1.1");
+	expected.is_request_format.is_request_line   = true;
+	expected.is_request_format.is_header_fields  = true;
+	expected.is_request_format.is_body_message   = false;
+	expected.request_result.request.body_message = "";
+	expected.current_buf                         = "4\r\nWiki\r";
+
+	// 1回目のParse
+	const Result result1 =
+		IsSameHttpRequestParsedData(ParseHttpRequestFormatForChunked(save_data), expected);
+	if (!result1.is_success) {
+		return result1;
+	}
+
+	// 次のread_bufが追加される
+	save_data.current_buf += "\n5\r\nxx\r\n0\r\n\r\nGET /";
+
+	// 2回目のParseのexpected
+	expected.request_result.status_code          = http::StatusCode(http::BAD_REQUEST); // 400
+	expected.request_result.request.body_message = "Wiki";
+	expected.current_buf                         = "5\r\nxx\r\n0\r\n\r\nGET /";
+
+	// 2回目のParse
+	const Result result2 =
+		IsSameHttpRequestParsedData(ParseHttpRequestFormatForChunked(save_data), expected);
+	return result2;
+}
+
 } // namespace
 
 int main(void) {
@@ -421,7 +505,7 @@ int main(void) {
 	test2_body_message_chunked.is_request_format.is_header_fields  = true;
 	test2_body_message_chunked.is_request_format.is_body_message   = false;
 	test2_body_message_chunked.request_result.request.body_message = "Wikipedia";
-	test2_body_message_chunked.current_buf                         = "0\r\n\r\n";
+	test2_body_message_chunked.current_buf                         = "2\r\npedia\r\n0\r\n\r\n";
 
 	// 13.Chunked Transfer-Encodingの場合で、Content-Lengthがある場合
 	http::HttpRequestParsedData test3_body_message_chunked;
@@ -454,7 +538,7 @@ int main(void) {
 	test5_body_message_chunked.is_request_format.is_header_fields  = true;
 	test5_body_message_chunked.is_request_format.is_body_message   = false;
 	test5_body_message_chunked.request_result.request.body_message = "Wikipedia";
-	test5_body_message_chunked.current_buf = "pedia\r\n"; // todo: "ss\r\npedia\r\n" にしたい
+	test5_body_message_chunked.current_buf                         = "ss\r\npedia\r\n";
 
 	// 16.Chunked Transfer-Encodingの場合で、chunk-sizeが不正な場合(負の数)
 	http::HttpRequestParsedData test6_body_message_chunked;
@@ -465,7 +549,7 @@ int main(void) {
 	test6_body_message_chunked.is_request_format.is_header_fields  = true;
 	test6_body_message_chunked.is_request_format.is_body_message   = false;
 	test6_body_message_chunked.request_result.request.body_message = "Wikipedia";
-	test6_body_message_chunked.current_buf = "pedia\r\n"; // todo: "-122\r\npedia\r\n" にしたい
+	test6_body_message_chunked.current_buf                         = "-122\r\npedia\r\n";
 
 	// 17.Chunked Transfer-Encodingの場合で、終端の0\r\n\r\nが中途半端な場合
 	http::HttpRequestParsedData test7_body_message_chunked;
@@ -476,9 +560,10 @@ int main(void) {
 	test7_body_message_chunked.is_request_format.is_header_fields  = true;
 	test7_body_message_chunked.is_request_format.is_body_message   = false;
 	test7_body_message_chunked.request_result.request.body_message = "Wikipedia";
-	test7_body_message_chunked.current_buf                         = "";
+	test7_body_message_chunked.current_buf                         = "0\r\n";
 
-	// 18.Chunked Transfer-Encodingの場合で、current_bufに次のリクエストが入っている場合正しく残るか
+	// 18.Chunked Transfer-Encodingの場合で
+	//    正常にchunk処理が終了した後、current_bufに次のリクエストが入っている場合正しく残るか
 	http::HttpRequestParsedData test8_body_message_chunked;
 	test8_body_message_chunked.request_result.status_code = http::StatusCode(http::OK);
 	test8_body_message_chunked.request_result.request.request_line =
@@ -488,6 +573,73 @@ int main(void) {
 	test8_body_message_chunked.is_request_format.is_body_message   = true;
 	test8_body_message_chunked.request_result.request.body_message = "Wikipedia";
 	test8_body_message_chunked.current_buf                         = "GET /";
+
+	// 19.Chunked Transfer-Encodingの場合で、0終わりの場合
+	http::HttpRequestParsedData test9_body_message_chunked;
+	test9_body_message_chunked.request_result.status_code = http::StatusCode(http::OK);
+	test9_body_message_chunked.request_result.request.request_line =
+		CreateRequestLine("POST", "/", "HTTP/1.1");
+	test9_body_message_chunked.is_request_format.is_request_line   = true;
+	test9_body_message_chunked.is_request_format.is_header_fields  = true;
+	test9_body_message_chunked.is_request_format.is_body_message   = false;
+	test9_body_message_chunked.request_result.request.body_message = "Wikipedia";
+	test9_body_message_chunked.current_buf                         = "0";
+
+	// 20.Chunked Transfer-Encodingの場合で、0\r終わりの場合
+	http::HttpRequestParsedData test10_body_message_chunked;
+	test10_body_message_chunked.request_result.status_code = http::StatusCode(http::OK);
+	test10_body_message_chunked.request_result.request.request_line =
+		CreateRequestLine("POST", "/", "HTTP/1.1");
+	test10_body_message_chunked.is_request_format.is_request_line   = true;
+	test10_body_message_chunked.is_request_format.is_header_fields  = true;
+	test10_body_message_chunked.is_request_format.is_body_message   = false;
+	test10_body_message_chunked.request_result.request.body_message = "Wikipedia";
+	test10_body_message_chunked.current_buf                         = "0\r";
+
+	// 21.Chunked Transfer-Encodingの場合で、
+	//    0\rの後に\nが来てない場合(大きい数字が来てる扱いでOKとした)
+	http::HttpRequestParsedData test11_body_message_chunked;
+	test11_body_message_chunked.request_result.status_code = http::StatusCode(http::OK);
+	test11_body_message_chunked.request_result.request.request_line =
+		CreateRequestLine("POST", "/", "HTTP/1.1");
+	test11_body_message_chunked.is_request_format.is_request_line   = true;
+	test11_body_message_chunked.is_request_format.is_header_fields  = true;
+	test11_body_message_chunked.is_request_format.is_body_message   = false;
+	test11_body_message_chunked.request_result.request.body_message = "Wikipedia";
+	test11_body_message_chunked.current_buf                         = "0\rGET /";
+
+	// 22.Chunked Transfer-Encodingの場合で、0\r\nの後に\r\nが来てない場合
+	http::HttpRequestParsedData test12_body_message_chunked;
+	test12_body_message_chunked.request_result.status_code = http::StatusCode(http::BAD_REQUEST);
+	test12_body_message_chunked.request_result.request.request_line =
+		CreateRequestLine("POST", "/", "HTTP/1.1");
+	test12_body_message_chunked.is_request_format.is_request_line   = true;
+	test12_body_message_chunked.is_request_format.is_header_fields  = true;
+	test12_body_message_chunked.is_request_format.is_body_message   = false;
+	test12_body_message_chunked.request_result.request.body_message = "Wikipedia";
+	test12_body_message_chunked.current_buf                         = "0\r\nGET /";
+
+	// 23.Chunked Transfer-Encodingの場合で、chunk sizeがoverflowしてる場合 / INT_MAX(7fffffff)
+	http::HttpRequestParsedData test13_body_message_chunked;
+	test13_body_message_chunked.request_result.status_code = http::StatusCode(http::BAD_REQUEST);
+	test13_body_message_chunked.request_result.request.request_line =
+		CreateRequestLine("POST", "/", "HTTP/1.1");
+	test13_body_message_chunked.is_request_format.is_request_line   = true;
+	test13_body_message_chunked.is_request_format.is_header_fields  = true;
+	test13_body_message_chunked.is_request_format.is_body_message   = false;
+	test13_body_message_chunked.request_result.request.body_message = "Wikipedia";
+	test13_body_message_chunked.current_buf                         = "80000000\r\naaa";
+
+	// 24.Chunked Transfer-Encodingの場合で、\r\nが含まれずchunk_sizeが8桁より多い場合は早期に400
+	http::HttpRequestParsedData test14_body_message_chunked;
+	test14_body_message_chunked.request_result.status_code = http::StatusCode(http::BAD_REQUEST);
+	test14_body_message_chunked.request_result.request.request_line =
+		CreateRequestLine("POST", "/", "HTTP/1.1");
+	test14_body_message_chunked.is_request_format.is_request_line   = true;
+	test14_body_message_chunked.is_request_format.is_header_fields  = true;
+	test14_body_message_chunked.is_request_format.is_body_message   = false;
+	test14_body_message_chunked.request_result.request.body_message = "Wikipedia";
+	test14_body_message_chunked.current_buf                         = "123456789";
 
 	static const TestCase test_case_http_request_body_message_format_with_chunked[] = {
 		TestCase(
@@ -531,6 +683,36 @@ int main(void) {
 			"chunked\r\n\r\n4\r\nWiki\r\n5\r\npedia\r\n0\r\n\r\nGET /",
 			test8_body_message_chunked
 		),
+		TestCase(
+			"POST / HTTP/1.1\r\nHost: host\r\nTransfer-Encoding: "
+			"chunked\r\n\r\n4\r\nWiki\r\n5\r\npedia\r\n0",
+			test9_body_message_chunked
+		),
+		TestCase(
+			"POST / HTTP/1.1\r\nHost: host\r\nTransfer-Encoding: "
+			"chunked\r\n\r\n4\r\nWiki\r\n5\r\npedia\r\n0\r",
+			test10_body_message_chunked
+		),
+		TestCase(
+			"POST / HTTP/1.1\r\nHost: host\r\nTransfer-Encoding: "
+			"chunked\r\n\r\n4\r\nWiki\r\n5\r\npedia\r\n0\rGET /",
+			test11_body_message_chunked
+		),
+		TestCase(
+			"POST / HTTP/1.1\r\nHost: host\r\nTransfer-Encoding: "
+			"chunked\r\n\r\n4\r\nWiki\r\n5\r\npedia\r\n0\r\nGET /",
+			test12_body_message_chunked
+		),
+		TestCase(
+			"POST / HTTP/1.1\r\nHost: host\r\nTransfer-Encoding: "
+			"chunked\r\n\r\n4\r\nWiki\r\n5\r\npedia\r\n80000000\r\naaa",
+			test13_body_message_chunked
+		),
+		TestCase(
+			"POST / HTTP/1.1\r\nHost: host\r\nTransfer-Encoding: "
+			"chunked\r\n\r\n4\r\nWiki\r\n5\r\npedia\r\n123456789",
+			test14_body_message_chunked
+		),
 	};
 
 	ret_code |= RunTestCases(
@@ -538,6 +720,13 @@ int main(void) {
 		sizeof(test_case_http_request_body_message_format_with_chunked) /
 			sizeof(test_case_http_request_body_message_format_with_chunked[0])
 	);
+
+	// 25. Chunked Transfer-Encodingの場合で、1回目OKで未完成・2回目OK 200で完成
+	//     chunk_dataが途中ならchunk_sizeもcurrent_bufに残す
+	ret_code |= HandleResult(ParseChunkedMultipleTimes1());
+
+	// 26. Chunked Transfer-Encodingの場合で、1回目OKで未完成・2回目で400
+	ret_code |= HandleResult(ParseChunkedMultipleTimes2());
 
 	return ret_code;
 }
