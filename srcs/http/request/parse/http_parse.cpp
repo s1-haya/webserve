@@ -174,7 +174,7 @@ void HttpParse::ParseHeaderFields(HttpRequestParsedData &data) {
 		throw HttpException("Error: missing Content-Type header field.", StatusCode(BAD_REQUEST));
 	}
 	if (data.request_result.request.request_line.method == POST &&
-		!data.request_result.request.header_fields.count(CONTENT_LENGTH)) {
+		!IsBodyMessageReadingRequired(data.request_result.request.header_fields)) {
 		throw HttpException("Error: missing Content-Length header field.", StatusCode(BAD_REQUEST));
 	}
 	if (!IsBodyMessageReadingRequired(data.request_result.request.header_fields)) {
