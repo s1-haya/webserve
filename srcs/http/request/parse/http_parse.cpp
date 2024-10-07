@@ -137,13 +137,23 @@ void ThrowMissingHostHeaderField(const HeaderFields &header_fields) {
 	}
 }
 
-void ValidateInvalidHeaderFields(const HeaderFields &header_fields, const std::string &method) {
-	ThrowMissingHostHeaderField(header_fields);
-	if (method == POST && !header_fields.count(CONTENT_TYPE)) {
+void ThrowMissingContentTypeHeaderField(const HeaderFields &header_fields) {
+	if (!header_fields.count(CONTENT_TYPE)) {
 		throw HttpException("Error: missing Content-Type header field.", StatusCode(BAD_REQUEST));
 	}
-	if (method == POST && !IsBodyMessageReadingRequired(header_fields)) {
+}
+
+void ThrowMissingBodyRequiredHeaderField(const HeaderFields &header_fields) {
+	if (!IsBodyMessageReadingRequired(header_fields)) {
 		throw HttpException("Error: missing Content-Length header field.", StatusCode(BAD_REQUEST));
+	}
+}
+
+void ValidateInvalidHeaderFields(const HeaderFields &header_fields, const std::string &method) {
+	ThrowMissingHostHeaderField(header_fields);
+	if (method == POST) {
+		ThrowMissingContentTypeHeaderField(header_fields);
+		ThrowMissingBodyRequiredHeaderField(header_fields);
 	}
 }
 
