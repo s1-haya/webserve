@@ -1,0 +1,89 @@
+import unittest
+from http import HTTPStatus
+from http.client import HTTPConnection, HTTPException
+
+from http_module.assert_http_response import (assert_body, assert_header,
+                                              assert_status_line)
+
+
+class TestCGI(unittest.TestCase):
+    def setUp(self):
+        # 各テストの前に実行される(unittestの機能)
+        self.con = HTTPConnection("localhost", 8080)
+
+    def tearDown(self):
+        # 各テストの後に実行される(unittestの機能)
+        self.con.close()
+
+    def test_print_ok_pl(self):
+        try:
+            self.con.request("GET", "/cgi-bin/print_ok.pl")
+            response = self.con.getresponse()
+            assert_status_line(response, HTTPStatus.OK)
+            assert_header(response, "Connection", "keep-alive")
+            self.assertEqual(response.read(), b"OK\n")
+        except HTTPException as e:
+            self.fail(f"Request failed: {e}")
+
+    def test_print_env_pl(self):
+        try:
+            self.con.request("GET", "/cgi-bin/print_env.pl")
+            response = self.con.getresponse()
+            assert_status_line(response, HTTPStatus.OK)
+            assert_header(response, "Connection", "keep-alive")
+            body = response.read().decode()
+            self.assertIn("AUTH_TYPE:", body)
+            self.assertIn("CONTENT_LENGTH:", body)
+            self.assertIn("CONTENT_TYPE:", body)
+            self.assertIn("GATEWAY_INTERFACE:", body)
+            self.assertIn("PATH_INFO:", body)
+            self.assertIn("PATH_TRANSLATED:", body)
+            self.assertIn("QUERY_STRING:", body)
+            self.assertIn("REMOTE_ADDR:", body)
+            self.assertIn("REMOTE_HOST:", body)
+            self.assertIn("REMOTE_IDENT:", body)
+            self.assertIn("REMOTE_USER:", body)
+            self.assertIn("REQUEST_METHOD:", body)
+            self.assertIn("SCRIPT_NAME:", body)
+            self.assertIn("SERVER_NAME:", body)
+            self.assertIn("SERVER_PORT:", body)
+            self.assertIn("SERVER_PROTOCOL:", body)
+            self.assertIn("SERVER_SOFTWARE:", body)
+        except HTTPException as e:
+            self.fail(f"Request failed: {e}")
+
+    def test_print_ok_py(self):
+        try:
+            self.con.request("GET", "/cgi-bin/print_ok.py")
+            response = self.con.getresponse()
+            assert_status_line(response, HTTPStatus.OK)
+            assert_header(response, "Connection", "keep-alive")
+            assert_body(response, "root/cgi-bin/print_ok.py")
+        except HTTPException as e:
+            self.fail(f"Request failed: {e}")
+
+    def test_print_stdin_pl(self):
+        try:
+            headers = {"Content-Type": "application/x-www-form-urlencoded"}
+            body = "key1=value1&key2=value2"
+            self.con.request("POST", "/cgi-bin/print_stdin.pl", body, headers)
+            response = self.con.getresponse()
+            assert_status_line(response, HTTPStatus.OK)
+            assert_header(response, "Connection", "keep-alive")
+            self.assertIn(b"POST data: key1=value1&key2=value2", response.read())
+        except HTTPException as e:
+            self.fail(f"Request failed: {e}")
+
+    def test_print_stdin_pl_no_data(self):
+        try:
+            headers = {"Content-Type": "application/x-www-form-urlencoded"}
+            self.con.request("POST", "/cgi-bin/print_stdin.pl", "", headers)
+            response = self.con.getresponse()
+            assert_status_line(response, HTTPStatus.OK)
+            assert_header(response, "Connection", "keep-alive")
+            self.assertIn(b"No POST data received.", response.read())
+        except HTTPException as e:
+            self.fail(f"Request failed: {e}")
+
+    # todo: PathInfo(マージ後追加)
+    # todo: error (マージ後追加)

@@ -42,14 +42,14 @@ int HandleResult(const T &result, const T &expected) {
 }
 
 server::Location BuildLocation(
-	const std::string                          &request_uri,
-	const std::string                          &alias,
-	const std::string                          &index,
+	const std::string						  &request_uri,
+	const std::string						  &alias,
+	const std::string						  &index,
 	bool                                        autoindex,
 	const std::list<std::string>               &allowed_methods,
 	const std::pair<unsigned int, std::string> &redirect,
-	const std::string                          &cgi_extension    = "",
-	const std::string                          &upload_directory = ""
+	const std::string						  &cgi_extension    = "",
+	const std::string						  &upload_directory = ""
 ) {
 	server::Location loc;
 	loc.request_uri      = request_uri;
@@ -221,6 +221,12 @@ int main(void) {
 	ret_code |= HandleResult(response2, expected2_response);
 
 	// ContentTypeのテスト
+	const std::string &file_name = "../../../../root/upload/delete_file";
+	std::ofstream      file(file_name.c_str(), std::ios::binary);
+	if (file.fail()) {
+		utils::Debug("Error: fail to create file in delete test case.");
+		return EXIT_FAILURE;
+	}
 	request_info.request.request_line.method         = http::GET;
 	request_info.request.request_line.request_target = "/www/delete_file";
 	request_info.request.request_line.version        = http::HTTP_VERSION;
@@ -230,13 +236,14 @@ int main(void) {
 
 	std::string expected4_status_line =
 		LoadFileContent("../../expected_response/default_status_line/200_ok.txt");
-	std::string expected4_body_message  = LoadFileContent("../../../../root/upload/delete_file");
+	std::string expected4_body_message  = "";
 	std::string expected4_header_fields = SetDefaultHeaderFields(
-		http::KEEP_ALIVE, utils::ToString(expected4_body_message.length()), "text/plain"
+		http::KEEP_ALIVE, utils::ToString(expected4_body_message.length()), http::TEXT_PLAIN
 	);
 	const std::string &expected4_response =
 		expected4_status_line + expected4_header_fields + http::CRLF + expected4_body_message;
 	ret_code |= HandleResult(response4, expected4_response);
+	std::remove(file_name.c_str());
 
 	// ErrorPageのテスト
 	request_info.request.request_line.method         = http::GET;

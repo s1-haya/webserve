@@ -2,8 +2,9 @@ import socket
 from http.client import HTTPConnection, HTTPException
 from typing import Optional
 
-from common import (assert_response, response_header_get_root_200_keep,
-                    root_index_file, timeout_response)
+from common_functions import assert_response
+from common_response import (response_header_get_root_200_keep,
+                             root_index_file, timeout_response)
 
 # serverのtimeout+αを設定する
 TIMEOUT = 4.0
@@ -38,7 +39,7 @@ def test_timeout_keep_alive() -> None:
         response = receive_with_timeout(con.sock)
         if response is None:
             # timeout秒経過していたらNG
-            assert False
+            raise AssertionError
         else:
             # serverが200 OKを返したことを確認
             assert_response(
@@ -49,14 +50,14 @@ def test_timeout_keep_alive() -> None:
         next_response = receive_with_timeout(con.sock)
         if next_response is None:
             # timeout秒経過していたらNG
-            assert False
+            raise AssertionError
         else:
             # timeout秒経過前にserverから何も送られてこなかったらOK(接続が切れたという判断はできないかも？)
             assert len(next_response) == 0
 
     except HTTPException as e:
         print(f"Request failed: {e}")
-        assert False
+        raise AssertionError
     finally:
         if con:
             con.close()
@@ -72,14 +73,14 @@ def test_timeout_incomplete_request() -> None:
 
         response = receive_with_timeout(con.sock)
         if response is None:
-            assert False
+            raise AssertionError
         else:
             # serverがtimeout responseを返したことを確認
             assert_response(response, timeout_response)
 
     except HTTPException as e:
         print(f"Request failed: {e}")
-        assert False
+        raise AssertionError
     finally:
         if con:
             con.close()
@@ -94,14 +95,14 @@ def test_timeout_no_request() -> None:
 
         response = receive_with_timeout(con.sock)
         if response is None:
-            assert False
+            raise AssertionError
         else:
             # serverが何も送らず接続を切断したらOK
             assert len(response) == 0
 
     except HTTPException as e:
         print(f"Request failed: {e}")
-        assert False
+        raise AssertionError
     finally:
         if con:
             con.close()
@@ -121,7 +122,7 @@ def test_incomplete_request_disconnect() -> None:
 
     except HTTPException as e:
         print(f"Request failed: {e}")
-        assert False
+        raise AssertionError
     finally:
         if con:
             con.close()
@@ -140,7 +141,7 @@ def test_timeout_no_request_disconnect() -> None:
 
     except HTTPException as e:
         print(f"Request failed: {e}")
-        assert False
+        raise AssertionError
     finally:
         if con:
             con.close()

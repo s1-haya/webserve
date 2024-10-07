@@ -12,8 +12,12 @@ static const std::string &EXPECTED_RESPONSE = "../../expected_response";
 static const std::string &EXPECTED_STATUS_LINE = EXPECTED_RESPONSE + "/default_status_line";
 static const std::string &EXPECTED_STATUS_LINE_OK =
 	LoadFileContent(EXPECTED_STATUS_LINE + "/200_ok.txt");
+static const std::string &EXPECTED_STATUS_LINE_NO_CONTENT =
+	LoadFileContent(EXPECTED_STATUS_LINE + "/204_no_content.txt");
 static const std::string &EXPECTED_STATUS_LINE_BAD_REQUEST =
 	LoadFileContent(EXPECTED_STATUS_LINE + "/400_bad_request.txt");
+static const std::string &EXPECTED_STATUS_LINE_FORBIDDEN =
+	LoadFileContent(EXPECTED_STATUS_LINE + "/403_forbidden.txt");
 static const std::string &EXPECTED_STATUS_LINE_NOT_FOUND =
 	LoadFileContent(EXPECTED_STATUS_LINE + "/404_not_found.txt");
 static const std::string &EXPECTED_STATUS_LINE_METHOD_NOT_ALLOWED =
@@ -27,8 +31,12 @@ static const std::string &EXPECTED_STATUS_LINE_NOT_IMPLEMENTED =
 
 // body_message
 static const std::string &EXPECTED_BODY_MESSAGE = EXPECTED_RESPONSE + "/default_body_message";
+static const std::string &EXPECTED_BODY_MESSAGE_NO_CONTENT =
+	LoadFileContent(EXPECTED_BODY_MESSAGE + "/204_no_content.txt");
 static const std::string &EXPECTED_BODY_MESSAGE_BAD_REQUEST =
 	LoadFileContent(EXPECTED_BODY_MESSAGE + "/400_bad_request.txt");
+static const std::string &EXPECTED_BODY_MESSAGE_FORBIDDEN =
+	LoadFileContent(EXPECTED_BODY_MESSAGE + "/403_forbidden.txt");
 static const std::string &EXPECTED_BODY_MESSAGE_NOT_FOUND =
 	LoadFileContent(EXPECTED_BODY_MESSAGE + "/404_not_found.txt");
 static const std::string &EXPECTED_BODY_MESSAGE_METHOD_NOT_ALLOWED =

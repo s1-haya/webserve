@@ -130,6 +130,24 @@ run-webserv:
 		echo "$(WEBSERV_CONTAINER_NAME) is already running."; \
 	fi
 
+# ファイル作成、削除テスト用にrootディレクトリをマウント
+.PHONY	: run-webserv-for-test
+run-webserv-for-test:
+	@if [ -z "$$(docker images -q $(WEBSERV_IMAGE_NAME):$(WEBSERV_IMAGE_TAG))" ]; then \
+		echo "$(WEBSERV_IMAGE_NAME):$(WEBSERV_IMAGE_TAG) not found. Building the image..."; \
+		make build-webserv; \
+	else \
+		echo "$(WEBSERV_IMAGE_NAME):$(WEBSERV_IMAGE_TAG) found."; \
+	fi
+	@sleep 1
+	@if [ -z "$$(docker ps -aqf name=$(WEBSERV_CONTAINER_NAME))" ]; then \
+		docker run -d --name $(WEBSERV_CONTAINER_NAME) -p $(WEBSERV_PORT):$(WEBSERV_PORT) -v $(PWD)/root:/webserv/root $(WEBSERV_IMAGE_NAME):$(WEBSERV_IMAGE_TAG); \
+	elif [ -z "$$(docker ps -qf name=$(WEBSERV_CONTAINER_NAME))" ]; then \
+		docker start $(WEBSERV_CONTAINER_NAME); \
+	else \
+		echo "$(WEBSERV_CONTAINER_NAME) is already running."; \
+	fi
+
 .PHONY	: re-run-webserv
 re-run-webserv:
 	@make fclean-webserv && make run-webserv
