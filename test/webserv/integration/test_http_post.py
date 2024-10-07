@@ -4,7 +4,7 @@ import time
 import pytest
 from common_functions import read_file, send_request_and_assert_response
 from common_response import (bad_request_response, created_response_close,
-                             created_response_keep, no_content_response,
+                             created_response_keep, no_content_response_close,
                              response_header_get_root_200_close,
                              root_index_file, timeout_response)
 
@@ -74,7 +74,7 @@ def cleanup_file_context():
         ),
         (
             REQUEST_POST_2XX_DIR + "201_03_upload_file_204_same_upload_file.txt",
-            created_response_keep + no_content_response,
+            created_response_keep + no_content_response_close,
             UPLOAD_FILE_PATH,
             "first",
         ),
