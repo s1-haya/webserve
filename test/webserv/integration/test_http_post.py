@@ -3,7 +3,10 @@ import time
 
 import pytest
 from common_functions import read_file, send_request_and_assert_response
-from common_response import *
+from common_response import (bad_request_response, created_response_close,
+                             created_response_keep, no_content_response,
+                             response_header_get_root_200_close,
+                             root_index_file, timeout_response)
 
 REQUEST_DIR = "test/common/request/"
 REQUEST_POST_2XX_DIR = REQUEST_DIR + "post/2xx/"
