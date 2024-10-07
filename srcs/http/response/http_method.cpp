@@ -476,16 +476,14 @@ Method::Part Method::ParsePart(const std::string &part) {
 	std::size_t pos = 0;
 	std::size_t end = headers.find(CRLF, pos);
 	while (end != std::string::npos) {
-		std::string header = headers.substr(pos, end - pos);
-		std::size_t colon  = header.find(": ");
-		if (colon == std::string::npos) {
+		std::string              header            = headers.substr(pos, end - pos);
+		std::vector<std::string> header_name_value = utils::SplitStr(header, ": ");
+		if (header_name_value.size() != 2) {
 			throw HttpException("Error: Invalid header format", StatusCode(BAD_REQUEST));
 		}
-		std::string name     = header.substr(0, colon);
-		std::string value    = header.substr(colon + CRLF.length());
-		result.headers[name] = value;
-		pos                  = end + CRLF.length();
-		end                  = headers.find(CRLF, pos);
+		result.headers[header_name_value[0]] = header_name_value[1];
+		pos                                  = end + CRLF.length();
+		end                                  = headers.find(CRLF, pos);
 	}
 	return result;
 }
