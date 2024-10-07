@@ -28,7 +28,7 @@ def delete_file(file_path):
             print(f"Deleted file: {file_path}")
     except Exception as e:
         print(f"Error deleting file: {file_path}, {e}")
-        assert False
+        raise AssertionError
 
 
 def assert_uploaded_file_content(upload_file_path, expected_upload_file_content):
