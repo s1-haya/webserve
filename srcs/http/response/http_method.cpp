@@ -59,7 +59,7 @@ bool StartWith(const std::string &str, const std::string &prefix) {
 std::string Trim(const std::string &str, const std::string &to_trim) {
 	std::size_t first = str.find_first_not_of(to_trim);
 	if (std::string::npos == first) {
-		return str;
+		return "";
 	}
 	std::size_t last = str.find_last_not_of(to_trim);
 	return str.substr(first, last - first + 1);
