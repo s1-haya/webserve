@@ -127,3 +127,11 @@ class TestCGI(unittest.TestCase):
             self.assertEqual(response.status, HTTPStatus.INTERNAL_SERVER_ERROR)
         except HTTPException as e:
             self.fail(f"Request failed: {e}")
+
+    def test_loop_pl(self):
+        try:
+            self.con.request("GET", "/cgi-bin/loop.pl")
+            response = self.con.getresponse()
+            self.assertEqual(response.status, HTTPStatus.REQUEST_TIMEOUT)
+        except HTTPException as e:
+            self.fail(f"Request failed: {e}")
