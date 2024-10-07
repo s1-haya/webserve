@@ -133,30 +133,31 @@ Result IsSameRequestLine(const http::RequestLine &res, const http::RequestLine &
 Result IsSameHeaderFields(const http::HeaderFields &res, http::HeaderFields expected) {
 	Result             header_fields_result;
 	std::ostringstream error_log;
-	if (expected["Host"].size() && expected.at("Host") != res.at("Host")) {
+	if (expected[http::HOST].size() && expected.at(http::HOST) != res.at(http::HOST)) {
 		error_log << "Error: Host\n";
-		error_log << "- Expected: [" << expected.at("Host") << "]\n";
-		error_log << "- Result  : [" << res.at("Host") << "]\n";
+		error_log << "- Expected: [" << expected.at(http::HOST) << "]\n";
+		error_log << "- Result  : [" << res.at(http::HOST) << "]\n";
 		header_fields_result.is_success = false;
 	}
-	if (expected["Connection"].size() && expected.at("Connection") != res.at("Connection")) {
+	if (expected[http::CONNECTION].size() &&
+		expected.at(http::CONNECTION) != res.at(http::CONNECTION)) {
 		error_log << "Error: Connection\n";
-		error_log << "- Expected: [" << expected.at("Connection") << "]\n";
-		error_log << "- Result  : [" << res.at("Connection") << "]\n";
+		error_log << "- Expected: [" << expected.at(http::CONNECTION) << "]\n";
+		error_log << "- Result  : [" << res.at(http::CONNECTION) << "]\n";
 		header_fields_result.is_success = false;
 	}
-	if (expected["Content-Length"].size() &&
-		expected.at("Content-Length") != res.at("Content-Length")) {
+	if (expected[http::CONTENT_LENGTH].size() &&
+		expected.at(http::CONTENT_LENGTH) != res.at(http::CONTENT_LENGTH)) {
 		error_log << "Error: Content-Length\n";
-		error_log << "- Expected: [" << expected.at("Content-Length") << "]\n";
-		error_log << "- Result  : [" << res.at("Content-Length") << "]\n";
+		error_log << "- Expected: [" << expected.at(http::CONTENT_LENGTH) << "]\n";
+		error_log << "- Result  : [" << res.at(http::CONTENT_LENGTH) << "]\n";
 		header_fields_result.is_success = false;
 	}
-	if (expected["Transfer-Encoding"].size() &&
-		expected.at("Transfer-Encoding") != res.at("Transfer-Encoding")) {
+	if (expected[http::TRANSFER_ENCODING].size() &&
+		expected.at(http::TRANSFER_ENCODING) != res.at(http::TRANSFER_ENCODING)) {
 		error_log << "Error: Transfer-Encoding\n";
-		error_log << "- Expected: [" << expected.at("Transfer-Encoding") << "]\n";
-		error_log << "- Result  : [" << res.at("Transfer-Encoding") << "]\n";
+		error_log << "- Expected: [" << expected.at(http::TRANSFER_ENCODING) << "]\n";
+		error_log << "- Result  : [" << res.at(http::TRANSFER_ENCODING) << "]\n";
 		header_fields_result.is_success = false;
 	}
 	header_fields_result.error_log = error_log.str();

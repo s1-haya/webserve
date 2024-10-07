@@ -21,20 +21,20 @@ const std::string DEFAULT_ALLOWED_METHODS[] = {GET};
 const std::size_t DEFAULT_ALLOWED_METHODS_SIZE =
 	sizeof(DEFAULT_ALLOWED_METHODS) / sizeof(DEFAULT_ALLOWED_METHODS[0]);
 
-const std::string HOST                     = "Host";
-const std::string USER_AGENT               = "User-Agent";
-const std::string ACCEPT                   = "Accept";
-const std::string ACCEPT_ENCODING          = "Accept-Encoding";
-const std::string CONNECTION               = "Connection";
+const std::string HOST                     = "host";
+const std::string USER_AGENT               = "user-agent";
+const std::string ACCEPT                   = "accept";
+const std::string ACCEPT_ENCODING          = "accept-encoding";
+const std::string CONNECTION               = "connection";
 const std::string KEEP_ALIVE               = "keep-alive";
 const std::string CLOSE                    = "close";
-const std::string CONTENT_TYPE             = "Content-Type";
+const std::string CONTENT_TYPE             = "content-type";
 const std::string APPLICATION_OCTET_STREAM = "application/octet-stream";
-const std::string CONTENT_LENGTH           = "Content-Length";
-const std::string TRANSFER_ENCODING        = "Transfer-Encoding";
+const std::string CONTENT_LENGTH           = "content-length";
+const std::string TRANSFER_ENCODING        = "transfer-encoding";
 const std::string CHUNKED                  = "chunked";
-const std::string LOCATION                 = "Location";
-const std::string AUTHORIZATION            = "Authorization";
+const std::string LOCATION                 = "location";
+const std::string AUTHORIZATION            = "authorization";
 const std::string REQUEST_HEADER_FIELDS[]  = {
     HOST,
     USER_AGENT,
@@ -51,6 +51,6 @@ const std::size_t REQUEST_HEADER_FIELDS_SIZE =
 	sizeof(REQUEST_HEADER_FIELDS) / sizeof(REQUEST_HEADER_FIELDS[0]);
 
 // response header fields
-const std::string SERVER = "Server";
+const std::string SERVER = "server";
 
 } // namespace http

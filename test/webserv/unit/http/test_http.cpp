@@ -57,8 +57,7 @@ int  main(void) {
     ret_code |= test::TestGetOk4ConnectionKeepAndOkConnectionKeep(server_infos);
     ret_code |= test::TestGetOk5ConnectionCloseAndOkConnectionClose(server_infos);
     ret_code |= test::TestGetOk6ConnectionKeepAndOkConnectionClose(server_infos);
-    // todo: ヘッダーフィールド大文字、小文字対応する？(優先度は低い)
-    // ret_code |= test::TestGetOk11UpperAndLowerHeaderFields(server_infos);
+    ret_code |= test::TestGetOk11UpperAndLowerHeaderFields(server_infos);
     // todo: ヘッダーフィールドのvalueの右のOWSをtrimする
     // ret_code |= test::TestGetOk12HeaderFieldValueSpace(server_infos);
     ret_code |= test::TestGetOk13SpaceHeaderFieldValue(server_infos);

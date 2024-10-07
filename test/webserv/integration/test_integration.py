@@ -58,6 +58,10 @@ def send_request_and_assert_response(request_file, expected_response):
             response_header_get_root_200_keep + root_index_file,
         ),
         (
+            REQUEST_GET_2XX_DIR + "200_11_upper_and_lower_header_fields.txt",
+            response_header_get_root_200_close + root_index_file,
+        ),
+        (
             REQUEST_GET_2XX_DIR + "200_12_header_field_value_space.txt",
             response_header_get_root_200_close + root_index_file,
         ),
@@ -153,6 +157,7 @@ def send_request_and_assert_response(request_file, expected_response):
         "200_03_sub_connection_close",
         "200_07_no_connection_value",
         "200_08_wrong_connection_value",
+        "200_11_upper_and_lower_header_fields",
         "200_12_header_field_value_space",
         "200_13_space_header_field_value",
         "200_14_extra_request",

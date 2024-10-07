@@ -182,7 +182,7 @@ int Test1() {
 	HttpRequestFormat request;
 	request.request_line              = CreateRequestLine("GET", "/", "HTTP/1.1");
 	request.header_fields[HOST]       = "host1";
-	request.header_fields[CONNECTION] = "keep-alive";
+	request.header_fields[CONNECTION] = KEEP_ALIVE;
 
 	server::VirtualServerAddrList virtual_servers = BuildVirtualServerAddrList();
 	CheckServerInfoResult         result   = HttpServerInfoCheck::Check(virtual_servers, request);
@@ -214,7 +214,7 @@ int Test2() {
 	HttpRequestFormat request;
 	request.request_line = CreateRequestLine("GET", "/www/test.html", "HTTP/1.1");
 	request.header_fields[HOST] = "host10"; // hostが見つからない場合がデフォルト(host1)に
-	request.header_fields[CONNECTION] = "keep-alive";
+	request.header_fields[CONNECTION] = KEEP_ALIVE;
 
 	server::VirtualServerAddrList virtual_servers = BuildVirtualServerAddrList();
 	CheckServerInfoResult         result = HttpServerInfoCheck::Check(virtual_servers, request);
@@ -245,7 +245,7 @@ int Test3() {
 	HttpRequestFormat request;
 	request.request_line              = CreateRequestLine("GET", "/www/data/test.html", "HTTP/1.1");
 	request.header_fields[HOST]       = "host2";
-	request.header_fields[CONNECTION] = "keep-alive";
+	request.header_fields[CONNECTION] = KEEP_ALIVE;
 
 	server::VirtualServerAddrList virtual_servers = BuildVirtualServerAddrList();
 	CheckServerInfoResult         result   = HttpServerInfoCheck::Check(virtual_servers, request);
@@ -277,7 +277,7 @@ int Test4() {
 	HttpRequestFormat request;
 	request.request_line              = CreateRequestLine("GET", "/web/", "HTTP/1.1");
 	request.header_fields[HOST]       = "host2";
-	request.header_fields[CONNECTION] = "keep-alive";
+	request.header_fields[CONNECTION] = KEEP_ALIVE;
 
 	server::VirtualServerAddrList virtual_servers = BuildVirtualServerAddrList();
 	CheckServerInfoResult         result = HttpServerInfoCheck::Check(virtual_servers, request);
@@ -312,7 +312,7 @@ int Test5() {
 	HttpRequestFormat request;
 	request.request_line              = request_line;
 	request.header_fields[HOST]       = "host3";
-	request.header_fields[CONNECTION] = "keep-alive";
+	request.header_fields[CONNECTION] = KEEP_ALIVE;
 
 	server::VirtualServerAddrList virtual_servers = BuildVirtualServerAddrList();
 
@@ -336,7 +336,7 @@ int Test6() {
 	HttpRequestFormat request;
 	request.request_line                  = request_line;
 	request.header_fields[HOST]           = "host1";
-	request.header_fields[CONNECTION]     = "keep-alive";
+	request.header_fields[CONNECTION]     = KEEP_ALIVE;
 	request.header_fields[CONTENT_LENGTH] = "4000"; // host1のclient_max_body_sizeは2048
 
 	server::VirtualServerAddrList virtual_servers = BuildVirtualServerAddrList();
