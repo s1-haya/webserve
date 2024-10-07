@@ -3,8 +3,9 @@ import time
 
 import pytest
 from common_functions import read_file, send_request_and_assert_response
-from common_response import (no_content_response_close,
-                                no_content_response_keep, not_found_response, forbidden_response, not_allowed_response)
+from common_response import (forbidden_response, no_content_response_close,
+                             no_content_response_keep, not_allowed_response,
+                             not_found_response)
 
 REQUEST_DIR = "test/common/request/"
 REQUEST_DELETE_2XX_DIR = REQUEST_DIR + "delete/2xx/"
@@ -14,13 +15,14 @@ UPLOAD_DIR = "root/upload/"
 DELETE_FILE_PATH = UPLOAD_DIR + "delete_file"
 NOT_EXISTING_FILE_PATH = UPLOAD_DIR + "not_found"
 
+
 def create_file(file_path, content=""):
     if file_path is None:
         return
 
     try:
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
-        with open(file_path, 'w') as f:
+        with open(file_path, "w") as f:
             f.write(content)
         print(f"Created file: {file_path}")
     except Exception as e:
@@ -57,13 +59,15 @@ def setup_file_context():
             "Sample content for deletion",
         ),
         (
-            REQUEST_DELETE_2XX_DIR + "204_02_delete_existing_file_with_body_message.txt",
+            REQUEST_DELETE_2XX_DIR
+            + "204_02_delete_existing_file_with_body_message.txt",
             no_content_response_close,
             DELETE_FILE_PATH,
             "Sample content for deletion",
         ),
         (
-            REQUEST_DELETE_2XX_DIR + "204_03_delete_existing_file_then_404_on_second_attempt.txt",
+            REQUEST_DELETE_2XX_DIR
+            + "204_03_delete_existing_file_then_404_on_second_attempt.txt",
             no_content_response_keep + not_found_response,
             DELETE_FILE_PATH,
             "Sample content for deletion",
@@ -73,7 +77,7 @@ def setup_file_context():
             no_content_response_close,
             DELETE_FILE_PATH,
             "",
-        )
+        ),
     ],
     ids=[
         "204_01_delete_existing_file",
@@ -108,6 +112,7 @@ def delete_file(file_path):
         print(f"Error deleting file: {file_path}, {e}")
         raise AssertionError
 
+
 # ファイルがある場合に削除する関数
 @pytest.fixture
 def cleanup_file_context():
@@ -140,7 +145,7 @@ def cleanup_file_context():
             REQUEST_DELETE_4XX_DIR + "405_01_method_not_allowed_for_uri.txt",
             not_allowed_response,
             "",
-        )
+        ),
     ],
     ids=[
         "403_01_delete_directory",
