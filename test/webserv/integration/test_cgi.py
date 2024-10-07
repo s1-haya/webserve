@@ -94,6 +94,15 @@ class TestCGI(unittest.TestCase):
             self.assertIn(b"PathInfo string: /path_info\n", response.read())
         except HTTPException as e:
             self.fail(f"Request failed: {e}")
+        
+    def test_client_redirect_pl(self):
+        try:
+            self.con.request("GET", "/cgi-bin/client_redirect.pl")
+            response = self.con.getresponse()
+            assert_status_line(response, HTTPStatus.FOUND)
+            assert_header(response, "Location", "http://localhost:8080/")
+        except HTTPException as e:
+            self.fail(f"Request failed: {e}")
     
     def test_no_header_pl(self):
         try:
