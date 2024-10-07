@@ -135,6 +135,12 @@ def test_post_upload_responses(
             UPLOAD_FILE_PATH,
         ),
         (
+            REQUEST_POST_4XX_DIR
+            + "400_04_no_content_length_and_no_transfer_encoding.txt",
+            bad_request_response,
+            UPLOAD_FILE_PATH,
+        ),
+        (
             REQUEST_POST_4XX_DIR + "408_01_shortened_body_message.txt",
             timeout_response,
             UPLOAD_DIR + "shortened_body_message",
@@ -149,6 +155,7 @@ def test_post_upload_responses(
         "400_01_duplicate_content_length",
         "400_02_transfer_encoding_and_content_length",
         "400_03_no_content_type",
+        "400_04_no_content_length_and_no_transfer_encoding",
         "408_01_shortened_body_message",
         "408_02_no_body_message",
     ],
