@@ -257,27 +257,23 @@ StatusCode Method::FileCreationHandlerForMultiPart(
 ) {
 	if (request_header_fields.find(CONTENT_TYPE) != request_header_fields.end() &&
 		StartWith(request_header_fields.at(CONTENT_TYPE), MULTIPART_FORM_DATA)) {
+		// Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+		// のようにContent-Typeがmultipart/form-dataの場合
 		std::vector<Method::Part> parts =
 			DecodeMultipartFormData(request_header_fields.at(CONTENT_TYPE), request_body_message);
 		for (std::vector<Method::Part>::iterator it = parts.begin(); it != parts.end(); ++it) {
+			// Content-Disposition: form-data; name="file"; filename="test.txt"
+			// のようにfilenameが含まれる場合 そのパスにファイルを作成する
 			if ((*it).headers.find(CONTENT_DISPOSITION) != (*it).headers.end()) {
 				std::map<std::string, std::string> content_disposition =
 					ParseContentDisposition((*it).headers[CONTENT_DISPOSITION]);
 				if (content_disposition.find(FILENAME) != content_disposition.end()) {
-					std::string   file_name = content_disposition[FILENAME];
-					std::string   file_path = path + "/" + file_name;
-					std::ofstream file(file_path.c_str(), std::ios::binary);
-					if (file.fail()) {
-						throw HttpException("Error: Forbidden", StatusCode(FORBIDDEN));
-					}
-					file.write((*it).body.c_str(), (*it).body.length());
-					if (file.fail()) {
-						file.close();
-						if (std::remove(file_path.c_str()) == SYSTEM_ERROR) {
-							SystemExceptionHandler(errno);
-						}
-						throw HttpException("Error: Forbidden", StatusCode(FORBIDDEN));
-					}
+					std::string file_name = content_disposition[FILENAME];
+					std::string file_path = path + "/" + file_name;
+					// upload_dir + "/" + file_name にファイルを作成
+					FileCreationHandler(
+						file_path, (*it).body, response_body_message, response_header_fields
+					);
 				}
 			}
 		}
