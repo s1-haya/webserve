@@ -5,7 +5,7 @@ import pytest
 from common_functions import read_file, send_request_and_assert_response
 from common_response import (forbidden_response, no_content_response_close,
                              no_content_response_keep, not_allowed_response,
-                             not_found_response)
+                             not_found_response, timeout_response)
 
 REQUEST_DIR = "test/common/request/"
 REQUEST_DELETE_2XX_DIR = REQUEST_DIR + "delete/2xx/"
@@ -73,10 +73,16 @@ def setup_file_context():
             "Sample content for deletion",
         ),
         (
-            REQUEST_DELETE_2XX_DIR + "204_01_delete_existing_file.txt",
+            REQUEST_DELETE_2XX_DIR + "204_04_delete_empty_file.txt",
             no_content_response_close,
             DELETE_FILE_PATH,
             "",
+        ),
+        (
+            REQUEST_DELETE_2XX_DIR + "204_05_delete_existing_file_keep.txt",
+            no_content_response_keep,
+            DELETE_FILE_PATH,
+            "Sample content for deletion",
         ),
     ],
     ids=[
@@ -84,6 +90,7 @@ def setup_file_context():
         "204_02_delete_existing_file_with_body_message",
         "204_03_delete_existing_file_then_404_on_second_attempt",
         "204_04_delete_empty_file",
+        "204_05_delete_existing_file_keep",
     ],
 )
 def test_delete_responses(
