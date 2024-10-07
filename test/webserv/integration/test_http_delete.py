@@ -4,7 +4,7 @@ import time
 import pytest
 from common_functions import read_file, send_request_and_assert_response
 from common_response import (no_content_response_close,
-                                no_content_response_keep, not_found_response, forbidden_response)
+                                no_content_response_keep, not_found_response, forbidden_response, not_allowed_response)
 
 REQUEST_DIR = "test/common/request/"
 REQUEST_DELETE_2XX_DIR = REQUEST_DIR + "delete/2xx/"
@@ -136,10 +136,16 @@ def cleanup_file_context():
             not_found_response,
             NOT_EXISTING_FILE_PATH,
         ),
+        (
+            REQUEST_DELETE_4XX_DIR + "405_01_method_not_allowed_for_uri.txt",
+            not_allowed_response,
+            "",
+        )
     ],
     ids=[
         "403_01_delete_directory",
         "404_01_delete_nonexistent_file",
+        "405_01_method_not_allowed_for_uri",
     ],
 )
 def test_post_4xx_responses(
