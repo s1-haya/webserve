@@ -84,7 +84,7 @@ class TestCGI(unittest.TestCase):
             self.assertIn(b"No POST data received.", response.read())
         except HTTPException as e:
             self.fail(f"Request failed: {e}")
-    
+
     def test_path_info_pl(self):
         try:
             self.con.request("GET", "/cgi-bin/path_info.pl/path_info")
@@ -94,7 +94,7 @@ class TestCGI(unittest.TestCase):
             self.assertIn(b"PathInfo string: /path_info\n", response.read())
         except HTTPException as e:
             self.fail(f"Request failed: {e}")
-        
+
     def test_client_redirect_pl(self):
         try:
             self.con.request("GET", "/cgi-bin/client_redirect.pl")
@@ -103,7 +103,7 @@ class TestCGI(unittest.TestCase):
             assert_header(response, "Location", "http://localhost:8080/")
         except HTTPException as e:
             self.fail(f"Request failed: {e}")
-    
+
     def test_no_header_pl(self):
         try:
             self.con.request("GET", "/cgi-bin/no_header.pl")
