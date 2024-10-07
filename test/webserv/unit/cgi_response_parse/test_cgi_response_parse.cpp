@@ -1,4 +1,5 @@
 #include "cgi_response_parse.hpp"
+#include "http_message.hpp"
 #include "result.hpp"
 #include "utils.hpp"
 #include <cstdlib>
@@ -102,9 +103,9 @@ int TestParseValidResponse() {
 	}
 
 	CgiResponseParse::ParsedData expected;
-	expected.header_fields["Content-Length"] = "13";
-	expected.header_fields["Content-Type"]   = "text/plain";
-	expected.body                            = "Hello, world!";
+	expected.header_fields[http::CONTENT_LENGTH] = "13";
+	expected.header_fields[http::CONTENT_TYPE]   = http::TEXT_PLAIN;
+	expected.body                                = "Hello, world!";
 	return HandleTestResult(CompareParsedData(expected, result.GetValue()));
 }
 
@@ -117,9 +118,9 @@ int TestParseHeaderOnlyResponse() {
 	}
 
 	CgiResponseParse::ParsedData expected;
-	expected.header_fields["Content-Length"] = "0";
-	expected.header_fields["Content-Type"]   = "text/plain";
-	expected.body                            = "";
+	expected.header_fields[http::CONTENT_LENGTH] = "0";
+	expected.header_fields[http::CONTENT_TYPE]   = http::TEXT_PLAIN;
+	expected.body                                = "";
 	return HandleTestResult(CompareParsedData(expected, result.GetValue()));
 }
 
@@ -132,9 +133,9 @@ int TestParseBodyLongerThanContentLength() {
 	}
 
 	CgiResponseParse::ParsedData expected;
-	expected.header_fields["Content-Length"] = "5";
-	expected.header_fields["Content-Type"]   = "text/plain";
-	expected.body                            = "Hello";
+	expected.header_fields[http::CONTENT_LENGTH] = "5";
+	expected.header_fields[http::CONTENT_TYPE]   = http::TEXT_PLAIN;
+	expected.body                                = "Hello";
 	return HandleTestResult(CompareParsedData(expected, result.GetValue()));
 }
 
@@ -147,8 +148,8 @@ int TestParseNoContentLength() {
 	}
 
 	CgiResponseParse::ParsedData expected;
-	expected.header_fields["Content-Type"] = "text/plain";
-	expected.body                          = "Hello, world!";
+	expected.header_fields[http::CONTENT_TYPE] = http::TEXT_PLAIN;
+	expected.body                              = "Hello, world!";
 	return HandleTestResult(CompareParsedData(expected, result.GetValue()));
 }
 
@@ -162,9 +163,9 @@ int TestHeaderFieldWithOws() {
 	}
 
 	CgiResponseParse::ParsedData expected;
-	expected.header_fields["Content-Length"] = "5";
-	expected.header_fields["Content-Type"]   = "text/plain";
-	expected.body                            = "Hello";
+	expected.header_fields[http::CONTENT_LENGTH] = "5";
+	expected.header_fields[http::CONTENT_TYPE]   = http::TEXT_PLAIN;
+	expected.body                                = "Hello";
 	return HandleTestResult(CompareParsedData(expected, result.GetValue()));
 }
 
@@ -177,8 +178,8 @@ int TestHeaderFieldHasLocation() {
 	}
 
 	CgiResponseParse::ParsedData expected;
-	expected.header_fields["Location"] = "http://www.example.com/";
-	expected.body                      = "";
+	expected.header_fields[http::LOCATION] = "http://www.example.com/";
+	expected.body                          = "";
 	return HandleTestResult(CompareParsedData(expected, result.GetValue()));
 }
 
