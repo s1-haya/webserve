@@ -17,7 +17,6 @@ WS_HTTP_DIR					:=	$(WS_SRCS_DIR)/http
 SRCS				+=	$(WS_HTTP_CGI_RESPONSE_PARSE)/cgi_response_parse.cpp \
 						$(WS_UTILS_DIR)/color.cpp \
 						$(WS_UTILS_DIR)/convert_str.cpp \
-						$(WS_UTILS_DIR)/isdigit.cpp \
 						$(WS_UTILS_DIR)/is_vstring.cpp \
 						$(WS_HTTP_DIR)/http_message.cpp
 

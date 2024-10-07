@@ -17,7 +17,6 @@ SRCS			+=	$(WS_CONFIG_PARSE_DIR)/parser.cpp \
 					$(WS_CONFIG_PARSE_DIR)/directive_names.cpp \
 					$(WS_UTILS_DIR)/color.cpp \
 					$(WS_UTILS_DIR)/convert_str.cpp \
-					$(WS_UTILS_DIR)/isdigit.cpp \
 					$(WS_UTILS_DIR)/split_str.cpp
 
 # 3. Add unit test files

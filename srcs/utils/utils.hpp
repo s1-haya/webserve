@@ -52,8 +52,6 @@ std::vector<std::string> SplitStr(const std::string &src, const std::string &sub
 std::string              ToLowerString(const std::string &str);
 bool                     IsVString(const std::string &str);
 
-bool IsDigit(char c);
-
 } // namespace utils
 
 #endif /* UTILS_HPP_ */

@@ -15,7 +15,6 @@ WS_HTTP_PARSE_DIR	:=	$(WS_HTTP_DIR)/request/parse
 
 SRCS				+=	$(WS_UTILS_DIR)/color.cpp \
 						$(WS_UTILS_DIR)/split_str.cpp \
-						$(WS_UTILS_DIR)/isdigit.cpp \
 						$(WS_UTILS_DIR)/convert_str.cpp \
 						$(WS_UTILS_DIR)/is_vstring.cpp \
 						$(WS_HTTP_DIR)/http_message.cpp \
