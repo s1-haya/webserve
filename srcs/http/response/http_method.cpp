@@ -368,38 +368,34 @@ utils::Result<std::string> Method::AutoindexHandler(const std::string &path) {
 							 "</h1><hr><pre>"
 							 "<a href=\"../\">../</a>\n";
 
-	errno = 0;
 	while ((entry = readdir(dir)) != NULL) {
 		if (entry->d_name[0] == '.') {
 			continue;
 		}
 		std::string full_path = path + "/" + entry->d_name;
 		struct stat file_stat;
-		if (stat(full_path.c_str(), &file_stat) == 0) {
-			bool        is_dir     = S_ISDIR(file_stat.st_mode);
-			std::string entry_name = std::string(entry->d_name) + (is_dir ? "/" : "");
-			// エントリ名の幅を固定
-			response_body_message += "<a href=\"" + entry_name + "\">" + entry_name + "</a>";
-			std::size_t padding = (entry_name.length() < 50) ? 50 - entry_name.length() : 0;
-			response_body_message += std::string(padding, ' ') + " ";
-
-			// ctimeの部分を固定幅にする
-			char time_buf[20];
-			std::strftime(
-				time_buf, sizeof(time_buf), "%Y-%m-%d %H:%M:%S", std::localtime(&file_stat.st_mtime)
-			);
-			response_body_message += std::string(time_buf) + " ";
-
-			// bytesの部分を固定幅にする
-			std::string size_str = is_dir ? "-" : utils::ToString(file_stat.st_size) + " bytes";
-			padding              = (size_str.length() < 20) ? 20 - size_str.length() : 0;
-			response_body_message += std::string(padding, ' ') + size_str + "\n";
-		} else {
+		if (stat(full_path.c_str(), &file_stat) != 0) {
 			result.Set(false);
+			return result;
 		}
-	}
-	if (errno != 0) {
-		result.Set(false);
+		bool        is_dir     = S_ISDIR(file_stat.st_mode);
+		std::string entry_name = std::string(entry->d_name) + (is_dir ? "/" : "");
+		// エントリ名の幅を固定
+		response_body_message += "<a href=\"" + entry_name + "\">" + entry_name + "</a>";
+		std::size_t padding = (entry_name.length() < 50) ? 50 - entry_name.length() : 0;
+		response_body_message += std::string(padding, ' ') + " ";
+
+		// ctimeの部分を固定幅にする
+		char time_buf[20];
+		std::strftime(
+			time_buf, sizeof(time_buf), "%Y-%m-%d %H:%M:%S", std::localtime(&file_stat.st_mtime)
+		);
+		response_body_message += std::string(time_buf) + " ";
+
+		// bytesの部分を固定幅にする
+		std::string size_str = is_dir ? "-" : utils::ToString(file_stat.st_size) + " bytes";
+		padding              = (size_str.length() < 20) ? 20 - size_str.length() : 0;
+		response_body_message += std::string(padding, ' ') + size_str + "\n";
 	}
 
 	response_body_message += "</pre><hr></body>\n</html>";
