@@ -401,6 +401,7 @@ int RunTestIsCompleteRequest() {
 // -----------------------------------------------------------------------------
 // MessageManager classの主なテスト対象関数
 // - AddRequestBuf()
+// - AddFrontRequestBuf()
 // - SetNewRequestBuf()
 // - GetRequestBuf()
 // -----------------------------------------------------------------------------
@@ -412,6 +413,16 @@ void AddRequestBuf(
 ) {
 	manager.AddRequestBuf(client_fd, request_buf);
 	expected_request_buf += request_buf;
+}
+
+void AddFrontRequestBuf(
+	server::MessageManager &manager,
+	std::string            &expected_request_buf,
+	int                     client_fd,
+	const std::string      &request_buf
+) {
+	manager.AddFrontRequestBuf(client_fd, request_buf);
+	expected_request_buf = request_buf + expected_request_buf;
 }
 
 void SetNewRequestBuf(
@@ -442,11 +453,17 @@ int RunTestRequestBuf() {
 	// request_buf == "abcdefg"
 	ret_code |= Test(RunIsSameRequestBuf(manager, expected_request_buf, client_fd)); // test12
 
+	// cgiからのbuffer追加
+	AddFrontRequestBuf(manager, expected_request_buf, client_fd, "xyz");
+
+	// request_buf == "xyzabcdefg"
+	ret_code |= Test(RunIsSameRequestBuf(manager, expected_request_buf, client_fd)); // test13
+
 	// 新規でrequest_bufをセット
 	SetNewRequestBuf(manager, expected_request_buf, client_fd, "hi");
 
 	// request_buf == "hi"
-	ret_code |= Test(RunIsSameRequestBuf(manager, expected_request_buf, client_fd)); // test13
+	ret_code |= Test(RunIsSameRequestBuf(manager, expected_request_buf, client_fd)); // test14
 
 	return ret_code;
 }
