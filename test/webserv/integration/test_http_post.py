@@ -4,7 +4,7 @@ import time
 import pytest
 from common_functions import read_file, send_request_and_assert_response
 from common_response import (bad_request_response, created_response_close,
-                             created_response_keep, no_content_response,
+                             created_response_keep, no_content_response_close,
                              response_header_get_root_200_close,
                              root_index_file, timeout_response)
 
@@ -74,7 +74,7 @@ def cleanup_file_context():
         ),
         (
             REQUEST_POST_2XX_DIR + "201_03_upload_file_204_same_upload_file.txt",
-            created_response_keep + no_content_response,
+            created_response_keep + no_content_response_close,
             UPLOAD_FILE_PATH,
             "first",
         ),
@@ -130,6 +130,23 @@ def test_post_upload_responses(
             UPLOAD_FILE_PATH,
         ),
         (
+            REQUEST_POST_4XX_DIR + "400_03_no_content_type.txt",
+            bad_request_response,
+            UPLOAD_FILE_PATH,
+        ),
+        (
+            REQUEST_POST_4XX_DIR
+            + "400_04_no_content_length_and_no_transfer_encoding.txt",
+            bad_request_response,
+            UPLOAD_FILE_PATH,
+        ),
+        (
+            REQUEST_POST_4XX_DIR
+            + "400_05_no_content_length_and_not_chunked_transfer_encoding.txt",
+            bad_request_response,
+            CHUNKED_FILE_PATH,
+        ),
+        (
             REQUEST_POST_4XX_DIR + "408_01_shortened_body_message.txt",
             timeout_response,
             UPLOAD_DIR + "shortened_body_message",
@@ -143,6 +160,9 @@ def test_post_upload_responses(
     ids=[
         "400_01_duplicate_content_length",
         "400_02_transfer_encoding_and_content_length",
+        "400_03_no_content_type",
+        "400_04_no_content_length_and_no_transfer_encoding",
+        "400_05_no_content_length_and_not_chunked_transfer_encoding",
         "408_01_shortened_body_message",
         "408_02_no_body_message",
     ],

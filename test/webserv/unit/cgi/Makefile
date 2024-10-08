@@ -22,7 +22,6 @@ SRCS				+=	$(WS_CGI_DIR)/cgi.cpp \
 						$(WS_HTTP_DIR)/http_message.cpp \
 						$(WS_UTILS_DIR)/color.cpp \
 						$(WS_UTILS_DIR)/convert_str.cpp \
-						$(WS_UTILS_DIR)/isdigit.cpp \
 						$(WS_EXCEPTION_DIR)/system_exception.cpp
 
 # 3. Add unit test files
