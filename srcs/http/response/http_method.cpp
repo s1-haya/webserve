@@ -84,7 +84,6 @@ StatusCode Method::Handler(
 			request_body_message,
 			request_header_fields,
 			response_body_message,
-			response_header_fields,
 			upload_directory
 		);
 	} else if (method == DELETE) {
@@ -138,7 +137,6 @@ StatusCode Method::PostHandler(
 	const std::string  &request_body_message,
 	const HeaderFields &request_header_fields,
 	std::string        &response_body_message,
-	HeaderFields       &response_header_fields,
 	const std::string  &upload_directory
 ) {
 	// ex. test.txt
@@ -150,7 +148,7 @@ StatusCode Method::PostHandler(
 	const std::string upload_file_path = upload_dir_path + "/" + file_name;
 
 	if (upload_directory.empty()) {
-		return EchoPostHandler(request_body_message, response_body_message, response_header_fields);
+		return EchoPostHandler(request_body_message, response_body_message);
 	} else if (request_header_fields.find(CONTENT_TYPE) != request_header_fields.end() &&
 			   utils::StartWith(request_header_fields.at(CONTENT_TYPE), MULTIPART_FORM_DATA)) {
 		// Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
@@ -167,7 +165,6 @@ StatusCode Method::PostHandler(
 		throw HttpException("Error: Forbidden", StatusCode(FORBIDDEN));
 	} else if (info.IsRegularFile()) {
 		response_body_message = HttpResponse::CreateDefaultBodyMessage(status_code);
-		response_header_fields[CONTENT_LENGTH] = utils::ToString(response_body_message.length());
 	} else {
 		// - upload_file_pathがシンボリックリンク
 		// - upload_file_pathが特殊ファイル（デバイスファイル、ソケットファイルなど）
@@ -358,12 +355,9 @@ utils::Result<std::string> Method::AutoindexHandler(const std::string &path) {
 }
 
 StatusCode Method::EchoPostHandler(
-	const std::string &request_body_message,
-	std::string       &response_body_message,
-	HeaderFields      &response_header_fields
+	const std::string &request_body_message, std::string &response_body_message
 ) {
-	response_body_message                  = request_body_message;
-	response_header_fields[CONTENT_LENGTH] = utils::ToString(response_body_message.length());
+	response_body_message = request_body_message;
 	return StatusCode(OK);
 }
 

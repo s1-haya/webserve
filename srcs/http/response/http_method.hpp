@@ -42,7 +42,6 @@ class Method {
 		const std::string  &request_body_message,
 		const HeaderFields &request_header_fields,
 		std::string        &response_body_message,
-		HeaderFields       &response_header_fields,
 		const std::string  &upload_directory
 	);
 	static StatusCode DeleteHandler(
@@ -64,11 +63,8 @@ class Method {
 		const HeaderFields &request_header_fields,
 		std::string        &response_body_message
 	);
-	static StatusCode EchoPostHandler(
-		const std::string &request_body_message,
-		std::string       &response_body_message,
-		HeaderFields      &response_header_fields
-	);
+	static StatusCode
+	EchoPostHandler(const std::string &request_body_message, std::string &response_body_message);
 	static utils::Result<std::string> AutoindexHandler(const std::string &path);
 
 	// マルチパート用のパートを表す構造体
