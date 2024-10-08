@@ -490,6 +490,11 @@ std::map<std::string, std::string> Method::ParseContentDisposition(const std::st
 		value             = RemoveQuotes(value);
 		result[key]       = value;
 	}
+	if (result.find("name") == result.end()) {
+		throw HttpException(
+			"Error: Content-Disposition header must contain 'name' field", StatusCode(BAD_REQUEST)
+		);
+	}
 	return result;
 }
 
