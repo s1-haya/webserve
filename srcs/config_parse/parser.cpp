@@ -170,8 +170,12 @@ void Parser::HandleClientMaxBodySize(std::size_t &client_max_body_size, NodeItr 
 		);
 	}
 	utils::Result<std::size_t> body_max_size = utils::ConvertStrToSize((*it).token);
-	if (!body_max_size.IsOk()) { // check range?
+	if (!body_max_size.IsOk()) {
 		throw std::runtime_error("invalid client_max_body_size: " + (*it).token);
+	} else if (body_max_size.GetValue() < BODY_SIZE_MIN ||
+			   body_max_size.GetValue() > BODY_SIZE_MAX) {
+		// 8MB以上はアップロードに時間がかかりすぎる
+		throw std::runtime_error("client_max_body_size should be greater than 0 and less than 8MB");
 	}
 	if (IsDuplicateDirectiveName(server_directive_set_, CLIENT_MAX_BODY_SIZE)) {
 		throw std::runtime_error("'client_max_body_size' directive is duplicated");

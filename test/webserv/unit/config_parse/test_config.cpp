@@ -527,6 +527,18 @@ int ClientMaxBodySizeDirectiveErrorTests() {
 		"client_max_body_size/"
 		"client_max_body_size_duplicated.conf"
 	);
+	ret_code |= RunErrorTest(
+		"client_max_body_size/"
+		"client_max_body_size_out_of_lower_range.conf",
+		"client_max_body_size/"
+		"client_max_body_size_out_of_lower_range.conf"
+	);
+	ret_code |= RunErrorTest(
+		"client_max_body_size/"
+		"client_max_body_size_out_of_upper_range.conf",
+		"client_max_body_size/"
+		"client_max_body_size_out_of_upper_range.conf"
+	);
 
 	return ret_code;
 }

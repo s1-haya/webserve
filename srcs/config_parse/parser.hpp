@@ -55,6 +55,8 @@ class Parser {
 	static const int PORT_MAX        = 65535;
 	static const int STATUS_CODE_MIN = 300;
 	static const int STATUS_CODE_MAX = 599;
+	static const int BODY_SIZE_MIN   = 1;       // 1B
+	static const int BODY_SIZE_MAX   = 8388608; // 8MB
 
 	/* For duplicated parameter */
 	typedef std::set<std::string>  DirectiveSet;
