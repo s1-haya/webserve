@@ -470,6 +470,11 @@ std::map<std::string, std::string> Method::ParseContentDisposition(const std::st
 
 	// form-data; name="file"; filename="a.txt"
 	std::getline(stream, part, ';'); // form-data
+	if (part != "form-data") {
+		throw HttpException(
+			"Error: Content-Disposition type must be 'form-data'", StatusCode(BAD_REQUEST)
+		);
+	}
 	// セミコロンで分割
 	while (std::getline(stream, part, ';')) {
 		part            = utils::Trim(part, OPTIONAL_WHITESPACE);
