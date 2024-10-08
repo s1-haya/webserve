@@ -39,12 +39,10 @@ def setup_file_context():
     @contextmanager
     def _setup(file_path, content=""):
         create_file(file_path, content)
-        try:
-            yield
-        finally:
-            if os.path.exists(file_path):
-                os.remove(file_path)
-                print(f"Deleted file: {file_path}")
+        yield
+        if os.path.exists(file_path):
+            print(f"File exists: {file_path}")
+            raise AssertionError
 
     return _setup
 
@@ -141,7 +139,7 @@ def cleanup_file_context():
         (
             REQUEST_DELETE_4XX_DIR + "403_01_delete_directory.txt",
             forbidden_response,
-            None
+            None,
         ),
         (
             REQUEST_DELETE_4XX_DIR + "404_01_delete_nonexistent_file.txt",
@@ -151,7 +149,7 @@ def cleanup_file_context():
         (
             REQUEST_DELETE_4XX_DIR + "405_01_method_not_allowed_for_uri.txt",
             not_allowed_response,
-            None
+            None,
         ),
     ],
     ids=[
