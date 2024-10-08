@@ -74,6 +74,18 @@ class TestServerRouting(unittest.TestCase):
         except HTTPException as e:
             self.fail(f"Request failed: {e}")
 
+    def test_get_sub_redirect_host3(self):
+        try:
+            headers = {"Host": "host3"}
+            self.con.request("GET", "/sub/redirect", headers=headers)
+            response = self.con.getresponse()
+            assert_status_line(response, HTTPStatus.MOVED_PERMANENTLY)
+            assert_header(response, "Connection", "keep-alive")
+            assert_header(response, "Location", "http://localhost:8080/")
+            assert_body_binary(response, MOVED_PERMANENTLY_BODY_FILE)
+        except HTTPException as e:
+            self.fail(f"Request failed: {e}")
+
     def test_get_redirect_not_implemented_status_code_host3(self):
         try:
             headers = {"Host": "host3"}
