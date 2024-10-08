@@ -141,7 +141,7 @@ def cleanup_file_context():
         (
             REQUEST_DELETE_4XX_DIR + "403_01_delete_directory.txt",
             forbidden_response,
-            "",
+            None
         ),
         (
             REQUEST_DELETE_4XX_DIR + "404_01_delete_nonexistent_file.txt",
@@ -151,7 +151,7 @@ def cleanup_file_context():
         (
             REQUEST_DELETE_4XX_DIR + "405_01_method_not_allowed_for_uri.txt",
             not_allowed_response,
-            "",
+            None
         ),
     ],
     ids=[
