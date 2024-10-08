@@ -58,6 +58,10 @@ REQUEST_GET_5XX_DIR = REQUEST_DIR + "get/5xx/"
             response_header_get_root_200_keep + root_index_file,
         ),
         (
+            REQUEST_GET_2XX_DIR + "200_09_two_colon_in_header_field.txt",
+            response_header_get_root_200_close + root_index_file,
+        ),
+        (
             REQUEST_GET_2XX_DIR + "200_11_upper_and_lower_header_fields.txt",
             response_header_get_root_200_close + root_index_file,
         ),
@@ -95,6 +99,7 @@ REQUEST_GET_5XX_DIR = REQUEST_DIR + "get/5xx/"
         "200_06_connection_keep_alive_and_200_connection_close",
         "200_07_no_connection_value",
         "200_08_wrong_connection_value",
+        "200_09_two_colon_in_header_field",
         "200_11_upper_and_lower_header_fields",
         "200_12_header_field_value_space",
         "200_13_space_header_field_value",
