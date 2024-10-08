@@ -13,7 +13,6 @@ enum ConnectionState {
 	CLOSE
 };
 
-// todo: tmp
 struct Response {
 	Response() : connection_state(KEEP) {};
 	Response(ConnectionState connection_state, const std::string &response_str)
