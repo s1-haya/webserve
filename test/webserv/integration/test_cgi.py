@@ -2,6 +2,7 @@ import unittest
 from http import HTTPStatus
 from http.client import HTTPConnection, HTTPException
 
+from common_functions import SERVER_PORT
 from http_module.assert_http_response import (assert_body, assert_header,
                                               assert_status_line)
 
@@ -9,7 +10,7 @@ from http_module.assert_http_response import (assert_body, assert_header,
 class TestCGI(unittest.TestCase):
     def setUp(self):
         # 各テストの前に実行される(unittestの機能)
-        self.con = HTTPConnection("localhost", 8080)
+        self.con = HTTPConnection("localhost", SERVER_PORT)
 
     def tearDown(self):
         # 各テストの後に実行される(unittestの機能)
