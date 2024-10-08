@@ -170,7 +170,7 @@ void Parser::HandleClientMaxBodySize(std::size_t &client_max_body_size, NodeItr 
 		);
 	}
 	utils::Result<std::size_t> body_max_size = utils::ConvertStrToSize((*it).token);
-	if (!body_max_size.IsOk()) { // check range?
+	if (!body_max_size.IsOk()) {
 		throw std::runtime_error("invalid client_max_body_size: " + (*it).token);
 	} else if (body_max_size.GetValue() < BODY_SIZE_MIN ||
 			   body_max_size.GetValue() > BODY_SIZE_MAX) {
