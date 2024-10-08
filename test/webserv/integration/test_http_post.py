@@ -187,6 +187,16 @@ def test_post_upload_responses(
             CHUNKED_FILE_PATH,
         ),
         (
+            REQUEST_POST_4XX_DIR + "400_11_overflow_chunk_size_and_crlf.txt",
+            bad_request_response,
+            CHUNKED_FILE_PATH,
+        ),
+        (
+            REQUEST_POST_4XX_DIR + "400_12_only_too_large_chunk_size_early_check.txt",
+            bad_request_response,
+            CHUNKED_FILE_PATH,
+        ),
+        (
             REQUEST_POST_4XX_DIR + "408_01_shortened_body_message.txt",
             timeout_response,
             UPLOAD_DIR + "shortened_body_message",
@@ -228,6 +238,8 @@ def test_post_upload_responses(
         "400_08_incomplete_chunked_body_0crlf_end",
         "400_09_chunked_empty_chunk_size",
         "400_10_chunked_empty_chunk_data",
+        "400_11_overflow_chunk_size_and_crlf",
+        "400_12_only_too_large_chunk_size_early_check",
         "408_01_shortened_body_message",
         "408_02_no_body_message",
         "408_03_incomplete_chunked_body",
