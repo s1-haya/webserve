@@ -5,17 +5,11 @@
 #include "http_result.hpp"
 #include "http_storage.hpp"
 #include "status_code.hpp"
+#include "utils.hpp"
 #include <iostream>
 
 namespace http {
 namespace {
-
-bool StartWith(const std::string &str, const std::string &prefix) {
-	if (prefix.length() > str.length()) {
-		return false;
-	}
-	return str.compare(0, prefix.length(), prefix) == 0;
-}
 
 std::string CreateLocalRedirectRequest(const std::string &location) {
 	std::string response;
@@ -53,7 +47,7 @@ HttpResult Http::GetResponseFromCgi(int client_fd, const cgi::CgiResponse &cgi_r
 	HttpRequestParsedData               data          = storage_.GetClientSaveData(client_fd);
 	cgi::CgiResponseParse::HeaderFields header_fields = cgi_parse_result.GetValue().header_fields;
 	if (header_fields.find(LOCATION) != header_fields.end() &&
-		StartWith(header_fields[LOCATION], "/")) {
+		utils::StartWith(header_fields[LOCATION], "/")) {
 		result.request_buf = CreateLocalRedirectRequest(header_fields[LOCATION]) + data.current_buf;
 		result.is_response_complete = false;
 	} else {
