@@ -128,7 +128,6 @@ def cleanup_file_context():
     def _cleanup(file_path):
         delete_file(file_path)
         yield
-        delete_file(file_path)
 
     return _cleanup
 
