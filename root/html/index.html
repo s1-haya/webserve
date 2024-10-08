@@ -72,26 +72,25 @@
         const filename = form.filename ? form.filename.value : '';
         const url = `${basePath}${encodeURIComponent(filename)}`;
         
-        let formData = new FormData();
+        let fetchOptions = {
+          method: method,
+          headers: {},
+        };
 
         if (hasFile) {
+          let formData = new FormData();
           const fileInput = form.file;
           for (let i = 0; i < fileInput.files.length; i++) {
             formData.append("files[]", fileInput.files[i]);
           }
+          fetchOptions.body = formData;
+        } else {
+          const userTextInput = form.user_text;
+          if (userTextInput) {
+            fetchOptions.headers['Content-Type'] = 'text/plain';
+            fetchOptions.body = userTextInput.value;
+          }
         }
-
-        // Add text field
-        const userTextInput = form.user_text;
-        if (userTextInput) {
-          formData.append("user_text", userTextInput.value);
-        }
-
-        const fetchOptions = {
-          method: method,
-          headers: {},
-          body: formData
-        };
 
         fetch(url, fetchOptions)
           .then(async response => {
@@ -197,19 +196,26 @@
       <div class="method">
         <h2>POST (with file upload)</h2>
         <form onsubmit="updateFormAction(event, 'upload/', 'POST', true, 'post-response')" method="POST" enctype="multipart/form-data">
-          <label for="text-input">Enter text</label>
-          <input type="text" name="user_text" id="text-input" />
-          
-          <label for="filename">Enter filename</label>
-          <input type="text" name="filename" id="filename" required />
-          
           <label for="file">Choose files</label>
-          <input type="file" name="files[]" id="file" multiple />
-          
+          <input type="file" name="file" id="file" multiple />
           <button type="submit">Submit</button>
         </form>
         <h3>Response:</h3>
         <pre id="post-response"></pre>
+      </div>
+
+      <!-- POST method section (text/plain) -->
+      <div class="method">
+        <h2>POST (text/plain)</h2>
+        <form onsubmit="updateFormAction(event, 'upload/', 'POST', false, 'post-text-response')" method="POST">
+          <label for="text-input-plain">Enter text</label>
+          <input type="text" name="user_text" id="text-input-plain" required />
+          <label for="filename-plain">Enter filename</label>
+          <input type="text" name="filename" id="filename-plain" required />
+          <button type="submit">Submit</button>
+        </form>
+        <h3>Response:</h3>
+        <pre id="post-text-response"></pre>
       </div>
 
       <!-- DELETE method section -->
@@ -224,10 +230,30 @@
         <pre id="delete-response"></pre>
       </div>
 
+      <!-- Echo POST request section -->
+      <div class="method">
+        <h2>Echo POST with Response Body Display</h2>
+        <form onsubmit="handleNewPost(event)" method="POST">
+          <label for="echo-post-input">Enter text to POST</label>
+          <input type="text" id="echo-post-input" name="user_text" required />
+          <button type="submit">Send POST</button>
+        </form>
+        <h3>Response Body:</h3>
+        <textarea id="echo-post-output" rows="10" readonly></textarea>
+      </div>
+
       <!-- GET method (CGI) section -->
       <div class="method">
         <h2>GET(CGI)</h2>
-        <p><a href="cgi-bin/print_env.pl">link to cgi-bin/print_env.pl</a></p>
+        <ul>
+            <li><a href="cgi-bin/print_env.pl">link to cgi-bin/print_env.pl</a></li>
+            <li><a href="cgi-bin/path_info.pl/this/is/path/info">link to cgi-bin/path_info.pl/this/is/path/info</a></li>
+            <li><a href="cgi-bin/json.pl">link to cgi-bin/json.pl</a></li>
+            <li><a href="cgi-bin/form.pl">link to cgi-bin/form.pl</a></li>
+            <li><a href="cgi-bin/file_upload.pl">link to cgi-bin/file_upload.pl</a></li>
+            <li><a href="cgi-bin/client_redirect.pl">link to cgi-bin/client_redirect.pl</a></li>
+            <li><a href="cgi-bin/env.py">link to cgi-bin/env.py</a></li>
+        </ul>
       </div>
 
       <!-- POST method (CGI) section -->
@@ -240,18 +266,6 @@
           <button type="submit">Submit</button>
         </form>
       </div>
-    </div>
-
-    <!-- New POST request section (independent) -->
-    <div class="method" style="margin-top: 40px;">
-      <h2>Echo POST with Response Body Display</h2>
-      <form onsubmit="handleNewPost(event)" method="POST">
-        <label for="echo-post-input">Enter text to POST</label>
-        <input type="text" id="echo-post-input" name="user_text" required />
-        <button type="submit">Send POST</button>
-      </form>
-      <h3>Response Body:</h3>
-      <textarea id="echo-post-output" rows="10" readonly></textarea>
     </div>
   </body>
 </html>
