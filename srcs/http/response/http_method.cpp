@@ -29,22 +29,17 @@ std::string FileToString(const std::ifstream &file) {
 	return ss.str();
 }
 
-bool EndWith(const std::string &str, const std::string &suffix) {
-	return str.size() >= suffix.size() &&
-		   str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0;
-}
-
 // ファイルの拡張子に基づいてContent-Typeを決定する関数: デフォルトはtext/plain
 std::string DetermineContentType(const std::string &path) {
 	const std::string html_extension = ".html";
 	const std::string json_extension = ".json";
 	const std::string pdf_extension  = ".pdf";
 
-	if (EndWith(path, html_extension)) {
+	if (utils::EndWith(path, html_extension)) {
 		return http::TEXT_HTML;
-	} else if (EndWith(path, json_extension)) {
+	} else if (utils::EndWith(path, json_extension)) {
 		return "application/json";
-	} else if (EndWith(path, pdf_extension)) {
+	} else if (utils::EndWith(path, pdf_extension)) {
 		return "application/pdf";
 	}
 	return TEXT_PLAIN;
@@ -445,7 +440,7 @@ Method::Part Method::ParsePart(const std::string &part) {
 	// のboundary=----WebKitFormBoundary7MA4YWxkTrZu0gW以降の\r\nから始まる
 	std::string headers = part.substr(CRLF.length(), header_end);
 	result.body         = part.substr(header_end + CRLF.length() * 2);
-	if (!EndWith(result.body, CRLF)) { // bodyの終端はCRLFで終わっているとする
+	if (!utils::EndWith(result.body, CRLF)) { // bodyの終端はCRLFで終わっているとする
 		throw HttpException(
 			"Error: Invalid part format, body not properly terminated", StatusCode(BAD_REQUEST)
 		);
