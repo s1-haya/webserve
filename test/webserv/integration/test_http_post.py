@@ -5,6 +5,7 @@ import pytest
 from common_functions import read_file, send_request_and_assert_response
 from common_response import (bad_request_response, created_response_close,
                              created_response_keep, no_content_response_close,
+                             payload_too_large_response,
                              response_header_get_root_200_close,
                              root_index_file, timeout_response)
 
@@ -210,6 +211,11 @@ def test_post_upload_responses(
             timeout_response,
             CHUNKED_FILE_PATH,
         ),
+        (
+            REQUEST_POST_4XX_DIR + "413_01_too_large_content_max_body_size.txt",
+            payload_too_large_response,
+            UPLOAD_FILE_PATH,
+        ),
     ],
     ids=[
         "400_01_duplicate_content_length",
@@ -227,6 +233,7 @@ def test_post_upload_responses(
         "408_03_incomplete_chunked_body",
         "408_04_incomplete_chunked_body_0_end",
         "408_05_incomplete_chunked_body_0crlf_end",
+        "413_01_too_large_content_max_body_size",
     ],
 )
 def test_post_4xx_responses(
