@@ -438,6 +438,13 @@ Method::Part Method::ParsePart(const std::string &part) {
 	}
 	// ----WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name="file";
 	// のboundary=----WebKitFormBoundary7MA4YWxkTrZu0gW以降の\r\nから始まる
+	// -- + boundary + CRLF で区切られていなければならない
+	if (!utils::StartWith(part, CRLF)) {
+		throw HttpException(
+			"Error: Invalid part format, headers not properly terminated with CRLF",
+			StatusCode(BAD_REQUEST)
+		);
+	}
 	std::string headers = part.substr(CRLF.length(), header_end);
 	result.body         = part.substr(header_end + CRLF.length() * 2);
 	if (!utils::EndWith(result.body, CRLF)) { // bodyの終端はCRLFで終わっているとする
@@ -454,6 +461,8 @@ Method::Part Method::ParsePart(const std::string &part) {
 		std::vector<std::string> header_name_value = utils::SplitStr(header, ": ");
 		if (header_name_value.size() != 2) {
 			throw HttpException("Error: Invalid header format", StatusCode(BAD_REQUEST));
+		} else if (result.headers.find(header_name_value[0]) != result.headers.end()) {
+			throw HttpException("Error: Duplicate header name in part", StatusCode(BAD_REQUEST));
 		}
 		result.headers[header_name_value[0]] = header_name_value[1];
 		pos                                  = end + CRLF.length();
@@ -470,6 +479,11 @@ std::map<std::string, std::string> Method::ParseContentDisposition(const std::st
 
 	// form-data; name="file"; filename="a.txt"
 	std::getline(stream, part, ';'); // form-data
+	if (part != "form-data") {
+		throw HttpException(
+			"Error: Content-Disposition type must be 'form-data'", StatusCode(BAD_REQUEST)
+		);
+	}
 	// セミコロンで分割
 	while (std::getline(stream, part, ';')) {
 		part            = utils::Trim(part, OPTIONAL_WHITESPACE);
@@ -483,7 +497,17 @@ std::map<std::string, std::string> Method::ParseContentDisposition(const std::st
 		std::string key   = utils::Trim(part.substr(0, pos), OPTIONAL_WHITESPACE);
 		std::string value = utils::Trim(part.substr(pos + 1), OPTIONAL_WHITESPACE);
 		value             = RemoveQuotes(value);
-		result[key]       = value;
+		if (result.find(key) != result.end()) {
+			throw HttpException(
+				"Error: Duplicate field name in Content-Disposition header", StatusCode(BAD_REQUEST)
+			);
+		}
+		result[key] = value;
+	}
+	if (result.find("name") == result.end()) {
+		throw HttpException(
+			"Error: Content-Disposition header must contain 'name' field", StatusCode(BAD_REQUEST)
+		);
 	}
 	return result;
 }
