@@ -14,6 +14,7 @@ STATUS = {
     404: "Not Found",
     405: "Method Not Allowed",
     408: "Request Timeout",
+    413: "Payload Too Large",
     501: "Not Implemented",
 }
 
@@ -32,6 +33,11 @@ ERROR_FILES = (
         "not_allowed_file_405_length",
     ),
     ("408_timeout.txt", "timeout_file_408", "timeout_file_408_length"),
+    (
+        "413_payload_too_large.txt",
+        "payload_too_large_file_413",
+        "payload_too_large_file_413_length",
+    ),
     (
         "501_not_implemented.txt",
         "not_implemented_file_501",
@@ -101,6 +107,9 @@ response_header_405 = create_response_header(
 response_header_408 = create_response_header(
     408, CLOSE, error_files_data["timeout_file_408_length"], TEXT_HTML
 )
+response_header_413 = create_response_header(
+    413, CLOSE, error_files_data["payload_too_large_file_413_length"], TEXT_HTML
+)
 response_header_501 = create_response_header(
     501, CLOSE, error_files_data["not_implemented_file_501_length"], TEXT_HTML
 )
@@ -132,6 +141,9 @@ not_allowed_response = response_header_405 + error_files_data[
 timeout_response = response_header_408 + error_files_data["timeout_file_408"].decode(
     "utf-8"
 )
+payload_too_large_response = response_header_413 + error_files_data[
+    "payload_too_large_file_413"
+].decode("utf-8")
 not_implemented_response = response_header_501 + error_files_data[
     "not_implemented_file_501"
 ].decode("utf-8")
