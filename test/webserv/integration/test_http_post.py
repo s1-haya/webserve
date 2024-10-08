@@ -162,6 +162,11 @@ def test_post_upload_responses(
             CHUNKED_FILE_PATH,
         ),
         (
+            REQUEST_POST_4XX_DIR + "400_09_chunked_empty_chunk_size.txt",
+            bad_request_response,
+            CHUNKED_FILE_PATH,
+        ),
+        (
             REQUEST_POST_4XX_DIR + "408_01_shortened_body_message.txt",
             timeout_response,
             UPLOAD_DIR + "shortened_body_message",
@@ -196,6 +201,7 @@ def test_post_upload_responses(
         "400_06_incomplete_chunked_body",
         "400_07_incomplete_chunked_body_0_end",
         "400_08_incomplete_chunked_body_0crlf_end",
+        "400_09_chunked_empty_chunk_size",
         "408_01_shortened_body_message",
         "408_02_no_body_message",
         "408_03_incomplete_chunked_body",
