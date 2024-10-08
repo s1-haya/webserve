@@ -42,14 +42,14 @@ int HandleResult(const T &result, const T &expected) {
 }
 
 server::Location BuildLocation(
-	const std::string						  &request_uri,
-	const std::string						  &alias,
-	const std::string						  &index,
+	const std::string                          &request_uri,
+	const std::string                          &alias,
+	const std::string                          &index,
 	bool                                        autoindex,
 	const std::list<std::string>               &allowed_methods,
 	const std::pair<unsigned int, std::string> &redirect,
-	const std::string						  &cgi_extension    = "",
-	const std::string						  &upload_directory = ""
+	const std::string                          &cgi_extension    = "",
+	const std::string                          &upload_directory = ""
 ) {
 	server::Location loc;
 	loc.request_uri      = request_uri;
@@ -205,9 +205,9 @@ int main(void) {
 		http::HttpResponse::Run(client_infos, server_info, request_info, cgi_result);
 
 	std::string expected3_status_line =
-		LoadFileContent("../../expected_response/default_status_line/301_redirect.txt");
+		LoadFileContent("../../expected_response/default_status_line/301_moved_permanently.txt");
 	std::string expected3_body_message =
-		LoadFileContent("../../expected_response/default_body_message/301_redirect.txt");
+		LoadFileContent("../../expected_response/default_body_message/301_moved_permanently.txt");
 	std::string expected3_header_fields = SetDefaultHeaderFields(
 		http::KEEP_ALIVE,
 		utils::ToString(expected3_body_message.length()),
