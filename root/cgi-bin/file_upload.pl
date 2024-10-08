@@ -25,7 +25,7 @@ if ($ENV{'REQUEST_METHOD'} eq 'POST') {
     print <<'END_HTML';
 <html>
 <body>
-<h1>File Upload</h1>
+<h1>File Upload (upload to /tmp)</h1>
 <form method="POST" enctype="multipart/form-data">
     <input type="file" name="file"><br>
     <input type="submit" value="Upload">
