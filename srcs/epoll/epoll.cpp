@@ -93,17 +93,9 @@ event::EventList Epoll::GetEventList() {
 
 // add new socket_fd to epoll's interest list
 void Epoll::Add(int socket_fd, event::Type type) {
-	// static int i = 0;
-	// if (i > 1) {
-	// 	return;
-	// }
-	// if (socket_fd == 14) {
-	// 	++i;
-	// }
 	EpollEvent ev = {};
 	ev.events     = ConvertToEpollEventType(type);
 	ev.data.fd    = socket_fd;
-	// std::cout << "sock: " << socket_fd << std::endl;
 	if (epoll_ctl(epoll_fd_, EPOLL_CTL_ADD, socket_fd, &ev) == SYSTEM_ERROR) {
 		throw SystemException("epoll_ctl add failed: " + std::string(std::strerror(errno)));
 	}

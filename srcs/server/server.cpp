@@ -196,8 +196,6 @@ void Server::HandleErrorEvent(int fd) {
 		return;
 	}
 	const int client_fd = IsCgi(fd) ? cgi_manager_.GetClientFd(fd) : fd;
-	std::cout << "HandleErrorEvent" << std::endl;
-	std::cout << "client_fd: " << client_fd << std::endl;
 	SetInternalServerError(client_fd);
 }
 
@@ -559,7 +557,6 @@ void Server::HandleCgi(int client_fd, const http::CgiResult &cgi_result) {
 		return;
 	}
 	try {
-		// std::cout << client_fd << std::endl;
 		cgi_manager_.AddNewCgi(client_fd, cgi_result.cgi_request);
 		// RunCgi() is called only when a new Cgi is added via AddNewCgi().
 		cgi_manager_.RunCgi(client_fd);
