@@ -454,6 +454,8 @@ Method::Part Method::ParsePart(const std::string &part) {
 		std::vector<std::string> header_name_value = utils::SplitStr(header, ": ");
 		if (header_name_value.size() != 2) {
 			throw HttpException("Error: Invalid header format", StatusCode(BAD_REQUEST));
+		} else if (result.headers.find(header_name_value[0]) != result.headers.end()) {
+			throw HttpException("Error: Duplicate header name in part", StatusCode(BAD_REQUEST));
 		}
 		result.headers[header_name_value[0]] = header_name_value[1];
 		pos                                  = end + CRLF.length();
@@ -488,7 +490,12 @@ std::map<std::string, std::string> Method::ParseContentDisposition(const std::st
 		std::string key   = utils::Trim(part.substr(0, pos), OPTIONAL_WHITESPACE);
 		std::string value = utils::Trim(part.substr(pos + 1), OPTIONAL_WHITESPACE);
 		value             = RemoveQuotes(value);
-		result[key]       = value;
+		if (result.find(key) != result.end()) {
+			throw HttpException(
+				"Error: Duplicate field name in Content-Disposition header", StatusCode(BAD_REQUEST)
+			);
+		}
+		result[key] = value;
 	}
 	if (result.find("name") == result.end()) {
 		throw HttpException(
