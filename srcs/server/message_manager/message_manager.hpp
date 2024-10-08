@@ -26,7 +26,7 @@ class MessageManager {
 	void       UpdateTime(int client_fd);
 	// request_buf
 	void AddRequestBuf(int client_fd, const std::string &request_buf);
-	void AppendRequestBuf(int client_fd, const std::string &request_buf);
+	void AddFrontRequestBuf(int client_fd, const std::string &request_buf);
 	void SetNewRequestBuf(int client_fd, const std::string &request_buf);
 	// response
 	void AddNormalResponse(

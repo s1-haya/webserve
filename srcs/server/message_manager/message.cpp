@@ -52,7 +52,7 @@ void Message::AddRequestBuf(const std::string &request_buf) {
 	request_buf_ += request_buf;
 }
 
-void Message::AppendRequestBuf(const std::string &request_buf) {
+void Message::AddFrontRequestBuf(const std::string &request_buf) {
 	request_buf_ = request_buf + request_buf_;
 }
 
