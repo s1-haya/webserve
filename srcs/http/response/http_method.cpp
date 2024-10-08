@@ -438,6 +438,13 @@ Method::Part Method::ParsePart(const std::string &part) {
 	}
 	// ----WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name="file";
 	// のboundary=----WebKitFormBoundary7MA4YWxkTrZu0gW以降の\r\nから始まる
+	// -- + boundary + CRLF で区切られていなければならない
+	if (!utils::StartWith(part, CRLF)) {
+		throw HttpException(
+			"Error: Invalid part format, headers not properly terminated with CRLF",
+			StatusCode(BAD_REQUEST)
+		);
+	}
 	std::string headers = part.substr(CRLF.length(), header_end);
 	result.body         = part.substr(header_end + CRLF.length() * 2);
 	if (!utils::EndWith(result.body, CRLF)) { // bodyの終端はCRLFで終わっているとする
