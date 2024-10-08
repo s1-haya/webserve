@@ -14,9 +14,17 @@ BUFFER_SIZE = 10240
 def receive_with_timeout(sock) -> Optional[str]:
     # timeoutを設定
     sock.settimeout(TIMEOUT)
+
+    # timeout秒までに受信したデータをためておく
+    received_data = []
     try:
-        # timeout秒までに何かを受信したらその時点で返す
-        return sock.recv(BUFFER_SIZE).decode("utf-8")
+        # 一度で全てrecvできない場合用にwhile
+        while True:
+            data = sock.recv(BUFFER_SIZE).decode("utf-8")
+            if not data:
+                # 受信データを繋げてstrにして返す
+                return "".join(received_data)
+            received_data.append(data)
     except socket.timeout:
         # timeout秒待っても何も送られてこなかった場合
         return None
