@@ -104,6 +104,7 @@ HttpResponseFormat HttpResponse::CreateHttpResponseFormat(
 				request_info.request.request_line.method,
 				server_info_result.allowed_methods,
 				request_info.request.body_message,
+				request_info.request.header_fields,
 				response_body_message,
 				response_header_fields,
 				server_info_result.index,

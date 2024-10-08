@@ -32,6 +32,8 @@ extern const std::string KEEP_ALIVE;
 extern const std::string CLOSE;
 extern const std::string CONTENT_TYPE;
 extern const std::string APPLICATION_OCTET_STREAM;
+extern const std::string MULTIPART_FORM_DATA;
+extern const std::string BOUNDARY;
 extern const std::string CONTENT_LENGTH;
 extern const std::string TRANSFER_ENCODING;
 extern const std::string CHUNKED;
@@ -41,6 +43,9 @@ extern const std::string REQUEST_HEADER_FIELDS[];
 extern const std::size_t REQUEST_HEADER_FIELDS_SIZE;
 
 extern const std::string SERVER;
+
+extern const std::string CONTENT_DISPOSITION;
+extern const std::string FILENAME;
 
 } // namespace http
 

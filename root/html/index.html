@@ -76,8 +76,8 @@
 
         if (hasFile) {
           const fileInput = form.file;
-          if (fileInput.files.length > 0) {
-            formData.append("file", fileInput.files[0]);
+          for (let i = 0; i < fileInput.files.length; i++) {
+            formData.append("files[]", fileInput.files[i]);
           }
         }
 
@@ -87,17 +87,11 @@
           formData.append("user_text", userTextInput.value);
         }
 
-        // For DELETE method, usually do not send body
         const fetchOptions = {
           method: method,
           headers: {},
+          body: formData
         };
-
-        if (method === 'POST') {
-          fetchOptions.body = formData;
-        } else if (method === 'DELETE') {
-          // For DELETE, usually do not send body, but can add if needed
-        }
 
         fetch(url, fetchOptions)
           .then(async response => {
@@ -209,8 +203,8 @@
           <label for="filename">Enter filename</label>
           <input type="text" name="filename" id="filename" required />
           
-          <label for="file">Choose file</label>
-          <input type="file" name="file" id="file" />
+          <label for="file">Choose files</label>
+          <input type="file" name="files[]" id="file" multiple />
           
           <button type="submit">Submit</button>
         </form>

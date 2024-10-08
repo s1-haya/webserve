@@ -18,6 +18,7 @@ class Method {
 					 const std::string  &method,
 					 const AllowMethods &allow_methods,
 					 const std::string  &request_body_message,
+					 const HeaderFields &request_header_fields,
 					 std::string        &response_body_message,
 					 HeaderFields       &response_header_fields,
 					 const std::string  &index_file_path,
@@ -37,11 +38,12 @@ class Method {
 		bool               autoindex_on
 	);
 	static StatusCode PostHandler(
-		const std::string &path,
-		const std::string &request_body_message,
-		std::string       &response_body_message,
-		HeaderFields      &response_header_fields,
-		const std::string &upload_directory
+		const std::string  &path,
+		const std::string  &request_body_message,
+		const HeaderFields &request_header_fields,
+		std::string        &response_body_message,
+		HeaderFields       &response_header_fields,
+		const std::string  &upload_directory
 	);
 	static StatusCode DeleteHandler(
 		const std::string &path,
@@ -57,12 +59,32 @@ class Method {
 		 std::string       &response_body_message,
 		 HeaderFields      &response_header_fields
 	 );
+	static StatusCode FileCreationHandlerForMultiPart(
+		const std::string  &path,
+		const std::string  &request_body_message,
+		const HeaderFields &request_header_fields,
+		std::string        &response_body_message,
+		HeaderFields       &response_header_fields
+	);
 	static StatusCode EchoPostHandler(
 		const std::string &request_body_message,
 		std::string       &response_body_message,
 		HeaderFields      &response_header_fields
 	);
 	static utils::Result<std::string> AutoindexHandler(const std::string &path);
+
+	// マルチパート用のパートを表す構造体
+	struct Part {
+		std::map<std::string, std::string> headers;
+		std::string                        body;
+	};
+	// multipart/form-dataをデコードする関数
+	static std::vector<Part>
+	DecodeMultipartFormData(const std::string &content_type, const std::string &body);
+	static std::string ExtractBoundary(const std::string &content_type);
+	static Part        ParsePart(const std::string &part);
+	static std::map<std::string, std::string>
+	ParseContentDisposition(const std::string &content_disposition);
 };
 
 } // namespace http
