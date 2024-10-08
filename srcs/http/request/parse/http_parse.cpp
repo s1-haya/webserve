@@ -5,7 +5,6 @@
 #include <vector>
 
 namespace http {
-
 namespace {
 
 bool IsUsAscii(int c) {
@@ -137,6 +136,36 @@ void ThrowMissingHostHeaderField(const HeaderFields &header_fields) {
 	}
 }
 
+void ThrowMissingContentTypeHeaderField(const HeaderFields &header_fields) {
+	if (!header_fields.count(CONTENT_TYPE)) {
+		throw HttpException("Error: missing Content-Type header field.", StatusCode(BAD_REQUEST));
+	}
+}
+
+void ThrowMissingBodyRequiredHeaderField(const HeaderFields &header_fields) {
+	if (!IsBodyMessageReadingRequired(header_fields)) {
+		throw HttpException(
+			"Error: missing either Content-Length or Transfer-Encoding header field.",
+			StatusCode(BAD_REQUEST)
+		);
+	}
+	// Transfer-Encodingのみ存在する場合、そのheader-field-valueがchunked以外はエラー
+	if (header_fields.count(TRANSFER_ENCODING) && header_fields.at(TRANSFER_ENCODING) != CHUNKED) {
+		throw HttpException(
+			"Error: invalid value for the Transfer-Encoding header; only chunked is allowed.",
+			StatusCode(BAD_REQUEST)
+		);
+	}
+}
+
+void ValidateInvalidHeaderFields(const HeaderFields &header_fields, const std::string &method) {
+	ThrowMissingHostHeaderField(header_fields);
+	if (method == POST) {
+		ThrowMissingContentTypeHeaderField(header_fields);
+		ThrowMissingBodyRequiredHeaderField(header_fields);
+	}
+}
+
 } // namespace
 
 void HttpParse::ParseRequestLine(HttpRequestParsedData &data) {
@@ -168,6 +197,9 @@ void HttpParse::ParseHeaderFields(HttpRequestParsedData &data) {
 	data.current_buf.erase(0, pos + HEADER_FIELDS_END.size());
 	data.request_result.request.header_fields =
 		SetHeaderFields(utils::SplitStr(header_fields, CRLF));
+	ValidateInvalidHeaderFields(
+		data.request_result.request.header_fields, data.request_result.request.request_line.method
+	);
 	data.is_request_format.is_header_fields = true;
 	if (!IsBodyMessageReadingRequired(data.request_result.request.header_fields)) {
 		data.is_request_format.is_body_message = true;
@@ -293,7 +325,6 @@ HeaderFields HttpParse::SetHeaderFields(const std::vector<std::string> &header_f
 			);
 		}
 	}
-	ThrowMissingHostHeaderField(header_fields);
 	return header_fields;
 }
 
@@ -366,7 +397,8 @@ void HttpParse::CheckValidHeaderFieldNameAndValue(
 		throw HttpException(
 			"Error: the value of Host header field is empty.", StatusCode(BAD_REQUEST)
 		);
-	} else if (header_field_name == CONTENT_LENGTH && !utils::ConvertStrToSize(header_field_value).IsOk()) {
+	} else if (header_field_name == CONTENT_LENGTH &&
+			   !utils::ConvertStrToSize(header_field_value).IsOk()) {
 		throw HttpException(
 			"Error: the value of Content-Length header field is not a number.",
 			StatusCode(BAD_REQUEST)
