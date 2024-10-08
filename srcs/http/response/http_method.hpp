@@ -44,11 +44,7 @@ class Method {
 		std::string        &response_body_message,
 		const std::string  &upload_directory
 	);
-	static StatusCode DeleteHandler(
-		const std::string &path,
-		std::string       &response_body_message,
-		HeaderFields      &response_header_fields
-	);
+	static StatusCode  DeleteHandler(const std::string &path, std::string &response_body_message);
 	static Stat        TryStat(const std::string &path);
 	static std::string ReadFile(const std::string &file_path);
 	static void        SystemExceptionHandler(int error_number);

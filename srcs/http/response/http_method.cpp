@@ -87,7 +87,7 @@ StatusCode Method::Handler(
 			upload_directory
 		);
 	} else if (method == DELETE) {
-		status_code = DeleteHandler(path, response_body_message, response_header_fields);
+		status_code = DeleteHandler(path, response_body_message);
 	}
 	return status_code;
 }
@@ -173,11 +173,7 @@ StatusCode Method::PostHandler(
 	return status_code;
 }
 
-StatusCode Method::DeleteHandler(
-	const std::string &path,
-	std::string       &response_body_message,
-	HeaderFields      &response_header_fields
-) {
+StatusCode Method::DeleteHandler(const std::string &path, std::string &response_body_message) {
 	const Stat &info        = TryStat(path);
 	StatusCode  status_code = StatusCode(NO_CONTENT);
 	if (info.IsDirectory()) {
@@ -187,7 +183,6 @@ StatusCode Method::DeleteHandler(
 		SystemExceptionHandler(errno);
 	} else {
 		response_body_message = HttpResponse::CreateDefaultBodyMessage(status_code);
-		response_header_fields[CONTENT_LENGTH] = utils::ToString(response_body_message.length());
 	}
 	return status_code;
 }
