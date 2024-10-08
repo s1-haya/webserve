@@ -8,7 +8,7 @@ from common_response import (response_header_get_root_200_keep,
 
 # serverのtimeout+αを設定する
 TIMEOUT = 4.0
-BUFFER_SIZE = 10240
+BUFFER_SIZE = 1024
 
 
 def receive_with_timeout(sock) -> Optional[str]:
