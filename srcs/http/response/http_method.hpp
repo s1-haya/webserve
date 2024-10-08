@@ -25,11 +25,11 @@ class Method {
 					 bool                autoindex_on,
 					 const std::string  &upload_directory
 				 );
-	static bool IsSupportedMethod(const std::string &method);
 	static bool
 	IsAllowedMethod(const std::string &method, const std::list<std::string> &allow_methods);
 
   private:
+	static bool       IsSupportedMethod(const std::string &method);
 	static StatusCode GetHandler(
 		const std::string &path,
 		std::string       &body_message,
