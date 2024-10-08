@@ -107,15 +107,11 @@ StatusCode Method::GetHandler(
 		if (path[path.size() - 1] != '/') {
 			throw HttpException("Error: Moved Permanently", StatusCode(MOVED_PERMANENTLY));
 		} else if (!index_file_path.empty()) {
-			response_body_message = ReadFile(path + index_file_path);
-			response_header_fields[CONTENT_LENGTH] =
-				utils::ToString(response_body_message.length());
+			response_body_message                = ReadFile(path + index_file_path);
 			response_header_fields[CONTENT_TYPE] = DetermineContentType(path + index_file_path);
 		} else if (autoindex_on) {
 			utils::Result<std::string> result = AutoindexHandler(path);
 			response_body_message             = result.GetValue();
-			response_header_fields[CONTENT_LENGTH] =
-				utils::ToString(response_body_message.length());
 			if (!result.IsOk()) {
 				throw HttpException(
 					"Error: Internal Server Error", StatusCode(INTERNAL_SERVER_ERROR)
@@ -128,9 +124,7 @@ StatusCode Method::GetHandler(
 		if (!info.IsReadableFile()) {
 			throw HttpException("Error: Forbidden", StatusCode(FORBIDDEN));
 		} else {
-			response_body_message = ReadFile(path);
-			response_header_fields[CONTENT_LENGTH] =
-				utils::ToString(response_body_message.length());
+			response_body_message                = ReadFile(path);
 			response_header_fields[CONTENT_TYPE] = DetermineContentType(path);
 		}
 	} else {
