@@ -1,6 +1,6 @@
 #include "utils.hpp"
 #include <algorithm> // transform
-#include <cctype>    // tolower
+#include <cctype>    // isdigit,tolower
 #include <cerrno>
 #include <cstddef> // size_t
 #include <cstdlib> // strtoul
@@ -9,6 +9,11 @@
 
 namespace utils {
 namespace {
+
+// https://en.cppreference.com/w/cpp/string/byte/isdigit
+bool IsDigit(char c) {
+	return std::isdigit(static_cast<unsigned char>(c));
+}
 
 char ToLowerChar(char c) {
 	return static_cast<char>(std::tolower(static_cast<unsigned char>(c)));

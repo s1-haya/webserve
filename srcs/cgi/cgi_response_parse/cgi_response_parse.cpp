@@ -5,15 +5,6 @@
 namespace cgi {
 namespace {
 
-bool IsVString(const std::string &str) {
-	for (std::string::const_iterator it = str.begin(); it != str.end(); ++it) {
-		if (!std::isprint(*it)) {
-			return false;
-		}
-	}
-	return true;
-}
-
 bool HasSpace(const std::string &str) {
 	for (std::string::const_iterator it = str.begin(); it != str.end(); ++it) {
 		if (std::isspace(*it)) {
@@ -32,7 +23,7 @@ utils::Result<void> CheckValidHeaderFieldNameAndValue(
 		utils::Debug("CgiResponseParse", "Header field name is empty");
 		return result;
 	}
-	if (!IsVString(header_field_name) || !IsVString(header_field_value)) {
+	if (!utils::IsVString(header_field_name) || !utils::IsVString(header_field_value)) {
 		utils::Debug(
 			"CgiResponseParse", "Header field name or value have non-printable characters"
 		);

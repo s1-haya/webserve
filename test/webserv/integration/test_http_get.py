@@ -85,6 +85,32 @@ REQUEST_GET_5XX_DIR = REQUEST_DIR + "get/5xx/"
             REQUEST_GET_2XX_DIR + "200_21_no_connection.txt",
             response_header_get_root_200_keep + root_index_file,
         ),
+    ],
+    ids=[
+        "200_01_connection_close",
+        "200_02_connection_keep",
+        "200_03_sub_connection_close",
+        "200_04_connection_keep_alive_and_200_connection_keep_alive",
+        "200_05_connection_close_and_200_connection_close",
+        "200_06_connection_keep_alive_and_200_connection_close",
+        "200_07_no_connection_value",
+        "200_08_wrong_connection_value",
+        "200_11_upper_and_lower_header_fields",
+        "200_12_header_field_value_space",
+        "200_13_space_header_field_value",
+        "200_14_extra_request",
+        "200_15_body_message_default",
+        "200_17_not_exist_header_field",
+        "200_21_no_connection",
+    ],
+)
+def test_get_2xx_responses(request_file, expected_response):
+    send_request_and_assert_response(request_file, expected_response)
+
+
+@pytest.mark.parametrize(
+    "request_file, expected_response",
+    [
         (REQUEST_GET_4XX_DIR + "400_02_lower_method.txt", bad_request_response),
         (
             REQUEST_GET_4XX_DIR + "400_03_no_ascii_method.txt",
@@ -153,32 +179,25 @@ REQUEST_GET_5XX_DIR = REQUEST_DIR + "get/5xx/"
             REQUEST_GET_4XX_DIR + "400_21_too_many_status_line_elements.txt",
             bad_request_response,
         ),
+        (
+            REQUEST_GET_4XX_DIR + "400_22_non_vchr_method.txt",
+            bad_request_response,
+        ),
+        (
+            REQUEST_GET_4XX_DIR + "400_23_non_vchr_request_target.txt",
+            bad_request_response,
+        ),
+        (
+            REQUEST_GET_4XX_DIR + "400_24_non_vchr_http_version.txt",
+            bad_request_response,
+        ),
         (REQUEST_GET_4XX_DIR + "404_01_not_exist_path.txt", not_found_response),
         (
             REQUEST_GET_4XX_DIR + "405_01_method_not_allowed_for_uri.txt",
             not_allowed_response,
         ),
-        (
-            REQUEST_GET_5XX_DIR + "501_01_not_exist_method.txt",
-            not_implemented_response,
-        ),
     ],
     ids=[
-        "200_01_connection_close",
-        "200_02_connection_keep",
-        "200_03_sub_connection_close",
-        "200_04_connection_keep_alive_and_200_connection_keep_alive",
-        "200_05_connection_close_and_200_connection_close",
-        "200_06_connection_keep_alive_and_200_connection_close",
-        "200_07_no_connection_value",
-        "200_08_wrong_connection_value",
-        "200_11_upper_and_lower_header_fields",
-        "200_12_header_field_value_space",
-        "200_13_space_header_field_value",
-        "200_14_extra_request",
-        "200_15_body_message_default",
-        "200_17_not_exist_header_field",
-        "200_21_no_connection",
         "400_02_lower_method",
         "400_03_no_ascii_method",
         "400_04_no_root",
@@ -199,10 +218,28 @@ REQUEST_GET_5XX_DIR = REQUEST_DIR + "get/5xx/"
         "400_19_non_vchr_header_field_value",
         "400_20_too_few_status_line_elements",
         "400_21_too_many_status_line_elements",
+        "400_22_non_vchr_method",
+        "400_23_non_vchr_request_target",
+        "400_24_non_vchr_http_version",
         "404_01_not_exist_path",
         "405_01_method_not_allowed_for_uri",
+    ],
+)
+def test_get_4xx_responses(request_file, expected_response):
+    send_request_and_assert_response(request_file, expected_response)
+
+
+@pytest.mark.parametrize(
+    "request_file, expected_response",
+    [
+        (
+            REQUEST_GET_5XX_DIR + "501_01_not_exist_method.txt",
+            not_implemented_response,
+        ),
+    ],
+    ids=[
         "501_01_not_exist_method",
     ],
 )
-def test_get_responses(request_file, expected_response):
+def test_get_5xx_responses(request_file, expected_response):
     send_request_and_assert_response(request_file, expected_response)

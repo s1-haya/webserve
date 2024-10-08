@@ -7,6 +7,14 @@
 namespace http {
 namespace {
 
+void ValidateVCharInStr(const std::string &target, const std::string &target_name) {
+	if (!utils::IsVString(target)) {
+		throw HttpException(
+			"Error: the " + target_name + " contains non-VCHR characters.", StatusCode(BAD_REQUEST)
+		);
+	}
+}
+
 bool IsUsAscii(int c) {
 	return static_cast<unsigned char>(c) > 127;
 }
@@ -65,16 +73,6 @@ bool HasSpace(const std::string &str) {
 		}
 	}
 	return false;
-}
-
-// 各文字が印字可能文字(VCHR)かどうかをチェック
-bool IsVString(const std::string &str) {
-	for (std::string::const_iterator it = str.begin(); it != str.end(); ++it) {
-		if (!std::isprint(*it)) {
-			return false;
-		}
-	}
-	return true;
 }
 
 typedef utils::Result<std::pair<std::string::size_type, std::string> > ChunkSizeResult;
@@ -343,6 +341,7 @@ void HttpParse::CheckValidMethod(const std::string &method) {
 	if (!method.size()) {
 		throw HttpException("Error: the method don't exist.", StatusCode(BAD_REQUEST));
 	}
+	ValidateVCharInStr(method, "method");
 	if (IsStringUsAscii(method) == false || IsStringUpper(method) == false) {
 		throw HttpException(
 			"Error: This method contains lowercase or non-USASCII characters.",
@@ -355,6 +354,7 @@ void HttpParse::CheckValidRequestTarget(const std::string &request_target) {
 	if (!request_target.size()) {
 		throw HttpException("Error: the request target don't exist.", StatusCode(BAD_REQUEST));
 	}
+	ValidateVCharInStr(request_target, "request target");
 	if (request_target.empty() || request_target[0] != '/') {
 		throw HttpException(
 			"Error: the request target is missing the '/' character at the beginning",
@@ -367,6 +367,7 @@ void HttpParse::CheckValidVersion(const std::string &version) {
 	if (!version.size()) {
 		throw HttpException("Error: the http version don't exist.", StatusCode(BAD_REQUEST));
 	}
+	ValidateVCharInStr(version, "http version");
 	if (version != HTTP_VERSION) {
 		throw HttpException(
 			"Error: The version is not supported by webserv", StatusCode(BAD_REQUEST)
@@ -382,12 +383,8 @@ void HttpParse::CheckValidHeaderFieldNameAndValue(
 			"Error: the name of Header field don't exist.", StatusCode(BAD_REQUEST)
 		);
 	}
-	if (!IsVString(header_field_name) || !IsVString(header_field_value)) {
-		throw HttpException(
-			"Error: the name or value of Header field contains non-VCHR characters.",
-			StatusCode(BAD_REQUEST)
-		);
-	}
+	ValidateVCharInStr(header_field_name, "name of header field");
+	ValidateVCharInStr(header_field_value, "value of header field");
 	if (HasSpace(header_field_name)) {
 		throw HttpException(
 			"Error: the name of Header field has a space.", StatusCode(BAD_REQUEST)
