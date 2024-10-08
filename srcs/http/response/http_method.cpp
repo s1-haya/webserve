@@ -156,16 +156,10 @@ StatusCode Method::PostHandler(
 		// Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
 		// のようにContent-Typeがmultipart/form-dataの場合
 		return FileCreationHandlerForMultiPart(
-			upload_dir_path,
-			request_body_message,
-			request_header_fields,
-			response_body_message,
-			response_header_fields
+			upload_dir_path, request_body_message, request_header_fields, response_body_message
 		);
 	} else if (!IsExistPath(upload_file_path)) {
-		return FileCreationHandler(
-			upload_file_path, request_body_message, response_body_message, response_header_fields
-		);
+		return FileCreationHandler(upload_file_path, request_body_message, response_body_message);
 	}
 	const Stat &info = TryStat(upload_file_path);
 	StatusCode  status_code(NO_CONTENT);
@@ -216,8 +210,7 @@ StatusCode Method::FileCreationHandlerForMultiPart(
 	const std::string  &path,
 	const std::string  &request_body_message,
 	const HeaderFields &request_header_fields,
-	std::string        &response_body_message,
-	HeaderFields       &response_header_fields
+	std::string        &response_body_message
 ) {
 	std::vector<Method::Part> parts =
 		DecodeMultipartFormData(request_header_fields.at(CONTENT_TYPE), request_body_message);
@@ -235,19 +228,17 @@ StatusCode Method::FileCreationHandlerForMultiPart(
 		std::string file_name = content_disposition[FILENAME];
 		std::string file_path = path + "/" + file_name;
 		// upload_dir + "/" + file_name にファイルを作成
-		FileCreationHandler(file_path, (*it).body, response_body_message, response_header_fields);
+		FileCreationHandler(file_path, (*it).body, response_body_message);
 	}
 	StatusCode status_code(CREATED);
-	response_body_message                  = HttpResponse::CreateDefaultBodyMessage(status_code);
-	response_header_fields[CONTENT_LENGTH] = utils::ToString(response_body_message.length());
+	response_body_message = HttpResponse::CreateDefaultBodyMessage(status_code);
 	return status_code;
 }
 
 StatusCode Method::FileCreationHandler(
 	const std::string &path,
 	const std::string &request_body_message,
-	std::string       &response_body_message,
-	HeaderFields      &response_header_fields
+	std::string       &response_body_message
 ) {
 	std::ofstream file(path.c_str(), std::ios::binary);
 	if (file.fail()) {
@@ -262,8 +253,7 @@ StatusCode Method::FileCreationHandler(
 		throw HttpException("Error: Forbidden", StatusCode(FORBIDDEN));
 	}
 	StatusCode status_code(CREATED);
-	response_body_message                  = HttpResponse::CreateDefaultBodyMessage(status_code);
-	response_header_fields[CONTENT_LENGTH] = utils::ToString(response_body_message.length());
+	response_body_message = HttpResponse::CreateDefaultBodyMessage(status_code);
 	return status_code;
 }
 
