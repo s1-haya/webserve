@@ -152,6 +152,11 @@ def test_post_upload_responses(
             CHUNKED_FILE_PATH,
         ),
         (
+            REQUEST_POST_4XX_DIR + "400_07_incomplete_chunked_body_0_end.txt",
+            bad_request_response,
+            CHUNKED_FILE_PATH,
+        ),
+        (
             REQUEST_POST_4XX_DIR + "408_01_shortened_body_message.txt",
             timeout_response,
             UPLOAD_DIR + "shortened_body_message",
@@ -166,6 +171,11 @@ def test_post_upload_responses(
             timeout_response,
             CHUNKED_FILE_PATH,
         ),
+        (
+            REQUEST_POST_4XX_DIR + "408_04_incomplete_chunked_body_0_end.txt",
+            timeout_response,
+            CHUNKED_FILE_PATH,
+        ),
     ],
     ids=[
         "400_01_duplicate_content_length",
@@ -174,9 +184,11 @@ def test_post_upload_responses(
         "400_04_no_content_length_and_no_transfer_encoding",
         "400_05_no_content_length_and_not_chunked_transfer_encoding",
         "400_06_incomplete_chunked_body",
+        "400_07_incomplete_chunked_body_0_end",
         "408_01_shortened_body_message",
         "408_02_no_body_message",
         "408_03_incomplete_chunked_body",
+        "408_04_incomplete_chunked_body_0_end",
     ],
 )
 def test_post_4xx_responses(
