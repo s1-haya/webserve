@@ -10,6 +10,7 @@ STATUS = {
     201: "Created",
     204: "No Content",
     400: "Bad Request",
+    403: "Forbidden",
     404: "Not Found",
     405: "Method Not Allowed",
     408: "Request Timeout",
@@ -23,6 +24,7 @@ SUCCESS_FILES = (
 
 ERROR_FILES = (
     ("400_bad_request.txt", "bad_request_file_400", "bad_request_file_400_length"),
+    ("403_forbidden.txt", "forbidden_file_403", "forbidden_file_403_length"),
     ("404_not_found.txt", "not_found_file_404", "not_found_file_404_length"),
     (
         "405_method_not_allowed.txt",
@@ -78,11 +80,17 @@ response_header_201_close = create_response_header(
 response_header_201_keep = create_response_header(
     201, KEEP_ALIVE, success_files_data["created_file_201_length"], TEXT_HTML
 )
-response_header_204 = create_response_header(
+response_header_204_close = create_response_header(
     204, CLOSE, success_files_data["no_content_file_204_length"], TEXT_HTML
+)
+response_header_204_keep = create_response_header(
+    204, KEEP_ALIVE, success_files_data["no_content_file_204_length"], TEXT_HTML
 )
 response_header_400 = create_response_header(
     400, CLOSE, error_files_data["bad_request_file_400_length"], TEXT_HTML
+)
+response_header_403 = create_response_header(
+    403, CLOSE, error_files_data["forbidden_file_403_length"], TEXT_HTML
 )
 response_header_404 = create_response_header(
     404, CLOSE, error_files_data["not_found_file_404_length"], TEXT_HTML
@@ -103,11 +111,17 @@ created_response_close = response_header_201_close + success_files_data[
 created_response_keep = response_header_201_keep + success_files_data[
     "created_file_201"
 ].decode("utf-8")
-no_content_response = response_header_204 + success_files_data[
+no_content_response_close = response_header_204_close + success_files_data[
+    "no_content_file_204"
+].decode("utf-8")
+no_content_response_keep = response_header_204_keep + success_files_data[
     "no_content_file_204"
 ].decode("utf-8")
 bad_request_response = response_header_400 + error_files_data[
     "bad_request_file_400"
+].decode("utf-8")
+forbidden_response = response_header_403 + error_files_data[
+    "forbidden_file_403"
 ].decode("utf-8")
 not_found_response = response_header_404 + error_files_data[
     "not_found_file_404"
