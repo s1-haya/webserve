@@ -222,6 +222,11 @@ def test_post_upload_responses(
             CHUNKED_FILE_PATH,
         ),
         (
+            REQUEST_POST_4XX_DIR + "408_06_max_chunk_size_and_crlf.txt",
+            timeout_response,
+            CHUNKED_FILE_PATH,
+        ),
+        (
             REQUEST_POST_4XX_DIR + "413_01_too_large_content_max_body_size.txt",
             payload_too_large_response,
             UPLOAD_FILE_PATH,
@@ -245,6 +250,7 @@ def test_post_upload_responses(
         "408_03_incomplete_chunked_body",
         "408_04_incomplete_chunked_body_0_end",
         "408_05_incomplete_chunked_body_0crlf_end",
+        "408_06_max_chunk_size_and_crlf",
         "413_01_too_large_content_max_body_size",
     ],
 )
