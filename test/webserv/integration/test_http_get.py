@@ -5,7 +5,7 @@ from common_response import (bad_request_response, not_allowed_response,
                              response_header_get_root_200_close,
                              response_header_get_root_200_keep,
                              response_header_get_sub_200_close,
-                             root_index_file, sub_index_file)
+                             root_index_file, sub_index_file, timeout_response)
 
 REQUEST_DIR = "test/common/request/"
 REQUEST_GET_2XX_DIR = REQUEST_DIR + "get/2xx/"
@@ -111,6 +111,7 @@ def test_get_2xx_responses(request_file, expected_response):
 @pytest.mark.parametrize(
     "request_file, expected_response",
     [
+        (REQUEST_GET_4XX_DIR + "400_01_only_crlf.txt", bad_request_response),
         (REQUEST_GET_4XX_DIR + "400_02_lower_method.txt", bad_request_response),
         (
             REQUEST_GET_4XX_DIR + "400_03_no_ascii_method.txt",
@@ -196,8 +197,17 @@ def test_get_2xx_responses(request_file, expected_response):
             REQUEST_GET_4XX_DIR + "405_01_method_not_allowed_for_uri.txt",
             not_allowed_response,
         ),
+        (
+            REQUEST_GET_4XX_DIR + "408_01_no_crlf.txt",
+            timeout_response,
+        ),
+        (
+            REQUEST_GET_4XX_DIR + "408_02_only_space.txt",
+            timeout_response,
+        ),
     ],
     ids=[
+        "400_01_only_crlf",
         "400_02_lower_method",
         "400_03_no_ascii_method",
         "400_04_no_root",
@@ -223,6 +233,8 @@ def test_get_2xx_responses(request_file, expected_response):
         "400_24_non_vchr_http_version",
         "404_01_not_exist_path",
         "405_01_method_not_allowed_for_uri",
+        "408_01_no_crlf",
+        "408_02_only_space",
     ],
 )
 def test_get_4xx_responses(request_file, expected_response):
