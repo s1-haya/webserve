@@ -238,12 +238,12 @@ void HttpParse::ParseChunkedRequest(HttpRequestParsedData &data) {
 		);
 	}
 
-	ChunkSizeResult result = GetChunkSizeStr(data.current_buf);
-	if (!result.IsOk()) {
+	ChunkSizeResult chunk_size_result = GetChunkSizeStr(data.current_buf);
+	if (!chunk_size_result.IsOk()) {
 		return;
 	}
-	std::string::size_type end_of_chunk_size_pos = result.GetValue().first;
-	std::string            chunk_size_str        = result.GetValue().second;
+	std::string::size_type end_of_chunk_size_pos = chunk_size_result.GetValue().first;
+	std::string            chunk_size_str        = chunk_size_result.GetValue().second;
 	std::size_t            chunk_size            = HexToDec(chunk_size_str).GetValue();
 
 	while (true) {
@@ -267,12 +267,12 @@ void HttpParse::ParseChunkedRequest(HttpRequestParsedData &data) {
 			break;
 		}
 
-		ChunkSizeResult result = GetChunkSizeStr(data.current_buf);
-		if (!result.IsOk()) {
+		chunk_size_result = GetChunkSizeStr(data.current_buf);
+		if (!chunk_size_result.IsOk()) {
 			return;
 		}
-		end_of_chunk_size_pos = result.GetValue().first;
-		chunk_size_str        = result.GetValue().second;
+		end_of_chunk_size_pos = chunk_size_result.GetValue().first;
+		chunk_size_str        = chunk_size_result.GetValue().second;
 		chunk_size            = HexToDec(chunk_size_str).GetValue();
 	}
 
