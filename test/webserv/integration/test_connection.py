@@ -2,7 +2,7 @@ import socket
 from http.client import HTTPConnection, HTTPException
 from typing import Optional
 
-from common_functions import assert_response
+from common_functions import SERVER_PORT, assert_response
 from common_response import (response_header_get_root_200_keep,
                              root_index_file, timeout_response)
 
@@ -26,7 +26,7 @@ def receive_with_timeout(sock) -> Optional[str]:
 # 通常のkeep-aliveを送信(各関数の説明付き)
 def test_timeout_keep_alive() -> None:
     try:
-        con = HTTPConnection("localhost", 8080)
+        con = HTTPConnection("localhost", SERVER_PORT)
         # serverに接続
         con.connect()
 
@@ -65,7 +65,7 @@ def test_timeout_keep_alive() -> None:
 
 def test_timeout_incomplete_request() -> None:
     try:
-        con = HTTPConnection("localhost", 8080)
+        con = HTTPConnection("localhost", SERVER_PORT)
         con.connect()
 
         # 完全ではないrequestを送信
@@ -88,7 +88,7 @@ def test_timeout_incomplete_request() -> None:
 
 def test_timeout_no_request() -> None:
     try:
-        con = HTTPConnection("localhost", 8080)
+        con = HTTPConnection("localhost", SERVER_PORT)
         con.connect()
 
         # requestを何も送らない
@@ -111,7 +111,7 @@ def test_timeout_no_request() -> None:
 # serverがその後も正常に動いていればOK
 def test_incomplete_request_disconnect() -> None:
     try:
-        con = HTTPConnection("localhost", 8080)
+        con = HTTPConnection("localhost", SERVER_PORT)
         con.connect()
 
         # 完全ではないrequestを送信
@@ -131,7 +131,7 @@ def test_incomplete_request_disconnect() -> None:
 # serverがその後も正常に動いていればOK
 def test_timeout_no_request_disconnect() -> None:
     try:
-        con = HTTPConnection("localhost", 8080)
+        con = HTTPConnection("localhost", SERVER_PORT)
         con.connect()
 
         # requestを何も送らない

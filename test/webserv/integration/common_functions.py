@@ -1,6 +1,8 @@
 import os
 import subprocess
 
+SERVER_PORT = 8080
+
 
 def read_file(file):
     with open(file, "r") as f:
@@ -46,7 +48,7 @@ except ImportError as e:
 
 
 def send_request_and_assert_response(request_file, expected_response):
-    client_instance = client.Client(8080)
+    client_instance = client.Client(SERVER_PORT)
     request, _ = read_file_binary(request_file)
     response = client_instance.SendRequestAndReceiveResponse(request)
     assert_response(response, expected_response)

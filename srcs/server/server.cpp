@@ -348,8 +348,7 @@ void Server::HandleTimeoutMessages() {
 			continue;
 		}
 
-		const http::HttpResult http_result =
-			http_.GetErrorResponse(client_fd, http::TIMEOUT);
+		const http::HttpResult http_result = http_.GetErrorResponse(client_fd, http::TIMEOUT);
 		message_manager_.AddPrimaryResponse(client_fd, message::CLOSE, http_result.response);
 		ReplaceEvent(client_fd, event::EVENT_WRITE);
 		utils::Debug("server", "timeout client", client_fd);
@@ -363,8 +362,7 @@ void Server::SetInternalServerError(int client_fd) {
 		cgi_manager_.DeleteCgi(client_fd);
 	}
 
-	const http::HttpResult http_result =
-		http_.GetErrorResponse(client_fd, http::INTERNAL_ERROR);
+	const http::HttpResult http_result = http_.GetErrorResponse(client_fd, http::INTERNAL_ERROR);
 	message_manager_.AddPrimaryResponse(client_fd, message::CLOSE, http_result.response);
 	ReplaceEvent(client_fd, event::EVENT_WRITE);
 	utils::Debug("server", "internal server error to client", client_fd);
