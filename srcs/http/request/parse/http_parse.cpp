@@ -39,15 +39,6 @@ bool IsStringUpper(const std::string &str) {
 	return true;
 }
 
-std::string StrTrimOptionalWhitespace(const std::string &str) {
-	std::string::size_type start = str.find_first_not_of(OPTIONAL_WHITESPACE);
-	if (start == std::string::npos) {
-		return "";
-	}
-	std::string::size_type end = str.find_last_not_of(OPTIONAL_WHITESPACE);
-	return str.substr(start, end - start + 1);
-}
-
 bool IsBodyMessageReadingRequired(const HeaderFields &header_fields) {
 	if (header_fields.find(CONTENT_LENGTH) == header_fields.end() &&
 		header_fields.find(TRANSFER_ENCODING) == header_fields.end()) {
@@ -310,7 +301,7 @@ HeaderFields HttpParse::SetHeaderFields(const std::vector<std::string> &header_f
 		std::size_t colon_pos          = (*it).find_first_of(':');
 		std::string header_field_name  = utils::ToLowerString((*it).substr(0, colon_pos));
 		std::string header_field_value = utils::ToLowerString((*it).substr(colon_pos + 1));
-		header_field_value             = StrTrimOptionalWhitespace(header_field_value);
+		header_field_value             = utils::Trim(header_field_value, OPTIONAL_WHITESPACE);
 		CheckValidHeaderFieldNameAndValue(header_field_name, header_field_value);
 		// todo:
 		// マルチパートを対応する場合はutils::SplitStrを使用して、セミコロン区切りのstd::vector<std::string>になる。

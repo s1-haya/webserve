@@ -5,6 +5,7 @@
 #include "http_response.hpp"
 #include "http_serverinfo_check.hpp"
 #include "stat.hpp"
+#include "utils.hpp"
 #include <algorithm> // std::find
 #include <cstring>
 #include <ctime>    // ctime
@@ -28,58 +29,25 @@ std::string FileToString(const std::ifstream &file) {
 	return ss.str();
 }
 
-bool EndWith(const std::string &str, const std::string &suffix) {
-	return str.size() >= suffix.size() &&
-		   str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0;
-}
-
 // ファイルの拡張子に基づいてContent-Typeを決定する関数: デフォルトはtext/plain
 std::string DetermineContentType(const std::string &path) {
 	const std::string html_extension = ".html";
 	const std::string json_extension = ".json";
 	const std::string pdf_extension  = ".pdf";
 
-	if (EndWith(path, html_extension)) {
+	if (utils::EndWith(path, html_extension)) {
 		return http::TEXT_HTML;
-	} else if (EndWith(path, json_extension)) {
+	} else if (utils::EndWith(path, json_extension)) {
 		return "application/json";
-	} else if (EndWith(path, pdf_extension)) {
+	} else if (utils::EndWith(path, pdf_extension)) {
 		return "application/pdf";
 	}
 	return TEXT_PLAIN;
 }
 
-// todo: utilsへ移動
-// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-bool StartWith(const std::string &str, const std::string &prefix) {
-	return str.size() >= prefix.size() && str.compare(0, prefix.size(), prefix) == 0;
-}
-
-// ヘルパー関数: 文字列のトリム: TrimOWSにも使える
-std::string Trim(const std::string &str, const std::string &to_trim) {
-	std::size_t first = str.find_first_not_of(to_trim);
-	if (first == std::string::npos) {
-		return "";
-	}
-	std::size_t last = str.find_last_not_of(to_trim);
-	return str.substr(first, last - first + 1);
-}
-
-// std::string::front()
-char GetFrontChar(const std::string &str) {
-	return str.empty() ? '\0' : str[0];
-}
-
-// std::string::back()
-char GetBackChar(const std::string &str) {
-	return str.empty() ? '\0' : str[str.size() - 1];
-}
-
-// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
 // ヘルパー関数: 文字列のクオートを削除
 std::string RemoveQuotes(const std::string &str) {
-	if (GetFrontChar(str) == '"' && GetBackChar(str) == '"') {
+	if (utils::GetFrontChar(str) == '"' && utils::GetBackChar(str) == '"') {
 		return str.substr(1, str.size() - 2);
 	}
 	return str;
@@ -190,7 +158,7 @@ StatusCode Method::PostHandler(
 	if (upload_directory.empty()) {
 		return EchoPostHandler(request_body_message, response_body_message, response_header_fields);
 	} else if (request_header_fields.find(CONTENT_TYPE) != request_header_fields.end() &&
-			   StartWith(request_header_fields.at(CONTENT_TYPE), MULTIPART_FORM_DATA)) {
+			   utils::StartWith(request_header_fields.at(CONTENT_TYPE), MULTIPART_FORM_DATA)) {
 		// Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
 		// のようにContent-Typeがmultipart/form-dataの場合
 		return FileCreationHandlerForMultiPart(
@@ -472,7 +440,7 @@ Method::Part Method::ParsePart(const std::string &part) {
 	// のboundary=----WebKitFormBoundary7MA4YWxkTrZu0gW以降の\r\nから始まる
 	std::string headers = part.substr(CRLF.length(), header_end);
 	result.body         = part.substr(header_end + CRLF.length() * 2);
-	if (!EndWith(result.body, CRLF)) { // bodyの終端はCRLFで終わっているとする
+	if (!utils::EndWith(result.body, CRLF)) { // bodyの終端はCRLFで終わっているとする
 		throw HttpException(
 			"Error: Invalid part format, body not properly terminated", StatusCode(BAD_REQUEST)
 		);
@@ -504,7 +472,7 @@ std::map<std::string, std::string> Method::ParseContentDisposition(const std::st
 	std::getline(stream, part, ';'); // form-data
 	// セミコロンで分割
 	while (std::getline(stream, part, ';')) {
-		part            = Trim(part, OPTIONAL_WHITESPACE);
+		part            = utils::Trim(part, OPTIONAL_WHITESPACE);
 		std::size_t pos = part.find('=');
 		if (pos == std::string::npos) {
 			throw HttpException(
@@ -512,8 +480,8 @@ std::map<std::string, std::string> Method::ParseContentDisposition(const std::st
 			);
 		}
 		// filename="a.txt"のような形で来る
-		std::string key   = Trim(part.substr(0, pos), OPTIONAL_WHITESPACE);
-		std::string value = Trim(part.substr(pos + 1), OPTIONAL_WHITESPACE);
+		std::string key   = utils::Trim(part.substr(0, pos), OPTIONAL_WHITESPACE);
+		std::string value = utils::Trim(part.substr(pos + 1), OPTIONAL_WHITESPACE);
 		value             = RemoveQuotes(value);
 		result[key]       = value;
 	}

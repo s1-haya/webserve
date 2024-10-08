@@ -51,6 +51,11 @@ std::string              ConvertUintToStr(unsigned int num);
 std::vector<std::string> SplitStr(const std::string &src, const std::string &substring);
 std::string              ToLowerString(const std::string &str);
 bool                     IsVString(const std::string &str);
+bool                     StartWith(const std::string &str, const std::string &prefix);
+bool                     EndWith(const std::string &str, const std::string &suffix);
+std::string              Trim(const std::string &str, const std::string &to_trim);
+char                     GetFrontChar(const std::string &str);
+char                     GetBackChar(const std::string &str);
 
 } // namespace utils
 

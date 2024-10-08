@@ -28,6 +28,11 @@ SRCS			+=	$(WS_EXCEPTION_DIR)/system_exception.cpp \
 					$(WS_UTILS_DIR)/convert_str.cpp \
 					$(WS_UTILS_DIR)/split_str.cpp \
 					$(WS_UTILS_DIR)/is_vstring.cpp \
+					$(WS_UTILS_DIR)/get_front_char.cpp \
+					$(WS_UTILS_DIR)/get_back_char.cpp \
+					$(WS_UTILS_DIR)/start_with.cpp \
+					$(WS_UTILS_DIR)/end_with.cpp \
+					$(WS_UTILS_DIR)/trim.cpp \
 					$(WS_HTTP_DIR)/http_message.cpp \
 					$(WS_HTTP_DIR)/status_code.cpp \
 					$(WS_HTTP_DIR)/http_exception.cpp \

@@ -17,6 +17,7 @@ SRCS				+=	$(WS_UTILS_DIR)/color.cpp \
 						$(WS_UTILS_DIR)/split_str.cpp \
 						$(WS_UTILS_DIR)/convert_str.cpp \
 						$(WS_UTILS_DIR)/is_vstring.cpp \
+						$(WS_UTILS_DIR)/trim.cpp \
 						$(WS_HTTP_DIR)/http_message.cpp \
 						$(WS_HTTP_DIR)/http_exception.cpp \
 						$(WS_HTTP_DIR)/status_code.cpp \
