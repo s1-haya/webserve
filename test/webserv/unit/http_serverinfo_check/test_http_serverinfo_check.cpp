@@ -11,14 +11,14 @@ namespace {
 using namespace http;
 
 server::Location BuildLocation(
-	const std::string						  &request_uri,
-	const std::string						  &alias,
-	const std::string						  &index,
+	const std::string                          &request_uri,
+	const std::string                          &alias,
+	const std::string                          &index,
 	bool                                        autoindex,
 	const std::list<std::string>               &allowed_methods,
 	const std::pair<unsigned int, std::string> &redirect,
-	const std::string						  &cgi_extension    = "",
-	const std::string						  &upload_directory = ""
+	const std::string                          &cgi_extension    = "",
+	const std::string                          &upload_directory = ""
 ) {
 	server::Location loc;
 	loc.request_uri      = request_uri;
@@ -212,7 +212,7 @@ int Test1() {
 int Test2() {
 	// request
 	HttpRequestFormat request;
-	request.request_line        = CreateRequestLine("GET", "/www/test.html", "HTTP/1.1");
+	request.request_line = CreateRequestLine("GET", "/www/test.html", "HTTP/1.1");
 	request.header_fields[HOST] = "host10"; // hostが見つからない場合がデフォルト(host1)に
 	request.header_fields[CONNECTION] = KEEP_ALIVE;
 
