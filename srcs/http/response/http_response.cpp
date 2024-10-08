@@ -211,6 +211,8 @@ HttpResponseFormat HttpResponse::HandleRedirect(
 	// サーバーで用意しているステータス以外を指定した場合はbodyやphraseを返さない
 	if (server_info_result.redirect.GetValue().first == MOVED_PERMANENTLY) {
 		throw HttpException("Moved Permanently", StatusCode(MOVED_PERMANENTLY));
+	} else if (server_info_result.redirect.GetValue().first == FOUND) {
+		throw HttpException("Found", StatusCode(FOUND));
 	} else {
 		response_header_fields[CONTENT_LENGTH] = "0";
 		const std::string redirect_status_code =

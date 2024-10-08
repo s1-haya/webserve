@@ -181,7 +181,7 @@ int main(void) {
 	std::string expected_no_content =
 		LoadFileContent("../../expected_response/default_body_message/204_no_content.txt");
 	std::string expected_redirect =
-		LoadFileContent("../../expected_response/default_body_message/301_redirect.txt");
+		LoadFileContent("../../expected_response/default_body_message/301_moved_permanently.txt");
 	std::string expected_forbidden =
 		LoadFileContent("../../expected_response/default_body_message/403_forbidden.txt");
 	std::string expected_not_found =
