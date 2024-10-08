@@ -64,7 +64,7 @@ class Parser {
 	LocationUriList                location_uri_list_;
 
   public:
-	explicit Parser(std::list<node::Node> &);
+	explicit Parser(const std::list<node::Node> &);
 	~Parser();
 
 	std::list<context::ServerCon> GetServers() const;

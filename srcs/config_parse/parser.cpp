@@ -8,7 +8,7 @@
 namespace config {
 namespace parser {
 
-Parser::Parser(std::list<node::Node> &tokens) : tokens_(tokens) {
+Parser::Parser(const std::list<node::Node> &tokens) : tokens_(tokens) {
 	ParseNode();
 }
 
