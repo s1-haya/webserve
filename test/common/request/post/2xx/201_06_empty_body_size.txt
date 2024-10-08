@@ -1,0 +1,6 @@
+POST /upload/test_upload_file HTTP/1.1
+Host: localhost
+Connection: close
+Content-Type: text/plain
+Content-Length: 0
+
