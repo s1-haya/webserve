@@ -1,5 +1,7 @@
 # 42 Webserver
 
+<img src="https://github.com/user-attachments/assets/34ed6b59-d0ed-4686-859e-b0e7a64ad300" alt="42Webserv" height="325">
+
 ## OVERVIEW
 
 ## USAGE
