@@ -168,6 +168,13 @@ def test_timeout_no_request_disconnect() -> None:
             con.close()
 
 
+# content-lengthは自動で入る
+def create_headers(content_type) -> Mapping[str, str]:
+    headers = {}
+    headers[CONTENT_TYPE] = content_type
+    return headers
+
+
 JSON_FILENAME, JSON_DATA = (
     "webserv.json",
     {
@@ -186,13 +193,7 @@ def create_json_request(json_data) -> Tuple[str, Mapping[str, str]]:
         encoded_json_data = json.dumps(json_data)
         return encoded_json_data
 
-    # content-lengthは自動で入る
-    def create_headers() -> Mapping[str, str]:
-        headers = {}
-        headers[CONTENT_TYPE] = APPLICATION_JSON
-        return headers
-
-    return create_json_body(), create_headers()
+    return create_json_body(), create_headers(APPLICATION_JSON)
 
 
 def test_content_type_post_json_and_get_json() -> None:
@@ -234,12 +235,6 @@ UNKNOWN_FILENAME, UNKNOWN_DATA = (
 UNKNOWN_FULL_PATH = ROOT_DIR + UPLOAD_DIR + UNKNOWN_FILENAME
 
 
-def create_unknown_headers() -> Mapping[str, str]:
-    headers = {}
-    headers[CONTENT_TYPE] = APPLICATION_OCTET_STREAM
-    return headers
-
-
 def test_content_type_post_unknown_and_get() -> None:
     delete_file(UNKNOWN_FULL_PATH)
 
@@ -251,7 +246,7 @@ def test_content_type_post_unknown_and_get() -> None:
             "POST",
             "/" + UPLOAD_DIR + UNKNOWN_FILENAME,
             UNKNOWN_DATA,
-            create_unknown_headers(),
+            create_headers(APPLICATION_OCTET_STREAM),
         )
 
         response = con.getresponse()
