@@ -18,7 +18,10 @@ UPLOAD_DIR = "upload/"
 
 CONTENT_TYPE = "Content-Type"
 CONTENT_LENGTH = "Content-Length"
+
 APPLICATION_JSON = "application/json"
+APPLICATION_OCTET_STREAM = "application/octet-stream"
+TEXT_PLAIN = "text/plain"
 
 
 def receive_with_timeout(sock) -> Optional[str]:
@@ -222,3 +225,51 @@ def test_content_type_post_json_and_get_json() -> None:
         if con:
             con.close()
         delete_file(JSON_FULL_PATH)
+
+
+UNKNOWN_FILENAME, UNKNOWN_DATA = (
+    "webserv.unknown",
+    b"unknownnnnnn",
+)
+UNKNOWN_FULL_PATH = ROOT_DIR + UPLOAD_DIR + UNKNOWN_FILENAME
+
+
+def create_unknown_headers() -> Mapping[str, str]:
+    headers = {}
+    headers[CONTENT_TYPE] = APPLICATION_OCTET_STREAM
+    return headers
+
+
+def test_content_type_post_unknown_and_get() -> None:
+    delete_file(UNKNOWN_FULL_PATH)
+
+    try:
+        con = HTTPConnection("localhost", SERVER_PORT)
+
+        # .unknownデータをPOSTしてuploadしておく
+        con.request(
+            "POST",
+            "/" + UPLOAD_DIR + UNKNOWN_FILENAME,
+            UNKNOWN_DATA,
+            create_unknown_headers(),
+        )
+
+        response = con.getresponse()
+        response.read()
+
+        # GET .unknownデータしてContent-Typeをassert
+        con.request("GET", "/" + UPLOAD_DIR + UNKNOWN_FILENAME)
+        response = con.getresponse()
+
+        assert_status_line(response, HTTPStatus.OK)
+        # 不明なものは"application/octet-stream"が良いらしい？がwebservはdefaultをtext/plainとしている
+        assert_header(response, CONTENT_TYPE, TEXT_PLAIN)
+        assert response.read() == UNKNOWN_DATA
+
+    except HTTPException as e:
+        print(f"Request failed: {e}")
+        raise AssertionError
+    finally:
+        if con:
+            con.close()
+        delete_file(UNKNOWN_FULL_PATH)
