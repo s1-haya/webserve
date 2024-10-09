@@ -39,7 +39,6 @@ class Message {
 	void UpdateTime();
 	// request_buf
 	void AddRequestBuf(const std::string &request_buf);
-	void AddFrontRequestBuf(const std::string &request_buf);
 	void DeleteRequestBuf();
 	// response
 	void     AddBackResponse(ConnectionState connection_state, const std::string &response_str);
