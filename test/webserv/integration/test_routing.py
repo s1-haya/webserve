@@ -49,7 +49,11 @@ class TestServerRouting(unittest.TestCase):
     def tearDownClass(cls):
         # クラス全体のクリーンアップ
         cls.process.terminate()
-        cls.process.wait()
+        try:
+            cls.process.wait(timeout=5)
+        except subprocess.TimeoutExpired:
+            cls.process.kill()
+            cls.process.wait()
 
     def setUp(self):
         # 各テストの前に実行される(unittestの機能)
