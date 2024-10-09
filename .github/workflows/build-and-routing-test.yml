@@ -35,9 +35,17 @@ jobs:
           pip-sync
 
       - name: Build webserv
-        run:
+        run: |
+          set -e
           make
 
       - name: Run routing tests
-        run:
-          pytest -v test/webserv/integration/test_routing.py
+        run: |
+          set -e
+          pytest -v test/webserv/integration/test_routing.py > test_results.txt
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v3
+        with:
+          name: routing-test-results
+          path: routing_test_results.txt
