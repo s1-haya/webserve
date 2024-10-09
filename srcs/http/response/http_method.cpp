@@ -84,11 +84,10 @@ StatusCode Method::Handler(
 			request_body_message,
 			request_header_fields,
 			response_body_message,
-			response_header_fields,
 			upload_directory
 		);
 	} else if (method == DELETE) {
-		status_code = DeleteHandler(path, response_body_message, response_header_fields);
+		status_code = DeleteHandler(path, response_body_message);
 	}
 	return status_code;
 }
@@ -107,15 +106,11 @@ StatusCode Method::GetHandler(
 		if (path[path.size() - 1] != '/') {
 			throw HttpException("Error: Moved Permanently", StatusCode(MOVED_PERMANENTLY));
 		} else if (!index_file_path.empty()) {
-			response_body_message = ReadFile(path + index_file_path);
-			response_header_fields[CONTENT_LENGTH] =
-				utils::ToString(response_body_message.length());
+			response_body_message                = ReadFile(path + index_file_path);
 			response_header_fields[CONTENT_TYPE] = DetermineContentType(path + index_file_path);
 		} else if (autoindex_on) {
 			utils::Result<std::string> result = AutoindexHandler(path);
 			response_body_message             = result.GetValue();
-			response_header_fields[CONTENT_LENGTH] =
-				utils::ToString(response_body_message.length());
 			if (!result.IsOk()) {
 				throw HttpException(
 					"Error: Internal Server Error", StatusCode(INTERNAL_SERVER_ERROR)
@@ -128,9 +123,7 @@ StatusCode Method::GetHandler(
 		if (!info.IsReadableFile()) {
 			throw HttpException("Error: Forbidden", StatusCode(FORBIDDEN));
 		} else {
-			response_body_message = ReadFile(path);
-			response_header_fields[CONTENT_LENGTH] =
-				utils::ToString(response_body_message.length());
+			response_body_message                = ReadFile(path);
 			response_header_fields[CONTENT_TYPE] = DetermineContentType(path);
 		}
 	} else {
@@ -144,7 +137,6 @@ StatusCode Method::PostHandler(
 	const std::string  &request_body_message,
 	const HeaderFields &request_header_fields,
 	std::string        &response_body_message,
-	HeaderFields       &response_header_fields,
 	const std::string  &upload_directory
 ) {
 	// ex. test.txt
@@ -156,22 +148,16 @@ StatusCode Method::PostHandler(
 	const std::string upload_file_path = upload_dir_path + "/" + file_name;
 
 	if (upload_directory.empty()) {
-		return EchoPostHandler(request_body_message, response_body_message, response_header_fields);
+		return EchoPostHandler(request_body_message, response_body_message);
 	} else if (request_header_fields.find(CONTENT_TYPE) != request_header_fields.end() &&
 			   utils::StartWith(request_header_fields.at(CONTENT_TYPE), MULTIPART_FORM_DATA)) {
 		// Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
 		// のようにContent-Typeがmultipart/form-dataの場合
 		return FileCreationHandlerForMultiPart(
-			upload_dir_path,
-			request_body_message,
-			request_header_fields,
-			response_body_message,
-			response_header_fields
+			upload_dir_path, request_body_message, request_header_fields, response_body_message
 		);
 	} else if (!IsExistPath(upload_file_path)) {
-		return FileCreationHandler(
-			upload_file_path, request_body_message, response_body_message, response_header_fields
-		);
+		return FileCreationHandler(upload_file_path, request_body_message, response_body_message);
 	}
 	const Stat &info = TryStat(upload_file_path);
 	StatusCode  status_code(NO_CONTENT);
@@ -179,7 +165,6 @@ StatusCode Method::PostHandler(
 		throw HttpException("Error: Forbidden", StatusCode(FORBIDDEN));
 	} else if (info.IsRegularFile()) {
 		response_body_message = HttpResponse::CreateDefaultBodyMessage(status_code);
-		response_header_fields[CONTENT_LENGTH] = utils::ToString(response_body_message.length());
 	} else {
 		// - upload_file_pathがシンボリックリンク
 		// - upload_file_pathが特殊ファイル（デバイスファイル、ソケットファイルなど）
@@ -188,11 +173,7 @@ StatusCode Method::PostHandler(
 	return status_code;
 }
 
-StatusCode Method::DeleteHandler(
-	const std::string &path,
-	std::string       &response_body_message,
-	HeaderFields      &response_header_fields
-) {
+StatusCode Method::DeleteHandler(const std::string &path, std::string &response_body_message) {
 	const Stat &info        = TryStat(path);
 	StatusCode  status_code = StatusCode(NO_CONTENT);
 	if (info.IsDirectory()) {
@@ -202,7 +183,6 @@ StatusCode Method::DeleteHandler(
 		SystemExceptionHandler(errno);
 	} else {
 		response_body_message = HttpResponse::CreateDefaultBodyMessage(status_code);
-		response_header_fields[CONTENT_LENGTH] = utils::ToString(response_body_message.length());
 	}
 	return status_code;
 }
@@ -222,8 +202,7 @@ StatusCode Method::FileCreationHandlerForMultiPart(
 	const std::string  &path,
 	const std::string  &request_body_message,
 	const HeaderFields &request_header_fields,
-	std::string        &response_body_message,
-	HeaderFields       &response_header_fields
+	std::string        &response_body_message
 ) {
 	std::vector<Method::Part> parts =
 		DecodeMultipartFormData(request_header_fields.at(CONTENT_TYPE), request_body_message);
@@ -241,19 +220,17 @@ StatusCode Method::FileCreationHandlerForMultiPart(
 		std::string file_name = content_disposition[FILENAME];
 		std::string file_path = path + "/" + file_name;
 		// upload_dir + "/" + file_name にファイルを作成
-		FileCreationHandler(file_path, (*it).body, response_body_message, response_header_fields);
+		FileCreationHandler(file_path, (*it).body, response_body_message);
 	}
 	StatusCode status_code(CREATED);
-	response_body_message                  = HttpResponse::CreateDefaultBodyMessage(status_code);
-	response_header_fields[CONTENT_LENGTH] = utils::ToString(response_body_message.length());
+	response_body_message = HttpResponse::CreateDefaultBodyMessage(status_code);
 	return status_code;
 }
 
 StatusCode Method::FileCreationHandler(
 	const std::string &path,
 	const std::string &request_body_message,
-	std::string       &response_body_message,
-	HeaderFields      &response_header_fields
+	std::string       &response_body_message
 ) {
 	std::ofstream file(path.c_str(), std::ios::binary);
 	if (file.fail()) {
@@ -268,8 +245,7 @@ StatusCode Method::FileCreationHandler(
 		throw HttpException("Error: Forbidden", StatusCode(FORBIDDEN));
 	}
 	StatusCode status_code(CREATED);
-	response_body_message                  = HttpResponse::CreateDefaultBodyMessage(status_code);
-	response_header_fields[CONTENT_LENGTH] = utils::ToString(response_body_message.length());
+	response_body_message = HttpResponse::CreateDefaultBodyMessage(status_code);
 	return status_code;
 }
 
@@ -374,12 +350,9 @@ utils::Result<std::string> Method::AutoindexHandler(const std::string &path) {
 }
 
 StatusCode Method::EchoPostHandler(
-	const std::string &request_body_message,
-	std::string       &response_body_message,
-	HeaderFields      &response_header_fields
+	const std::string &request_body_message, std::string &response_body_message
 ) {
-	response_body_message                  = request_body_message;
-	response_header_fields[CONTENT_LENGTH] = utils::ToString(response_body_message.length());
+	response_body_message = request_body_message;
 	return StatusCode(OK);
 }
 

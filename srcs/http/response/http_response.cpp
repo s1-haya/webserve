@@ -125,8 +125,8 @@ HttpResponseFormat HttpResponse::CreateHttpResponseFormat(
 		} else {
 			response_body_message = CreateDefaultBodyMessage(status_code);
 		}
-		response_header_fields[CONTENT_LENGTH] = utils::ToString(response_body_message.length());
 	}
+	response_header_fields[CONTENT_LENGTH] = utils::ToString(response_body_message.length());
 	return HttpResponseFormat(
 		StatusLine(HTTP_VERSION, status_code.GetStatusCode(), status_code.GetReasonPhrase()),
 		response_header_fields,

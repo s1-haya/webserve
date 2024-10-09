@@ -25,11 +25,11 @@ class Method {
 					 bool                autoindex_on,
 					 const std::string  &upload_directory
 				 );
-	static bool IsSupportedMethod(const std::string &method);
 	static bool
 	IsAllowedMethod(const std::string &method, const std::list<std::string> &allow_methods);
 
   private:
+	static bool       IsSupportedMethod(const std::string &method);
 	static StatusCode GetHandler(
 		const std::string &path,
 		std::string       &body_message,
@@ -42,35 +42,25 @@ class Method {
 		const std::string  &request_body_message,
 		const HeaderFields &request_header_fields,
 		std::string        &response_body_message,
-		HeaderFields       &response_header_fields,
 		const std::string  &upload_directory
 	);
-	static StatusCode DeleteHandler(
-		const std::string &path,
-		std::string       &response_body_message,
-		HeaderFields      &response_header_fields
-	);
+	static StatusCode  DeleteHandler(const std::string &path, std::string &response_body_message);
 	static Stat        TryStat(const std::string &path);
 	static std::string ReadFile(const std::string &file_path);
 	static void        SystemExceptionHandler(int error_number);
 	static StatusCode  FileCreationHandler(
 		 const std::string &path,
 		 const std::string &request_body_message,
-		 std::string       &response_body_message,
-		 HeaderFields      &response_header_fields
+		 std::string       &response_body_message
 	 );
 	static StatusCode FileCreationHandlerForMultiPart(
 		const std::string  &path,
 		const std::string  &request_body_message,
 		const HeaderFields &request_header_fields,
-		std::string        &response_body_message,
-		HeaderFields       &response_header_fields
+		std::string        &response_body_message
 	);
-	static StatusCode EchoPostHandler(
-		const std::string &request_body_message,
-		std::string       &response_body_message,
-		HeaderFields      &response_header_fields
-	);
+	static StatusCode
+	EchoPostHandler(const std::string &request_body_message, std::string &response_body_message);
 	static utils::Result<std::string> AutoindexHandler(const std::string &path);
 
 	// マルチパート用のパートを表す構造体

@@ -8,7 +8,7 @@
 namespace config {
 namespace parser {
 
-Parser::Parser(std::list<node::Node> &tokens) : tokens_(tokens) {
+Parser::Parser(const std::list<node::Node> &tokens) : tokens_(tokens) {
 	ParseNode();
 }
 
@@ -192,7 +192,7 @@ void Parser::HandleErrorPage(std::pair<unsigned int, std::string> &error_page, N
 	}
 	// ex. 404 /404.html
 	NodeItr tmp_it = it; // 404
-	it++;                // /404.html
+	++it;                // /404.html
 	utils::Result<unsigned int> status_code = utils::ConvertStrToUint((*tmp_it).token);
 	if (!status_code.IsOk() || status_code.GetValue() < STATUS_CODE_MIN ||
 		status_code.GetValue() > STATUS_CODE_MAX) {
@@ -348,7 +348,7 @@ void Parser::HandleReturn(std::pair<unsigned int, std::string> &redirect, NodeIt
 	}
 	// ex. 302 /index.html
 	NodeItr tmp_it = it; // 302
-	it++;                // /index.html
+	++it;                // /index.html
 	utils::Result<unsigned int> status_code = utils::ConvertStrToUint((*tmp_it).token);
 	if (!status_code.IsOk() || status_code.GetValue() < STATUS_CODE_MIN ||
 		status_code.GetValue() > STATUS_CODE_MAX) {

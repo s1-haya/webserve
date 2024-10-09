@@ -138,9 +138,4 @@ bool Http::IsHttpRequestFormatComplete(int client_fd) {
 		   save_data.is_request_format.is_body_message;
 }
 
-// For test
-HttpRequestParsedData Http::GetClientData(int client_fd) {
-	return storage_.GetClientSaveData(client_fd);
-}
-
 } // namespace http
