@@ -45,7 +45,7 @@ def receive_with_timeout(sock) -> Optional[str]:
 
 # ------------------------------------------------------------------------------
 # 通常のkeep-aliveを送信(各関数の説明付き)
-def test_timeout_keep_alive() -> None:
+def test_01_timeout_keep_alive() -> None:
     try:
         con = HTTPConnection("localhost", SERVER_PORT)
         # serverに接続
@@ -84,7 +84,7 @@ def test_timeout_keep_alive() -> None:
             con.close()
 
 
-def test_timeout_incomplete_request() -> None:
+def test_02_timeout_incomplete_request() -> None:
     try:
         con = HTTPConnection("localhost", SERVER_PORT)
         con.connect()
@@ -107,7 +107,7 @@ def test_timeout_incomplete_request() -> None:
             con.close()
 
 
-def test_timeout_no_request() -> None:
+def test_03_timeout_no_request() -> None:
     try:
         con = HTTPConnection("localhost", SERVER_PORT)
         con.connect()
@@ -130,7 +130,7 @@ def test_timeout_no_request() -> None:
 
 
 # serverがその後も正常に動いていればOK
-def test_incomplete_request_disconnect() -> None:
+def test_04_incomplete_request_disconnect() -> None:
     try:
         con = HTTPConnection("localhost", SERVER_PORT)
         con.connect()
@@ -150,7 +150,7 @@ def test_incomplete_request_disconnect() -> None:
 
 
 # serverがその後も正常に動いていればOK
-def test_timeout_no_request_disconnect() -> None:
+def test_05_timeout_no_request_disconnect() -> None:
     try:
         con = HTTPConnection("localhost", SERVER_PORT)
         con.connect()
@@ -196,7 +196,7 @@ def create_json_request(json_data) -> Tuple[str, Mapping[str, str]]:
     return create_json_body(), create_headers(APPLICATION_JSON)
 
 
-def test_content_type_post_json_and_get_json() -> None:
+def test_06_content_type_post_json_and_get_json() -> None:
     delete_file(JSON_FULL_PATH)
 
     try:
@@ -235,7 +235,7 @@ UNKNOWN_FILENAME, UNKNOWN_DATA = (
 UNKNOWN_FULL_PATH = ROOT_DIR + UPLOAD_DIR + UNKNOWN_FILENAME
 
 
-def test_content_type_post_unknown_and_get() -> None:
+def test_07_content_type_post_unknown_and_get() -> None:
     delete_file(UNKNOWN_FULL_PATH)
 
     try:
