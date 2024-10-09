@@ -1,14 +1,24 @@
+import json
 import socket
+from http import HTTPStatus
 from http.client import HTTPConnection, HTTPException
-from typing import Optional
+from typing import Mapping, Optional, Tuple
 
-from common_functions import SERVER_PORT, assert_response
+from common_functions import SERVER_PORT, assert_response, delete_file
 from common_response import (response_header_get_root_200_keep,
                              root_index_file, timeout_response)
+from http_module.assert_http_response import assert_header, assert_status_line
 
 # serverのtimeout+αを設定する
 TIMEOUT = 4.0
 BUFFER_SIZE = 1024
+
+ROOT_DIR = "root/"
+UPLOAD_DIR = "upload/"
+
+CONTENT_TYPE = "Content-Type"
+CONTENT_LENGTH = "Content-Length"
+APPLICATION_JSON = "application/json"
 
 
 def receive_with_timeout(sock) -> Optional[str]:
@@ -153,3 +163,62 @@ def test_timeout_no_request_disconnect() -> None:
     finally:
         if con:
             con.close()
+
+
+JSON_FILENAME, JSON_DATA = (
+    "webserv.json",
+    {
+        "name": "webserv",
+        "team": {
+            "members": 3,
+        },
+    },
+)
+JSON_FULL_PATH = ROOT_DIR + UPLOAD_DIR + JSON_FILENAME
+
+
+def create_json_request(json_data) -> Tuple[str, Mapping[str, str]]:
+    def create_json_body() -> str:
+        # jsonを文字列に変換し、byte列にencode
+        encoded_json_data = json.dumps(json_data)
+        return encoded_json_data
+
+    # content-lengthは自動で入る
+    def create_headers() -> Mapping[str, str]:
+        headers = {}
+        headers[CONTENT_TYPE] = APPLICATION_JSON
+        return headers
+
+    return create_json_body(), create_headers()
+
+
+def test_content_type_post_json_and_get_json() -> None:
+    delete_file(JSON_FULL_PATH)
+
+    try:
+        con = HTTPConnection("localhost", SERVER_PORT)
+
+        # JSONをPOSTしてuploadしておく
+        con.request(
+            "POST", "/" + UPLOAD_DIR + JSON_FILENAME, *create_json_request(JSON_DATA)
+        )
+
+        response = con.getresponse()
+        # 201 Created のbodyを読む
+        response.read()
+
+        # GET JSONしてContent-Typeがjsonかどうかをassert
+        con.request("GET", "/" + UPLOAD_DIR + JSON_FILENAME)
+        response = con.getresponse()
+
+        assert_status_line(response, HTTPStatus.OK)
+        assert_header(response, CONTENT_TYPE, APPLICATION_JSON)
+        assert response.read() == json.dumps(JSON_DATA).encode("utf-8")
+
+    except HTTPException as e:
+        print(f"Request failed: {e}")
+        raise AssertionError
+    finally:
+        if con:
+            con.close()
+        delete_file(JSON_FULL_PATH)
