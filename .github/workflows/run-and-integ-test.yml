@@ -1,4 +1,4 @@
-name: build-and-integ-test
+name: run-and-integ-test
 
 on:
   push:

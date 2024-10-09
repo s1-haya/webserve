@@ -100,7 +100,7 @@ unit:
 
 .PHONY	: e2e
 e2e:
-	@pytest -v ./test/webserv/integration
+	@pytest -v ./test/webserv/integration --ignore=./test/webserv/integration/test_routing.py
 
 #--------------------------------------------
 

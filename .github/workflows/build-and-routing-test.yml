@@ -1,0 +1,43 @@
+name: build-and-routing-test
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.8.2
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3=3.8.2-0ubuntu2 python3-pip=20.0.2-5ubuntu1.10
+
+      - name: Upgrade pip and install pip-tools
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install --no-cache-dir pip-tools==7.4.1
+      
+      - name: Install Python dependencies
+        run: |
+          pip-compile requirements.in --strip-extras
+          pip-sync
+
+      - name: Build webserv
+        run:
+          make
+
+      - name: Run routing tests
+        run:
+          pytest -v test/webserv/integration/test_routing.py
