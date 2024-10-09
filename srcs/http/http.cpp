@@ -5,9 +5,19 @@
 #include "http_result.hpp"
 #include "http_storage.hpp"
 #include "status_code.hpp"
+#include "utils.hpp"
 #include <iostream>
 
 namespace http {
+namespace {
+
+std::string CreateLocalRedirectRequest(const std::string &location, const std::string &host) {
+	std::string response;
+	response += "GET " + location + " HTTP/1.1\r\nHost: " + host + "\r\n\r\n";
+	return response;
+}
+
+} // namespace
 
 Http::Http() {}
 
@@ -34,12 +44,23 @@ HttpResult Http::GetResponseFromCgi(int client_fd, const cgi::CgiResponse &cgi_r
 	if (!cgi_parse_result.IsOk()) {
 		return GetErrorResponse(client_fd, INTERNAL_ERROR);
 	}
-	HttpRequestParsedData data = storage_.GetClientSaveData(client_fd);
-
+	HttpRequestParsedData               data          = storage_.GetClientSaveData(client_fd);
+	cgi::CgiResponseParse::HeaderFields header_fields = cgi_parse_result.GetValue().header_fields;
+	if (header_fields.find(LOCATION) != header_fields.end() &&
+		utils::StartWith(header_fields[LOCATION], "/")) {
+		// Hostがないリクエストヘッダはエラーで弾かれている
+		result.request_buf =
+			CreateLocalRedirectRequest(
+				header_fields[LOCATION], data.request_result.request.header_fields.at(HOST)
+			) +
+			data.current_buf;
+		result.is_response_complete = false;
+	} else {
+		result.request_buf          = data.current_buf;
+		result.is_response_complete = true;
+	}
 	result.is_connection_keep =
 		HttpResponse::IsConnectionKeep(data.request_result.request.header_fields);
-	result.is_response_complete = true;
-	result.request_buf          = data.current_buf;
 	result.response =
 		HttpResponse::GetResponseFromCgi(cgi_parse_result.GetValue(), data.request_result);
 	storage_.DeleteClientSaveData(client_fd);

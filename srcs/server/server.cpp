@@ -172,6 +172,8 @@ void Server::HandleExistingConnection(const event::Event &event) {
 	}
 	// Call RunHttpAndCgi() if request_buf contains data, even without a read event.
 	if (IsHttpRequestBufExist(event.fd)) {
+		// 何かしらeventが発生しないとここ(http_.Run()が呼ばれない作りになってる
+		// -> event監視と別で、request_bufがあるclientは全部http_.Run()を呼ぶなどした方が良いのかも
 		RunHttpAndCgi(event);
 	}
 }
@@ -308,6 +310,11 @@ void Server::HandleWriteEvent(int fd) {
 }
 
 void Server::SendHttpResponse(int client_fd) {
+	// local_redirect後にEVENT_WRITEセットしたらresponseがなくても入ってくるようになってしまう
+	if (!message_manager_.IsResponseExist(client_fd)) {
+		return;
+	}
+
 	message::Response              response         = message_manager_.PopHeadResponse(client_fd);
 	const message::ConnectionState connection_state = response.connection_state;
 	const std::string             &response_str     = response.response_str;
@@ -626,11 +633,17 @@ Server::CgiResponseResult Server::AddAndGetCgiResponse(int client_fd, const std:
 }
 
 void Server::GetHttpResponseFromCgiResponse(int client_fd, const cgi::CgiResponse &cgi_response) {
-	const http::HttpResult http_result = http_.GetResponseFromCgi(client_fd, cgi_response);
+	http::HttpResult http_result = http_.GetResponseFromCgi(client_fd, cgi_response);
 
+	// http_.Run()の後とほぼ同じ処理になる
 	message_manager_.SetNewRequestBuf(client_fd, http_result.request_buf);
 	if (!http_result.is_response_complete) {
-		throw std::logic_error("GetResponseFromCgi: incorrect HttpResult");
+		std::cout << "request_buf: " << message_manager_.GetRequestBuf(client_fd) << std::endl;
+		message_manager_.SetIsCompleteRequest(client_fd, false);
+		// 	今だと何かしらeventが起きないとhttp_.Run()が呼ばれない流れになってるので仮にEVENT_WRITEを登録する(良くはない)
+		ReplaceEvent(client_fd, event::EVENT_WRITE);
+		utils::Debug("server", "received local redirect request from client", client_fd);
+		return;
 	}
 	message_manager_.SetIsCompleteRequest(client_fd, true);
 	utils::Debug("server", "received all request from client", client_fd);
