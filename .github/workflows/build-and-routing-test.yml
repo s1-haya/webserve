@@ -1,4 +1,4 @@
-name: build-and-integ-test
+name: build-and-routing-test
 
 on:
   push:
@@ -8,21 +8,21 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     timeout-minutes: 10
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Python 3.8
+      - name: Set up Python 3.10
         uses: actions/setup-python@v4
         with:
-          python-version: 3.8.2
+          python-version: 3.10.6
 
       - name: Install system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y python3=3.8.2-0ubuntu2 python3-pip=20.0.2-5ubuntu1.10
+          sudo apt-get install -y python3-pip
 
       - name: Upgrade pip and install pip-tools
         run: |
@@ -34,18 +34,18 @@ jobs:
           pip-compile requirements.in --strip-extras
           pip-sync
 
-      - name: Run webserv
-        run:
-          make run-webserv-for-test
+      - name: Build webserv
+        run: |
+          set -e
+          make
 
-      - name: Wait for webserv to start
-        run:
-          sleep 3
+      - name: Run routing tests
+        run: |
+          set -e
+          pytest -v test/webserv/integration/test_routing.py > routing_test_results.txt
 
-      - name: Check whether webserv is running
-        run:
-          make is-running
-
-      - name: Run e2e tests
-        run:
-          make e2e
+      - name: Upload test results
+        uses: actions/upload-artifact@v3
+        with:
+          name: routing-test-results
+          path: routing_test_results.txt

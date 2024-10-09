@@ -1,3 +1,5 @@
+import subprocess
+import time
 import unittest
 from http import HTTPStatus
 from http.client import HTTPConnection, HTTPException, HTTPResponse
@@ -30,11 +32,32 @@ def assert_status_line_without_reason_phrase(
     assert response.version == 11, f"Expected version 1.1, but got {response.version}"
 
 
-# Host2はコンテナ外からアクセスできないのでHost3を使う
+# config/routing_test.confを用いたテスト
 class TestServerRouting(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        # クラス全体のセットアップ
+        cls.process = subprocess.Popen(
+            ["./webserv", "config/routing_test.conf"],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+        )
+        time.sleep(2)  # サーバーが起動するのを待つ
+
+    @classmethod
+    def tearDownClass(cls):
+        # クラス全体のクリーンアップ
+        cls.process.terminate()
+        try:
+            cls.process.wait(timeout=5)
+        except subprocess.TimeoutExpired:
+            cls.process.kill()
+            cls.process.wait()
+
     def setUp(self):
         # 各テストの前に実行される(unittestの機能)
-        self.con = HTTPConnection("localhost", 8080)  # todo: 定数に
+        self.con = HTTPConnection("localhost", 9000)  # configに依存
 
     def tearDown(self):
         # 各テストの後に実行される(unittestの機能)
@@ -48,6 +71,24 @@ class TestServerRouting(unittest.TestCase):
             assert_status_line(response, HTTPStatus.OK)
             assert_header(response, "Connection", "keep-alive")
             assert_body(response, "root/html/index.html")
+        except HTTPException as e:
+            self.fail(f"Request failed: {e}")
+
+    def test_post_root_host1(self):
+        try:
+            body = "This is a test payload"
+            headers = {
+                "Host": "no_exist_host",
+                "Content-Type": "text/plain",
+                "Content-Length": str(len(body)),
+            }
+            self.con.request("POST", "/a", headers=headers, body=body)
+            response = self.con.getresponse()
+            # サーバーで設定されているものと違うため, Phraseとbodyはチェックしない
+            assert_status_line_without_reason_phrase(
+                response, HTTPStatus.REQUEST_ENTITY_TOO_LARGE
+            )
+            assert_header(response, "Connection", "keep-alive")
         except HTTPException as e:
             self.fail(f"Request failed: {e}")
 

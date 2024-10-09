@@ -8,12 +8,19 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     timeout-minutes: 10
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Run unit tests
-        run:
-          make unit
+        run: |
+          set -e
+          make unit > unit_test_results.txt
+
+      - name: Upload unit test results
+        uses: actions/upload-artifact@v3
+        with:
+          name: unit-test-results
+          path: unit_test_results.txt
