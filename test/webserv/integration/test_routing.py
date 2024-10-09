@@ -1,4 +1,6 @@
 import unittest
+import subprocess
+import time
 from http import HTTPStatus
 from http.client import HTTPConnection, HTTPException, HTTPResponse
 
@@ -32,6 +34,18 @@ def assert_status_line_without_reason_phrase(
 
 # Host2はコンテナ外からアクセスできないのでHost3を使う
 class TestServerRouting(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        # クラス全体のセットアップ
+        cls.process = subprocess.Popen(["./webserv"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        time.sleep(2)  # サーバーが起動するのを待つ
+
+    @classmethod
+    def tearDownClass(cls):
+        # クラス全体のクリーンアップ
+        cls.process.terminate()
+        cls.process.wait()
+
     def setUp(self):
         # 各テストの前に実行される(unittestの機能)
         self.con = HTTPConnection("localhost", 8080)  # todo: 定数に
