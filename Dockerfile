@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM ubuntu:22.04
 
 # 非対話的モードを設定
 ENV DEBIAN_FRONTEND=noninteractive
