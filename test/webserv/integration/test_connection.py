@@ -1,5 +1,6 @@
 import json
 import socket
+import unittest
 from http import HTTPStatus
 from http.client import HTTPConnection, HTTPException
 from typing import Mapping, Optional, Tuple
@@ -44,109 +45,93 @@ def receive_with_timeout(sock) -> Optional[str]:
 
 
 # ------------------------------------------------------------------------------
-# 通常のkeep-aliveを送信(各関数の説明付き)
-def test_01_timeout_keep_alive() -> None:
-    try:
-        con = HTTPConnection("localhost", SERVER_PORT)
-        # serverに接続
-        con.connect()
+# connect()してsend(),recv()を使うテスト
+class TestConnection01(unittest.TestCase):
+    def setUp(self):
+        # 各テストの前に実行される(unittestの機能)
+        self.con = HTTPConnection("localhost", SERVER_PORT)
+        self.con.connect()
 
-        # request送信
-        con.sock.send(
-            b"GET / HTTP/1.1\r\nHost: localhost\r\nConnection: keep-alive\r\n\r\n"
-        )
+    def tearDown(self):
+        # 各テストの後に実行される(unittestの機能)
+        if self.con:
+            self.con.close()
 
-        # serverからのresponseを読み込む
-        response = receive_with_timeout(con.sock)
-        if response is None:
-            # timeout秒経過していたらNG
-            raise AssertionError
-        else:
-            # serverが200 OKを返したことを確認
-            assert_response(
-                response, response_header_get_root_200_keep + root_index_file
+    # 通常のkeep-aliveを送信(各関数の説明付き)
+    def test_01_timeout_keep_alive(self) -> None:
+        try:
+            # request送信
+            self.con.sock.send(
+                b"GET / HTTP/1.1\r\nHost: localhost\r\nConnection: keep-alive\r\n\r\n"
             )
 
-        # 再度responseを読み込み
-        next_response = receive_with_timeout(con.sock)
-        if next_response is None:
-            # timeout秒経過していたらNG
+            # serverからのresponseを読み込む
+            response = receive_with_timeout(self.con.sock)
+            if response is None:
+                # timeout秒経過していたらNG
+                raise AssertionError
+            else:
+                # serverが200 OKを返したことを確認
+                assert_response(
+                    response, response_header_get_root_200_keep + root_index_file
+                )
+
+            # 再度responseを読み込み
+            next_response = receive_with_timeout(self.con.sock)
+            if next_response is None:
+                # timeout秒経過していたらNG
+                raise AssertionError
+            else:
+                # timeout秒経過前にserverから何も送られてこなかったらOK(接続が切れたという判断はできないかも？)
+                assert len(next_response) == 0
+
+        except HTTPException as e:
+            print(f"Request failed: {e}")
             raise AssertionError
-        else:
-            # timeout秒経過前にserverから何も送られてこなかったらOK(接続が切れたという判断はできないかも？)
-            assert len(next_response) == 0
 
-    except HTTPException as e:
-        print(f"Request failed: {e}")
-        raise AssertionError
-    finally:
-        if con:
-            con.close()
+    def test_02_timeout_incomplete_request(self) -> None:
+        try:
+            # 完全ではないrequestを送信
+            self.con.sock.send(b"GET / HTTP/1.1\r\nHost: localhost\r\nConnectio")
 
+            response = receive_with_timeout(self.con.sock)
+            if response is None:
+                raise AssertionError
+            else:
+                # serverがtimeout responseを返したことを確認
+                assert_response(response, timeout_response)
 
-def test_02_timeout_incomplete_request() -> None:
-    try:
-        con = HTTPConnection("localhost", SERVER_PORT)
-        con.connect()
-
-        # 完全ではないrequestを送信
-        con.sock.send(b"GET / HTTP/1.1\r\nHost: localhost\r\nConnectio")
-
-        response = receive_with_timeout(con.sock)
-        if response is None:
+        except HTTPException as e:
+            print(f"Request failed: {e}")
             raise AssertionError
-        else:
-            # serverがtimeout responseを返したことを確認
-            assert_response(response, timeout_response)
 
-    except HTTPException as e:
-        print(f"Request failed: {e}")
-        raise AssertionError
-    finally:
-        if con:
-            con.close()
+    def test_03_timeout_no_request(self) -> None:
+        try:
+            # requestを何も送らない
 
+            response = receive_with_timeout(self.con.sock)
+            if response is None:
+                raise AssertionError
+            else:
+                # serverが何も送らず接続を切断したらOK
+                assert len(response) == 0
 
-def test_03_timeout_no_request() -> None:
-    try:
-        con = HTTPConnection("localhost", SERVER_PORT)
-        con.connect()
-
-        # requestを何も送らない
-
-        response = receive_with_timeout(con.sock)
-        if response is None:
+        except HTTPException as e:
+            print(f"Request failed: {e}")
             raise AssertionError
-        else:
-            # serverが何も送らず接続を切断したらOK
-            assert len(response) == 0
 
-    except HTTPException as e:
-        print(f"Request failed: {e}")
-        raise AssertionError
-    finally:
-        if con:
-            con.close()
+    # serverがその後も正常に動いていればOK
+    def test_04_incomplete_request_disconnect(self) -> None:
+        try:
+            # 完全ではないrequestを送信
+            self.con.sock.send(b"GET / HTTP/1.1\r\nHost: localhost\r\nConnectio")
 
+            # 完全なリクエストを送る前に接続を切断
+            self.con.close()
 
-# serverがその後も正常に動いていればOK
-def test_04_incomplete_request_disconnect() -> None:
-    try:
-        con = HTTPConnection("localhost", SERVER_PORT)
-        con.connect()
-
-        # 完全ではないrequestを送信
-        con.sock.send(b"GET / HTTP/1.1\r\nHost: localhost\r\nConnectio")
-
-        # 完全なリクエストを送る前に接続を切断
-        con.close()
-
-    except HTTPException as e:
-        print(f"Request failed: {e}")
-        raise AssertionError
-    finally:
-        if con:
-            con.close()
+        except HTTPException as e:
+            print(f"Request failed: {e}")
+            raise AssertionError
 
 
 # serverがその後も正常に動いていればOK
