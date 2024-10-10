@@ -1,7 +1,7 @@
 import pytest
 from common_functions import send_request_and_assert_response
 from common_response import (bad_request_response, not_allowed_response,
-                             not_found_response_close,
+                             not_found_response_close, not_found_response_keep,
                              not_implemented_response,
                              response_header_get_root_200_close,
                              response_header_get_root_200_keep,
@@ -200,6 +200,10 @@ def test_get_2xx_responses(request_file, expected_response):
         ),
         (REQUEST_GET_4XX_DIR + "404_01_not_exist_path.txt", not_found_response_close),
         (
+            REQUEST_GET_4XX_DIR + "404_02_not_exist_path_keep_alive.txt",
+            not_found_response_keep,
+        ),
+        (
             REQUEST_GET_4XX_DIR + "405_01_method_not_allowed_for_uri.txt",
             not_allowed_response,
         ),
@@ -238,6 +242,7 @@ def test_get_2xx_responses(request_file, expected_response):
         "400_23_non_vchr_request_target",
         "400_24_non_vchr_http_version",
         "404_01_not_exist_path",
+        "404_02_not_exist_path_keep_alive",
         "405_01_method_not_allowed_for_uri",
         "408_01_no_crlf",
         "408_02_only_space",
