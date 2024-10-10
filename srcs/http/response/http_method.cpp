@@ -65,7 +65,7 @@ StatusCode Method::Handler(
 	HeaderFields       &response_header_fields,
 	const std::string  &index_file_path,
 	bool                autoindex_on,
-	const std::string  &upload_directory
+	const std::string  &file_upload_path
 ) {
 	StatusCode status_code(OK);
 	if (!IsSupportedMethod(method)) {
@@ -80,11 +80,7 @@ StatusCode Method::Handler(
 		);
 	} else if (method == POST) {
 		status_code = PostHandler(
-			path,
-			request_body_message,
-			request_header_fields,
-			response_body_message,
-			upload_directory
+			file_upload_path, request_body_message, request_header_fields, response_body_message
 		);
 	} else if (method == DELETE) {
 		status_code = DeleteHandler(path, response_body_message);
@@ -133,33 +129,25 @@ StatusCode Method::GetHandler(
 }
 
 StatusCode Method::PostHandler(
-	const std::string  &path,
+	const std::string  &file_upload_path,
 	const std::string  &request_body_message,
 	const HeaderFields &request_header_fields,
-	std::string        &response_body_message,
-	const std::string  &upload_directory
+	std::string        &response_body_message
 ) {
-	// ex. test.txt
-	const std::string file_name = path.substr(path.find_last_of('/') + 1);
-	// ex. srcs/http/response/http_serverinfo_check/../../../../root
-	const std::string root_path = path.substr(0, path.find("root/") + 4);
-	// ex. srcs/http/response/http_serverinfo_check/../../../../root/save/test.txt
-	const std::string upload_dir_path  = root_path + upload_directory;
-	const std::string upload_file_path = upload_dir_path + "/" + file_name;
 
-	if (upload_directory.empty()) {
+	if (file_upload_path.empty()) {
 		return EchoPostHandler(request_body_message, response_body_message);
 	} else if (request_header_fields.find(CONTENT_TYPE) != request_header_fields.end() &&
 			   utils::StartWith(request_header_fields.at(CONTENT_TYPE), MULTIPART_FORM_DATA)) {
 		// Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
 		// のようにContent-Typeがmultipart/form-dataの場合
 		return FileCreationHandlerForMultiPart(
-			upload_dir_path, request_body_message, request_header_fields, response_body_message
+			file_upload_path, request_body_message, request_header_fields, response_body_message
 		);
-	} else if (!IsExistPath(upload_file_path)) {
-		return FileCreationHandler(upload_file_path, request_body_message, response_body_message);
+	} else if (!IsExistPath(file_upload_path)) {
+		return FileCreationHandler(file_upload_path, request_body_message, response_body_message);
 	}
-	const Stat &info = TryStat(upload_file_path);
+	const Stat &info = TryStat(file_upload_path);
 	StatusCode  status_code(NO_CONTENT);
 	if (info.IsDirectory()) {
 		throw HttpException("Error: Forbidden", StatusCode(FORBIDDEN));
@@ -234,7 +222,7 @@ StatusCode Method::FileCreationHandler(
 ) {
 	std::ofstream file(path.c_str(), std::ios::binary);
 	if (file.fail()) {
-		throw HttpException("Error: Forbidden", StatusCode(FORBIDDEN));
+		SystemExceptionHandler(errno);
 	}
 	file.write(request_body_message.c_str(), request_body_message.length());
 	if (file.fail()) {
@@ -242,7 +230,7 @@ StatusCode Method::FileCreationHandler(
 		if (std::remove(path.c_str()) == SYSTEM_ERROR) {
 			SystemExceptionHandler(errno);
 		}
-		throw HttpException("Error: Forbidden", StatusCode(FORBIDDEN));
+		SystemExceptionHandler(errno);
 	}
 	StatusCode status_code(CREATED);
 	response_body_message = HttpResponse::CreateDefaultBodyMessage(status_code);

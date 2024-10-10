@@ -23,7 +23,7 @@ struct MethodArgument {
 		http::HeaderFields               &response_header_fields,
 		const std::string                &index_file_path  = "",
 		bool                              autoindex_on     = false,
-		const std::string                &upload_directory = "/upload"
+		const std::string                &upload_file_path = ""
 	)
 		: path(path),
 		  method(method),
@@ -34,7 +34,7 @@ struct MethodArgument {
 		  response_header_fields(response_header_fields),
 		  index_file_path(index_file_path),
 		  autoindex_on(autoindex_on),
-		  upload_directory(upload_directory) {
+		  upload_file_path(upload_file_path) {
 		response_body_message.clear();
 	}
 	const std::string                &path;
@@ -46,7 +46,7 @@ struct MethodArgument {
 	http::HeaderFields               &response_header_fields;
 	const std::string                &index_file_path;
 	bool                              autoindex_on;
-	const std::string                &upload_directory;
+	const std::string                &upload_file_path;
 };
 
 std::string LoadFileContent(const std::string &file_path) {
@@ -142,7 +142,7 @@ int MethodHandlerResult(const MethodArgument &srcs, const std::string &expected_
 			srcs.response_header_fields,
 			srcs.index_file_path,
 			srcs.autoindex_on,
-			srcs.upload_directory
+			srcs.upload_file_path
 		);
 		result = HandleResult(srcs.response_body_message, expected_body_message);
 
@@ -289,7 +289,7 @@ int main(void) {
 			response_header_fields,
 			"",
 			false,
-			"/directory"
+			"root/directory/200_ok.txt"
 		),
 		expected_created
 	);
@@ -307,7 +307,7 @@ int main(void) {
 			response_header_fields,
 			"",
 			false,
-			"/directory"
+			"root/directory/200_ok.txt"
 		),
 		expected_no_content
 	);
@@ -325,7 +325,7 @@ int main(void) {
 			response_header_fields,
 			"",
 			false,
-			"/upload"
+			"root/upload/200_ok.txt"
 		),
 		expected_created
 	);
@@ -339,7 +339,10 @@ int main(void) {
 			request,
 			request_header_fields,
 			response,
-			response_header_fields
+			response_header_fields,
+			"",
+			false,
+			"root/directory/"
 		),
 		expected_forbidden
 	);
