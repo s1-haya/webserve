@@ -46,6 +46,16 @@ std::string ReadErrorFile(const std::string &file_path) {
 	return ss.str();
 }
 
+bool IsErrorConnectionClose(EStatusCode status_code) {
+	return status_code == http::BAD_REQUEST || status_code == http::INTERNAL_SERVER_ERROR;
+}
+
+void SetErrorConnectionClose(HeaderFields &HeaderFields, EStatusCode status_code) {
+	if (IsErrorConnectionClose(status_code)) {
+		HeaderFields[CONNECTION] = CLOSE;
+	}
+}
+
 } // namespace
 
 std::string HttpResponse::Run(
@@ -127,6 +137,7 @@ HttpResponseFormat HttpResponse::CreateHttpResponseFormat(
 		}
 	}
 	response_header_fields[CONTENT_LENGTH] = utils::ToString(response_body_message.length());
+	SetErrorConnectionClose(response_header_fields, status_code.GetEStatusCode());
 	return HttpResponseFormat(
 		StatusLine(HTTP_VERSION, status_code.GetStatusCode(), status_code.GetReasonPhrase()),
 		response_header_fields,
