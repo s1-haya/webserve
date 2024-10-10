@@ -174,19 +174,25 @@ void HttpServerInfoCheck::CheckUploadPath(
 	if (location.upload_directory.empty()) {
 		return;
 	}
-	std::size_t pos = result.path.find(location.request_uri);
-	// ex. location.request_uri /www/ result.request_path /www/
-	if (result.path.length() <= pos + location.request_uri.length()) {
+
+	std::string location_uri = location.request_uri;
+	if (!location.alias.empty()) {
+		location_uri = location.alias;
+	}
+	std::size_t pos = result.path.find(location_uri);
+	// ex. location_uri /www/ result.request_path /www/
+	if (result.path.length() <= pos + location_uri.length()) {
+		result.file_upload_path = location_uri;
 		return;
 	}
 	// ex. test.txt, aa/bb/test.txt
 	std::string file_name;
-	if (utils::EndWith(location.request_uri, "/")) {
+	if (utils::EndWith(location_uri, "/")) {
 		// ex. location /www/ request /www/test.txt
-		file_name = result.path.substr(pos + location.request_uri.length());
+		file_name = result.path.substr(pos + location_uri.length());
 	} else {
 		// ex. location /www request /www/test.txt
-		file_name = result.path.substr(pos + location.request_uri.length() + 1);
+		file_name = result.path.substr(pos + location_uri.length() + 1);
 	}
 	// ex. upload/test.txt, upload/aa/bb/test.txt
 	const std::string file_upload_path = location.upload_directory + "/" + file_name;
