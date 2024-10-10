@@ -277,7 +277,8 @@ int Test3() {
 
 int Test4() {
 	// request
-	// "/web/"(locationそのもの)にリクエストを送る場合、upload_directoryは"/data"でupload_fileは""
+	// "/web/"(locationそのもの)にリクエストを送る場合、upload_directoryは"/data"でupload_fileは"/web/"
+	// (multipart/form-data 用)
 	HttpRequestFormat request;
 	request.request_line              = CreateRequestLine("POST", "/web/", "HTTP/1.1");
 	request.header_fields[HOST]       = "host2";
@@ -288,7 +289,7 @@ int Test4() {
 	const server::VirtualServer  *vs     = *(Next(virtual_servers.begin(), 1)); // host2
 	server::Location              location =
 		*(Next(vs->GetLocationList().begin(), 1)); // location2(cgi, upload_directory)
-	std::string upload_file_path = "";
+	std::string upload_file_path = "/web/";
 
 	try {
 		COMPARE(ExtractHttpServerInfoCheckPath(result.path), location.request_uri);
