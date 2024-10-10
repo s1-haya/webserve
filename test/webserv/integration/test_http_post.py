@@ -1,11 +1,11 @@
 import os
-import time
 
 import pytest
-from common_functions import read_file, send_request_and_assert_response
+from common_functions import (delete_file, read_file,
+                              send_request_and_assert_response)
 from common_response import (bad_request_response, created_response_close,
                              created_response_keep, no_content_response_close,
-                             payload_too_large_response,
+                             not_allowed_response, payload_too_large_response,
                              response_header_get_root_200_close,
                              root_index_file, timeout_response)
 
@@ -16,20 +16,6 @@ REQUEST_POST_4XX_DIR = REQUEST_DIR + "post/4xx/"
 UPLOAD_DIR = "root/upload/"
 UPLOAD_FILE_PATH = UPLOAD_DIR + "test_upload_file"
 CHUNKED_FILE_PATH = UPLOAD_DIR + "chunked_request_file"
-
-
-def delete_file(file_path):
-    if file_path is None:
-        return
-
-    try:
-        if os.path.exists(file_path):
-            os.remove(file_path)
-            time.sleep(1)
-            print(f"Deleted file: {file_path}")
-    except Exception as e:
-        print(f"Error deleting file: {file_path}, {e}")
-        raise AssertionError
 
 
 def assert_uploaded_file_content(upload_file_path, expected_upload_file_content):
@@ -197,6 +183,11 @@ def test_post_upload_responses(
             CHUNKED_FILE_PATH,
         ),
         (
+            REQUEST_POST_4XX_DIR + "405_01_method_not_allowed_for_uri.txt",
+            not_allowed_response,
+            None,
+        ),
+        (
             REQUEST_POST_4XX_DIR + "408_01_shortened_body_message.txt",
             timeout_response,
             UPLOAD_DIR + "shortened_body_message",
@@ -245,6 +236,7 @@ def test_post_upload_responses(
         "400_10_chunked_empty_chunk_data",
         "400_11_overflow_chunk_size_and_crlf",
         "400_12_only_too_large_chunk_size_early_check",
+        "405_01_method_not_allowed_for_uri",
         "408_01_shortened_body_message",
         "408_02_no_body_message",
         "408_03_incomplete_chunked_body",

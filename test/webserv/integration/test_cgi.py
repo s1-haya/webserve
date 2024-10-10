@@ -136,3 +136,11 @@ class TestCGI(unittest.TestCase):
             self.assertEqual(response.status, HTTPStatus.REQUEST_TIMEOUT)
         except HTTPException as e:
             self.fail(f"Request failed: {e}")
+
+    def test_not_allowed_method_delete_pl(self):
+        try:
+            self.con.request("DELETE", "/cgi-bin/print_ok.pl")
+            response = self.con.getresponse()
+            self.assertEqual(response.status, HTTPStatus.METHOD_NOT_ALLOWED)
+        except HTTPException as e:
+            self.fail(f"Request failed: {e}")

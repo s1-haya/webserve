@@ -1,5 +1,6 @@
 import os
 import subprocess
+import time
 
 SERVER_PORT = 8080
 
@@ -15,6 +16,20 @@ def read_file_binary(file):
     with open(file, "rb") as f:
         data = f.read()
     return data, len(data)
+
+
+def delete_file(file_path):
+    if file_path is None:
+        return
+
+    try:
+        if os.path.exists(file_path):
+            os.remove(file_path)
+            time.sleep(1)
+            print(f"Deleted file: {file_path}")
+    except Exception as e:
+        print(f"Error deleting file: {file_path}, {e}")
+        raise AssertionError
 
 
 def assert_response(response, expected_response):
