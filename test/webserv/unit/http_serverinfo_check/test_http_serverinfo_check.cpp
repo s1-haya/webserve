@@ -67,7 +67,7 @@ server::VirtualServer *BuildVirtualServer2() {
 	server::Location           location1 = // alias_on
 		BuildLocation("/www/data/", "/var/www/", "index.html", true, allowed_methods, redirect);
 	server::Location location2 = // cgi, upload_directory
-		BuildLocation("/web/", "", "index.htm", false, allowed_methods, redirect, ".php", "/data/");
+		BuildLocation("/web/", "", "index.htm", false, allowed_methods, redirect, ".php", "/data");
 	locationlist.push_back(location1);
 	locationlist.push_back(location2);
 
@@ -188,6 +188,7 @@ int Test1() {
 	CheckServerInfoResult         result   = HttpServerInfoCheck::Check(virtual_servers, request);
 	const server::VirtualServer  *vs       = virtual_servers.front();       // host1
 	server::Location              location = vs->GetLocationList().front(); // location1
+	std::string                   upload_file_path = "";
 
 	try {
 		COMPARE(ExtractHttpServerInfoCheckPath(result.path), location.request_uri);
@@ -195,7 +196,7 @@ int Test1() {
 		COMPARE(result.autoindex, location.autoindex);
 		COMPARE(result.allowed_methods, location.allowed_methods);
 		COMPARE(result.cgi_extension, location.cgi_extension);
-		COMPARE(result.upload_directory, location.upload_directory);
+		COMPARE(ExtractHttpServerInfoCheckPath(result.file_upload_path), upload_file_path);
 		COMPARE(result.redirect.GetValue(), location.redirect);
 		COMPARE(result.error_page.GetValue(), virtual_servers.front()->GetErrorPage());
 	} catch (const std::exception &e) {
@@ -220,13 +221,14 @@ int Test2() {
 	CheckServerInfoResult         result = HttpServerInfoCheck::Check(virtual_servers, request);
 	const server::VirtualServer  *vs     = virtual_servers.front();        // host1
 	server::Location location = *(Next(vs->GetLocationList().begin(), 1)); // location2(redirect)
+	std::string      upload_file_path = "";
 
 	try {
 		COMPARE(result.index, location.index);
 		COMPARE(result.autoindex, location.autoindex);
 		COMPARE(result.allowed_methods, location.allowed_methods);
 		COMPARE(result.cgi_extension, location.cgi_extension);
-		COMPARE(result.upload_directory, location.upload_directory);
+		COMPARE(ExtractHttpServerInfoCheckPath(result.file_upload_path), upload_file_path);
 		COMPARE(result.redirect.GetValue(), location.redirect);
 		COMPARE(result.error_page.GetValue(), virtual_servers.front()->GetErrorPage());
 	} catch (const std::exception &e) {
@@ -251,6 +253,7 @@ int Test3() {
 	CheckServerInfoResult         result   = HttpServerInfoCheck::Check(virtual_servers, request);
 	const server::VirtualServer  *vs       = *(Next(virtual_servers.begin(), 1)); // host2
 	server::Location              location = vs->GetLocationList().front(); // location1(alias)
+	std::string                   upload_file_path = ""; // upload_directoryはないので空文字
 
 	try {
 		COMPARE(ExtractHttpServerInfoCheckPath(result.path), location.alias + "test.html");
@@ -258,7 +261,7 @@ int Test3() {
 		COMPARE(result.autoindex, location.autoindex);
 		COMPARE(result.allowed_methods, location.allowed_methods);
 		COMPARE(result.cgi_extension, location.cgi_extension);
-		COMPARE(result.upload_directory, location.upload_directory);
+		COMPARE(ExtractHttpServerInfoCheckPath(result.file_upload_path), upload_file_path);
 		COMPARE(result.redirect.GetValue(), location.redirect);
 		COMPARE(result.error_page.GetValue(), virtual_servers.front()->GetErrorPage());
 	} catch (const std::exception &e) {
@@ -274,8 +277,10 @@ int Test3() {
 
 int Test4() {
 	// request
+	// "/web/"(locationそのもの)にリクエストを送る場合、upload_directoryは"/data"でupload_fileは"/web/"
+	// (multipart/form-data 用)
 	HttpRequestFormat request;
-	request.request_line              = CreateRequestLine("GET", "/web/", "HTTP/1.1");
+	request.request_line              = CreateRequestLine("POST", "/web/", "HTTP/1.1");
 	request.header_fields[HOST]       = "host2";
 	request.header_fields[CONNECTION] = KEEP_ALIVE;
 
@@ -284,6 +289,7 @@ int Test4() {
 	const server::VirtualServer  *vs     = *(Next(virtual_servers.begin(), 1)); // host2
 	server::Location              location =
 		*(Next(vs->GetLocationList().begin(), 1)); // location2(cgi, upload_directory)
+	std::string upload_file_path = "/web/";
 
 	try {
 		COMPARE(ExtractHttpServerInfoCheckPath(result.path), location.request_uri);
@@ -291,7 +297,42 @@ int Test4() {
 		COMPARE(result.autoindex, location.autoindex);
 		COMPARE(result.allowed_methods, location.allowed_methods);
 		COMPARE(result.cgi_extension, location.cgi_extension);
-		COMPARE(result.upload_directory, location.upload_directory);
+		COMPARE(ExtractHttpServerInfoCheckPath(result.file_upload_path), upload_file_path);
+		COMPARE(result.redirect.GetValue(), location.redirect);
+		COMPARE(result.error_page.GetValue(), virtual_servers.front()->GetErrorPage());
+	} catch (const std::exception &e) {
+		PrintNg();
+		utils::Debug(e.what());
+		DeleteVirtualServerAddrList(virtual_servers);
+		return EXIT_FAILURE;
+	}
+	PrintOk();
+	DeleteVirtualServerAddrList(virtual_servers);
+	return EXIT_SUCCESS;
+}
+
+int Test5() {
+	// request
+	HttpRequestFormat request;
+	// "/web/aa/bb"にリクエストを送る場合、upload_directoryは"/data"でupload_fileは"/data/aa/bb"
+	request.request_line              = CreateRequestLine("POST", "/web/aa/bb", "HTTP/1.1");
+	request.header_fields[HOST]       = "host2";
+	request.header_fields[CONNECTION] = KEEP_ALIVE;
+
+	server::VirtualServerAddrList virtual_servers = BuildVirtualServerAddrList();
+	CheckServerInfoResult         result = HttpServerInfoCheck::Check(virtual_servers, request);
+	const server::VirtualServer  *vs     = *(Next(virtual_servers.begin(), 1)); // host2
+	server::Location              location =
+		*(Next(vs->GetLocationList().begin(), 1)); // location2(cgi, upload_directory)
+	std::string upload_file_path = "/data/aa/bb";
+
+	try {
+		COMPARE(ExtractHttpServerInfoCheckPath(result.path), location.request_uri + "aa/bb");
+		COMPARE(result.index, location.index);
+		COMPARE(result.autoindex, location.autoindex);
+		COMPARE(result.allowed_methods, location.allowed_methods);
+		COMPARE(result.cgi_extension, location.cgi_extension);
+		COMPARE(ExtractHttpServerInfoCheckPath(result.file_upload_path), upload_file_path);
 		COMPARE(result.redirect.GetValue(), location.redirect);
 		COMPARE(result.error_page.GetValue(), virtual_servers.front()->GetErrorPage());
 	} catch (const std::exception &e) {
@@ -306,7 +347,7 @@ int Test4() {
 }
 
 // host3に"/"がないのでlocation NOFエラー
-int Test5() {
+int Test6() {
 	// request
 	const RequestLine request_line = {"GET", "/", "HTTP/1.1"};
 	HttpRequestFormat request;
@@ -330,7 +371,7 @@ int Test5() {
 }
 
 // client_max_body_sizeを超えたエラー
-int Test6() {
+int Test7() {
 	// request
 	const RequestLine request_line = {"GET", "/", "HTTP/1.1"};
 	HttpRequestFormat request;
@@ -365,5 +406,6 @@ int main() {
 	ret |= Test4();
 	ret |= Test5();
 	ret |= Test6();
+	ret |= Test7();
 	return ret;
 }

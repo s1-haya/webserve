@@ -18,6 +18,12 @@ std::string GetCwd() {
 	return directory;
 }
 
+void CheckPayloadTooLarge(std::size_t payload_size, std::size_t client_max_body_size) {
+	if (payload_size > client_max_body_size) {
+		throw HttpException("Error: payload too large.", StatusCode(PAYLOAD_TOO_LARGE));
+	}
+}
+
 } // namespace
 
 CheckServerInfoResult HttpServerInfoCheck::Check(
@@ -26,8 +32,7 @@ CheckServerInfoResult HttpServerInfoCheck::Check(
 	CheckServerInfoResult        result;
 	const server::VirtualServer *vs = FindVirtualServer(server_infos, request.header_fields);
 	result.host_name                = request.header_fields.at(HOST);
-	// todo: server_portを追加
-	CheckVirtualServer(result, *vs, request.header_fields);
+	CheckVirtualServer(result, *vs, request.header_fields, request.body_message.size());
 	CheckLocationList(result, vs->GetLocationList(), request.request_line.request_target);
 	return result;
 }
@@ -55,16 +60,17 @@ const server::VirtualServer *HttpServerInfoCheck::FindVirtualServer(
 void HttpServerInfoCheck::CheckVirtualServer(
 	CheckServerInfoResult       &result,
 	const server::VirtualServer &virtual_server,
-	const HeaderFields          &header_fields
+	const HeaderFields          &header_fields,
+	std::size_t                  request_body_size
 ) {
 	if (header_fields.find(CONTENT_LENGTH) != header_fields.end()) {
 		utils::Result<std::size_t> content_length =
 			utils::ConvertStrToSize(header_fields.at(CONTENT_LENGTH));
-		if (content_length.IsOk() &&
-			content_length.GetValue() > virtual_server.GetClientMaxBodySize()) {
-			throw HttpException("Error: payload too large.", StatusCode(PAYLOAD_TOO_LARGE));
+		if (content_length.IsOk()) {
+			CheckPayloadTooLarge(content_length.GetValue(), virtual_server.GetClientMaxBodySize());
 		}
 	}
+	CheckPayloadTooLarge(request_body_size, virtual_server.GetClientMaxBodySize());
 	if (!virtual_server.GetErrorPage().second.empty()) {
 		result.error_page.Set(true, virtual_server.GetErrorPage());
 	}
@@ -77,16 +83,19 @@ void HttpServerInfoCheck::CheckLocationList(
 	const std::string     &request_target
 ) {
 	const server::Location &match_location = FindLocation(result, locations, request_target);
-	// std::cout << match_location.request_uri << std::endl; // for debug
 	CheckIndex(result, match_location);
 	CheckAutoIndex(result, match_location);
 	CheckAlias(result, match_location);
 	CheckRedirect(result, match_location);
 	CheckAllowedMethods(result, match_location);
 	CheckCgiExtension(result, match_location);
-	CheckUploadDirectory(result, match_location);
+	CheckUploadPath(result, match_location);
 	const std::string ROOT_PATH = GetCwd() + "/../../../../root";
 	result.path                 = ROOT_PATH + result.path;
+	// upload_dirがない場合はそのまま返す
+	if (!result.file_upload_path.empty()) {
+		result.file_upload_path = ROOT_PATH + result.file_upload_path;
+	}
 	return;
 }
 
@@ -168,10 +177,35 @@ void HttpServerInfoCheck::CheckCgiExtension(
 	result.cgi_extension = location.cgi_extension;
 }
 
-void HttpServerInfoCheck::CheckUploadDirectory(
+void HttpServerInfoCheck::CheckUploadPath(
 	CheckServerInfoResult &result, const server::Location &location
 ) {
-	result.upload_directory = location.upload_directory;
+	if (location.upload_directory.empty()) {
+		return;
+	}
+
+	std::string location_uri = location.request_uri;
+	if (!location.alias.empty()) {
+		location_uri = location.alias;
+	}
+	std::size_t pos = result.path.find(location_uri);
+	// ex. location_uri /www/ result.request_path /www/
+	if (result.path.length() <= pos + location_uri.length()) {
+		result.file_upload_path = location_uri;
+		return;
+	}
+	// ex. test.txt, aa/bb/test.txt
+	std::string file_name;
+	if (utils::EndWith(location_uri, "/")) {
+		// ex. location /www/ request /www/test.txt
+		file_name = result.path.substr(pos + location_uri.length());
+	} else {
+		// ex. location /www request /www/test.txt
+		file_name = result.path.substr(pos + location_uri.length() + 1);
+	}
+	// ex. upload/test.txt, upload/aa/bb/test.txt
+	const std::string file_upload_path = location.upload_directory + "/" + file_name;
+	result.file_upload_path            = file_upload_path;
 }
 
 } // namespace http

@@ -16,11 +16,4 @@ jobs:
 
       - name: Run unit tests
         run: |
-          set -e
           make unit > unit_test_results.txt
-
-      - name: Upload unit test results
-        uses: actions/upload-artifact@v3
-        with:
-          name: unit-test-results
-          path: unit_test_results.txt

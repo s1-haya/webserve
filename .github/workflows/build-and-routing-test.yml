@@ -41,11 +41,4 @@ jobs:
 
       - name: Run routing tests
         run: |
-          set -e
-          pytest -v test/webserv/integration/test_routing.py > routing_test_results.txt
-
-      - name: Upload test results
-        uses: actions/upload-artifact@v3
-        with:
-          name: routing-test-results
-          path: routing_test_results.txt
+          pytest -v test/webserv/integration/test_routing.py
