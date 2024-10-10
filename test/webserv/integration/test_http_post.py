@@ -18,6 +18,7 @@ REQUEST_POST_4XX_DIR = REQUEST_DIR + "post/4xx/"
 UPLOAD_DIR = "root/upload/"
 UPLOAD_FILE_PATH = UPLOAD_DIR + "test_upload_file"
 CHUNKED_FILE_PATH = UPLOAD_DIR + "chunked_request_file"
+UPLOAD_SUB_DIR = UPLOAD_DIR + "upload_sub/"
 
 PERMISSION_DENIED_DIR = UPLOAD_DIR + "permission-denied-dir/"
 
@@ -129,6 +130,50 @@ def test_post_upload_responses(
 ):
     # cleanup_file_contextフィクスチャを使用してファイル削除を実行
     with cleanup_file_context(upload_file_path):
+        send_request_and_assert_response(request_file, expected_response)
+        assert_uploaded_file_content(upload_file_path, expected_upload_file_content)
+
+
+@pytest.fixture
+def create_and_cleanup_dir():
+    from contextlib import contextmanager
+
+    @contextmanager
+    def _set_and_cleanup():
+        sub_dir_path = UPLOAD_SUB_DIR
+        # ディレクトリを作成
+        os.makedirs(sub_dir_path, exist_ok=True)
+
+        yield sub_dir_path
+
+        # 作成したディレクトリとその中身を削除
+        shutil.rmtree(sub_dir_path)
+
+    return _set_and_cleanup
+
+
+@pytest.mark.parametrize(
+    "request_file, expected_response, upload_file_path, expected_upload_file_content",
+    [
+        (
+            REQUEST_POST_2XX_DIR + "201_08_upload_file_exist_sub_dir.txt",
+            created_response_close,
+            UPLOAD_SUB_DIR + "test_upload_file",
+            "abcde",
+        ),
+    ],
+    ids=[
+        "201_08_upload_file_exist_sub_dir",
+    ],
+)
+def test_post_201_responses(
+    request_file,
+    expected_response,
+    upload_file_path,
+    expected_upload_file_content,
+    create_and_cleanup_dir,
+):
+    with create_and_cleanup_dir():
         send_request_and_assert_response(request_file, expected_response)
         assert_uploaded_file_content(upload_file_path, expected_upload_file_content)
 
