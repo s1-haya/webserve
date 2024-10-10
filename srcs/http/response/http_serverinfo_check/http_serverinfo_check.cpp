@@ -86,7 +86,10 @@ void HttpServerInfoCheck::CheckLocationList(
 	CheckUploadPath(result, match_location);
 	const std::string ROOT_PATH = GetCwd() + "/../../../../root";
 	result.path                 = ROOT_PATH + result.path;
-	result.file_upload_path     = ROOT_PATH + result.file_upload_path;
+	// upload_dirがない場合はそのまま返す
+	if (!result.file_upload_path.empty()) {
+		result.file_upload_path = ROOT_PATH + result.file_upload_path;
+	}
 	return;
 }
 

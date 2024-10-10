@@ -29,17 +29,6 @@ std::string FileToString(const std::ifstream &file) {
 	return ss.str();
 }
 
-// root 以降を抜き出す
-std::string ExtractHttpServerInfoCheckPath(const std::string &full_path) {
-	const std::string target = "root";
-	size_t            pos    = full_path.find(target);
-	if (pos != std::string::npos) {
-		return full_path.substr(pos + target.length());
-	} else {
-		return "";
-	}
-}
-
 // ファイルの拡張子に基づいてContent-Typeを決定する関数: デフォルトはtext/plain
 std::string DetermineContentType(const std::string &path) {
 	const std::string html_extension = ".html";
@@ -146,7 +135,7 @@ StatusCode Method::PostHandler(
 	std::string        &response_body_message
 ) {
 
-	if (ExtractHttpServerInfoCheckPath(file_upload_path).empty()) {
+	if (file_upload_path.empty()) {
 		return EchoPostHandler(request_body_message, response_body_message);
 	} else if (request_header_fields.find(CONTENT_TYPE) != request_header_fields.end() &&
 			   utils::StartWith(request_header_fields.at(CONTENT_TYPE), MULTIPART_FORM_DATA)) {
