@@ -1,6 +1,5 @@
 import os
 import shutil
-import time
 
 import pytest
 from common_functions import (delete_file, read_file,
