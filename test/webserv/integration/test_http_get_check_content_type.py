@@ -46,7 +46,7 @@ def create_json_request(json_data) -> Tuple[str, Mapping[str, str]]:
     return create_json_body(), create_headers(APPLICATION_JSON)
 
 
-def test_06_content_type_post_json_and_get_json() -> None:
+def test_01_content_type_post_json_and_get_json() -> None:
     delete_file(JSON_FULL_PATH)
 
     try:
@@ -85,7 +85,7 @@ UNKNOWN_FILENAME, UNKNOWN_DATA = (
 UNKNOWN_FULL_PATH = ROOT_DIR + UPLOAD_DIR + UNKNOWN_FILENAME
 
 
-def test_07_content_type_post_unknown_and_get() -> None:
+def test_02_content_type_post_unknown_and_get() -> None:
     delete_file(UNKNOWN_FULL_PATH)
 
     try:
