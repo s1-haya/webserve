@@ -176,7 +176,7 @@ void HttpServerInfoCheck::CheckUploadPath(
 	}
 	std::size_t pos = result.path.find(location.request_uri);
 	// ex. location.request_uri /www/ result.request_path /www/
-	if (result.path.length() == pos + location.request_uri.length()) {
+	if (result.path.length() <= pos + location.request_uri.length()) {
 		return;
 	}
 	// ex. test.txt, aa/bb/test.txt
