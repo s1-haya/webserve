@@ -43,11 +43,11 @@ std::string DetermineContentType(const std::string &path) {
 	} else if (utils::EndWith(path, html_extension)) {
 		return http::TEXT_HTML;
 	} else if (utils::EndWith(path, json_extension)) {
-		return "application/json";
+		return http::APPLICATION_JSON;
 	} else if (utils::EndWith(path, pdf_extension)) {
-		return "application/pdf";
+		return http::APPLICATION_PDF;
 	} else if (utils::EndWith(path, jpeg_extension) || utils::EndWith(path, jpg_extension)) {
-		return "image/jpeg";
+		return http::IMAGE_JPEG;
 	}
 	return APPLICATION_OCTET_STREAM;
 }
