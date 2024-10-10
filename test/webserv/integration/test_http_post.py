@@ -124,10 +124,9 @@ def test_post_upload_responses(
     cleanup_file_context,
 ):
     # cleanup_file_contextフィクスチャを使用してファイル削除を実行
-    if upload_file_path:
-        with cleanup_file_context(upload_file_path):
-            send_request_and_assert_response(request_file, expected_response)
-            assert_uploaded_file_content(upload_file_path, expected_upload_file_content)
+    with cleanup_file_context(upload_file_path):
+        send_request_and_assert_response(request_file, expected_response)
+        assert_uploaded_file_content(upload_file_path, expected_upload_file_content)
 
 
 # upload_file_path: ファイルを作らない想定でもテスト失敗時用にupload_file_pathを指定。ない場合はNoneを指定
@@ -266,6 +265,6 @@ def test_post_4xx_responses(
     upload_file_path,
     cleanup_file_context,
 ):
-    if upload_file_path:
-        with cleanup_file_context(upload_file_path):
-            send_request_and_assert_response(request_file, expected_response)
+    with cleanup_file_context(upload_file_path):
+        send_request_and_assert_response(request_file, expected_response)
+
