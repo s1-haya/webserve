@@ -47,7 +47,8 @@ class HttpServerInfoCheck {
 	static void CheckVirtualServer(
 		CheckServerInfoResult       &result,
 		const server::VirtualServer &virtual_server,
-		const HeaderFields          &header_fields
+		const HeaderFields          &header_fields,
+		std::size_t                  request_body_size
 	);
 
 	typedef server::VirtualServer::LocationList VsLocationList;

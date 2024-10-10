@@ -18,6 +18,12 @@ std::string GetCwd() {
 	return directory;
 }
 
+void CheckPayloadTooLarge(std::size_t payload_size, std::size_t client_max_body_size) {
+	if (payload_size > client_max_body_size) {
+		throw HttpException("Error: payload too large.", StatusCode(PAYLOAD_TOO_LARGE));
+	}
+}
+
 } // namespace
 
 CheckServerInfoResult HttpServerInfoCheck::Check(
@@ -26,8 +32,7 @@ CheckServerInfoResult HttpServerInfoCheck::Check(
 	CheckServerInfoResult        result;
 	const server::VirtualServer *vs = FindVirtualServer(server_infos, request.header_fields);
 	result.host_name                = request.header_fields.at(HOST);
-	// todo: server_portを追加
-	CheckVirtualServer(result, *vs, request.header_fields);
+	CheckVirtualServer(result, *vs, request.header_fields, request.body_message.size());
 	CheckLocationList(result, vs->GetLocationList(), request.request_line.request_target);
 	return result;
 }
@@ -55,16 +60,17 @@ const server::VirtualServer *HttpServerInfoCheck::FindVirtualServer(
 void HttpServerInfoCheck::CheckVirtualServer(
 	CheckServerInfoResult       &result,
 	const server::VirtualServer &virtual_server,
-	const HeaderFields          &header_fields
+	const HeaderFields          &header_fields,
+	std::size_t                  request_body_size
 ) {
 	if (header_fields.find(CONTENT_LENGTH) != header_fields.end()) {
 		utils::Result<std::size_t> content_length =
 			utils::ConvertStrToSize(header_fields.at(CONTENT_LENGTH));
-		if (content_length.IsOk() &&
-			content_length.GetValue() > virtual_server.GetClientMaxBodySize()) {
-			throw HttpException("Error: payload too large.", StatusCode(PAYLOAD_TOO_LARGE));
+		if (content_length.IsOk()) {
+			CheckPayloadTooLarge(content_length.GetValue(), virtual_server.GetClientMaxBodySize());
 		}
 	}
+	CheckPayloadTooLarge(request_body_size, virtual_server.GetClientMaxBodySize());
 	if (!virtual_server.GetErrorPage().second.empty()) {
 		result.error_page.Set(true, virtual_server.GetErrorPage());
 	}
