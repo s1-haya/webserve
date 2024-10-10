@@ -156,14 +156,14 @@ def create_and_cleanup_dir():
     "request_file, expected_response, upload_file_path, expected_upload_file_content",
     [
         (
-            REQUEST_POST_2XX_DIR + "201_08_upload_file_exist_sub_dir.txt",
+            REQUEST_POST_2XX_DIR + "201_09_upload_file_exist_sub_dir.txt",
             created_response_close,
             UPLOAD_SUB_DIR + "test_upload_file",
             "abcde",
         ),
     ],
     ids=[
-        "201_08_upload_file_exist_sub_dir",
+        "201_09_upload_file_exist_sub_dir",
     ],
 )
 def test_post_201_responses(
