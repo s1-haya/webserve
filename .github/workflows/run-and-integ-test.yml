@@ -48,11 +48,4 @@ jobs:
 
       - name: Run e2e tests
         run: |
-          set -e
-          make e2e > e2e_test_results.txt
-
-      - name: Upload e2e test results
-        uses: actions/upload-artifact@v3
-        with:
-          name: e2e-test-results
-          path: e2e_test_results.txt
+          make e2e
