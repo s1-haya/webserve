@@ -222,7 +222,7 @@ StatusCode Method::FileCreationHandler(
 ) {
 	std::ofstream file(path.c_str(), std::ios::binary);
 	if (file.fail()) {
-		throw HttpException("Error: Forbidden", StatusCode(FORBIDDEN));
+		SystemExceptionHandler(errno);
 	}
 	file.write(request_body_message.c_str(), request_body_message.length());
 	if (file.fail()) {
@@ -230,7 +230,7 @@ StatusCode Method::FileCreationHandler(
 		if (std::remove(path.c_str()) == SYSTEM_ERROR) {
 			SystemExceptionHandler(errno);
 		}
-		throw HttpException("Error: Forbidden", StatusCode(FORBIDDEN));
+		SystemExceptionHandler(errno);
 	}
 	StatusCode status_code(CREATED);
 	response_body_message = HttpResponse::CreateDefaultBodyMessage(status_code);
