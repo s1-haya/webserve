@@ -46,7 +46,7 @@ std::string DetermineContentType(const std::string &path) {
 	} else if (utils::EndWith(path, jpeg_extension) || utils::EndWith(path, jpg_extension)) {
 		return "image/jpeg";
 	}
-	return TEXT_PLAIN;
+	return APPLICATION_OCTET_STREAM;
 }
 
 // ヘルパー関数: 文字列のクオートを削除
