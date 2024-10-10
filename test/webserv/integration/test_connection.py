@@ -268,3 +268,31 @@ def test_07_content_type_post_unknown_and_get() -> None:
         if con:
             con.close()
         delete_file(UNKNOWN_FULL_PATH)
+
+
+# serverがその後も正常に動いていればOK
+def test_08_shortened_body_message_disconnect() -> None:
+    try:
+        con = HTTPConnection("localhost", SERVER_PORT)
+        con.connect()
+
+        # content-length分以下のbody
+        con.request(
+            "GET",
+            "/",
+            "abc",
+            {
+                "Connection": "keep-alive",
+                "Content-Length": "5",
+            },
+        )
+
+        # content-length分を送る前に接続を切る
+        con.close()
+
+    except HTTPException as e:
+        print(f"Request failed: {e}")
+        raise AssertionError
+    finally:
+        if con:
+            con.close()
