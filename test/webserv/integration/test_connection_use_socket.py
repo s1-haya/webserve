@@ -1,10 +1,13 @@
 import socket
+import time
 import unittest
 from http.client import HTTPConnection, HTTPException
 from typing import Optional
 
-from common_functions import SERVER_PORT, assert_response
-from common_response import (response_header_get_root_200_keep,
+from common_functions import (SERVER_PORT, assert_file_content,
+                              assert_response, delete_file)
+from common_response import (created_response_close,
+                             response_header_get_root_200_keep,
                              root_index_file, timeout_response)
 
 # serverのtimeout+αを設定する
@@ -119,3 +122,41 @@ class TestConnectionUseSocket(unittest.TestCase):
         except HTTPException as e:
             print(f"Request failed: {e}")
             raise AssertionError
+
+    # chunkedが2回に分けて送られてくる場合
+    def test_05_chunked_request(self) -> None:
+        UPLOAD_FILE_PATH = "root/upload/chunked_request_file"
+        delete_file(UPLOAD_FILE_PATH)
+
+        try:
+            # chunkedが完全ではないrequestを送信
+            self.con.sock.send(
+                f"POST /upload/chunked_request_file HTTP/1.1\r\n"
+                f"Host: localhost\r\n"
+                f"Connection: close\r\n"
+                f"Content-Type: text/plain\r\n"
+                f"Transfer-Encoding: chunked\r\n\r\n"
+                f"4\r\n"
+                f"Wi".encode("utf-8")
+            )
+
+            time.sleep(1)
+
+            # chunkedの続きを送信
+            self.con.sock.send(
+                f"ki\r\n" f"5\r\n" f"pedia\r\n" f"0\r\n" f"\r\n".encode("utf-8")
+            )
+
+            response = receive_with_timeout(self.con.sock)
+            if response is None:
+                raise AssertionError
+            else:
+                # 201 responseを返したこと・uploadされたファイルの中身を確認
+                assert_response(response, created_response_close)
+                assert_file_content(UPLOAD_FILE_PATH, "Wikipedia")
+
+        except HTTPException as e:
+            print(f"Request failed: {e}")
+            raise AssertionError
+        finally:
+            delete_file(UPLOAD_FILE_PATH)
