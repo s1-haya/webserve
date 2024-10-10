@@ -238,7 +238,9 @@ int main(void) {
 		LoadFileContent("../../expected_response/default_status_line/200_ok.txt");
 	std::string expected4_body_message  = "";
 	std::string expected4_header_fields = SetDefaultHeaderFields(
-		http::KEEP_ALIVE, utils::ToString(expected4_body_message.length()), http::TEXT_PLAIN
+		http::KEEP_ALIVE,
+		utils::ToString(expected4_body_message.length()),
+		http::APPLICATION_OCTET_STREAM
 	);
 	const std::string &expected4_response =
 		expected4_status_line + expected4_header_fields + http::CRLF + expected4_body_message;
