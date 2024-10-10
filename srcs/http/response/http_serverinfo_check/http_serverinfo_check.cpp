@@ -84,7 +84,7 @@ void HttpServerInfoCheck::CheckLocationList(
 	CheckRedirect(result, match_location);
 	CheckAllowedMethods(result, match_location);
 	CheckCgiExtension(result, match_location);
-	CheckUploadDirectory(result, match_location);
+	CheckUploadPath(result, match_location);
 	const std::string ROOT_PATH = GetCwd() + "/../../../../root";
 	result.path                 = ROOT_PATH + result.path;
 	return;
@@ -168,10 +168,10 @@ void HttpServerInfoCheck::CheckCgiExtension(
 	result.cgi_extension = location.cgi_extension;
 }
 
-void HttpServerInfoCheck::CheckUploadDirectory(
+void HttpServerInfoCheck::CheckUploadPath(
 	CheckServerInfoResult &result, const server::Location &location
 ) {
-	result.upload_directory = location.upload_directory;
+	// result.upload_directory = location.upload_directory;
 }
 
 } // namespace http

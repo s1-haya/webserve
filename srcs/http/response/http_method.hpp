@@ -23,7 +23,7 @@ class Method {
 					 HeaderFields       &response_header_fields,
 					 const std::string  &index_file_path,
 					 bool                autoindex_on,
-					 const std::string  &upload_directory
+					 const std::string  &file_upload_path
 				 );
 	static bool
 	IsAllowedMethod(const std::string &method, const std::list<std::string> &allow_methods);

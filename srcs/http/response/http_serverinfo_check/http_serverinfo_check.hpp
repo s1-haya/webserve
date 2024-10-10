@@ -23,7 +23,7 @@ struct CheckServerInfoResult {
 	// メソッドの処理で使用
 	std::list<std::string> allowed_methods;
 	std::string            cgi_extension;
-	std::string            upload_directory;
+	std::string            file_upload_path;
 
 	utils::Result< std::pair<unsigned int, std::string> > redirect;
 	utils::Result< std::pair<unsigned int, std::string> > error_page;
@@ -68,8 +68,7 @@ class HttpServerInfoCheck {
 	static void
 	CheckAllowedMethods(CheckServerInfoResult &result, const server::Location &location);
 	static void CheckCgiExtension(CheckServerInfoResult &result, const server::Location &location);
-	static void
-	CheckUploadDirectory(CheckServerInfoResult &result, const server::Location &location);
+	static void CheckUploadPath(CheckServerInfoResult &result, const server::Location &location);
 
   public:
 	static CheckServerInfoResult
