@@ -38,11 +38,10 @@ class Method {
 		bool               autoindex_on
 	);
 	static StatusCode PostHandler(
-		const std::string  &path,
+		const std::string  &file_upload_path,
 		const std::string  &request_body_message,
 		const HeaderFields &request_header_fields,
-		std::string        &response_body_message,
-		const std::string  &upload_directory
+		std::string        &response_body_message
 	);
 	static StatusCode  DeleteHandler(const std::string &path, std::string &response_body_message);
 	static Stat        TryStat(const std::string &path);

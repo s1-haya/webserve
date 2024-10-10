@@ -80,11 +80,7 @@ StatusCode Method::Handler(
 		);
 	} else if (method == POST) {
 		status_code = PostHandler(
-			path,
-			request_body_message,
-			request_header_fields,
-			response_body_message,
-			file_upload_path
+			file_upload_path, request_body_message, request_header_fields, response_body_message
 		);
 	} else if (method == DELETE) {
 		status_code = DeleteHandler(path, response_body_message);
@@ -133,19 +129,11 @@ StatusCode Method::GetHandler(
 }
 
 StatusCode Method::PostHandler(
-	const std::string  &path,
+	const std::string  &file_upload_path,
 	const std::string  &request_body_message,
 	const HeaderFields &request_header_fields,
-	std::string        &response_body_message,
-	const std::string  &file_upload_path
+	std::string        &response_body_message
 ) {
-	// ex. test.txt
-	// const std::string file_name = path.substr(path.find_last_of('/') + 1);
-	// // ex. srcs/http/response/http_serverinfo_check/../../../../root
-	// const std::string root_path = path.substr(0, path.find("root/") + 4);
-	// // ex. srcs/http/response/http_serverinfo_check/../../../../root/save/test.txt
-	// const std::string upload_dir_path  = root_path + upload_directory;
-	// const std::string upload_file_path = upload_dir_path + "/" + file_name;
 
 	if (file_upload_path.empty()) {
 		return EchoPostHandler(request_body_message, response_body_message);
