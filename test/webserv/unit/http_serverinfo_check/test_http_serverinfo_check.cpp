@@ -253,7 +253,7 @@ int Test3() {
 	CheckServerInfoResult         result   = HttpServerInfoCheck::Check(virtual_servers, request);
 	const server::VirtualServer  *vs       = *(Next(virtual_servers.begin(), 1)); // host2
 	server::Location              location = vs->GetLocationList().front(); // location1(alias)
-	std::string                   upload_file_path = "";
+	std::string                   upload_file_path = ""; // upload_directoryはないので空文字
 
 	try {
 		COMPARE(ExtractHttpServerInfoCheckPath(result.path), location.alias + "test.html");
