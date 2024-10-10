@@ -175,10 +175,13 @@ void HttpServerInfoCheck::CheckUploadPath(
 	if (location.upload_directory.empty()) {
 		return;
 	}
+	std::size_t pos = result.path.find(location.request_uri);
+	// ex. location.request_uri /www/ result.request_path /www/
+	if (result.path.length() == pos + location.request_uri.length()) {
+		return;
+	}
 	// ex. test.txt, aa/bb/test.txt
-	const std::string file_name = result.path.substr(
-		result.path.find(location.request_uri) + location.request_uri.length() + 1
-	);
+	const std::string file_name = result.path.substr(pos + location.request_uri.length() + 1);
 	// ex. upload/test.txt, upload/aa/bb/test.txt
 	const std::string file_upload_path = location.upload_directory + "/" + file_name;
 	result.file_upload_path            = file_upload_path;

@@ -67,7 +67,7 @@ server::VirtualServer *BuildVirtualServer2() {
 	server::Location           location1 = // alias_on
 		BuildLocation("/www/data/", "/var/www/", "index.html", true, allowed_methods, redirect);
 	server::Location location2 = // cgi, upload_directory
-		BuildLocation("/web/", "", "index.htm", false, allowed_methods, redirect, ".php", "/data/");
+		BuildLocation("/web/", "", "index.htm", false, allowed_methods, redirect, ".php", "/data");
 	locationlist.push_back(location1);
 	locationlist.push_back(location2);
 
