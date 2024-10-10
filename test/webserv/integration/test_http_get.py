@@ -198,6 +198,10 @@ def test_get_2xx_responses(request_file, expected_response):
             REQUEST_GET_4XX_DIR + "400_24_non_vchr_http_version.txt",
             bad_request_response,
         ),
+        (
+            REQUEST_GET_4XX_DIR + "400_25_keep_alive_turns_close_in_400.txt",
+            bad_request_response,
+        ),
         (REQUEST_GET_4XX_DIR + "404_01_not_exist_path.txt", not_found_response_close),
         (
             REQUEST_GET_4XX_DIR + "404_02_not_exist_path_keep_alive.txt",
@@ -241,6 +245,7 @@ def test_get_2xx_responses(request_file, expected_response):
         "400_22_non_vchr_method",
         "400_23_non_vchr_request_target",
         "400_24_non_vchr_http_version",
+        "400_25_keep_alive_turns_close_in_400",
         "404_01_not_exist_path",
         "404_02_not_exist_path_keep_alive",
         "405_01_method_not_allowed_for_uri",
