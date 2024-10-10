@@ -5,7 +5,7 @@ import pytest
 from common_functions import read_file, send_request_and_assert_response
 from common_response import (bad_request_response, created_response_close,
                              created_response_keep, no_content_response_close,
-                             payload_too_large_response,
+                             not_found_response, payload_too_large_response,
                              response_header_get_root_200_close,
                              root_index_file, timeout_response)
 
@@ -197,6 +197,11 @@ def test_post_upload_responses(
             CHUNKED_FILE_PATH,
         ),
         (
+            REQUEST_POST_4XX_DIR + "404_01_non_exist_directory.txt",
+            not_found_response,
+            None,
+        ),
+        (
             REQUEST_POST_4XX_DIR + "408_01_shortened_body_message.txt",
             timeout_response,
             UPLOAD_DIR + "shortened_body_message",
@@ -245,6 +250,7 @@ def test_post_upload_responses(
         "400_10_chunked_empty_chunk_data",
         "400_11_overflow_chunk_size_and_crlf",
         "400_12_only_too_large_chunk_size_early_check",
+        "404_01_non_exist_directory",
         "408_01_shortened_body_message",
         "408_02_no_body_message",
         "408_03_incomplete_chunked_body",
