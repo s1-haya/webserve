@@ -188,6 +188,7 @@ int Test1() {
 	CheckServerInfoResult         result   = HttpServerInfoCheck::Check(virtual_servers, request);
 	const server::VirtualServer  *vs       = virtual_servers.front();       // host1
 	server::Location              location = vs->GetLocationList().front(); // location1
+	std::string                   upload_file_path = "";
 
 	try {
 		COMPARE(ExtractHttpServerInfoCheckPath(result.path), location.request_uri);
@@ -195,7 +196,7 @@ int Test1() {
 		COMPARE(result.autoindex, location.autoindex);
 		COMPARE(result.allowed_methods, location.allowed_methods);
 		COMPARE(result.cgi_extension, location.cgi_extension);
-		COMPARE(result.upload_directory, location.upload_directory);
+		COMPARE(ExtractHttpServerInfoCheckPath(result.file_upload_path), upload_file_path);
 		COMPARE(result.redirect.GetValue(), location.redirect);
 		COMPARE(result.error_page.GetValue(), virtual_servers.front()->GetErrorPage());
 	} catch (const std::exception &e) {
@@ -220,13 +221,14 @@ int Test2() {
 	CheckServerInfoResult         result = HttpServerInfoCheck::Check(virtual_servers, request);
 	const server::VirtualServer  *vs     = virtual_servers.front();        // host1
 	server::Location location = *(Next(vs->GetLocationList().begin(), 1)); // location2(redirect)
+	std::string      upload_file_path = "";
 
 	try {
 		COMPARE(result.index, location.index);
 		COMPARE(result.autoindex, location.autoindex);
 		COMPARE(result.allowed_methods, location.allowed_methods);
 		COMPARE(result.cgi_extension, location.cgi_extension);
-		COMPARE(result.upload_directory, location.upload_directory);
+		COMPARE(ExtractHttpServerInfoCheckPath(result.file_upload_path), upload_file_path);
 		COMPARE(result.redirect.GetValue(), location.redirect);
 		COMPARE(result.error_page.GetValue(), virtual_servers.front()->GetErrorPage());
 	} catch (const std::exception &e) {
@@ -251,6 +253,7 @@ int Test3() {
 	CheckServerInfoResult         result   = HttpServerInfoCheck::Check(virtual_servers, request);
 	const server::VirtualServer  *vs       = *(Next(virtual_servers.begin(), 1)); // host2
 	server::Location              location = vs->GetLocationList().front(); // location1(alias)
+	std::string                   upload_file_path = "";
 
 	try {
 		COMPARE(ExtractHttpServerInfoCheckPath(result.path), location.alias + "test.html");
@@ -258,7 +261,7 @@ int Test3() {
 		COMPARE(result.autoindex, location.autoindex);
 		COMPARE(result.allowed_methods, location.allowed_methods);
 		COMPARE(result.cgi_extension, location.cgi_extension);
-		COMPARE(result.upload_directory, location.upload_directory);
+		COMPARE(ExtractHttpServerInfoCheckPath(result.file_upload_path), upload_file_path);
 		COMPARE(result.redirect.GetValue(), location.redirect);
 		COMPARE(result.error_page.GetValue(), virtual_servers.front()->GetErrorPage());
 	} catch (const std::exception &e) {
@@ -284,6 +287,7 @@ int Test4() {
 	const server::VirtualServer  *vs     = *(Next(virtual_servers.begin(), 1)); // host2
 	server::Location              location =
 		*(Next(vs->GetLocationList().begin(), 1)); // location2(cgi, upload_directory)
+	std::string upload_file_path = "";
 
 	try {
 		COMPARE(ExtractHttpServerInfoCheckPath(result.path), location.request_uri);
@@ -291,7 +295,7 @@ int Test4() {
 		COMPARE(result.autoindex, location.autoindex);
 		COMPARE(result.allowed_methods, location.allowed_methods);
 		COMPARE(result.cgi_extension, location.cgi_extension);
-		COMPARE(result.upload_directory, location.upload_directory);
+		COMPARE(ExtractHttpServerInfoCheckPath(result.file_upload_path), upload_file_path);
 		COMPARE(result.redirect.GetValue(), location.redirect);
 		COMPARE(result.error_page.GetValue(), virtual_servers.front()->GetErrorPage());
 	} catch (const std::exception &e) {
