@@ -107,8 +107,8 @@ def test_02_content_type_post_unknown_and_get() -> None:
         response = con.getresponse()
 
         assert_status_line(response, HTTPStatus.OK)
-        # 不明なものは"application/octet-stream"が良いらしい？がwebservはdefaultをtext/plainとしている
-        assert_header(response, CONTENT_TYPE, TEXT_PLAIN)
+        # 不明なものは"application/octet-stream"
+        assert_header(response, CONTENT_TYPE, APPLICATION_OCTET_STREAM)
         assert response.read() == UNKNOWN_DATA
 
     except HTTPException as e:
