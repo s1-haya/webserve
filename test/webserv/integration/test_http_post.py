@@ -231,6 +231,11 @@ def test_post_upload_responses(
             payload_too_large_response,
             UPLOAD_FILE_PATH,
         ),
+        (
+            REQUEST_POST_4XX_DIR + "413_02_too_large_unchunked_body_size.txt",
+            payload_too_large_response,
+            CHUNKED_FILE_PATH,
+        ),
     ],
     ids=[
         "400_01_duplicate_content_length",
@@ -252,6 +257,7 @@ def test_post_upload_responses(
         "408_05_incomplete_chunked_body_0crlf_end",
         "408_06_max_chunk_size_and_crlf",
         "413_01_too_large_content_max_body_size",
+        "413_02_too_large_unchunked_body_size.txt",
     ],
 )
 def test_post_4xx_responses(
