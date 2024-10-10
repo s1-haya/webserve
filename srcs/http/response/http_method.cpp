@@ -34,6 +34,8 @@ std::string DetermineContentType(const std::string &path) {
 	const std::string html_extension = ".html";
 	const std::string json_extension = ".json";
 	const std::string pdf_extension  = ".pdf";
+	const std::string jpeg_extension = ".jpeg";
+	const std::string jpg_extension  = ".jpg";
 
 	if (utils::EndWith(path, html_extension)) {
 		return http::TEXT_HTML;
@@ -41,6 +43,8 @@ std::string DetermineContentType(const std::string &path) {
 		return "application/json";
 	} else if (utils::EndWith(path, pdf_extension)) {
 		return "application/pdf";
+	} else if (utils::EndWith(path, jpeg_extension) || utils::EndWith(path, jpg_extension)) {
+		return "image/jpeg";
 	}
 	return TEXT_PLAIN;
 }
