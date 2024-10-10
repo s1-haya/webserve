@@ -2,10 +2,10 @@ import os
 import time
 
 import pytest
-from common_functions import read_file, send_request_and_assert_response
+from common_functions import send_request_and_assert_response
 from common_response import (forbidden_response, no_content_response_close,
                              no_content_response_keep, not_allowed_response,
-                             not_found_response_close, timeout_response)
+                             not_found_response_close)
 
 REQUEST_DIR = "test/common/request/"
 REQUEST_DELETE_2XX_DIR = REQUEST_DIR + "delete/2xx/"
