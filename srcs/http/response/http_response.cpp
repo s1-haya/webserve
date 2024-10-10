@@ -50,9 +50,9 @@ bool IsErrorConnectionClose(EStatusCode status_code) {
 	return status_code == http::BAD_REQUEST || status_code == http::INTERNAL_SERVER_ERROR;
 }
 
-void SetErrorConnectionClose(HeaderFields &HeaderFields, EStatusCode status_code) {
+void SetErrorConnectionClose(HeaderFields &header_fields, EStatusCode status_code) {
 	if (IsErrorConnectionClose(status_code)) {
-		HeaderFields[CONNECTION] = CLOSE;
+		header_fields[CONNECTION] = CLOSE;
 	}
 }
 
