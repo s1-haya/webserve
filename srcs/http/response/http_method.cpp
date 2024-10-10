@@ -29,7 +29,7 @@ std::string FileToString(const std::ifstream &file) {
 	return ss.str();
 }
 
-// ファイルの拡張子に基づいてContent-Typeを決定する関数: デフォルトはtext/plain
+// ファイルの拡張子に基づいてContent-Typeを決定する関数: デフォルトはapplication/octet-stream
 std::string DetermineContentType(const std::string &path) {
 	const std::string html_extension = ".html";
 	const std::string json_extension = ".json";
