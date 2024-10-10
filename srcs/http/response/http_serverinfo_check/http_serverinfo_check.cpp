@@ -77,7 +77,6 @@ void HttpServerInfoCheck::CheckLocationList(
 	const std::string     &request_target
 ) {
 	const server::Location &match_location = FindLocation(result, locations, request_target);
-	// std::cout << match_location.request_uri << std::endl; // for debug
 	CheckIndex(result, match_location);
 	CheckAutoIndex(result, match_location);
 	CheckAlias(result, match_location);
@@ -181,7 +180,14 @@ void HttpServerInfoCheck::CheckUploadPath(
 		return;
 	}
 	// ex. test.txt, aa/bb/test.txt
-	const std::string file_name = result.path.substr(pos + location.request_uri.length() + 1);
+	std::string file_name;
+	if (utils::EndWith(location.request_uri, "/")) {
+		// ex. location /www/ request /www/test.txt
+		file_name = result.path.substr(pos + location.request_uri.length());
+	} else {
+		// ex. location /www request /www/test.txt
+		file_name = result.path.substr(pos + location.request_uri.length() + 1);
+	}
 	// ex. upload/test.txt, upload/aa/bb/test.txt
 	const std::string file_upload_path = location.upload_directory + "/" + file_name;
 	result.file_upload_path            = file_upload_path;
