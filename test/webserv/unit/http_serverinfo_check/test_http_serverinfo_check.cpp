@@ -277,8 +277,9 @@ int Test3() {
 
 int Test4() {
 	// request
+	// "/web/"(locationそのもの)にリクエストを送る場合、upload_directoryは"/data"でupload_fileは""
 	HttpRequestFormat request;
-	request.request_line              = CreateRequestLine("GET", "/web/", "HTTP/1.1");
+	request.request_line              = CreateRequestLine("POST", "/web/", "HTTP/1.1");
 	request.header_fields[HOST]       = "host2";
 	request.header_fields[CONNECTION] = KEEP_ALIVE;
 
@@ -309,8 +310,43 @@ int Test4() {
 	return EXIT_SUCCESS;
 }
 
-// host3に"/"がないのでlocation NOFエラー
 int Test5() {
+	// request
+	HttpRequestFormat request;
+	// "/web/aa/bb"にリクエストを送る場合、upload_directoryは"/data"でupload_fileは"/data/aa/bb"
+	request.request_line              = CreateRequestLine("POST", "/web/aa/bb", "HTTP/1.1");
+	request.header_fields[HOST]       = "host2";
+	request.header_fields[CONNECTION] = KEEP_ALIVE;
+
+	server::VirtualServerAddrList virtual_servers = BuildVirtualServerAddrList();
+	CheckServerInfoResult         result = HttpServerInfoCheck::Check(virtual_servers, request);
+	const server::VirtualServer  *vs     = *(Next(virtual_servers.begin(), 1)); // host2
+	server::Location              location =
+		*(Next(vs->GetLocationList().begin(), 1)); // location2(cgi, upload_directory)
+	std::string upload_file_path = "/data/aa/bb";
+
+	try {
+		COMPARE(ExtractHttpServerInfoCheckPath(result.path), location.request_uri + "aa/bb");
+		COMPARE(result.index, location.index);
+		COMPARE(result.autoindex, location.autoindex);
+		COMPARE(result.allowed_methods, location.allowed_methods);
+		COMPARE(result.cgi_extension, location.cgi_extension);
+		COMPARE(ExtractHttpServerInfoCheckPath(result.file_upload_path), upload_file_path);
+		COMPARE(result.redirect.GetValue(), location.redirect);
+		COMPARE(result.error_page.GetValue(), virtual_servers.front()->GetErrorPage());
+	} catch (const std::exception &e) {
+		PrintNg();
+		utils::Debug(e.what());
+		DeleteVirtualServerAddrList(virtual_servers);
+		return EXIT_FAILURE;
+	}
+	PrintOk();
+	DeleteVirtualServerAddrList(virtual_servers);
+	return EXIT_SUCCESS;
+}
+
+// host3に"/"がないのでlocation NOFエラー
+int Test6() {
 	// request
 	const RequestLine request_line = {"GET", "/", "HTTP/1.1"};
 	HttpRequestFormat request;
@@ -334,7 +370,7 @@ int Test5() {
 }
 
 // client_max_body_sizeを超えたエラー
-int Test6() {
+int Test7() {
 	// request
 	const RequestLine request_line = {"GET", "/", "HTTP/1.1"};
 	HttpRequestFormat request;
@@ -369,5 +405,6 @@ int main() {
 	ret |= Test4();
 	ret |= Test5();
 	ret |= Test6();
+	ret |= Test7();
 	return ret;
 }
