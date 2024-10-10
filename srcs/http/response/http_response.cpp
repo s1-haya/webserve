@@ -58,7 +58,7 @@ void SetErrorConnectionClose(HeaderFields &HeaderFields, EStatusCode status_code
 
 } // namespace
 
-std::string HttpResponse::Run(
+HttpResponseResult HttpResponse::Run(
 	const http::ClientInfos             &client_info,
 	const server::VirtualServerAddrList &server_info,
 	const HttpRequestResult             &request_info,
@@ -67,9 +67,12 @@ std::string HttpResponse::Run(
 	HttpResponseFormatResult response_format_result =
 		CreateHttpResponseFormat(client_info, server_info, request_info, cgi_result);
 	if (cgi_result.is_cgi) {
-		return "";
+		return HttpResponseResult(false, "");
 	}
-	return CreateHttpResponse(response_format_result.http_response_format);
+	return HttpResponseResult(
+		response_format_result.is_connection_close,
+		CreateHttpResponse(response_format_result.http_response_format)
+	);
 }
 
 HttpResponseFormatResult HttpResponse::CreateHttpResponseFormat(

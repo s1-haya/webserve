@@ -39,6 +39,13 @@ class Stat;
 //    GetInternalServerErrorBodyMessage();
 // };
 
+struct HttpResponseResult {
+	HttpResponseResult(bool is_connection_close, const std::string &response)
+		: is_connection_close(is_connection_close), response(response) {}
+	bool        is_connection_close;
+	std::string response;
+};
+
 struct HttpResponseFormatResult {
 	HttpResponseFormatResult(
 		bool is_connection_close, const HttpResponseFormat &http_response_format
@@ -51,7 +58,7 @@ struct HttpResponseFormatResult {
 class HttpResponse {
   public:
 	typedef std::map<EStatusCode, std::string> ReasonPhrase;
-	static std::string
+	static HttpResponseResult
 					   Run(const http::ClientInfos             &client_info,
 						   const server::VirtualServerAddrList &server_info,
 						   const HttpRequestResult             &request_info,
