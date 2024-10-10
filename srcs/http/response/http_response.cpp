@@ -64,17 +64,15 @@ std::string HttpResponse::Run(
 	const HttpRequestResult             &request_info,
 	CgiResult                           &cgi_result
 ) {
-	HttpResponseFormat response =
+	HttpResponseFormatResult response_format_result =
 		CreateHttpResponseFormat(client_info, server_info, request_info, cgi_result);
 	if (cgi_result.is_cgi) {
 		return "";
 	}
-	return CreateHttpResponse(response);
+	return CreateHttpResponse(response_format_result.http_response_format);
 }
 
-// todo: HttpResponseFormat HttpResponse::CreateHttpResponseFormat(const HttpRequestResult
-// &request_info) 作成
-HttpResponseFormat HttpResponse::CreateHttpResponseFormat(
+HttpResponseFormatResult HttpResponse::CreateHttpResponseFormat(
 	const http::ClientInfos             &client_info,
 	const server::VirtualServerAddrList &server_info,
 	const HttpRequestResult             &request_info,
@@ -90,7 +88,10 @@ HttpResponseFormat HttpResponse::CreateHttpResponseFormat(
 			HttpServerInfoCheck::Check(server_info, request_info.request);
 		error_page = server_info_result.error_page;
 		if (server_info_result.redirect.IsOk()) {
-			return HandleRedirect(response_header_fields, server_info_result);
+			// redirect時のエラーでconnection:closeで返したい場合はcatchに入ってくれる
+			return HttpResponseFormatResult(
+				false, HandleRedirect(response_header_fields, server_info_result)
+			);
 		}
 		if (IsCgi(
 				server_info_result.cgi_extension,
@@ -138,10 +139,13 @@ HttpResponseFormat HttpResponse::CreateHttpResponseFormat(
 	}
 	response_header_fields[CONTENT_LENGTH] = utils::ToString(response_body_message.length());
 	SetErrorConnectionClose(response_header_fields, status_code.GetEStatusCode());
-	return HttpResponseFormat(
-		StatusLine(HTTP_VERSION, status_code.GetStatusCode(), status_code.GetReasonPhrase()),
-		response_header_fields,
-		response_body_message
+	return HttpResponseFormatResult(
+		IsErrorConnectionClose(status_code.GetEStatusCode()),
+		HttpResponseFormat(
+			StatusLine(HTTP_VERSION, status_code.GetStatusCode(), status_code.GetReasonPhrase()),
+			response_header_fields,
+			response_body_message
+		)
 	);
 }
 
