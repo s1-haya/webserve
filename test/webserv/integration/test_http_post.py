@@ -1,11 +1,13 @@
 import os
+import shutil
 import time
 
 import pytest
 from common_functions import read_file, send_request_and_assert_response
 from common_response import (bad_request_response, created_response_close,
-                             created_response_keep, no_content_response_close,
-                             not_found_response, payload_too_large_response,
+                             created_response_keep, forbidden_response,
+                             no_content_response_close, not_found_response,
+                             payload_too_large_response,
                              response_header_get_root_200_close,
                              root_index_file, timeout_response)
 
@@ -16,6 +18,8 @@ REQUEST_POST_4XX_DIR = REQUEST_DIR + "post/4xx/"
 UPLOAD_DIR = "root/upload/"
 UPLOAD_FILE_PATH = UPLOAD_DIR + "test_upload_file"
 CHUNKED_FILE_PATH = UPLOAD_DIR + "chunked_request_file"
+
+PERMISSION_DENIED_DIR = UPLOAD_DIR + "permission-denied-dir/"
 
 
 def delete_file(file_path):
@@ -195,6 +199,7 @@ def test_post_upload_responses(
             bad_request_response,
             CHUNKED_FILE_PATH,
         ),
+        # 403 is below -> test_post_403_responses()
         (
             REQUEST_POST_4XX_DIR + "404_01_non_exist_directory.txt",
             not_found_response,
@@ -268,3 +273,50 @@ def test_post_4xx_responses(
     with cleanup_file_context(upload_file_path):
         send_request_and_assert_response(request_file, expected_response)
 
+
+@pytest.fixture
+def set_permission_and_cleanup_restricted_dir():
+    from contextlib import contextmanager
+
+    @contextmanager
+    def _set_and_cleanup(upload_file_path):
+        # permissionを操作したいディレクトリ
+        restricted_path = PERMISSION_DENIED_DIR
+        # ディレクトリを作成
+        os.makedirs(restricted_path, exist_ok=True)
+        # permissionを変更して書き込み不可に設定
+        os.chmod(restricted_path, 0o400)
+
+        yield restricted_path
+
+        # テスト後に元に戻す
+        os.chmod(restricted_path, 0o775)
+        # テスト失敗時にファイルがuploadされてしまった場合用
+        delete_file(upload_file_path)
+        # 作成したディレクトリとその中身を削除
+        shutil.rmtree(restricted_path)
+
+    return _set_and_cleanup
+
+
+@pytest.mark.parametrize(
+    "request_file, expected_response, upload_file_path",
+    [
+        (
+            REQUEST_POST_4XX_DIR + "403_01_permission_denied_directory.txt",
+            forbidden_response,
+            PERMISSION_DENIED_DIR + "test_upload_file",
+        ),
+    ],
+    ids=[
+        "403_01_permission_denied_directory",
+    ],
+)
+def test_post_403_responses(
+    request_file,
+    expected_response,
+    upload_file_path,
+    set_permission_and_cleanup_restricted_dir,
+):
+    with set_permission_and_cleanup_restricted_dir(upload_file_path):
+        send_request_and_assert_response(request_file, expected_response)
