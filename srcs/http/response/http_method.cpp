@@ -31,13 +31,16 @@ std::string FileToString(const std::ifstream &file) {
 
 // ファイルの拡張子に基づいてContent-Typeを決定する関数: デフォルトはapplication/octet-stream
 std::string DetermineContentType(const std::string &path) {
+	const std::string txt_extension  = ".txt";
 	const std::string html_extension = ".html";
 	const std::string json_extension = ".json";
 	const std::string pdf_extension  = ".pdf";
 	const std::string jpeg_extension = ".jpeg";
 	const std::string jpg_extension  = ".jpg";
 
-	if (utils::EndWith(path, html_extension)) {
+	if (utils::EndWith(path, txt_extension)) {
+		return http::TEXT_PLAIN;
+	} else if (utils::EndWith(path, html_extension)) {
 		return http::TEXT_HTML;
 	} else if (utils::EndWith(path, json_extension)) {
 		return "application/json";
