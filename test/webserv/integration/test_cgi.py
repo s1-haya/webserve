@@ -152,6 +152,16 @@ class TestCGI(unittest.TestCase):
         except HTTPException as e:
             self.fail(f"Request failed: {e}")
 
+    def test_loop_local_redirect_pl(self):
+        try:
+            self.con.request("GET", "/cgi-bin/loop_local_redirect.pl")
+            response = self.con.getresponse()
+            # timeoutへ
+            assert_status_line(response, HTTPStatus.REQUEST_TIMEOUT)
+            assert_header(response, "Connection", "close")
+        except HTTPException as e:
+            self.fail(f"Request failed: {e}")
+
     def test_no_header_pl(self):
         try:
             self.con.request("GET", "/cgi-bin/no_header.pl")
