@@ -79,6 +79,7 @@ class TestCGI(unittest.TestCase):
             response = self.con.getresponse()
             assert_status_line(response, HTTPStatus.OK)
             assert_header(response, "Connection", "keep-alive")
+            # ファイルが実行されずに中身が返ってくればOK
             assert_body(response, "root/cgi-bin/print_ok.py")
         except HTTPException as e:
             self.fail(f"Request failed: {e}")
@@ -91,6 +92,7 @@ class TestCGI(unittest.TestCase):
             response = self.con.getresponse()
             assert_status_line(response, HTTPStatus.OK)
             assert_header(response, "Connection", "keep-alive")
+            # POSTしたデータが返ってくればOK
             self.assertIn(b"POST data: key1=value1&key2=value2", response.read())
         except HTTPException as e:
             self.fail(f"Request failed: {e}")
@@ -102,6 +104,7 @@ class TestCGI(unittest.TestCase):
             response = self.con.getresponse()
             assert_status_line(response, HTTPStatus.OK)
             assert_header(response, "Connection", "keep-alive")
+            # POSTデータがない場合
             self.assertIn(b"No POST data received.", response.read())
         except HTTPException as e:
             self.fail(f"Request failed: {e}")
@@ -122,6 +125,7 @@ class TestCGI(unittest.TestCase):
             response = self.con.getresponse()
             assert_status_line(response, HTTPStatus.FOUND)
             assert_header(response, "Location", "http://localhost:8080/")
+            # bodyは空
             self.assertEqual(response.read().decode(), "")
         except HTTPException as e:
             self.fail(f"Request failed: {e}")
@@ -176,7 +180,7 @@ class TestCGI(unittest.TestCase):
         try:
             self.con.request("GET", "/cgi-bin/loop_local_redirect.pl")
             response = self.con.getresponse()
-            # timeoutへ
+            # 無限ループしてtimeoutへ
             assert_status_line(response, HTTPStatus.REQUEST_TIMEOUT)
             assert_header(response, "Connection", "close")
             assert_body_binary(response, TIMEOUT_FILE_PATH)
