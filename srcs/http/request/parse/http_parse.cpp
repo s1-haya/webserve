@@ -156,7 +156,7 @@ void ValidateInvalidHeaderFields(const HeaderFields &header_fields, const std::s
 }
 
 // Boundary以外のContent-Typeヘッダーを小文字に変換
-void ToLowerContentTypeHeaderExceptBoundary(std::string &header_field_value) {
+std::string ToLowerContentTypeHeaderExceptBoundary(const std::string &header_field_value) {
 	// Content-Typeヘッダーの処理
 	std::size_t boundary_pos = header_field_value.find("boundary=");
 	if (boundary_pos != std::string::npos) {
@@ -170,12 +170,12 @@ void ToLowerContentTypeHeaderExceptBoundary(std::string &header_field_value) {
 			std::string boundary_param = boundary_value.substr(0, semicolon_pos);
 			std::string other_params   = boundary_value.substr(semicolon_pos);
 			other_params               = utils::ToLowerString(other_params);
-			header_field_value         = before_boundary + boundary_param + other_params;
+			return before_boundary + boundary_param + other_params;
 		} else {
-			header_field_value = before_boundary + boundary_value;
+			return before_boundary + boundary_value;
 		}
 	} else {
-		header_field_value = utils::ToLowerString(header_field_value);
+		return utils::ToLowerString(header_field_value);
 	}
 }
 
@@ -327,7 +327,7 @@ HeaderFields HttpParse::SetHeaderFields(const std::vector<std::string> &header_f
 		std::string header_field_value = (*it).substr(colon_pos + 1);
 		header_field_value             = utils::Trim(header_field_value, OPTIONAL_WHITESPACE);
 		if (header_field_name == CONTENT_TYPE) {
-			ToLowerContentTypeHeaderExceptBoundary(header_field_value);
+			header_field_value = ToLowerContentTypeHeaderExceptBoundary(header_field_value);
 		} else {
 			header_field_value = utils::ToLowerString(header_field_value);
 		}
