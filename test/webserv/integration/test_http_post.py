@@ -305,6 +305,11 @@ def test_post_201_responses(
         #     bad_request_response,
         #     MULTIPART_FILE_PATH1,
         # ),
+        (
+            REQUEST_POST_4XX_DIR + "400_25_multipart_keep_alive.txt",
+            bad_request_response,
+            MULTIPART_FILE_PATH1,
+        ),
         # 403 is below -> test_post_403_responses()
         (
             REQUEST_POST_4XX_DIR + "404_01_non_exist_directory.txt",
@@ -382,6 +387,7 @@ def test_post_201_responses(
         "400_22_multipart_no_equal_in_field_name",
         "400_23_multipart_no_equal_in_field_filename",
         # "400_24_multipart_missing_semicolon_no_filename",
+        "400_25_multipart_keep_alive",
         "404_01_non_exist_directory",
         "405_01_method_not_allowed_for_uri",
         "408_01_shortened_body_message",
