@@ -120,7 +120,13 @@ def cleanup_file_context():
             MULTIPART_FILE_PATH1,
             "value1",
         ),
-        # 201_12 is below -> test_post_upload_multi_file_responses()
+        # 201_12, 201_13 is below -> test_post_upload_multi_file_responses()
+        (
+            REQUEST_POST_2XX_DIR + "201_14_upload_multipart_extra_parameter.txt",
+            created_response_close,
+            MULTIPART_FILE_PATH1,
+            "value1",
+        ),
     ],
     ids=[
         "201_01_upload_file",
@@ -133,6 +139,7 @@ def cleanup_file_context():
         "201_08_unchunked_body_size_just_client_max_body_size",
         "201_10_upload_multipart",
         "201_11_upload_multipart_no_quote",
+        "201_14_upload_multipart_extra_parameter",
     ],
 )
 def test_post_upload_responses(
@@ -219,9 +226,20 @@ def cleanup_files_context():
             [MULTIPART_FILE_PATH1, MULTIPART_FILE_PATH2],
             ["value1", "value2"],
         ),
+        (
+            REQUEST_POST_2XX_DIR
+            + "201_13_upload_multipart_multi_files_case_sensitive_boundary.txt",
+            created_response_close,
+            [MULTIPART_FILE_PATH1, MULTIPART_FILE_PATH2],
+            [
+                'value1\n------webkitformboundarY\nContent-Disposition: form-data; name="field"; filename="filename2.txt"\nContent-Type: text/plain\n\nvalue2',
+                'value3\n------wEbkitformboundary\nContent-Disposition: form-data; name="field"; filename="filename3.txt"\nContent-Type: text/plain\n\nvalue4',
+            ],
+        ),
     ],
     ids=[
         "201_12_upload_multipart_multi_files",
+        "201_13_upload_multipart_multi_files_case_sensitive_boundary",
     ],
 )
 def test_post_upload_multi_file_responses(

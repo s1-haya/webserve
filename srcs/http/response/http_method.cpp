@@ -392,10 +392,15 @@ Method::DecodeMultipartFormData(const std::string &content_type, const std::stri
 std::string Method::ExtractBoundary(const std::string &content_type) {
 	const std::string boundary_prefix = BOUNDARY + "=";
 	std::size_t       pos             = content_type.find(boundary_prefix);
-	// Content-Type: multipart/form-data; boundary=--WebKitFormBoundary7MA4YWxkTrZu0gW
+	// Content-Type: multipart/form-data; boundary=--WebKitFormBoundary7MA4YWxkTrZu0gW; abcd=efgh
 	if (pos != std::string::npos) {
 		// ----WebKitFormBoundary7MA4YWxkTrZu0gW\r\n のような形式になっている
-		return "--" + content_type.substr(pos + boundary_prefix.length());
+		std::size_t start = pos + boundary_prefix.length();
+		std::size_t end   = content_type.find(';', start);
+		if (end == std::string::npos) {
+			end = content_type.length();
+		}
+		return "--" + content_type.substr(start, end - start);
 	}
 	throw HttpException(
 		"Error: Boundary not found in Content-Type header", StatusCode(BAD_REQUEST)

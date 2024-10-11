@@ -155,6 +155,30 @@ void ValidateInvalidHeaderFields(const HeaderFields &header_fields, const std::s
 	}
 }
 
+// Boundary以外のContent-Typeヘッダーを小文字に変換
+std::string ToLowerContentTypeHeaderExceptBoundary(const std::string &header_field_value) {
+	// Content-Typeヘッダーの処理
+	std::size_t boundary_pos = header_field_value.find("boundary=");
+	if (boundary_pos != std::string::npos) {
+		std::string before_boundary = header_field_value.substr(0, boundary_pos);
+		std::string boundary_value  = header_field_value.substr(boundary_pos);
+		before_boundary             = utils::ToLowerString(before_boundary);
+
+		// 他のパラメータがある場合の処理 (boundary=----WebKitFormBouKx7oK7;charset=utf-8)
+		std::size_t semicolon_pos = boundary_value.find(';', 9); // "boundary="の長さは9
+		if (semicolon_pos != std::string::npos) {
+			std::string boundary_param = boundary_value.substr(0, semicolon_pos);
+			std::string other_params   = boundary_value.substr(semicolon_pos);
+			other_params               = utils::ToLowerString(other_params);
+			return before_boundary + boundary_param + other_params;
+		} else {
+			return before_boundary + boundary_value;
+		}
+	} else {
+		return utils::ToLowerString(header_field_value);
+	}
+}
+
 } // namespace
 
 void HttpParse::ParseRequestLine(HttpRequestParsedData &data) {
@@ -300,8 +324,14 @@ HeaderFields HttpParse::SetHeaderFields(const std::vector<std::string> &header_f
 	for (It it = header_fields_info.begin(); it != header_fields_info.end(); ++it) {
 		std::size_t colon_pos          = (*it).find_first_of(':');
 		std::string header_field_name  = utils::ToLowerString((*it).substr(0, colon_pos));
-		std::string header_field_value = utils::ToLowerString((*it).substr(colon_pos + 1));
+		std::string header_field_value = (*it).substr(colon_pos + 1);
 		header_field_value             = utils::Trim(header_field_value, OPTIONAL_WHITESPACE);
+		if (header_field_name == CONTENT_TYPE) {
+			header_field_value = ToLowerContentTypeHeaderExceptBoundary(header_field_value);
+		} else {
+			header_field_value = utils::ToLowerString(header_field_value);
+		}
+
 		CheckValidHeaderFieldNameAndValue(header_field_name, header_field_value);
 		// todo:
 		// マルチパートを対応する場合はutils::SplitStrを使用して、セミコロン区切りのstd::vector<std::string>になる。
