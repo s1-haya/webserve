@@ -179,6 +179,7 @@ class TestServerRouting(unittest.TestCase):
             response = self.con.getresponse()
             assert_status_line(response, HTTPStatus.OK)
             assert_header(response, "Connection", "close")
+            assert_header(response, "Content-Length", str(len(body)))
             self.assertEqual(response.read().decode(), body)
         except HTTPException as e:
             self.fail(f"Request failed: {e}")
@@ -195,6 +196,7 @@ class TestServerRouting(unittest.TestCase):
             response = self.con.getresponse()
             assert_status_line(response, HTTPStatus.OK)
             assert_header(response, "Connection", "keep-alive")
+            assert_header(response, "Content-Length", str(len(body)))
             self.assertEqual(response.read().decode(), body)
         except HTTPException as e:
             self.fail(f"Request failed: {e}")
