@@ -100,8 +100,7 @@ HttpResult Http::CreateHttpResponse(
 	result.is_connection_keep = IsConnectionKeep(
 		response_result.is_connection_close, data.request_result.request.header_fields
 	);
-	result.response = response_result.response;
-	// todo: 仮。CGI実行中はfalseにしたい
+	result.response             = response_result.response;
 	result.is_response_complete = !result.cgi_result.is_cgi;
 	if (!result.cgi_result.is_cgi) { // cgiの場合はcgiのhttp_responseを作るときにsave_dataが必要
 		storage_.DeleteClientSaveData(client_info.fd);
@@ -140,7 +139,6 @@ HttpResult Http::CreateBadRequestResponse(int client_fd) {
 	return result;
 }
 
-// todo: HTTPRequestの書式が完全かどうか(どのように取得するかは要検討)
 bool Http::IsHttpRequestFormatComplete(int client_fd) {
 	HttpRequestParsedData save_data = storage_.GetClientSaveData(client_fd);
 	return save_data.is_request_format.is_request_line &&

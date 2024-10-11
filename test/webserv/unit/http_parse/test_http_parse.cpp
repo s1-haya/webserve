@@ -351,8 +351,6 @@ Result ParseChunkedMultipleTimes2() {
 int main(void) {
 	int ret_code = EXIT_SUCCESS;
 
-	// todo: http/http_response/test_http_request.cpp HttpRequestParsedData関数のテストケース
-
 	// 1.リクエストラインの書式が正しい場合
 	http::HttpRequestParsedData test1_request_line;
 	test1_request_line.request_result.status_code        = http::StatusCode(http::OK);
