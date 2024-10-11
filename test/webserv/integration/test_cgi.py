@@ -39,9 +39,23 @@ class TestCGI(unittest.TestCase):
         # 各テストの後に実行される(unittestの機能)
         self.con.close()
 
-    def test_print_ok_pl(self):
+    def test_print_ok_pl_close(self):
         try:
-            self.con.request("GET", "/cgi-bin/print_ok.pl")
+            self.con.request(
+                "GET", "/cgi-bin/print_ok.pl", headers={"Connection": "close"}
+            )
+            response = self.con.getresponse()
+            assert_status_line(response, HTTPStatus.OK)
+            assert_header(response, "Connection", "close")
+            self.assertEqual(response.read(), b"OK\n")
+        except HTTPException as e:
+            self.fail(f"Request failed: {e}")
+
+    def test_print_ok_pl_keep(self):
+        try:
+            self.con.request(
+                "GET", "/cgi-bin/print_ok.pl", headers={"Connection": "keep-alive"}
+            )
             response = self.con.getresponse()
             assert_status_line(response, HTTPStatus.OK)
             assert_header(response, "Connection", "keep-alive")
