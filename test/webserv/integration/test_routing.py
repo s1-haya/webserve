@@ -75,11 +75,11 @@ class TestServerRouting(unittest.TestCase):
         except HTTPException as e:
             self.fail(f"Request failed: {e}")
 
-    def test_post_root_host1(self):
+    def test_post_root_host3(self):
         try:
             body = "This is a test payload"
             headers = {
-                "Host": "no_exist_host",
+                "Host": "host3",
                 "Content-Type": "text/plain",
                 "Content-Length": str(len(body)),
             }
