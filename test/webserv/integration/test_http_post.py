@@ -289,6 +289,11 @@ def test_post_201_responses(
             bad_request_response,
             MULTIPART_FILE_PATH1,
         ),
+        (
+            REQUEST_POST_4XX_DIR + "400_22_multipart_no_equal_in_field_name.txt",
+            bad_request_response,
+            MULTIPART_FILE_PATH1,
+        ),
         # 403 is below -> test_post_403_responses()
         (
             REQUEST_POST_4XX_DIR + "404_01_non_exist_directory.txt",
@@ -363,6 +368,7 @@ def test_post_201_responses(
         "400_19_multipart_no_2_crlf_after_header",
         "400_20_multipart_no_crlf_at_end",
         "400_21_multipart_no_crlf_at_end_of_body",
+        "400_22_multipart_no_equal_in_field_name",
         "404_01_non_exist_directory",
         "405_01_method_not_allowed_for_uri",
         "408_01_shortened_body_message",
