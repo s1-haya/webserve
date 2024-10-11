@@ -8,6 +8,7 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <unistd.h> // access
 
 namespace http {
 namespace {
@@ -54,6 +55,10 @@ void SetErrorConnectionClose(HeaderFields &header_fields, EStatusCode status_cod
 	if (IsErrorConnectionClose(status_code)) {
 		header_fields[CONNECTION] = CLOSE;
 	}
+}
+
+bool IsExistPath(const std::string &path) {
+	return access(path.c_str(), F_OK) == 0;
 }
 
 } // namespace
@@ -110,6 +115,9 @@ HttpResponseFormatResult HttpResponse::CreateHttpResponseFormat(
 				utils::ToString(client_info.listen_server_port),
 				client_info.ip
 			);
+			if (!IsExistPath(cgi_request.meta_variables[cgi::SCRIPT_NAME])) {
+				throw HttpException("Error: Not Found", StatusCode(NOT_FOUND));
+			}
 			cgi_result.is_cgi      = true;
 			cgi_result.cgi_request = cgi_request;
 		} else {
@@ -209,7 +217,7 @@ bool HttpResponse::IsCgi(
 	}
 	// methodがGETかPOSTかつallow_methodかどうか
 	if (!(Method::IsAllowedMethod(method, allowed_methods)) || (method != GET && method != POST)) {
-		return false;
+		throw HttpException("Error: Method Not Allowed", StatusCode(METHOD_NOT_ALLOWED));
 	}
 	return true;
 }
