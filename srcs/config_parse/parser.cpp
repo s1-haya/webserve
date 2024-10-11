@@ -37,11 +37,9 @@ bool FindDuplicated(const std::list<T> &list, const T &element) {
 bool IsDuplicateDirectiveName(
 	std::set<std::string> &directive_set, const std::string &directive_name
 ) {
-	if (directive_set.count(directive_name) == 0) {
-		directive_set.insert(directive_name);
-		return false;
-	}
-	return true;
+	typedef std::pair<std::set<std::string>::iterator, bool> InsertResult;
+	const InsertResult result = directive_set.insert(directive_name);
+	return result.second == false;
 }
 
 } // namespace
@@ -172,8 +170,7 @@ void Parser::HandleClientMaxBodySize(std::size_t &client_max_body_size, NodeItr 
 	utils::Result<std::size_t> body_max_size = utils::ConvertStrToSize((*it).token);
 	if (!body_max_size.IsOk()) {
 		throw std::runtime_error("invalid client_max_body_size: " + (*it).token);
-	} else if (body_max_size.GetValue() < BODY_SIZE_MIN ||
-			   body_max_size.GetValue() > BODY_SIZE_MAX) {
+	} else if (body_max_size.GetValue() < BODY_SIZE_MIN || body_max_size.GetValue() > BODY_SIZE_MAX) {
 		// 8MB以上はアップロードに時間がかかりすぎる
 		throw std::runtime_error("client_max_body_size should be greater than 0 and less than 8MB");
 	}
