@@ -109,10 +109,16 @@ HttpResult Http::CreateHttpResponse(
 		response_result.is_connection_close, data.request_result.request.header_fields
 	);
 	result.response = response_result.response;
-	// todo: 仮。CGI実行中はfalseにしたい
-	result.is_response_complete = !result.cgi_result.is_cgi;
-	if (!result.cgi_result.is_cgi) { // cgiの場合はcgiのhttp_responseを作るときにsave_dataが必要
+	if (result.cgi_result.is_cgi) {
+		// cgiの場合はcgiのhttp_responseを作るときにsave_dataが必要
+		// is_cgi_runningを変えて更新
+		data.is_cgi_running = true;
+		storage_.UpdateClientSaveData(client_info.fd, data);
+		result.is_response_complete = false;
+	} else {
+		// httpの場合はsave_dataは不要
 		storage_.DeleteClientSaveData(client_info.fd);
+		result.is_response_complete = true;
 	}
 	return result;
 }
