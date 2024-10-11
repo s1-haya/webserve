@@ -257,6 +257,11 @@ def test_post_201_responses(
             bad_request_response,
             MULTIPART_FILE_PATH1,
         ),
+        (
+            REQUEST_POST_4XX_DIR + "400_16_multipart_no_name_in_disposition.txt",
+            bad_request_response,
+            MULTIPART_FILE_PATH1,
+        ),
         # 403 is below -> test_post_403_responses()
         (
             REQUEST_POST_4XX_DIR + "404_01_non_exist_directory.txt",
@@ -325,6 +330,7 @@ def test_post_201_responses(
         "400_13_multipart_one_boundary",
         "400_14_multipart_invalid_end",
         "400_15_multipart_content_disposition_not_form_data",
+        "400_16_multipart_no_name_in_disposition",
         "404_01_non_exist_directory",
         "405_01_method_not_allowed_for_uri",
         "408_01_shortened_body_message",
