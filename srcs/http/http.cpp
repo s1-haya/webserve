@@ -95,6 +95,14 @@ HttpResult Http::CreateHttpResponse(
 	HttpResult            result;
 	HttpRequestParsedData data = storage_.GetClientSaveData(client_info.fd);
 	result.request_buf         = data.current_buf;
+
+	// CGI実行中は何もしない
+	if (data.is_cgi_running) {
+		result.is_response_complete = false; // same as default
+		result.is_connection_keep =
+			HttpResponse::IsConnectionKeep(data.request_result.request.header_fields);
+		return result;
+	}
 	HttpResponseResult response_result =
 		HttpResponse::Run(client_info, server_info, data.request_result, result.cgi_result);
 	result.is_connection_keep = IsConnectionKeep(
