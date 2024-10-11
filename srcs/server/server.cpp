@@ -386,7 +386,6 @@ void Server::Disconnect(int client_fd) {
 		// Call Cgi's destructor -> close pipe_fd -> automatically deleted from epoll
 		cgi_manager_.DeleteCgi(client_fd);
 	}
-	// todo: client_save_dataがない場合に呼ばれても大丈夫な作りになってるか確認
 	// HttpResult is not used.
 	http_.GetErrorResponse(client_fd, http::INTERNAL_ERROR);
 	event_monitor_.Delete(client_fd);

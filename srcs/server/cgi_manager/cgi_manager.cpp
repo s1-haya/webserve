@@ -14,7 +14,7 @@ CgiManager::~CgiManager() {
 	}
 }
 
-// todo: 1complete_request(1CGI)につき2回以上この関数が呼ばれないかhttpの実装を確認
+// This function should not be called more than once per complete_request (1CGI) from HTTP
 // throw(SystemException)
 void CgiManager::AddNewCgi(int client_fd, const cgi::CgiRequest &request) {
 	Cgi *cgi = new (std::nothrow) Cgi(request);
