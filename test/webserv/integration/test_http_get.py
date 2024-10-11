@@ -219,6 +219,10 @@ def test_get_2xx_responses(request_file, expected_response):
             REQUEST_GET_4XX_DIR + "408_02_only_space.txt",
             timeout_response,
         ),
+        (
+            REQUEST_GET_4XX_DIR + "408_03_run_cgi_with_over_buffer_size_request.txt",
+            timeout_response,
+        ),
     ],
     ids=[
         "400_01_only_crlf",
@@ -251,6 +255,7 @@ def test_get_2xx_responses(request_file, expected_response):
         "405_01_method_not_allowed_for_uri",
         "408_01_no_crlf",
         "408_02_only_space",
+        "408_03_run_cgi_with_over_buffer_size_request",
     ],
 )
 def test_get_4xx_responses(request_file, expected_response):
