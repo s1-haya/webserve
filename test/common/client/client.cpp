@@ -43,7 +43,7 @@ void Client::SendRequestAndReceiveResponse(const std::string &message) {
 				// Connection reset by peer
 				break;
 			}
-			throw std::runtime_error("read failed" + std::string(std::strerror(errno)));
+			throw std::runtime_error("read failed: " + std::string(std::strerror(errno)));
 		}
 		if (read_ret == 0) {
 			break;
