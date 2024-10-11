@@ -174,9 +174,20 @@ def cleanup_files_context():
             [MULTIPART_FILE_PATH1, MULTIPART_FILE_PATH2],
             ["value1", "value2"],
         ),
+        (
+            REQUEST_POST_2XX_DIR
+            + "201_13_upload_multipart_multi_files_case_sensitive_boundary.txt",
+            created_response_close,
+            [MULTIPART_FILE_PATH1, MULTIPART_FILE_PATH2],
+            [
+                'value1\n------webkitformboundarY\nContent-Disposition: form-data; name="field"; filename="filename2.txt"\nContent-Type: text/plain\n\nvalue2',
+                'value3\n------wEbkitformboundary\nContent-Disposition: form-data; name="field"; filename="filename3.txt"\nContent-Type: text/plain\n\nvalue4',
+            ],
+        ),
     ],
     ids=[
         "201_12_upload_multipart_multi_files",
+        "201_13_upload_multipart_multi_files_case_sensitive_boundary",
     ],
 )
 def test_post_upload_multi_file_responses(

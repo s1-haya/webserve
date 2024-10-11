@@ -1,0 +1,27 @@
+POST /upload HTTP/1.1
+Host: localhost
+Connection: close
+Content-Type: multipart/form-data; boundary=----webkitformboundary
+Content-Length: 564
+
+------webkitformboundary
+Content-Disposition: form-data; name="field"; filename="filename1.txt"
+Content-Type: text/plain
+
+value1
+------webkitformboundarY
+Content-Disposition: form-data; name="field"; filename="filename2.txt"
+Content-Type: text/plain
+
+value2
+------webkitformboundary
+Content-Disposition: form-data; name="field"; filename="filename2.txt"
+Content-Type: text/plain
+
+value3
+------wEbkitformboundary
+Content-Disposition: form-data; name="field"; filename="filename3.txt"
+Content-Type: text/plain
+
+value4
+------webkitformboundary--
