@@ -119,7 +119,13 @@ def cleanup_file_context():
             MULTIPART_FILE_PATH1,
             "value1",
         ),
-        # 201_12 is below -> test_post_upload_multi_file_responses()
+        # 201_12, 201_13 is below -> test_post_upload_multi_file_responses()
+        (
+            REQUEST_POST_2XX_DIR + "201_14_upload_multipart_extra_parameter.txt",
+            created_response_close,
+            MULTIPART_FILE_PATH1,
+            "value1",
+        ),
     ],
     ids=[
         "201_01_upload_file",
@@ -132,6 +138,7 @@ def cleanup_file_context():
         "201_08_unchunked_body_size_just_client_max_body_size",
         "201_10_upload_multipart",
         "201_11_upload_multipart_no_quote",
+        "201_14_upload_multipart_extra_parameter",
     ],
 )
 def test_post_upload_responses(
