@@ -52,7 +52,7 @@ server::VirtualServer *BuildVirtualServer1() {
 	server_names.push_back("host1");
 	server::VirtualServer::HostPortList host_ports;
 	host_ports.push_back(std::make_pair("localhost", 8080));
-	server::VirtualServer::ErrorPage error_page(404, "/error_pages/404-ja.html");
+	server::VirtualServer::ErrorPage error_page(404, "/error_pages/404.html");
 
 	return new server::VirtualServer(server_names, locationlist, host_ports, 2048, error_page);
 }
@@ -76,7 +76,7 @@ server::VirtualServer *BuildVirtualServer2() {
 	server_names.push_back("host2");
 	server::VirtualServer::HostPortList host_ports;
 	host_ports.push_back(std::make_pair("localhost", 8080));
-	server::VirtualServer::ErrorPage error_page(404, "/error_pages/404-ja.html");
+	server::VirtualServer::ErrorPage error_page(404, "/error_pages/404.html");
 
 	return new server::VirtualServer(server_names, locationlist, host_ports, 2024, error_page);
 }
@@ -90,7 +90,7 @@ server::VirtualServer *BuildVirtualServer3() {
 	server_names.push_back("host3");
 	server::VirtualServer::HostPortList host_ports;
 	host_ports.push_back(std::make_pair("127.0.0.10", 8090));
-	server::VirtualServer::ErrorPage error_page(404, "/error_pages/404-ja.html");
+	server::VirtualServer::ErrorPage error_page(404, "/error_pages/404.html");
 
 	return new server::VirtualServer(server_names, locationlist, host_ports, 1024, error_page);
 }
