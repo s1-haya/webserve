@@ -33,13 +33,13 @@ def test_ok_in_sub_directory() -> None:
 
 def test_not_found() -> None:
     try:
-        con = HTTPConnection("localhost", 8080)
-        con.request("GET", "/no-exist-path")
+        # error_pageのテスト
+        con = HTTPConnection("localhost", 8000)
+        con.request("GET", "/sub/sss")
         response = con.getresponse()
         assert_status_line(response, HTTPStatus.NOT_FOUND)
         assert_header(response, "Connection", "keep-alive")
-        # todo
-        # assert_body(response, "root/html/error_pages/404.html")
+        assert_body(response, "root/html/error_pages/404.html")
         con.close()
     except HTTPException as e:
         print(f"Request failed: {e}")
