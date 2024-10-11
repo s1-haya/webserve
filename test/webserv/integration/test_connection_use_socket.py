@@ -2,7 +2,7 @@ import socket
 import time
 import unittest
 from http.client import HTTPConnection, HTTPException
-from typing import Optional
+from typing import Optional, List
 
 from common_functions import (SERVER_PORT, assert_file_content,
                               assert_response, delete_file)
@@ -20,7 +20,7 @@ def receive_with_timeout(sock) -> Optional[str]:
     sock.settimeout(TIMEOUT)
 
     # timeout秒までに受信したデータをためておく
-    received_data = []
+    received_data: list[str] = []
     try:
         # 一度で全てrecvできない場合用にwhile
         while True:
