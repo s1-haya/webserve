@@ -39,9 +39,23 @@ class TestCGI(unittest.TestCase):
         # 各テストの後に実行される(unittestの機能)
         self.con.close()
 
-    def test_print_ok_pl(self):
+    def test_print_ok_pl_close(self):
         try:
-            self.con.request("GET", "/cgi-bin/print_ok.pl")
+            self.con.request(
+                "GET", "/cgi-bin/print_ok.pl", headers={"Connection": "close"}
+            )
+            response = self.con.getresponse()
+            assert_status_line(response, HTTPStatus.OK)
+            assert_header(response, "Connection", "close")
+            self.assertEqual(response.read(), b"OK\n")
+        except HTTPException as e:
+            self.fail(f"Request failed: {e}")
+
+    def test_print_ok_pl_keep(self):
+        try:
+            self.con.request(
+                "GET", "/cgi-bin/print_ok.pl", headers={"Connection": "keep-alive"}
+            )
             response = self.con.getresponse()
             assert_status_line(response, HTTPStatus.OK)
             assert_header(response, "Connection", "keep-alive")
@@ -127,6 +141,7 @@ class TestCGI(unittest.TestCase):
             self.con.request("GET", "/cgi-bin/client_redirect.pl")
             response = self.con.getresponse()
             assert_status_line(response, HTTPStatus.FOUND)
+            assert_header(response, "Connection", "keep-alive")
             assert_header(response, "Location", "http://localhost:8080/")
             # bodyは空
             self.assertEqual(response.read().decode(), "")
@@ -138,6 +153,7 @@ class TestCGI(unittest.TestCase):
             self.con.request("GET", "/cgi-bin/client_redirect_with_doc.pl")
             response = self.con.getresponse()
             assert_status_line(response, HTTPStatus.FOUND)
+            assert_header(response, "Connection", "keep-alive")
             assert_header(response, "Location", "http://localhost:8080/")
             expected_body = (
                 "<html>\n"
@@ -247,5 +263,79 @@ class TestCGI(unittest.TestCase):
             self.assertEqual(response.status, HTTPStatus.METHOD_NOT_ALLOWED)
             assert_header(response, "Connection", "keep-alive")
             assert_body_binary(response, METHOD_NOT_ALLOWED_FILE_PATH)
+        except HTTPException as e:
+            self.fail(f"Request failed: {e}")
+
+    def test_multiple_cgi_requests(self):
+        try:
+            # print_ok.plへのリクエスト
+            self.con.request("GET", "/cgi-bin/print_ok.pl")
+            response1 = self.con.getresponse()
+            assert_status_line(response1, HTTPStatus.OK)
+            assert_header(response1, "Connection", "keep-alive")
+            assert_header(response1, "Content-Type", "text/plain")
+            self.assertEqual(response1.read().decode(), "OK\n")
+
+            # print_err.shへのリクエスト
+            self.con.request("GET", "/cgi-bin/print_err.sh")
+            response2 = self.con.getresponse()
+            assert_status_line(response2, HTTPStatus.OK)
+            assert_header(response2, "Connection", "keep-alive")
+            # ファイルが実行されずに中身が返ってくればOK
+            assert_body(response2, "root/cgi-bin/print_err.sh")
+
+            # json.plへのリクエスト
+            self.con.request("GET", "/cgi-bin/json.pl")
+            response3 = self.con.getresponse()
+            assert_status_line(response3, HTTPStatus.OK)
+            assert_header(response3, "Connection", "keep-alive")
+            assert_header(response3, "Content-Type", "application/json")
+            expected_json = '{\n  "status": "success",\n  "message": "Hello, world!"\n}'
+            self.assertEqual(response3.read().decode(), expected_json)
+        except HTTPException as e:
+            self.fail(f"Request failed: {e}")
+
+    def test_multiple_http_requests(self):
+        try:
+            # local_redirect.plへのリクエスト
+            self.con.request("GET", "/cgi-bin/local_redirect.pl")
+            response = self.con.getresponse()
+            # test_print_env_plと同じ内容が返ってくるはず
+            assert_status_line(response, HTTPStatus.OK)
+            assert_header(response, "Connection", "keep-alive")
+            body = response.read().decode()
+            self.assertIn("AUTH_TYPE:", body)
+            self.assertIn("CONTENT_LENGTH:", body)
+            self.assertIn("CONTENT_TYPE:", body)
+            self.assertIn("GATEWAY_INTERFACE:", body)
+            self.assertIn("PATH_INFO:", body)
+            self.assertIn("PATH_TRANSLATED:", body)
+            self.assertIn("QUERY_STRING:", body)
+            self.assertIn("REMOTE_ADDR:", body)
+            self.assertIn("REMOTE_HOST:", body)
+            self.assertIn("REMOTE_IDENT:", body)
+            self.assertIn("REMOTE_USER:", body)
+            self.assertIn("REQUEST_METHOD:", body)
+            self.assertIn("SCRIPT_NAME:", body)
+            self.assertIn("SERVER_NAME:", body)
+            self.assertIn("SERVER_PORT:", body)
+            self.assertIn("SERVER_PROTOCOL:", body)
+            self.assertIn("SERVER_SOFTWARE:", body)
+
+            # GET /
+            self.con.request("GET", "/")
+            response = self.con.getresponse()
+            assert_status_line(response, HTTPStatus.OK)
+            assert_header(response, "Connection", "keep-alive")
+            assert_body(response, "root/html/index.html")
+
+            # client_redirect.plへのリクエスト
+            self.con.request("GET", "/cgi-bin/client_redirect.pl")
+            response = self.con.getresponse()
+            assert_status_line(response, HTTPStatus.FOUND)
+            assert_header(response, "Connection", "keep-alive")
+            assert_header(response, "Location", "http://localhost:8080/")
+            # bodyは空
+            self.assertEqual(response.read().decode(), "")
         except HTTPException as e:
             self.fail(f"Request failed: {e}")
