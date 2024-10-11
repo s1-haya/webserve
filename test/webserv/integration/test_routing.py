@@ -11,6 +11,7 @@ MOVED_PERMANENTLY_BODY_FILE = (
     "test/webserv/expected_response/default_body_message/301_moved_permanently.txt"
 )
 FOUND_BODY_FILE = "test/webserv/expected_response/default_body_message/302_found.txt"
+CUSTOM_ERROR_PAGE = "root/html/error_pages/404.html"
 
 
 def assert_body_binary(response: HTTPResponse, path: str) -> None:
@@ -136,5 +137,30 @@ class TestServerRouting(unittest.TestCase):
             assert_header(response, "Connection", "keep-alive")
             assert_header(response, "Location", "http://localhost:9000/")
             # サーバーで設定されていない303なのでbodyは空
+        except HTTPException as e:
+            self.fail(f"Request failed: {e}")
+
+    # カスタムエラーページに飛ぶか
+    def test_error_page_host1(self):
+        try:
+            # 404の場合
+            headers = {"Host": "host1"}
+            self.con.request("GET", "/not_exist", headers=headers)
+            response = self.con.getresponse()
+            assert_status_line(response, HTTPStatus.NOT_FOUND)
+            assert_header(response, "Connection", "keep-alive")
+            assert_body(response, CUSTOM_ERROR_PAGE)
+        except HTTPException as e:
+            self.fail(f"Request failed: {e}")
+
+    def test_error_page_host3(self):
+        try:
+            # 501の場合
+            headers = {"Host": "host3"}
+            self.con.request("GETT", "/html/index", headers=headers)
+            response = self.con.getresponse()
+            assert_status_line(response, HTTPStatus.NOT_IMPLEMENTED)
+            assert_header(response, "Connection", "keep-alive")
+            assert_body(response, CUSTOM_ERROR_PAGE)
         except HTTPException as e:
             self.fail(f"Request failed: {e}")
