@@ -205,7 +205,9 @@ StatusCode Method::FileCreationHandlerForMultiPart(
 		// Content-Disposition: form-data; name="file"; filename="test.txt"
 		// のようにfilenameが含まれる場合 そのパスにファイルを作成する
 		if ((*it).headers.find(CONTENT_DISPOSITION) == (*it).headers.end()) {
-			continue;
+			throw HttpException(
+				"Error: Invalid part format, missing Content-Disposition", StatusCode(BAD_REQUEST)
+			);
 		}
 		std::map<std::string, std::string> content_disposition =
 			ParseContentDisposition((*it).headers[CONTENT_DISPOSITION]);
