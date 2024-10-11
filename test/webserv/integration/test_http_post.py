@@ -107,6 +107,7 @@ def cleanup_file_context():
             CHUNKED_FILE_PATH,
             "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",
         ),
+        # 201_09 is below -> test_post_201_responses()
         (
             REQUEST_POST_2XX_DIR + "201_10_upload_multipart.txt",
             created_response_close,
@@ -143,6 +144,50 @@ def test_post_upload_responses(
 ):
     # cleanup_file_contextフィクスチャを使用してファイル削除を実行
     with cleanup_file_context(upload_file_path):
+        send_request_and_assert_response(request_file, expected_response)
+        assert_uploaded_file_content(upload_file_path, expected_upload_file_content)
+
+
+@pytest.fixture
+def create_and_cleanup_dir():
+    from contextlib import contextmanager
+
+    @contextmanager
+    def _set_and_cleanup():
+        sub_dir_path = UPLOAD_SUB_DIR
+        # ディレクトリを作成
+        os.makedirs(sub_dir_path, exist_ok=True)
+
+        yield sub_dir_path
+
+        # 作成したディレクトリとその中身を削除
+        shutil.rmtree(sub_dir_path)
+
+    return _set_and_cleanup
+
+
+@pytest.mark.parametrize(
+    "request_file, expected_response, upload_file_path, expected_upload_file_content",
+    [
+        (
+            REQUEST_POST_2XX_DIR + "201_09_upload_file_exist_sub_dir.txt",
+            created_response_close,
+            UPLOAD_SUB_DIR + "test_upload_file",
+            "abcde",
+        ),
+    ],
+    ids=[
+        "201_09_upload_file_exist_sub_dir",
+    ],
+)
+def test_post_201_responses(
+    request_file,
+    expected_response,
+    upload_file_path,
+    expected_upload_file_content,
+    create_and_cleanup_dir,
+):
+    with create_and_cleanup_dir():
         send_request_and_assert_response(request_file, expected_response)
         assert_uploaded_file_content(upload_file_path, expected_upload_file_content)
 
@@ -195,50 +240,6 @@ def test_post_upload_multi_file_responses(
             expected_upload_file_contents,
         ):
             assert_uploaded_file_content(upload_file_path, expected_upload_file_content)
-
-
-@pytest.fixture
-def create_and_cleanup_dir():
-    from contextlib import contextmanager
-
-    @contextmanager
-    def _set_and_cleanup():
-        sub_dir_path = UPLOAD_SUB_DIR
-        # ディレクトリを作成
-        os.makedirs(sub_dir_path, exist_ok=True)
-
-        yield sub_dir_path
-
-        # 作成したディレクトリとその中身を削除
-        shutil.rmtree(sub_dir_path)
-
-    return _set_and_cleanup
-
-
-@pytest.mark.parametrize(
-    "request_file, expected_response, upload_file_path, expected_upload_file_content",
-    [
-        (
-            REQUEST_POST_2XX_DIR + "201_09_upload_file_exist_sub_dir.txt",
-            created_response_close,
-            UPLOAD_SUB_DIR + "test_upload_file",
-            "abcde",
-        ),
-    ],
-    ids=[
-        "201_09_upload_file_exist_sub_dir",
-    ],
-)
-def test_post_201_responses(
-    request_file,
-    expected_response,
-    upload_file_path,
-    expected_upload_file_content,
-    create_and_cleanup_dir,
-):
-    with create_and_cleanup_dir():
-        send_request_and_assert_response(request_file, expected_response)
-        assert_uploaded_file_content(upload_file_path, expected_upload_file_content)
 
 
 # upload_file_path: ファイルを作らない想定でもテスト失敗時用にupload_file_pathを指定。ない場合はNoneを指定
