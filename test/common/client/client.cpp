@@ -2,6 +2,8 @@
 #include "color.hpp"
 #include "utils.hpp"
 #include <arpa/inet.h> // inet_pton,htons
+#include <cerrno>
+#include <cstring> // strerror
 #include <iostream>
 #include <sys/socket.h> // socket,connect
 #include <sys/types.h>
@@ -34,9 +36,14 @@ void Client::SendRequestAndReceiveResponse(const std::string &message) {
 	// receive response
 	char buffer[BUFFER_SIZE];
 	while (true) {
+		errno            = 0;
 		ssize_t read_ret = read(sock_fd_, buffer, BUFFER_SIZE);
 		if (read_ret == SYSTEM_ERROR) {
-			throw std::runtime_error("read failed");
+			if (errno == ECONNRESET) {
+				// Connection reset by peer
+				break;
+			}
+			throw std::runtime_error("read failed" + std::string(std::strerror(errno)));
 		}
 		if (read_ret == 0) {
 			break;
