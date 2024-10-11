@@ -249,3 +249,32 @@ class TestCGI(unittest.TestCase):
             assert_body_binary(response, METHOD_NOT_ALLOWED_FILE_PATH)
         except HTTPException as e:
             self.fail(f"Request failed: {e}")
+
+    def test_multiple_requests(self):
+        try:
+            # print_ok.plへのリクエスト
+            self.con.request("GET", "/cgi-bin/print_ok.pl")
+            response1 = self.con.getresponse()
+            assert_status_line(response1, HTTPStatus.OK)
+            assert_header(response1, "Connection", "keep-alive")
+            assert_header(response1, "Content-Type", "text/plain")
+            self.assertEqual(response1.read().decode(), "OK\n")
+
+            # print_err.shへのリクエスト
+            self.con.request("GET", "/cgi-bin/print_err.sh")
+            response2 = self.con.getresponse()
+            assert_status_line(response2, HTTPStatus.OK)
+            assert_header(response2, "Connection", "keep-alive")
+            # ファイルが実行されずに中身が返ってくればOK
+            assert_body(response2, "root/cgi-bin/print_err.sh")
+
+            # json.plへのリクエスト
+            self.con.request("GET", "/cgi-bin/json.pl")
+            response3 = self.con.getresponse()
+            assert_status_line(response3, HTTPStatus.OK)
+            assert_header(response3, "Connection", "keep-alive")
+            assert_header(response3, "Content-Type", "application/json")
+            expected_json = '{\n  "status": "success",\n  "message": "Hello, world!"\n}'
+            self.assertEqual(response3.read().decode(), expected_json)
+        except HTTPException as e:
+            self.fail(f"Request failed: {e}")
