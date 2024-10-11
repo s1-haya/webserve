@@ -23,6 +23,8 @@ UPLOAD_SUB_DIR = UPLOAD_DIR + "upload_sub/"
 
 PERMISSION_DENIED_DIR = UPLOAD_DIR + "permission-denied-dir/"
 
+MULTIPART_FILE_PATH1 = UPLOAD_DIR + "filename1.txt"
+
 
 def assert_uploaded_file_content(upload_file_path, expected_upload_file_content):
     if upload_file_path is None:
@@ -239,6 +241,11 @@ def test_post_201_responses(
             bad_request_response,
             CHUNKED_FILE_PATH,
         ),
+        (
+            REQUEST_POST_4XX_DIR + "400_13_multipart_one_boundary.txt",
+            bad_request_response,
+            MULTIPART_FILE_PATH1,
+        ),
         # 403 is below -> test_post_403_responses()
         (
             REQUEST_POST_4XX_DIR + "404_01_non_exist_directory.txt",
@@ -304,6 +311,7 @@ def test_post_201_responses(
         "400_10_chunked_empty_chunk_data",
         "400_11_overflow_chunk_size_and_crlf",
         "400_12_only_too_large_chunk_size_early_check",
+        "400_13_multipart_one_boundary",
         "404_01_non_exist_directory",
         "405_01_method_not_allowed_for_uri",
         "408_01_shortened_body_message",
