@@ -7,7 +7,6 @@
 
 namespace server {
 
-// todo: in VirtualServer class?
 struct Location {
 	typedef std::list<std::string>               AllowedMethodList;
 	typedef std::pair<unsigned int, std::string> Redirect;

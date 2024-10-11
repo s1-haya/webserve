@@ -52,8 +52,7 @@ MessageManager::TimeoutFds MessageManager::GetNewTimeoutFds(double timeout) {
 	return timeout_fds_;
 }
 
-// todo: 全てのresponse_strをsend()できた場合かつkeep-aliveの場合に呼ばれる想定
-// For Connection: keep-alive
+// Called when all of response_str is sent and connection is keep-alive
 void MessageManager::UpdateTime(int client_fd) {
 	try {
 		message::Message &message = messages_.at(client_fd);

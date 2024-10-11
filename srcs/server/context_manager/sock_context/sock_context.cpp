@@ -7,7 +7,6 @@ namespace server {
 
 SockContext::SockContext() {}
 
-// todo: tmp
 SockContext::~SockContext() {
 	typedef ServerInfoMap::iterator ItServer;
 	for (ItServer it = server_context_.begin(); it != server_context_.end(); ++it) {
@@ -37,7 +36,6 @@ SockContext &SockContext::operator=(const SockContext &other) {
 	return *this;
 }
 
-// todo: server_context_無駄なことしてる
 void SockContext::AddServerInfo(const HostPortPair &host_port) {
 	if (server_context_.count(host_port) > 0) {
 		return;
