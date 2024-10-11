@@ -18,6 +18,7 @@ SRCS				+=	$(WS_HTTP_CGI_RESPONSE_PARSE)/cgi_response_parse.cpp \
 						$(WS_UTILS_DIR)/color.cpp \
 						$(WS_UTILS_DIR)/convert_str.cpp \
 						$(WS_UTILS_DIR)/is_vstring.cpp \
+						$(WS_UTILS_DIR)/trim.cpp \
 						$(WS_HTTP_DIR)/http_message.cpp
 
 # 3. Add unit test files
