@@ -217,7 +217,7 @@ bool HttpResponse::IsCgi(
 	}
 	// methodがGETかPOSTかつallow_methodかどうか
 	if (!(Method::IsAllowedMethod(method, allowed_methods)) || (method != GET && method != POST)) {
-		return false;
+		throw HttpException("Error: Method Not Allowed", StatusCode(METHOD_NOT_ALLOWED));
 	}
 	return true;
 }
