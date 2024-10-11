@@ -189,7 +189,7 @@ class TestCGI(unittest.TestCase):
 
     def test_no_header_pl(self):
         try:
-            self.con.request("GET", "/cgi-bin/no_header.pl")
+            self.con.request("GET", "/cgi-bin/error/no_header.pl")
             response = self.con.getresponse()
             self.assertEqual(response.status, HTTPStatus.INTERNAL_SERVER_ERROR)
             assert_header(response, "Connection", "close")
@@ -199,7 +199,7 @@ class TestCGI(unittest.TestCase):
 
     def test_not_executable_pl(self):
         try:
-            self.con.request("GET", "/cgi-bin/not_executable.pl")
+            self.con.request("GET", "/cgi-bin/error/not_executable.pl")
             response = self.con.getresponse()
             self.assertEqual(response.status, HTTPStatus.INTERNAL_SERVER_ERROR)
             assert_header(response, "Connection", "close")
@@ -209,7 +209,7 @@ class TestCGI(unittest.TestCase):
 
     def test_invalid_header_pl(self):
         try:
-            self.con.request("GET", "/cgi-bin/invalid_header.pl")
+            self.con.request("GET", "/cgi-bin/error/invalid_header.pl")
             response = self.con.getresponse()
             self.assertEqual(response.status, HTTPStatus.INTERNAL_SERVER_ERROR)
             assert_header(response, "Connection", "close")
