@@ -30,6 +30,7 @@ class Epoll {
 	EpollEventVector CreateEventReadyList();
 	// const
 	static const int SYSTEM_ERROR = -1;
+	static const int WAIT_TIMEOUT = 500; // ms
 	// variables
 	int          epoll_fd_;
 	unsigned int monitored_fd_count_;
