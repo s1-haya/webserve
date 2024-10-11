@@ -180,13 +180,14 @@ class TestServerRouting(unittest.TestCase):
             assert_status_line(response, HTTPStatus.OK)
             assert_header(response, "Connection", "close")
             assert_header(response, "Content-Length", str(len(body)))
+            assert_header(response, "Content-Type", "text/plain")
             self.assertEqual(response.read().decode(), body)
         except HTTPException as e:
             self.fail(f"Request failed: {e}")
 
     def test_echo_post_keep(self):
         try:
-            body = "This is a echo test"
+            body = "This is a echo test 22222222222222222222222"
             headers = {
                 "Host": "host1",
                 "Content-Type": "text/plain",
@@ -197,6 +198,7 @@ class TestServerRouting(unittest.TestCase):
             assert_status_line(response, HTTPStatus.OK)
             assert_header(response, "Connection", "keep-alive")
             assert_header(response, "Content-Length", str(len(body)))
+            assert_header(response, "Content-Type", "text/plain")
             self.assertEqual(response.read().decode(), body)
         except HTTPException as e:
             self.fail(f"Request failed: {e}")
