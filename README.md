@@ -24,7 +24,7 @@ You can use HTTP methods
 - GET, POST, DELETE to ordinary files
 - GET, POST to cgi files
 
-You use GET to get files in server, POST to upload files or echo the messages you sent and DELETE to delete files you have uploaded.
+You use GET to get files in server, POST to upload files or echo the messages you sent and DELETE to delete files you have uploaded.  
 Also, you can call CGI scripts with GET to execute them or with POST to execute with the messages you sent.
 
 You can Configuration
