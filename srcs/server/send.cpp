@@ -15,7 +15,6 @@ Send::SendResult Send::SendStr(int client_fd, const std::string &send_str) {
 	SendResult send_result;
 
 	ssize_t send_size = write(client_fd, send_str.c_str(), send_str.size());
-	utils::Debug("Send", "send_size: ", send_size);
 	if (send_size == SYSTEM_ERROR) {
 		utils::PrintError("write: ", strerror(errno));
 		send_result.Set(false);

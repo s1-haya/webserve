@@ -205,7 +205,6 @@ ClientInfo Connection::Accept(int server_fd) {
 
 	// create new client struct
 	ClientInfo client_info(client_fd, client_ip_port.first, listen_ip, listen_port);
-	utils::Debug("server", "new ClientInfo created. fd", client_fd);
 	return client_info;
 }
 

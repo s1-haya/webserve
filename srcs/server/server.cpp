@@ -287,8 +287,8 @@ void Server::RunHttpAndCgi(const event::Event &event) {
 		HandleCgi(client_fd, http_result.cgi_result);
 		return;
 	}
+	// received all request from client
 	message_manager_.SetIsCompleteRequest(client_fd, true);
-	utils::Debug("server", "received all request from client", client_fd);
 
 	const message::ConnectionState connection_state =
 		http_result.is_connection_keep ? message::KEEP : message::CLOSE;
@@ -644,8 +644,8 @@ void Server::GetHttpResponseFromCgiResponse(int client_fd, const cgi::CgiRespons
 		utils::Debug("server", "received local redirect request from client", client_fd);
 		return;
 	}
+	// received all request from client
 	message_manager_.SetIsCompleteRequest(client_fd, true);
-	utils::Debug("server", "received all request from client", client_fd);
 
 	const message::ConnectionState connection_state =
 		http_result.is_connection_keep ? message::KEEP : message::CLOSE;
