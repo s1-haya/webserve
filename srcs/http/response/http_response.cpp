@@ -281,10 +281,11 @@ std::string HttpResponse::GetResponseFromCgi(
 	} else {
 		response_header_fields[CONTENT_LENGTH] = cgi_parsed_data.header_fields.at(CONTENT_LENGTH);
 	}
-	if (IsConnectionKeep(request_info.request.header_fields)) {
-		response_header_fields[CONNECTION] = KEEP_ALIVE;
+	if (cgi_parsed_data.header_fields.find(CONNECTION) != cgi_parsed_data.header_fields.end()) {
+		response_header_fields[CONNECTION] = cgi_parsed_data.header_fields.at(CONNECTION);
 	} else {
-		response_header_fields[CONNECTION] = CLOSE;
+		response_header_fields[CONNECTION] =
+			IsConnectionKeep(request_info.request.header_fields) ? KEEP_ALIVE : CLOSE;
 	}
 	if (cgi_parsed_data.header_fields.find(LOCATION) != cgi_parsed_data.header_fields.end()) {
 		status_code                      = StatusCode(FOUND);
