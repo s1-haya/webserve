@@ -210,7 +210,9 @@ StatusCode Method::FileCreationHandlerForMultiPart(
 		std::map<std::string, std::string> content_disposition =
 			ParseContentDisposition((*it).headers[CONTENT_DISPOSITION]);
 		if (content_disposition.find(FILENAME) == content_disposition.end()) {
-			continue;
+			throw HttpException(
+				"Error: Invalid part format, missing filename", StatusCode(BAD_REQUEST)
+			);
 		}
 		std::string file_name = content_disposition[FILENAME];
 		std::string file_path = path + "/" + file_name;
