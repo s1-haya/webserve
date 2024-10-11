@@ -2,7 +2,7 @@ import socket
 import time
 import unittest
 from http.client import HTTPConnection, HTTPException
-from typing import Optional, List
+from typing import List, Optional
 
 from common_functions import (SERVER_PORT, assert_file_content,
                               assert_response, delete_file)
