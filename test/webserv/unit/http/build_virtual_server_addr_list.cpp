@@ -104,7 +104,7 @@ server::VirtualServer *BuildVirtualServer1() {
 
 	std::size_t client_max_body_size = 1024;
 
-	server::VirtualServer::ErrorPage error_page(404, "/error_pages/404-ja.html");
+	server::VirtualServer::ErrorPage error_page(404, "/error_pages/404.html");
 
 	server::VirtualServer::LocationList locationlist;
 	// Location 1 - "/"
