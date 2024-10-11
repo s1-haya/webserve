@@ -1,10 +1,30 @@
 import unittest
 from http import HTTPStatus
-from http.client import HTTPConnection, HTTPException
+from http.client import HTTPConnection, HTTPException, HTTPResponse
 
 from common_functions import SERVER_PORT
 from http_module.assert_http_response import (assert_body, assert_header,
                                               assert_status_line)
+
+METHOD_NOT_ALLOWED_FILE_PATH = (
+    "test/webserv/expected_response/default_body_message/405_method_not_allowed.txt"
+)
+TIMEOUT_FILE_PATH = (
+    "test/webserv/expected_response/default_body_message/408_timeout.txt"
+)
+INTERNAL_SERVER_ERROR_FILE_PATH = (
+    "test/webserv/expected_response/default_body_message/500_internal_server_error.txt"
+)
+
+
+def assert_body_binary(response: HTTPResponse, path: str) -> None:
+    response_body = response.read()
+    with open(path, "rb") as f:
+        expected_body = f.read()
+    assert (
+        response_body == expected_body
+    ), f"Expected response body (binary) {expected_body}, but got {response_body}"
+    assert_header(response, "Content-Length", str(len(expected_body)))
 
 
 class TestCGI(unittest.TestCase):
@@ -159,6 +179,7 @@ class TestCGI(unittest.TestCase):
             # timeoutへ
             assert_status_line(response, HTTPStatus.REQUEST_TIMEOUT)
             assert_header(response, "Connection", "close")
+            assert_body_binary(response, TIMEOUT_FILE_PATH)
         except HTTPException as e:
             self.fail(f"Request failed: {e}")
 
@@ -167,6 +188,8 @@ class TestCGI(unittest.TestCase):
             self.con.request("GET", "/cgi-bin/no_header.pl")
             response = self.con.getresponse()
             self.assertEqual(response.status, HTTPStatus.INTERNAL_SERVER_ERROR)
+            assert_header(response, "Connection", "close")
+            assert_body_binary(response, INTERNAL_SERVER_ERROR_FILE_PATH)
         except HTTPException as e:
             self.fail(f"Request failed: {e}")
 
@@ -175,6 +198,8 @@ class TestCGI(unittest.TestCase):
             self.con.request("GET", "/cgi-bin/not_executable.pl")
             response = self.con.getresponse()
             self.assertEqual(response.status, HTTPStatus.INTERNAL_SERVER_ERROR)
+            assert_header(response, "Connection", "close")
+            assert_body_binary(response, INTERNAL_SERVER_ERROR_FILE_PATH)
         except HTTPException as e:
             self.fail(f"Request failed: {e}")
 
@@ -183,6 +208,8 @@ class TestCGI(unittest.TestCase):
             self.con.request("GET", "/cgi-bin/invalid_header.pl")
             response = self.con.getresponse()
             self.assertEqual(response.status, HTTPStatus.INTERNAL_SERVER_ERROR)
+            assert_header(response, "Connection", "close")
+            assert_body_binary(response, INTERNAL_SERVER_ERROR_FILE_PATH)
         except HTTPException as e:
             self.fail(f"Request failed: {e}")
 
@@ -191,6 +218,8 @@ class TestCGI(unittest.TestCase):
             self.con.request("GET", "/cgi-bin/loop.pl")
             response = self.con.getresponse()
             self.assertEqual(response.status, HTTPStatus.REQUEST_TIMEOUT)
+            assert_header(response, "Connection", "close")
+            assert_body_binary(response, TIMEOUT_FILE_PATH)
         except HTTPException as e:
             self.fail(f"Request failed: {e}")
 
@@ -199,5 +228,7 @@ class TestCGI(unittest.TestCase):
             self.con.request("DELETE", "/cgi-bin/print_ok.pl")
             response = self.con.getresponse()
             self.assertEqual(response.status, HTTPStatus.METHOD_NOT_ALLOWED)
+            assert_header(response, "Connection", "keep-alive")
+            assert_body_binary(response, METHOD_NOT_ALLOWED_FILE_PATH)
         except HTTPException as e:
             self.fail(f"Request failed: {e}")
