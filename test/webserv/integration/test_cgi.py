@@ -63,6 +63,33 @@ class TestCGI(unittest.TestCase):
         except HTTPException as e:
             self.fail(f"Request failed: {e}")
 
+    # CgiResponseの中のConnectionヘッダーが適用されているか
+    def test_print_ok_close_pl(self):
+        try:
+            self.con.request(
+                "GET",
+                "/cgi-bin/print_ok_close.pl",
+                headers={"Connection": "keep-alive"},
+            )
+            response = self.con.getresponse()
+            assert_status_line(response, HTTPStatus.OK)
+            assert_header(response, "Connection", "close")
+            self.assertEqual(response.read(), b"OK\n")
+        except HTTPException as e:
+            self.fail(f"Request failed: {e}")
+
+    def test_print_ok_keep_pl(self):
+        try:
+            self.con.request(
+                "GET", "/cgi-bin/print_ok_keep.pl", headers={"Connection": "close"}
+            )
+            response = self.con.getresponse()
+            assert_status_line(response, HTTPStatus.OK)
+            assert_header(response, "Connection", "keep-alive")
+            self.assertEqual(response.read(), b"OK\n")
+        except HTTPException as e:
+            self.fail(f"Request failed: {e}")
+
     def test_print_env_pl(self):
         try:
             self.con.request("GET", "/cgi-bin/print_env.pl")
