@@ -68,7 +68,10 @@ HttpResult Http::GetResponseFromCgi(int client_fd, const cgi::CgiResponse &cgi_r
 		result.is_response_complete = true;
 	}
 	result.is_connection_keep =
-		HttpResponse::IsConnectionKeep(data.request_result.request.header_fields);
+		cgi_parse_result.GetValue().header_fields.find(CONNECTION) !=
+				cgi_parse_result.GetValue().header_fields.end()
+			? cgi_parse_result.GetValue().header_fields.at(CONNECTION) == KEEP_ALIVE
+			: HttpResponse::IsConnectionKeep(data.request_result.request.header_fields);
 	result.response =
 		HttpResponse::GetResponseFromCgi(cgi_parse_result.GetValue(), data.request_result);
 	storage_.DeleteClientSaveData(client_fd);
