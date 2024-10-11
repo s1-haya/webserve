@@ -75,11 +75,11 @@ class TestServerRouting(unittest.TestCase):
         except HTTPException as e:
             self.fail(f"Request failed: {e}")
 
-    def test_post_root_host1(self):
+    def test_post_root_host3(self):
         try:
             body = "This is a test payload"
             headers = {
-                "Host": "no_exist_host",
+                "Host": "host3",
                 "Content-Type": "text/plain",
                 "Content-Length": str(len(body)),
             }
@@ -162,5 +162,43 @@ class TestServerRouting(unittest.TestCase):
             assert_status_line(response, HTTPStatus.NOT_IMPLEMENTED)
             assert_header(response, "Connection", "keep-alive")
             assert_body(response, CUSTOM_ERROR_PAGE)
+        except HTTPException as e:
+            self.fail(f"Request failed: {e}")
+
+    # echo postのテスト
+    def test_echo_post_close(self):
+        try:
+            body = "This is a echo test"
+            headers = {
+                "Host": "host1",
+                "Content-Type": "text/plain",
+                "Content-Length": str(len(body)),
+                "Connection": "close",
+            }
+            self.con.request("POST", "/", headers=headers, body=body)
+            response = self.con.getresponse()
+            assert_status_line(response, HTTPStatus.OK)
+            assert_header(response, "Connection", "close")
+            assert_header(response, "Content-Length", str(len(body)))
+            assert_header(response, "Content-Type", "text/plain")
+            self.assertEqual(response.read().decode(), body)
+        except HTTPException as e:
+            self.fail(f"Request failed: {e}")
+
+    def test_echo_post_keep(self):
+        try:
+            body = "This is a echo test 22222222222222222222222"
+            headers = {
+                "Host": "host1",
+                "Content-Type": "text/plain",
+                "Content-Length": str(len(body)),
+            }
+            self.con.request("POST", "/", headers=headers, body=body)
+            response = self.con.getresponse()
+            assert_status_line(response, HTTPStatus.OK)
+            assert_header(response, "Connection", "keep-alive")
+            assert_header(response, "Content-Length", str(len(body)))
+            assert_header(response, "Content-Type", "text/plain")
+            self.assertEqual(response.read().decode(), body)
         except HTTPException as e:
             self.fail(f"Request failed: {e}")

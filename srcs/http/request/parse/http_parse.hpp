@@ -25,12 +25,16 @@ struct IsHttpRequestFormat {
 };
 
 struct HttpRequestParsedData {
+	HttpRequestParsedData() : is_cgi_running(false) {}
+
 	// HTTP各書式のパースしたかどうか
 	IsHttpRequestFormat is_request_format;
 	// HttpRequestResult
 	HttpRequestResult request_result;
 	// HTTP各書式をパースする前の読み込んだ情報
 	std::string current_buf;
+	// CGI実行中かどうか
+	bool is_cgi_running;
 };
 
 class HttpParse {

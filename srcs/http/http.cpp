@@ -95,15 +95,30 @@ HttpResult Http::CreateHttpResponse(
 	HttpResult            result;
 	HttpRequestParsedData data = storage_.GetClientSaveData(client_info.fd);
 	result.request_buf         = data.current_buf;
+
+	// CGI実行中は何もしない
+	if (data.is_cgi_running) {
+		result.is_response_complete = false; // same as default
+		result.is_connection_keep =
+			HttpResponse::IsConnectionKeep(data.request_result.request.header_fields);
+		return result;
+	}
 	HttpResponseResult response_result =
 		HttpResponse::Run(client_info, server_info, data.request_result, result.cgi_result);
 	result.is_connection_keep = IsConnectionKeep(
 		response_result.is_connection_close, data.request_result.request.header_fields
 	);
-	result.response             = response_result.response;
-	result.is_response_complete = !result.cgi_result.is_cgi;
-	if (!result.cgi_result.is_cgi) { // cgiの場合はcgiのhttp_responseを作るときにsave_dataが必要
+	result.response = response_result.response;
+	if (result.cgi_result.is_cgi) {
+		// cgiの場合はcgiのhttp_responseを作るときにsave_dataが必要
+		// is_cgi_runningを変えて更新
+		data.is_cgi_running = true;
+		storage_.UpdateClientSaveData(client_info.fd, data);
+		result.is_response_complete = false;
+	} else {
+		// httpの場合はsave_dataは不要
 		storage_.DeleteClientSaveData(client_info.fd);
+		result.is_response_complete = true;
 	}
 	return result;
 }

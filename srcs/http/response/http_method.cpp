@@ -87,7 +87,11 @@ StatusCode Method::Handler(
 		);
 	} else if (method == POST) {
 		status_code = PostHandler(
-			file_upload_path, request_body_message, request_header_fields, response_body_message
+			file_upload_path,
+			request_body_message,
+			request_header_fields,
+			response_body_message,
+			response_header_fields
 		);
 	} else if (method == DELETE) {
 		status_code = DeleteHandler(path, response_body_message);
@@ -139,11 +143,12 @@ StatusCode Method::PostHandler(
 	const std::string  &file_upload_path,
 	const std::string  &request_body_message,
 	const HeaderFields &request_header_fields,
-	std::string        &response_body_message
+	std::string        &response_body_message,
+	HeaderFields       &response_header_fields
 ) {
 
 	if (file_upload_path.empty()) {
-		return EchoPostHandler(request_body_message, response_body_message);
+		return EchoPostHandler(request_body_message, response_body_message, response_header_fields);
 	} else if (request_header_fields.find(CONTENT_TYPE) != request_header_fields.end() &&
 			   utils::StartWith(request_header_fields.at(CONTENT_TYPE), MULTIPART_FORM_DATA)) {
 		// Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
@@ -205,12 +210,16 @@ StatusCode Method::FileCreationHandlerForMultiPart(
 		// Content-Disposition: form-data; name="file"; filename="test.txt"
 		// のようにfilenameが含まれる場合 そのパスにファイルを作成する
 		if ((*it).headers.find(CONTENT_DISPOSITION) == (*it).headers.end()) {
-			continue;
+			throw HttpException(
+				"Error: Invalid part format, missing Content-Disposition", StatusCode(BAD_REQUEST)
+			);
 		}
 		std::map<std::string, std::string> content_disposition =
 			ParseContentDisposition((*it).headers[CONTENT_DISPOSITION]);
 		if (content_disposition.find(FILENAME) == content_disposition.end()) {
-			continue;
+			throw HttpException(
+				"Error: Invalid part format, missing filename", StatusCode(BAD_REQUEST)
+			);
 		}
 		std::string file_name = content_disposition[FILENAME];
 		std::string file_path = path + "/" + file_name;
@@ -345,9 +354,12 @@ utils::Result<std::string> Method::AutoindexHandler(const std::string &path) {
 }
 
 StatusCode Method::EchoPostHandler(
-	const std::string &request_body_message, std::string &response_body_message
+	const std::string &request_body_message,
+	std::string       &response_body_message,
+	HeaderFields      &response_header_fields
 ) {
-	response_body_message = request_body_message;
+	response_body_message                = request_body_message;
+	response_header_fields[CONTENT_TYPE] = TEXT_PLAIN;
 	return StatusCode(OK);
 }
 
