@@ -6,6 +6,9 @@ from common_functions import SERVER_PORT
 from http_module.assert_http_response import (assert_body, assert_header,
                                               assert_status_line)
 
+NOT_FOUND_FILE_PATH = (
+    "test/webserv/expected_response/default_body_message/404_not_found.txt"
+)
 METHOD_NOT_ALLOWED_FILE_PATH = (
     "test/webserv/expected_response/default_body_message/405_method_not_allowed.txt"
 )
@@ -224,6 +227,16 @@ class TestCGI(unittest.TestCase):
             self.assertEqual(response.status, HTTPStatus.REQUEST_TIMEOUT)
             assert_header(response, "Connection", "close")
             assert_body_binary(response, TIMEOUT_FILE_PATH)
+        except HTTPException as e:
+            self.fail(f"Request failed: {e}")
+
+    def test_script_not_found_pl(self):
+        try:
+            self.con.request("GET", "/cgi-bin/non.pl")
+            response = self.con.getresponse()
+            self.assertEqual(response.status, HTTPStatus.NOT_FOUND)
+            assert_header(response, "Connection", "keep-alive")
+            assert_body_binary(response, NOT_FOUND_FILE_PATH)
         except HTTPException as e:
             self.fail(f"Request failed: {e}")
 
