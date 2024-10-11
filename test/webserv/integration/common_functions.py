@@ -73,6 +73,9 @@ def send_request_and_assert_response(request_file, expected_response):
     try:
         response = client_instance.SendRequestAndReceiveResponse(request)
         assert_response(response, expected_response)
-    except RuntimeError as e:
-        # ex) recv failed: Connection reset by peer
-        print(f"Error: {e}. Ignoring the error.")
+    except Exception as e:
+        if "Connection reset by peer" in str(e):
+            print(f"Error: {e}. Ignoring the error.")
+        else:
+            print(f"Error: {e}")
+            raise
