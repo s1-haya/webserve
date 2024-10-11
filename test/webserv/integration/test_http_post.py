@@ -427,6 +427,11 @@ def test_post_201_responses(
             payload_too_large_response,
             CHUNKED_FILE_PATH,
         ),
+        (
+            REQUEST_POST_4XX_DIR + "413_03_too_large_multipart_body_size.txt",
+            payload_too_large_response,
+            MULTIPART_FILE_PATH1,
+        ),
     ],
     ids=[
         "400_01_duplicate_content_length",
@@ -464,6 +469,7 @@ def test_post_201_responses(
         "408_06_max_chunk_size_and_crlf",
         "413_01_too_large_content_max_body_size",
         "413_02_too_large_unchunked_body_size.txt",
+        "413_03_too_large_multipart_body_size",
     ],
 )
 def test_post_4xx_responses(
