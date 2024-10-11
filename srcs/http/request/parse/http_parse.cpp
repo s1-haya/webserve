@@ -333,9 +333,6 @@ HeaderFields HttpParse::SetHeaderFields(const std::vector<std::string> &header_f
 		}
 
 		CheckValidHeaderFieldNameAndValue(header_field_name, header_field_value);
-		// todo:
-		// マルチパートを対応する場合はutils::SplitStrを使用して、セミコロン区切りのstd::vector<std::string>になる。
-		// ex) Content-Type: multipart/form-data; boundary=----WebKitFormBoundary64XhQJfFNRKx7oK7
 		typedef std::pair<HeaderFields::const_iterator, bool> Result;
 		Result result = header_fields.insert(std::make_pair(header_field_name, header_field_value));
 		if (result.second == false) {

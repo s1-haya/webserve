@@ -287,8 +287,8 @@ void Server::RunHttpAndCgi(const event::Event &event) {
 		HandleCgi(client_fd, http_result.cgi_result);
 		return;
 	}
+	// received all request from client
 	message_manager_.SetIsCompleteRequest(client_fd, true);
-	utils::Debug("server", "received all request from client", client_fd);
 
 	const message::ConnectionState connection_state =
 		http_result.is_connection_keep ? message::KEEP : message::CLOSE;
@@ -386,7 +386,6 @@ void Server::Disconnect(int client_fd) {
 		// Call Cgi's destructor -> close pipe_fd -> automatically deleted from epoll
 		cgi_manager_.DeleteCgi(client_fd);
 	}
-	// todo: client_save_dataがない場合に呼ばれても大丈夫な作りになってるか確認
 	// HttpResult is not used.
 	http_.GetErrorResponse(client_fd, http::INTERNAL_ERROR);
 	event_monitor_.Delete(client_fd);
@@ -645,8 +644,8 @@ void Server::GetHttpResponseFromCgiResponse(int client_fd, const cgi::CgiRespons
 		utils::Debug("server", "received local redirect request from client", client_fd);
 		return;
 	}
+	// received all request from client
 	message_manager_.SetIsCompleteRequest(client_fd, true);
-	utils::Debug("server", "received all request from client", client_fd);
 
 	const message::ConnectionState connection_state =
 		http_result.is_connection_keep ? message::KEEP : message::CLOSE;

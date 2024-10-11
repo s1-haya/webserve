@@ -81,7 +81,7 @@ Result RunGetClientInfo(
 	return result;
 }
 
-// test_funcを実行したらthrowされることを期待するテスト(todo: テスト共通化？)
+// test_funcを実行したらthrowされることを期待するテスト
 template <typename TestFunc>
 int TestThrow(TestFunc test_func, server::SockContext &context, const HostPortPair &host_port) {
 	try {
@@ -89,14 +89,14 @@ int TestThrow(TestFunc test_func, server::SockContext &context, const HostPortPa
 		PrintNg();
 		PrintError("throw failed");
 		return EXIT_FAILURE;
-	} catch (const std::exception &e) { // todo: 独自のexceptionだけcatchしてokが良いかも
+	} catch (const std::exception &e) {
 		PrintOk();
 		std::cerr << utils::color::GRAY << e.what() << utils::color::RESET << std::endl;
 		return EXIT_SUCCESS;
 	}
 }
 
-// test_funcを実行したらthrowされることを期待するテスト(todo: テスト共通化？)
+// test_funcを実行したらthrowされることを期待するテスト
 template <typename TestFunc>
 int TestThrow(TestFunc test_func, const server::SockContext &context, int client_fd) {
 	try {
@@ -104,7 +104,7 @@ int TestThrow(TestFunc test_func, const server::SockContext &context, int client
 		PrintNg();
 		PrintError("throw failed");
 		return EXIT_FAILURE;
-	} catch (const std::exception &e) { // todo: 独自のexceptionだけcatchしてokが良いかも
+	} catch (const std::exception &e) {
 		PrintOk();
 		std::cerr << utils::color::GRAY << e.what() << utils::color::RESET << std::endl;
 		return EXIT_SUCCESS;
@@ -210,9 +210,6 @@ int RunTestSockContext() {
 	// contextのメンバと自作のexpectedが同じか確認
 	ret_code |= Test(RunGetClientInfo(context, expected_client_info, client_fd1));
 
-	// contextにClientInfo2とServerInfoMapに登録されていないserver_fdを追加してみる (todo: 保留)
-	// ret_code |= TestThrow(&server::SockContext::AddClientInfo, client_fd2, client_info2, 100);
-
 	// contextにClientInfo2とそれに紐づくserver_fd2を追加
 	// - ServerInfoMap = {{host_port1: ServerInfo1}, {host_port2: ServerInfo2}}
 	// - ClientInfoMap = {{6: ClientInfo1}, {7: ClientInfo2}}
@@ -225,7 +222,7 @@ int RunTestSockContext() {
 	// - ServerInfoMap = {{host_port1: ServerInfo1}, {host_port2: ServerInfo2}}
 	// - ClientInfoMap = {{7: ClientInfo2}}
 	DeleteClientInfoForTest(context, expected_client_info, client_fd1);
-	// 削除後にgetterを使用し,期待通りthrowされるか確認 (todo: getterがthrowするなら必要なテスト)
+	// 削除後にgetterを使用し,期待通りthrowされるか確認 (getterがthrowするなら必要なテスト)
 	ret_code |= TestThrow(&server::SockContext::GetClientInfo, context, client_fd1);
 
 	// 2度同じClientInfo1を削除してみる(期待: 何も起きない)

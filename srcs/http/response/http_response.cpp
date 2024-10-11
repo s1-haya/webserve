@@ -136,10 +136,6 @@ HttpResponseFormatResult HttpResponse::CreateHttpResponseFormat(
 		}
 	} catch (const HttpException &e) {
 		// ステータスコードが300番台以上の場合
-		// for debug
-		std::cerr << utils::color::GRAY << "Debug [" << e.what() << "]" << utils::color::RESET
-				  << std::endl;
-
 		status_code = e.GetStatusCode();
 		if (error_page.IsOk() && status_code.GetEStatusCode() == error_page.GetValue().first) {
 			utils::Debug("ErrorPage", error_page.GetValue().second);

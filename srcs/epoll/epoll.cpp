@@ -67,8 +67,8 @@ Epoll::EpollEventVector Epoll::CreateEventReadyList() {
 	EpollEventVector events(monitored_fd_count_);
 
 	errno = 0;
-	// todo: set timeout(ms)
-	const int ready_list_size = epoll_wait(epoll_fd_, events.data(), monitored_fd_count_, 500);
+	const int ready_list_size =
+		epoll_wait(epoll_fd_, events.data(), monitored_fd_count_, WAIT_TIMEOUT);
 	if (ready_list_size == SYSTEM_ERROR) {
 		if (errno == EINTR) {
 			events.clear();

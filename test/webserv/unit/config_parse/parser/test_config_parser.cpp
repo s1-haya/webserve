@@ -258,8 +258,6 @@ int RunErrorTests(const TestCase test_cases[], std::size_t num_test_cases) {
 	return ret_code;
 }
 
-// TODO: Lexerとテストケースを揃える
-
 /* Test1 One Server */
 ServerList MakeExpectedTest1() {
 	ServerList                                        expected_result;

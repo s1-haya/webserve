@@ -42,7 +42,7 @@ std::string ConvertToIpv4Str(const struct in_addr &addr) {
 	return oss.str();
 }
 
-// todo: remove
+// note: unused
 // 128bit(16bytes) -> xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx
 // struct in6_addr addr = {0x20, 0x01, 0x0d, 0xb8, 0x85, 0xa3, 0x00, 0x00,
 //                         0x00, 0x00, 0x8a, 0x2e, 0x03, 0x70, 0x73, 0x34}
@@ -187,7 +187,6 @@ Connection::IpPortPair Connection::GetListenServerIpPort(int client_fd) {
 	return GetIpPort(listen_sock_addr);
 }
 
-// todo: return ClientInfo *?
 ClientInfo Connection::Accept(int server_fd) {
 	struct sockaddr_storage client_sock_addr = {};
 	socklen_t               addrlen          = sizeof(client_sock_addr);
@@ -206,7 +205,6 @@ ClientInfo Connection::Accept(int server_fd) {
 
 	// create new client struct
 	ClientInfo client_info(client_fd, client_ip_port.first, listen_ip, listen_port);
-	utils::Debug("server", "new ClientInfo created. fd", client_fd);
 	return client_info;
 }
 

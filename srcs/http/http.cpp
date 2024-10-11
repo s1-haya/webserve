@@ -157,7 +157,6 @@ HttpResult Http::CreateBadRequestResponse(int client_fd) {
 	return result;
 }
 
-// todo: HTTPRequestの書式が完全かどうか(どのように取得するかは要検討)
 bool Http::IsHttpRequestFormatComplete(int client_fd) {
 	HttpRequestParsedData save_data = storage_.GetClientSaveData(client_fd);
 	return save_data.is_request_format.is_request_line &&
