@@ -326,7 +326,7 @@ HeaderFields HttpParse::SetHeaderFields(const std::vector<std::string> &header_f
 		std::string header_field_name  = utils::ToLowerString((*it).substr(0, colon_pos));
 		std::string header_field_value = (*it).substr(colon_pos + 1);
 		header_field_value             = utils::Trim(header_field_value, OPTIONAL_WHITESPACE);
-		if (header_field_name == "content-type") {
+		if (header_field_name == CONTENT_TYPE) {
 			ToLowerContentTypeHeaderExceptBoundary(header_field_value);
 		} else {
 			header_field_value = utils::ToLowerString(header_field_value);
