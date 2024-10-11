@@ -87,7 +87,11 @@ StatusCode Method::Handler(
 		);
 	} else if (method == POST) {
 		status_code = PostHandler(
-			file_upload_path, request_body_message, request_header_fields, response_body_message
+			file_upload_path,
+			request_body_message,
+			request_header_fields,
+			response_body_message,
+			response_header_fields
 		);
 	} else if (method == DELETE) {
 		status_code = DeleteHandler(path, response_body_message);
@@ -139,11 +143,12 @@ StatusCode Method::PostHandler(
 	const std::string  &file_upload_path,
 	const std::string  &request_body_message,
 	const HeaderFields &request_header_fields,
-	std::string        &response_body_message
+	std::string        &response_body_message,
+	HeaderFields       &response_header_fields
 ) {
 
 	if (file_upload_path.empty()) {
-		return EchoPostHandler(request_body_message, response_body_message);
+		return EchoPostHandler(request_body_message, response_body_message, response_header_fields);
 	} else if (request_header_fields.find(CONTENT_TYPE) != request_header_fields.end() &&
 			   utils::StartWith(request_header_fields.at(CONTENT_TYPE), MULTIPART_FORM_DATA)) {
 		// Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
@@ -345,9 +350,12 @@ utils::Result<std::string> Method::AutoindexHandler(const std::string &path) {
 }
 
 StatusCode Method::EchoPostHandler(
-	const std::string &request_body_message, std::string &response_body_message
+	const std::string &request_body_message,
+	std::string       &response_body_message,
+	HeaderFields      &response_header_fields
 ) {
-	response_body_message = request_body_message;
+	response_body_message                = request_body_message;
+	response_header_fields[CONTENT_TYPE] = TEXT_PLAIN;
 	return StatusCode(OK);
 }
 

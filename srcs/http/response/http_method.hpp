@@ -41,7 +41,8 @@ class Method {
 		const std::string  &file_upload_path,
 		const std::string  &request_body_message,
 		const HeaderFields &request_header_fields,
-		std::string        &response_body_message
+		std::string        &response_body_message,
+		HeaderFields       &response_header_fields
 	);
 	static StatusCode  DeleteHandler(const std::string &path, std::string &response_body_message);
 	static Stat        TryStat(const std::string &path);
@@ -58,8 +59,11 @@ class Method {
 		const HeaderFields &request_header_fields,
 		std::string        &response_body_message
 	);
-	static StatusCode
-	EchoPostHandler(const std::string &request_body_message, std::string &response_body_message);
+	static StatusCode EchoPostHandler(
+		const std::string &request_body_message,
+		std::string       &response_body_message,
+		HeaderFields      &response_header_fields
+	);
 	static utils::Result<std::string> AutoindexHandler(const std::string &path);
 
 	// マルチパート用のパートを表す構造体
