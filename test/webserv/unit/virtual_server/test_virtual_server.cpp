@@ -25,7 +25,7 @@ std::ostream &operator<<(std::ostream &os, const VirtualServer::LocationList &lo
 		os << "  alias: [" << location.alias << "]" << std::endl;
 		os << "  index: [" << location.index << "]" << std::endl;
 		os << "  autoindex: [" << (location.autoindex ? "on" : "off") << "]" << std::endl;
-		os << "  allowed_methods: " << location.allowed_methods << std::endl; // todo
+		os << "  allowed_methods: " << location.allowed_methods << std::endl;
 		os << "  redirect: [" << location.request_uri << "]" << std::endl;
 		os << "  cgi_extension: [" << location.cgi_extension << "]" << std::endl;
 		os << "  upload_directory: [" << location.upload_directory << "]" << std::endl;
