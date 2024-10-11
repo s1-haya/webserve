@@ -164,3 +164,37 @@ class TestServerRouting(unittest.TestCase):
             assert_body(response, CUSTOM_ERROR_PAGE)
         except HTTPException as e:
             self.fail(f"Request failed: {e}")
+
+    # echo postのテスト
+    def test_echo_post_close(self):
+        try:
+            body = "This is a echo test"
+            headers = {
+                "Host": "host1",
+                "Content-Type": "text/plain",
+                "Content-Length": str(len(body)),
+                "Connection": "close",
+            }
+            self.con.request("POST", "/", headers=headers, body=body)
+            response = self.con.getresponse()
+            assert_status_line(response, HTTPStatus.OK)
+            assert_header(response, "Connection", "close")
+            self.assertEqual(response.read().decode(), body)
+        except HTTPException as e:
+            self.fail(f"Request failed: {e}")
+
+    def test_echo_post_keep(self):
+        try:
+            body = "This is a echo test"
+            headers = {
+                "Host": "host1",
+                "Content-Type": "text/plain",
+                "Content-Length": str(len(body)),
+            }
+            self.con.request("POST", "/", headers=headers, body=body)
+            response = self.con.getresponse()
+            assert_status_line(response, HTTPStatus.OK)
+            assert_header(response, "Connection", "keep-alive")
+            self.assertEqual(response.read().decode(), body)
+        except HTTPException as e:
+            self.fail(f"Request failed: {e}")
