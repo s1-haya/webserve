@@ -112,6 +112,12 @@ def cleanup_file_context():
             MULTIPART_FILE_PATH1,
             "value1",
         ),
+        (
+            REQUEST_POST_2XX_DIR + "201_11_upload_multipart_no_quote.txt",
+            created_response_close,
+            MULTIPART_FILE_PATH1,
+            "value1",
+        ),
     ],
     ids=[
         "201_01_upload_file",
@@ -123,6 +129,7 @@ def cleanup_file_context():
         "201_07_just_content_max_body_size",
         "201_08_unchunked_body_size_just_client_max_body_size",
         "201_10_upload_multipart",
+        "201_11_upload_multipart_no_quote",
     ],
 )
 def test_post_upload_responses(
