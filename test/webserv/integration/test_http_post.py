@@ -24,6 +24,7 @@ UPLOAD_SUB_DIR = UPLOAD_DIR + "upload_sub/"
 PERMISSION_DENIED_DIR = UPLOAD_DIR + "permission-denied-dir/"
 
 MULTIPART_FILE_PATH1 = UPLOAD_DIR + "filename1.txt"
+MULTIPART_FILE_PATH2 = UPLOAD_DIR + "filename2.txt"
 
 
 def assert_uploaded_file_content(upload_file_path, expected_upload_file_content):
@@ -118,6 +119,7 @@ def cleanup_file_context():
             MULTIPART_FILE_PATH1,
             "value1",
         ),
+        # 201_12 is below -> test_post_upload_multi_file_responses()
     ],
     ids=[
         "201_01_upload_file",
@@ -143,6 +145,56 @@ def test_post_upload_responses(
     with cleanup_file_context(upload_file_path):
         send_request_and_assert_response(request_file, expected_response)
         assert_uploaded_file_content(upload_file_path, expected_upload_file_content)
+
+
+@pytest.fixture
+def cleanup_files_context():
+    # コンテキストマネージャとして使用可能なフィクスチャ
+    from contextlib import contextmanager
+
+    @contextmanager
+    def _cleanup(file_paths):
+        for file in file_paths:
+            delete_file(file)
+
+        yield
+
+        for file in file_paths:
+            delete_file(file)
+
+    return _cleanup
+
+
+@pytest.mark.parametrize(
+    "request_file, expected_response, upload_file_paths, expected_upload_file_contents",
+    [
+        (
+            REQUEST_POST_2XX_DIR + "201_12_upload_multipart_multi_files.txt",
+            created_response_close,
+            [MULTIPART_FILE_PATH1, MULTIPART_FILE_PATH2],
+            ["value1", "value2"],
+        ),
+    ],
+    ids=[
+        "201_12_upload_multipart_multi_files",
+    ],
+)
+def test_post_upload_multi_file_responses(
+    request_file,
+    expected_response,
+    upload_file_paths,
+    expected_upload_file_contents,
+    cleanup_files_context,
+):
+    # cleanup_files_contextフィクスチャを使用してファイル削除を実行
+    with cleanup_files_context(upload_file_paths):
+        send_request_and_assert_response(request_file, expected_response)
+        # 複数ファイルを全て比較
+        for upload_file_path, expected_upload_file_content in zip(
+            upload_file_paths,
+            expected_upload_file_contents,
+        ):
+            assert_uploaded_file_content(upload_file_path, expected_upload_file_content)
 
 
 @pytest.fixture
