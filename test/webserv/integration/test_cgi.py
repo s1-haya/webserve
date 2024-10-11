@@ -102,6 +102,53 @@ class TestCGI(unittest.TestCase):
             response = self.con.getresponse()
             assert_status_line(response, HTTPStatus.FOUND)
             assert_header(response, "Location", "http://localhost:8080/")
+            self.assertEqual(response.read().decode(), "")
+        except HTTPException as e:
+            self.fail(f"Request failed: {e}")
+
+    def test_client_redirect_with_doc_pl(self):
+        try:
+            self.con.request("GET", "/cgi-bin/client_redirect_with_doc.pl")
+            response = self.con.getresponse()
+            assert_status_line(response, HTTPStatus.FOUND)
+            assert_header(response, "Location", "http://localhost:8080/")
+            expected_body = (
+                "<html>\n"
+                "<head><title>Redirect</title></head>\n"
+                "<body>\n"
+                '<p>Redirecting to <a href="http://localhost:8080/">http://localhost:8080/</a></p>\n'
+                "</body>\n"
+                "</html>\n"
+            )
+            self.assertEqual(response.read().decode(), expected_body)
+        except HTTPException as e:
+            self.fail(f"Request failed: {e}")
+
+    def test_local_redirect_pl(self):
+        try:
+            self.con.request("GET", "/cgi-bin/local_redirect.pl")
+            response = self.con.getresponse()
+            # test_print_env_plと同じ内容が返ってくるはず
+            assert_status_line(response, HTTPStatus.OK)
+            assert_header(response, "Connection", "keep-alive")
+            body = response.read().decode()
+            self.assertIn("AUTH_TYPE:", body)
+            self.assertIn("CONTENT_LENGTH:", body)
+            self.assertIn("CONTENT_TYPE:", body)
+            self.assertIn("GATEWAY_INTERFACE:", body)
+            self.assertIn("PATH_INFO:", body)
+            self.assertIn("PATH_TRANSLATED:", body)
+            self.assertIn("QUERY_STRING:", body)
+            self.assertIn("REMOTE_ADDR:", body)
+            self.assertIn("REMOTE_HOST:", body)
+            self.assertIn("REMOTE_IDENT:", body)
+            self.assertIn("REMOTE_USER:", body)
+            self.assertIn("REQUEST_METHOD:", body)
+            self.assertIn("SCRIPT_NAME:", body)
+            self.assertIn("SERVER_NAME:", body)
+            self.assertIn("SERVER_PORT:", body)
+            self.assertIn("SERVER_PROTOCOL:", body)
+            self.assertIn("SERVER_SOFTWARE:", body)
         except HTTPException as e:
             self.fail(f"Request failed: {e}")
 
