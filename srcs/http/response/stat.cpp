@@ -30,8 +30,8 @@ bool Stat::IsReadableFile() const {
 	return IsRegularFile() && (stat_buf_.st_mode & S_IRUSR);
 }
 
-bool Stat::IsWritableFile() const {
-	return IsRegularFile() && (stat_buf_.st_mode & S_IWUSR);
-}
+// bool Stat::IsWritableFile() const {
+// 	return IsRegularFile() && (stat_buf_.st_mode & S_IWUSR);
+// }
 
 } // namespace http

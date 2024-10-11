@@ -25,13 +25,13 @@ int ServerInfo::GetFd() const {
 	return fd_;
 }
 
-const std::string &ServerInfo::GetHost() const {
-	return host_port_.first;
-}
+// const std::string &ServerInfo::GetHost() const {
+// 	return host_port_.first;
+// }
 
-unsigned int ServerInfo::GetPort() const {
-	return host_port_.second;
-}
+// unsigned int ServerInfo::GetPort() const {
+// 	return host_port_.second;
+// }
 
 void ServerInfo::SetSockFd(int fd) {
 	fd_ = fd;
