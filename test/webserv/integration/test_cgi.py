@@ -141,6 +141,7 @@ class TestCGI(unittest.TestCase):
             self.con.request("GET", "/cgi-bin/client_redirect.pl")
             response = self.con.getresponse()
             assert_status_line(response, HTTPStatus.FOUND)
+            assert_header(response, "Connection", "keep-alive")
             assert_header(response, "Location", "http://localhost:8080/")
             # bodyは空
             self.assertEqual(response.read().decode(), "")
@@ -152,6 +153,7 @@ class TestCGI(unittest.TestCase):
             self.con.request("GET", "/cgi-bin/client_redirect_with_doc.pl")
             response = self.con.getresponse()
             assert_status_line(response, HTTPStatus.FOUND)
+            assert_header(response, "Connection", "keep-alive")
             assert_header(response, "Location", "http://localhost:8080/")
             expected_body = (
                 "<html>\n"
@@ -331,6 +333,7 @@ class TestCGI(unittest.TestCase):
             self.con.request("GET", "/cgi-bin/client_redirect.pl")
             response = self.con.getresponse()
             assert_status_line(response, HTTPStatus.FOUND)
+            assert_header(response, "Connection", "keep-alive")
             assert_header(response, "Location", "http://localhost:8080/")
             # bodyは空
             self.assertEqual(response.read().decode(), "")
