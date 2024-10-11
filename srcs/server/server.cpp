@@ -196,7 +196,8 @@ void Server::HandleErrorEvent(int fd) {
 		return;
 	}
 	const int client_fd = IsCgi(fd) ? cgi_manager_.GetClientFd(fd) : fd;
-	SetInternalServerError(client_fd);
+	utils::Debug("server", "An error occurred on the monitored fd", client_fd);
+	Disconnect(client_fd);
 }
 
 void Server::HandleHangUpEvent(const event::Event &event) {
