@@ -33,6 +33,7 @@ RUN rm -rf /var/lib/apt/lists/*
 
 # 新しいユーザーを作成。この時点ではuserはroot
 RUN useradd -ms /bin/bash user_webserv
+RUN chown -R user_webserv:user_webserv /workspaces
 # root権限が必要なinstall等を終えたら、作成したユーザーに切り替え
 USER user_webserv
 

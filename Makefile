@@ -222,7 +222,7 @@ run-dev:
 	fi
 	@sleep 1
 	@if [ -z "$$(docker ps -aqf name=$(DEV_CONTAINER_NAME))" ]; then \
-		docker run -it --name $(DEV_CONTAINER_NAME) -p $(DEV_PORT):$(WEBSERV_PORT) $(DEV_IMAGE_NAME):$(DEV_IMAGE_TAG); \
+		docker run -it --name $(DEV_CONTAINER_NAME) -p $(DEV_PORT):$(WEBSERV_PORT) -v .:/workspaces/webserv/ $(DEV_IMAGE_NAME):$(DEV_IMAGE_TAG); \
 	elif [ -z "$$(docker ps -qf name=$(DEV_CONTAINER_NAME))" ]; then \
 		docker start $(DEV_CONTAINER_NAME); \
 	else \
