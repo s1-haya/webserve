@@ -13,7 +13,7 @@ make run
 ```
 to use default configuration file or
 ```
-make && ./webserv [configuration file]
+make run PATH_CONFIG=[configuration file] 
 ```
 to use optional configuration file
 
