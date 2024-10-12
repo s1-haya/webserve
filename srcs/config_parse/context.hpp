@@ -30,7 +30,8 @@ struct ServerCon {
 	LocationList                         location_con;
 	std::size_t                          client_max_body_size;
 	std::pair<unsigned int, std::string> error_page;
-	ServerCon() : client_max_body_size(1024) {}
+	// default value for client_max_body_size is 1MB
+	ServerCon() : client_max_body_size(1024 * 1024) {}
 };
 
 } // namespace context

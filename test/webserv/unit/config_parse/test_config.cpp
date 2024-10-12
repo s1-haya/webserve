@@ -273,7 +273,7 @@ ServerList MakeExpectedTest1() {
 	LocationList                                      expected_locationlist_1;
 	std::pair<unsigned int, std::string>              error_page_1;
 	context::ServerCon                                expected_server_1 = BuildServerCon(
-        expected_ports_1, server_names_1, expected_locationlist_1, 1024, error_page_1
+        expected_ports_1, server_names_1, expected_locationlist_1, 1024 * 1024, error_page_1
     );
 	expected_result.push_back(expected_server_1);
 
@@ -293,7 +293,7 @@ ServerList MakeExpectedTest2() {
 	expected_locationlist_1.push_back(expected_location_1_1);
 	std::pair<unsigned int, std::string> error_page_1;
 	context::ServerCon                   expected_server_1 = BuildServerCon(
-        expected_ports_1, server_names_1, expected_locationlist_1, 1024, error_page_1
+        expected_ports_1, server_names_1, expected_locationlist_1, 1024 * 1024, error_page_1
     );
 	expected_result.push_back(expected_server_1);
 
@@ -315,7 +315,7 @@ ServerList MakeExpectedTest3() {
 	expected_locationlist_1.push_back(expected_location_1_1);
 	std::pair<unsigned int, std::string> error_page_1;
 	context::ServerCon                   expected_server_1 = BuildServerCon(
-        expected_ports_1, server_names_1, expected_locationlist_1, 1024, error_page_1
+        expected_ports_1, server_names_1, expected_locationlist_1, 1024 * 1024, error_page_1
     );
 	expected_result.push_back(expected_server_1);
 
@@ -334,7 +334,7 @@ ServerList MakeExpectedTest4() {
 	LocationList                         expected_locationlist_1;
 	std::pair<unsigned int, std::string> error_page_1;
 	context::ServerCon                   expected_server_1 = BuildServerCon(
-        expected_ports_1, server_names_1, expected_locationlist_1, 1024, error_page_1
+        expected_ports_1, server_names_1, expected_locationlist_1, 1024 * 1024, error_page_1
     );
 	expected_result.push_back(expected_server_1);
 
@@ -360,7 +360,7 @@ ServerList MakeExpectedTest5() {
 	expected_locationlist_1.push_back(expected_location_1_2);
 	std::pair<unsigned int, std::string> error_page_1;
 	context::ServerCon                   expected_server_1 = BuildServerCon(
-        expected_ports_1, server_names_1, expected_locationlist_1, 1024, error_page_1
+        expected_ports_1, server_names_1, expected_locationlist_1, 1024 * 1024, error_page_1
     );
 	expected_result.push_back(expected_server_1);
 
@@ -381,7 +381,7 @@ ServerList MakeExpectedTest6() {
 	expected_locationlist_1.push_back(expected_location_1_1);
 	std::pair<unsigned int, std::string> error_page_1;
 	context::ServerCon                   expected_server_1 = BuildServerCon(
-        expected_ports_1, server_names_1, expected_locationlist_1, 1024, error_page_1
+        expected_ports_1, server_names_1, expected_locationlist_1, 1024 * 1024, error_page_1
     );
 	expected_result.push_back(expected_server_1);
 
@@ -399,7 +399,7 @@ ServerList MakeExpectedTest7() {
 	LocationList                         expected_locationlist_1;
 	std::pair<unsigned int, std::string> error_page_1;
 	context::ServerCon                   expected_server_1 = BuildServerCon(
-        expected_ports_1, server_names_1, expected_locationlist_1, 1024, error_page_1
+        expected_ports_1, server_names_1, expected_locationlist_1, 1024 * 1024, error_page_1
     );
 	expected_result.push_back(expected_server_1);
 
@@ -410,7 +410,7 @@ ServerList MakeExpectedTest7() {
 	LocationList                         expected_locationlist_2;
 	std::pair<unsigned int, std::string> error_page_2;
 	context::ServerCon                   expected_server_2 = BuildServerCon(
-        expected_ports_2, server_names_2, expected_locationlist_2, 1024, error_page_2
+        expected_ports_2, server_names_2, expected_locationlist_2, 1024 * 1024, error_page_2
     );
 	expected_result.push_back(expected_server_2);
 

@@ -2,7 +2,7 @@ import random
 import string
 
 
-def generate_random_chunked_body(min_total_size=2025):
+def generate_random_chunked_body(min_total_size=2097153):
     total_size = 0
     chunked_body = []
     all_chunked_data = []
