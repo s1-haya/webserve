@@ -37,7 +37,7 @@ int main() {
 	}
 
 	// HTTP GETリクエストの作成
-	std::string request_body = "key1=value1&key2=value2";
+	// std::string request_body = "key1=value1&key2=value2";
 	std::string http_request = "GET /cgi-bin/first.pl HTTP/1.1\r\n"
 							   "Host: a\r\n\r\n";
 	// Hostを複数設定した場合　HTTP/1.1 400 Bad Request

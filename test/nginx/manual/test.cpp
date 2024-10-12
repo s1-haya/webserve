@@ -37,7 +37,7 @@ int main() {
 	}
 
 	// HTTP GETリクエストの作成
-	std::string request_body = "key1=value1&key2=value2";
+	// std::string request_body = "key1=value1&key2=value2";
 	std::string http_request = "GET / HTTP/1.1";
 	//    "Connection: close\r\n"
 	//    "Content-Length: " +

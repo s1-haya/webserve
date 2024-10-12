@@ -37,11 +37,9 @@ bool FindDuplicated(const std::list<T> &list, const T &element) {
 bool IsDuplicateDirectiveName(
 	std::set<std::string> &directive_set, const std::string &directive_name
 ) {
-	if (directive_set.count(directive_name) == 0) {
-		directive_set.insert(directive_name);
-		return false;
-	}
-	return true;
+	typedef std::pair<std::set<std::string>::iterator, bool> InsertResult;
+	const InsertResult result = directive_set.insert(directive_name);
+	return result.second == false;
 }
 
 } // namespace

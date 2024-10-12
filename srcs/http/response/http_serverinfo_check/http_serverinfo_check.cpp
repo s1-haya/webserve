@@ -114,7 +114,7 @@ const server::Location HttpServerInfoCheck::FindLocation(
 	// -> /www/
 	result.path = request_target;
 	for (VsLocationList::const_iterator it = locations.begin(); it != locations.end(); ++it) {
-		if (request_target.find((*it).request_uri) == 0 &&
+		if ((utils::StartWith(request_target, (*it).request_uri)) &&
 			(*it).request_uri.length() > match_loc.request_uri.length()) { // Longest Match
 			match_loc = *it;
 		}

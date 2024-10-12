@@ -30,17 +30,8 @@ bool Stat::IsReadableFile() const {
 	return IsRegularFile() && (stat_buf_.st_mode & S_IRUSR);
 }
 
-bool Stat::IsWritableFile() const {
-	return IsRegularFile() && (stat_buf_.st_mode & S_IWUSR);
-}
-
-// for use max_body_size？？
-std::size_t Stat::GetFileSize() const {
-	if (IsDirectory()) {
-		throw std::logic_error("This path is a directory.");
-	} else {
-		return stat_buf_.st_size;
-	}
-}
+// bool Stat::IsWritableFile() const {
+// 	return IsRegularFile() && (stat_buf_.st_mode & S_IWUSR);
+// }
 
 } // namespace http

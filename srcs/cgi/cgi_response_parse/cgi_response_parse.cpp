@@ -88,9 +88,10 @@ CgiResponseParse::ParseHeaderFields(const std::string &header, HeaderFields &hea
 			utils::Debug("CgiResponseParse", "Invalid header field format: " + line);
 			return result;
 		}
-		std::string key                         = utils::ToLowerString(line.substr(0, colon_pos));
-		std::string value                       = utils::ToLowerString(line.substr(colon_pos + 1));
-		value                                   = TrimOws(value);
+		std::string key   = utils::ToLowerString(line.substr(0, colon_pos));
+		std::string value = utils::Trim(
+			utils::ToLowerString(line.substr(colon_pos + 1)), http::OPTIONAL_WHITESPACE
+		);
 		utils::Result<void> check_header_result = CheckValidHeaderFieldNameAndValue(key, value);
 		if (!check_header_result.IsOk()) {
 			return result;
@@ -120,24 +121,6 @@ utils::Result<void> CgiResponseParse::ParseBody(const std::string &body, ParsedD
 	parsed_data.body = body;
 	result.Set(true);
 	return result;
-}
-
-std::string &CgiResponseParse::TrimOws(std::string &s) {
-	// 先頭のスペースとタブを削除
-	std::string::iterator it = s.begin();
-	while (it != s.end() && http::OPTIONAL_WHITESPACE.find(*it) != std::string::npos) {
-		++it;
-	}
-	s.erase(s.begin(), it);
-
-	// 末尾のスペースとタブを削除
-	std::string::reverse_iterator rit = s.rbegin();
-	while (rit != s.rend() && http::OPTIONAL_WHITESPACE.find(*rit) != std::string::npos) {
-		++rit;
-	}
-	s.erase(rit.base(), s.end());
-
-	return s;
 }
 
 } // namespace cgi
