@@ -15,8 +15,8 @@
 
 namespace server {
 
-// todo: tmp
-const double Server::REQUEST_TIMEOUT = 3.0;
+// Client connection timeout (in seconds)
+const double Server::REQUEST_TIMEOUT = 30.0;
 
 namespace {
 
