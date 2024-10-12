@@ -4,7 +4,7 @@
 
 ## OVERVIEW
 
-A Simple Webserver Implemention in C++
+A Simple Webserver Implementation in C++
 
 ## USAGE
 
